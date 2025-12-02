@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import PlanAction from './pages/PlanAction';
 import PlanStepDetail from './pages/PlanStepDetail';
 import DailyActions from './pages/DailyActions';
+import Documents from './pages/Documents';
 
 
 export const PAGES = {
@@ -15,6 +16,7 @@ export const PAGES = {
     "PlanAction": PlanAction,
     "PlanStepDetail": PlanStepDetail,
     "DailyActions": DailyActions,
+    "Documents": Documents,
 }
 
 export const pagesConfig = {

@@ -6,6 +6,7 @@ import PlanAction from './pages/PlanAction';
 import PlanStepDetail from './pages/PlanStepDetail';
 import DailyActions from './pages/DailyActions';
 import Documents from './pages/Documents';
+import Settings from './pages/Settings';
 
 
 export const PAGES = {
@@ -17,6 +18,7 @@ export const PAGES = {
     "PlanStepDetail": PlanStepDetail,
     "DailyActions": DailyActions,
     "Documents": Documents,
+    "Settings": Settings,
 }
 
 export const pagesConfig = {

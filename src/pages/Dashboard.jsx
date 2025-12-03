@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
 import { 
   Target, 
@@ -34,6 +34,7 @@ const planSteps = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [dailyActions, setDailyActions] = useState([]);
@@ -41,8 +42,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
   
   const loadData = async () => {
     try {
@@ -146,7 +149,7 @@ export default function Dashboard() {
     return Math.round((completed / dailyActions.length) * 100);
   };
   
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="flex min-h-screen bg-[#11112b]">
         <Sidebar currentPage="Dashboard" progress={0} />

@@ -7,6 +7,7 @@ import PlanStepDetail from './pages/PlanStepDetail';
 import DailyActions from './pages/DailyActions';
 import Documents from './pages/Documents';
 import Settings from './pages/Settings';
+import Register from './pages/Register';
 
 
 export const PAGES = {
@@ -19,6 +20,7 @@ export const PAGES = {
     "DailyActions": DailyActions,
     "Documents": Documents,
     "Settings": Settings,
+    "Register": Register,
 }
 
 export const pagesConfig = {

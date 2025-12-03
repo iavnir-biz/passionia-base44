@@ -19,7 +19,6 @@ import ProgressBar from '@/components/ui/ProgressBar';
 import ActionOfTheDayCard from '@/components/dashboard/ActionOfTheDayCard';
 import PlanStepCard from '@/components/dashboard/PlanStepCard';
 import GlowButton from '@/components/ui/GlowButton';
-import { Link } from 'react-router-dom';
 
 const planSteps = [
   { step_number: 1, title: "Trouver une idée", description: "Identifier ta passion rentable" },

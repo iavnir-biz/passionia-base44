@@ -2,13 +2,32 @@ import React from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, ArrowRight, CheckCircle, Zap, Target, FileText } from "lucide-react";
+import { base44 } from '@/api/base44Client';
+import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp } from "lucide-react";
 import GlowButton from '@/components/ui/GlowButton';
+import { Button } from "@/components/ui/button";
 
-const benefits = [
-  { icon: Target, text: "Trouve ta passion rentable" },
-  { icon: Zap, text: "Crée ton offre en quelques minutes" },
-  { icon: FileText, text: "Génère tous tes documents IA" },
+const features = [
+  { 
+    icon: Zap, 
+    title: "Analyse IA instantanée", 
+    description: "Transformez votre passion en business validé en quelques minutes." 
+  },
+  { 
+    icon: Target, 
+    title: "Plan d'action personnalisé", 
+    description: "Un roadmap sur-mesure pour atteindre vos premiers revenus." 
+  },
+  { 
+    icon: FileText, 
+    title: "Documents générés", 
+    description: "Page de vente, emails, scripts DM... tout prêt à l'emploi." 
+  },
+  { 
+    icon: TrendingUp, 
+    title: "Suivi progression", 
+    description: "Suivez votre avancement et restez motivé chaque jour." 
+  },
 ];
 
 export default function Welcome() {
@@ -17,12 +36,38 @@ export default function Welcome() {
   const handleStart = () => {
     navigate(createPageUrl('Onboarding'));
   };
+
+  const handleLogin = () => {
+    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+  };
   
   return (
     <div className="min-h-screen bg-[#11112b] flex flex-col">
+      {/* Header with login button */}
+      <header className="w-full flex justify-end p-6">
+        <Button
+          variant="outline"
+          onClick={handleLogin}
+          className="bg-[#1b1b33] border-[#2a2a45] text-white hover:bg-[#2a2a45] px-8 py-2 rounded-xl"
+        >
+          Connexion
+        </Button>
+      </header>
+
       {/* Hero Section */}
-      <div className="flex-1 flex items-center justify-center p-6">
+      <div className="flex-1 flex items-center justify-center p-6 pt-0">
         <div className="max-w-2xl text-center">
+          {/* AI Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-[#1b1b33] border border-[#2a2a45] rounded-full px-5 py-2.5 mb-8"
+          >
+            <Sparkles className="w-4 h-4 text-[#61f7a2]" />
+            <span className="text-[#61f7a2] text-sm font-medium">Propulsé par l'Intelligence Artificielle</span>
+          </motion.div>
+
           {/* Logo animation */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
@@ -54,29 +99,12 @@ export default function Welcome() {
             Transforme ta passion en business rentable avec l'aide de l'intelligence artificielle
           </motion.p>
           
-          {/* Benefits */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="flex flex-wrap justify-center gap-6 mb-12"
-          >
-            {benefits.map((benefit, index) => (
-              <div 
-                key={index}
-                className="flex items-center gap-2 text-gray-300"
-              >
-                <CheckCircle className="w-5 h-5 text-[#61f7a2]" />
-                <span>{benefit.text}</span>
-              </div>
-            ))}
-          </motion.div>
-          
           {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
+            transition={{ delay: 0.7 }}
+            className="flex flex-col items-center"
           >
             <GlowButton 
               onClick={handleStart}
@@ -93,9 +121,54 @@ export default function Welcome() {
           </motion.div>
         </div>
       </div>
-      
-      {/* Bottom decoration */}
-      <div className="h-32 bg-gradient-to-t from-[#61f7a2]/5 to-transparent" />
+
+      {/* Features Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9 }}
+        className="w-full max-w-6xl mx-auto px-6 pb-12"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {features.map((feature, index) => (
+            <div 
+              key={index}
+              className="bg-[#1b1b33] border border-[#2a2a45] rounded-xl p-5"
+            >
+              <div className="w-12 h-12 rounded-xl bg-[#2a2a45] flex items-center justify-center mb-4">
+                <feature.icon className="w-6 h-6 text-[#61f7a2]" />
+              </div>
+              <h3 className="text-white font-semibold mb-2">{feature.title}</h3>
+              <p className="text-gray-400 text-sm">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Bottom CTA Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.1 }}
+        className="w-full bg-[#1b1b33] border-t border-[#2a2a45] py-16"
+      >
+        <div className="max-w-2xl mx-auto text-center px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+            Prêt à transformer ta passion en business ?
+          </h2>
+          <p className="text-gray-400 mb-8">
+            Rejoins des centaines d'entrepreneurs qui ont déjà lancé leur activité grâce à PASSION IA.
+          </p>
+          <GlowButton 
+            onClick={handleStart}
+            size="lg"
+            className="text-lg px-10"
+          >
+            <Sparkles className="w-5 h-5 mr-2" />
+            Commencer maintenant
+          </GlowButton>
+        </div>
+      </motion.div>
     </div>
   );
 }

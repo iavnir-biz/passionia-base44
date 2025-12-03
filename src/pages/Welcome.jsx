@@ -71,16 +71,6 @@ export default function Welcome() {
             <span className="text-[#61f7a2] text-sm font-medium">Propulsé par l'Intelligence Artificielle</span>
           </motion.div>
 
-          {/* Logo animation */}
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", duration: 0.8 }}
-            className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] mx-auto mb-8 flex items-center justify-center glow-green"
-          >
-            <Sparkles className="w-10 h-10 text-[#11112b]" />
-          </motion.div>
-          
           {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}

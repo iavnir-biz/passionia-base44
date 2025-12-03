@@ -43,8 +43,11 @@ export default function Welcome() {
   
   return (
     <div className="min-h-screen bg-[#11112b] flex flex-col">
-      {/* Header with login button */}
-      <header className="w-full flex justify-end p-6">
+      {/* Header with logo and login button */}
+      <header className="w-full flex justify-between items-center p-6">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+          <Sparkles className="w-6 h-6 text-[#11112b]" />
+        </div>
         <Button
           variant="outline"
           onClick={handleLogin}

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
 import { Sparkles, ArrowRight, CheckCircle, Zap, Target, FileText } from "lucide-react";
 import GlowButton from '@/components/ui/GlowButton';
 
@@ -13,9 +14,38 @@ const benefits = [
 
 export default function Welcome() {
   const navigate = useNavigate();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const isAuthenticated = await base44.auth.isAuthenticated();
+      if (isAuthenticated) {
+        const user = await base44.auth.me();
+        const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+        
+        if (profiles.length > 0 && profiles[0].has_paid) {
+          navigate(createPageUrl('Dashboard'));
+        } else if (profiles.length > 0 && profiles[0].onboarding_completed) {
+          navigate(createPageUrl('Results'));
+        }
+      }
+    } catch (err) {
+      // Not authenticated
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
   
   const handleStart = () => {
-    navigate(createPageUrl('Onboarding'));
+    navigate(createPageUrl('Register'));
+  };
+
+  const handleLogin = () => {
+    base44.auth.redirectToLogin(createPageUrl('Dashboard'));
   };
   
   return (
@@ -77,17 +107,28 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
+            className="space-y-4"
           >
             <GlowButton 
               onClick={handleStart}
               size="lg"
               className="text-lg px-12"
             >
-              Commencer maintenant
+              Créer mon compte
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
             
-            <p className="text-gray-500 text-sm mt-4">
+            <p className="text-gray-400 text-sm mt-4">
+              Déjà un compte ?{' '}
+              <button 
+                onClick={handleLogin}
+                className="text-[#61f7a2] hover:underline font-medium"
+              >
+                Se connecter
+              </button>
+            </p>
+            
+            <p className="text-gray-500 text-xs">
               Gratuit • Aucune carte requise • 5 minutes
             </p>
           </motion.div>

@@ -41,7 +41,7 @@ export default function Welcome() {
   };
   
   const handleStart = () => {
-    navigate(createPageUrl('Register'));
+    base44.auth.redirectToLogin(createPageUrl('Onboarding'));
   };
 
   const handleLogin = () => {

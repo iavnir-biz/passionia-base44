@@ -114,7 +114,7 @@ export default function Welcome() {
               size="lg"
               className="text-lg px-12"
             >
-              Créer mon compte
+              Commencer maintenant
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
             

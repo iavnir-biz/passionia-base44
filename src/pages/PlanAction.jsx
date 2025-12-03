@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
 import { Target, CheckCircle, ArrowRight } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
@@ -8,13 +9,16 @@ import PlanStepCard from '@/components/dashboard/PlanStepCard';
 import ProgressBar from '@/components/ui/ProgressBar';
 
 export default function PlanAction() {
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [steps, setSteps] = useState([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
   
   const loadData = async () => {
     try {

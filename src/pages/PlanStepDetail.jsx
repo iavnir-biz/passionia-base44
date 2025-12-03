@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
+import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, 
@@ -20,6 +21,7 @@ import { Link } from 'react-router-dom';
 
 export default function PlanStepDetail() {
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [step, setStep] = useState(null);
   const [allSteps, setAllSteps] = useState([]);
@@ -34,8 +36,10 @@ export default function PlanStepDetail() {
   const stepNumber = parseInt(urlParams.get('step')) || 1;
   
   useEffect(() => {
-    loadData();
-  }, [stepNumber]);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [stepNumber, isAuthenticated]);
   
   const loadData = async () => {
     try {

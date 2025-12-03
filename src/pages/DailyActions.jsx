@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
 import { Calendar, Sparkles, RefreshCw, Trophy } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
@@ -9,6 +10,7 @@ import ProgressBar from '@/components/ui/ProgressBar';
 import GlowButton from '@/components/ui/GlowButton';
 
 export default function DailyActions() {
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [actions, setActions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,8 +24,10 @@ export default function DailyActions() {
   });
   
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
   
   const loadData = async () => {
     try {

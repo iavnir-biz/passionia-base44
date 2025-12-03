@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
+import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
 import { 
   User, 
@@ -19,6 +20,7 @@ import GlowButton from '@/components/ui/GlowButton';
 
 export default function Settings() {
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,8 +36,10 @@ export default function Settings() {
   });
   
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
   
   const loadData = async () => {
     try {

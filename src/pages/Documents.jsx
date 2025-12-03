@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
 import { 
   FileText, 
@@ -90,6 +91,7 @@ const categories = [
 ];
 
 export default function Documents() {
+  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -99,8 +101,10 @@ export default function Documents() {
   const [selectedDocument, setSelectedDocument] = useState(null);
   
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
   
   const loadData = async () => {
     try {

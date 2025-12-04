@@ -18,7 +18,7 @@ export default function OnboardingFirstName() {
     setIsLoading(true);
     try {
       await base44.auth.updateMe({ firstName: firstName.trim() });
-      navigate(createPageUrl('Onboarding'));
+      navigate(createPageUrl('OnboardingQ1CoreSkill'));
     } catch (error) {
       console.error('Error saving firstName:', error);
     } finally {

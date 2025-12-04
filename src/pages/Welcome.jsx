@@ -34,7 +34,7 @@ export default function Welcome() {
   const navigate = useNavigate();
   
   const handleStart = () => {
-    navigate(createPageUrl('Onboarding'));
+    navigate(createPageUrl('OnboardingFirstName'));
   };
 
   const handleLogin = () => {

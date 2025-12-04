@@ -35,6 +35,10 @@ import OnboardingQ24IfNothingChanges from './pages/OnboardingQ24IfNothingChanges
 import OnboardingQ25Readiness from './pages/OnboardingQ25Readiness';
 import OnboardingQ26DeliveryPreferences from './pages/OnboardingQ26DeliveryPreferences';
 import OfferGenerationStart from './pages/OfferGenerationStart';
+import OfferProductPrincipal from './pages/OfferProductPrincipal';
+import OfferPetitExtra from './pages/OfferPetitExtra';
+import OfferSuperieure from './pages/OfferSuperieure';
+import OfferPremium from './pages/OfferPremium';
 
 
 export const PAGES = {
@@ -75,6 +79,10 @@ export const PAGES = {
     "OnboardingQ25Readiness": OnboardingQ25Readiness,
     "OnboardingQ26DeliveryPreferences": OnboardingQ26DeliveryPreferences,
     "OfferGenerationStart": OfferGenerationStart,
+    "OfferProductPrincipal": OfferProductPrincipal,
+    "OfferPetitExtra": OfferPetitExtra,
+    "OfferSuperieure": OfferSuperieure,
+    "OfferPremium": OfferPremium,
 }
 
 export const pagesConfig = {

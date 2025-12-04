@@ -26,8 +26,8 @@ export default function OfferGenerationStart() {
       // Mark onboarding as completed
       await base44.auth.updateMe({ onboardingCompleted: true });
       
-      // Navigate to results page (to be configured)
-      navigate(createPageUrl('Results'));
+      // Navigate to offer selection pages
+      navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
       console.error('Error:', error);
       navigate(createPageUrl('Results'));

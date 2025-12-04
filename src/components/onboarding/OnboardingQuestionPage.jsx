@@ -1,0 +1,319 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { motion } from 'framer-motion';
+import { ArrowRight, ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
+import GlowButton from '@/components/ui/GlowButton';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+
+export default function OnboardingQuestionPage({
+  questionId,
+  title,
+  subtitle,
+  inputType = 'textarea', // 'textarea', 'radio', 'checkbox', 'slider'
+  options = [],
+  sliderConfig = { min: 0, max: 10, step: 1, suffix: '' },
+  placeholder = '',
+  fieldName,
+  nextPage,
+  prevPage,
+  progress,
+  buttonText = 'Continuer'
+}) {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [value, setValue] = useState(inputType === 'checkbox' ? [] : inputType === 'slider' ? sliderConfig.min : '');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [helperText, setHelperText] = useState('');
+  const [examples, setExamples] = useState([]);
+  const [isLoadingHelper, setIsLoadingHelper] = useState(false);
+
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  useEffect(() => {
+    if (user && questionId) {
+      loadDynamicHelper();
+    }
+  }, [user, questionId]);
+
+  const loadUser = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+      
+      // Pre-fill value if exists
+      if (currentUser[fieldName] !== undefined && currentUser[fieldName] !== null) {
+        setValue(currentUser[fieldName]);
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadDynamicHelper = async () => {
+    setIsLoadingHelper(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Tu es un coach bienveillant dans l'application Passion IA.
+Ta mission : générer un texte d'aide et des exemples concrets adaptés à l'utilisateur, en fonction de ses réponses et de la question en cours.
+
+Données utilisateur :
+- Prénom : ${user.firstName || 'non renseigné'}
+- Compétence : ${user.coreSkill || 'non renseignée'}
+- Niveau d'expérience : ${user.experienceLevel || 'non renseigné'}
+- Années de pratique : ${user.yearsPracticing || 'non renseigné'}
+- Public cible : ${user.targetAudience || 'non renseigné'}
+- Problème principal : ${user.mainProblem || 'non renseigné'}
+- Revenu cible : ${user.targetIncome || 'non renseigné'}€/mois
+
+Question actuelle (questionId) : ${questionId}
+
+Génère un JSON avec :
+- helperText : une phrase d'aide courte et bienveillante adaptée au contexte
+- examples : 2-3 exemples concrets personnalisés si possible
+
+Règles :
+- Tu tutoies.
+- Utilise le prénom et la compétence dès que possible.
+- Personnalise les exemples avec ce que tu sais.
+- Si tu manques d'info, reste générique.
+- Pas de conseils business avancés, focus sur clarté et inspiration.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            helperText: { type: "string" },
+            examples: { type: "array", items: { type: "string" } }
+          }
+        }
+      });
+      
+      if (result.helperText) setHelperText(result.helperText);
+      if (result.examples) setExamples(result.examples);
+    } catch (error) {
+      console.error('Error loading helper:', error);
+    } finally {
+      setIsLoadingHelper(false);
+    }
+  };
+
+  const replaceVariables = (text) => {
+    if (!text || !user) return text;
+    return text
+      .replace(/\{\{user\.firstName\}\}/g, user.firstName || '')
+      .replace(/\{\{user\.coreSkill\}\}/g, user.coreSkill || '')
+      .replace(/\{\{user\.targetIncome\}\}/g, user.targetIncome || '')
+      .replace(/\{\{user\.targetIncomeDelay\}\}/g, user.targetIncomeDelay || '');
+  };
+
+  const handleNext = async () => {
+    if (!canProceed()) return;
+    
+    setIsSaving(true);
+    try {
+      await base44.auth.updateMe({ [fieldName]: value });
+      navigate(createPageUrl(nextPage));
+    } catch (error) {
+      console.error('Error saving:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleBack = () => {
+    if (prevPage) {
+      navigate(createPageUrl(prevPage));
+    }
+  };
+
+  const canProceed = () => {
+    if (inputType === 'checkbox') return value.length > 0;
+    if (inputType === 'slider') return true;
+    if (inputType === 'radio') return value !== '';
+    return value && value.trim() !== '';
+  };
+
+  const handleCheckboxChange = (option, checked) => {
+    if (checked) {
+      setValue([...value, option]);
+    } else {
+      setValue(value.filter(v => v !== option));
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#11112b] flex flex-col">
+      {/* Progress bar */}
+      <div className="w-full bg-[#1b1b33] h-2">
+        <div 
+          className="h-full bg-[#61f7a2] transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      <div className="text-center py-2 text-sm text-gray-400">
+        {progress}%
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-2xl"
+        >
+          {/* Card */}
+          <div className="bg-[#1b1b33] rounded-2xl p-8 border border-[#2a2a45]">
+            {/* Title */}
+            <h1 className="text-2xl font-bold text-white mb-4 leading-relaxed">
+              {replaceVariables(title)}
+            </h1>
+
+            {/* Subtitle (static) */}
+            {subtitle && (
+              <p className="text-gray-400 mb-4">{replaceVariables(subtitle)}</p>
+            )}
+
+            {/* Dynamic helper text */}
+            {isLoadingHelper ? (
+              <div className="flex items-center gap-2 text-gray-500 mb-4">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Personnalisation en cours...</span>
+              </div>
+            ) : helperText && (
+              <p className="text-[#61f7a2] text-sm mb-4 flex items-start gap-2">
+                <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                {helperText}
+              </p>
+            )}
+
+            {/* Examples */}
+            {examples.length > 0 && (
+              <p className="text-gray-500 text-sm mb-6">
+                Ex : {examples.join(' • ')}
+              </p>
+            )}
+
+            {/* Input */}
+            <div className="mb-8">
+              {inputType === 'textarea' && (
+                <Textarea
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  placeholder={placeholder}
+                  className="w-full bg-[#11112b] border-[#2a2a45] text-white min-h-[120px] text-lg p-4 rounded-xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-500"
+                />
+              )}
+
+              {inputType === 'radio' && (
+                <RadioGroup value={value} onValueChange={setValue} className="space-y-3">
+                  {options.map((option, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex items-center space-x-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                        value === option 
+                          ? 'bg-[#61f7a2]/10 border-[#61f7a2]' 
+                          : 'bg-[#11112b] border-[#2a2a45] hover:border-[#3a3a55]'
+                      }`}
+                      onClick={() => setValue(option)}
+                    >
+                      <RadioGroupItem value={option} id={`option-${idx}`} />
+                      <Label htmlFor={`option-${idx}`} className="text-white cursor-pointer flex-1">
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              )}
+
+              {inputType === 'checkbox' && (
+                <div className="space-y-3">
+                  {options.map((option, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex items-center space-x-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                        value.includes(option)
+                          ? 'bg-[#61f7a2]/10 border-[#61f7a2]'
+                          : 'bg-[#11112b] border-[#2a2a45] hover:border-[#3a3a55]'
+                      }`}
+                      onClick={() => handleCheckboxChange(option, !value.includes(option))}
+                    >
+                      <Checkbox
+                        checked={value.includes(option)}
+                        onCheckedChange={(checked) => handleCheckboxChange(option, checked)}
+                      />
+                      <Label className="text-white cursor-pointer flex-1">{option}</Label>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {inputType === 'slider' && (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <span className="text-4xl font-bold text-[#61f7a2]">
+                      {value}{sliderConfig.suffix}
+                    </span>
+                  </div>
+                  <Slider
+                    value={[value]}
+                    onValueChange={(vals) => setValue(vals[0])}
+                    min={sliderConfig.min}
+                    max={sliderConfig.max}
+                    step={sliderConfig.step}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-gray-500">
+                    <span>{sliderConfig.min}{sliderConfig.suffix}</span>
+                    <span>{sliderConfig.max}{sliderConfig.suffix}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-4">
+              {prevPage && (
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="bg-[#11112b] border-[#2a2a45] text-white hover:bg-[#2a2a45]"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Retour
+                </Button>
+              )}
+              <GlowButton
+                onClick={handleNext}
+                disabled={!canProceed()}
+                loading={isSaving}
+                className="flex-1"
+                size="lg"
+              >
+                {buttonText}
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </GlowButton>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

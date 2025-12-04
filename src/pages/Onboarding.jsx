@@ -1,82 +1,75 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import OnboardingStep from '@/components/onboarding/OnboardingStep';
-import { TextInput, NumberInput, OptionCards } from '@/components/onboarding/QuestionInput';
+import { TextInput } from '@/components/onboarding/QuestionInput';
 import LoadingStateAI from '@/components/common/LoadingStateAI';
-import { Package, Briefcase, GraduationCap, Users } from "lucide-react";
 
-const projectTypes = [
-  { value: 'mini-produit', label: 'Mini-produit digital', description: 'Ebook, template, guide...', icon: Package },
-  { value: 'service-ia', label: 'Service IA', description: 'Automatisation, outils IA...', icon: Briefcase },
-  { value: 'formation', label: 'Formation en ligne', description: 'Cours, masterclass...', icon: GraduationCap },
-  { value: 'accompagnement', label: 'Accompagnement', description: 'Coaching, consulting...', icon: Users },
-];
-
+// Structure des questions orientée enseignement
 const questions = [
+  // Étape 1 – Compétence
   {
     id: 'passion',
     question: "Quel est ton savoir-faire, ta passion ou ta compétence ?",
-    description: "Ce que tu maîtrises et que tu pourrais transmettre ou vendre",
-    type: 'text',
-    multiline: true,
-    placeholder: "Ex: Je suis expert en photographie de portrait..."
+    description: "Ce que tu maîtrises et que tu pourrais transmettre ou vendre sous forme de formation, coaching, programme…",
+    placeholder: "Ex: Je suis passionné par l'éducation canine et j'aide les maîtres à mieux comprendre leur chien..."
   },
-  {
-    id: 'transformation',
-    question: "Quelle transformation sais-tu apporter ?",
-    description: "Le résultat concret que tu peux offrir à quelqu'un",
-    type: 'text',
-    multiline: true,
-    placeholder: "Ex: J'aide les gens à prendre de meilleures photos..."
-  },
+  // Étape 2 – Client idéal / élève (question 1)
   {
     id: 'target_audience',
-    question: "À qui veux-tu t'adresser ?",
-    description: "Décris ton client idéal en quelques mots",
-    type: 'text',
-    multiline: true,
-    placeholder: "Ex: Les entrepreneurs qui veulent une image professionnelle..."
+    question: "À qui aimerais-tu le plus enseigner cette compétence ?",
+    description: "Décris la personne idéale à qui tu veux transmettre ton savoir",
+    placeholder: "Ex: Les propriétaires d'un chiot turbulent qui ne savent pas comment l'éduquer, les freelances débutants en design..."
   },
+  // Étape 2 – Client idéal / élève (question 2)
   {
-    id: 'obstacles',
-    question: "Quels sont tes obstacles et forces personnelles ?",
-    description: "Ce qui te freine et ce qui te différencie",
-    type: 'text',
-    multiline: true,
-    placeholder: "Ex: Obstacle: manque de temps. Force: créativité..."
+    id: 'main_problem',
+    question: "Quel est le problème N°1 que cette personne rencontre dans son apprentissage et que tu peux l'aider à résoudre ?",
+    description: "Le blocage principal qui l'empêche d'avancer seul(e)",
+    placeholder: "Ex: Ils ne savent pas par où commencer, ils sont submergés par trop d'informations contradictoires..."
   },
+  // Étape 3 – Résultat rapide (quick win)
   {
-    id: 'experience',
-    question: "Quelle expérience ou problème as-tu déjà vécu ?",
-    description: "Une situation qui t'a forgé et que tu peux partager",
-    type: 'text',
-    multiline: true,
-    placeholder: "Ex: J'ai dû reconstruire ma carrière après..."
+    id: 'quick_win',
+    question: "Quel est le tout premier résultat concret et rapide que ton élève pourra obtenir grâce à ton enseignement ?",
+    description: "Un petit gain visible dès les premiers jours ou semaines",
+    placeholder: "Ex: Obtenir que son chiot s'assoie sur commande en 3 jours, créer son premier logo professionnel..."
   },
+  // Étape 4 – Transformation finale
   {
-    id: 'project_type',
-    question: "Qu'aimerais-tu construire ?",
-    description: "Choisis le type de produit qui te correspond",
-    type: 'options',
-    options: projectTypes
+    id: 'transformation',
+    question: "Et à la fin de ton accompagnement, quel grand changement ou transformation aura-t-il vécu ?",
+    description: "Exemple : pour la guitare, \"savoir jouer son morceau préféré au coin du feu\"",
+    placeholder: "Ex: Un chien calme et obéissant qui peut l'accompagner partout sans stress..."
   },
+  // Étape 5 – Contenu clé
   {
-    id: 'hours_per_week',
-    question: "Combien d'heures par semaine peux-tu consacrer ?",
-    description: "Sois réaliste pour un plan adapté",
-    type: 'number',
-    suffix: 'heures/semaine',
-    placeholder: "10"
+    id: 'key_teaching',
+    question: "Quelle est LA chose la plus importante que tu vas lui apprendre en priorité ?",
+    description: "Le concept ou la compétence fondamentale que tu transmets",
+    placeholder: "Ex: Comprendre le langage corporel du chien pour anticiper ses réactions..."
   },
+  // Étape 6 – Approche pédagogique (question 1)
   {
-    id: 'revenue_goal',
-    question: "Quel revenu vises-tu comme premier palier ?",
-    description: "Ton objectif financier mensuel initial",
-    type: 'number',
-    suffix: '€/mois',
-    placeholder: "1000"
+    id: 'unique_method',
+    question: "As-tu une méthode ou une façon d'enseigner qui te rend différent des autres ?",
+    description: "Tu peux répondre \"je ne sais pas encore\" si ce n'est pas clair pour toi",
+    placeholder: "Ex: J'utilise uniquement le renforcement positif et des exercices de 5 minutes max..."
+  },
+  // Étape 6 – Approche pédagogique (question 2)
+  {
+    id: 'common_mistake',
+    question: "Quelle est l'erreur typique que les débutants font dans ton domaine, et que tu veux absolument leur éviter ?",
+    description: "L'erreur que tu vois le plus souvent et qui freine les progrès",
+    placeholder: "Ex: Vouloir aller trop vite et brûler les étapes, ce qui crée de la frustration..."
+  },
+  // Étape 7 – Question de clôture
+  {
+    id: 'personal_story',
+    question: "Pour finir, y a-t-il autre chose que tu aimerais partager ?",
+    description: "Une anecdote, une histoire personnelle liée à ta compétence, ou un détail qui te rend unique. Cela m'aidera à créer une offre qui te ressemble vraiment.",
+    placeholder: "Ex: J'ai commencé à m'intéresser à l'éducation canine après avoir adopté un chien difficile qui a changé ma vie..."
   }
 ];
 
@@ -101,7 +94,6 @@ export default function Onboarding() {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Generate results
       await generateResults();
     }
   };
@@ -119,27 +111,26 @@ export default function Onboarding() {
   const generateResults = async () => {
     setIsGenerating(true);
     
-    // Animate loading steps
     const loadingInterval = setInterval(() => {
       setLoadingStep(prev => (prev + 1) % 5);
     }, 2000);
     
     try {
-      // Save profile data
       const user = await base44.auth.me();
       
-      // Check if profile exists
       const existingProfiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       
+      // Sauvegarder toutes les réponses de l'onboarding
       const profileData = {
         passion: answers.passion,
-        transformation: answers.transformation,
         target_audience: answers.target_audience,
-        obstacles: answers.obstacles,
-        experience: answers.experience,
-        project_type: answers.project_type,
-        hours_per_week: parseInt(answers.hours_per_week) || 10,
-        revenue_goal: parseInt(answers.revenue_goal) || 1000,
+        main_problem: answers.main_problem,
+        quick_win: answers.quick_win,
+        transformation: answers.transformation,
+        key_teaching: answers.key_teaching,
+        unique_method: answers.unique_method,
+        common_mistake: answers.common_mistake,
+        personal_story: answers.personal_story,
         onboarding_completed: true
       };
       
@@ -149,29 +140,30 @@ export default function Onboarding() {
         await base44.entities.UserProfile.create(profileData);
       }
       
-      // Generate AI analysis
-      const prompt = `Tu es un expert en business en ligne et en création d'offres. Analyse les réponses suivantes et génère une analyse complète.
+      // Génération de l'analyse IA
+      const prompt = `Tu es un expert en création de formations et d'offres pédagogiques. Analyse les réponses suivantes et génère une analyse complète pour aider cette personne à lancer son activité d'enseignement.
 
-PROFIL:
-- Passion/Compétence: ${answers.passion}
-- Transformation apportée: ${answers.transformation}
-- Audience cible: ${answers.target_audience}
-- Obstacles et forces: ${answers.obstacles}
-- Expérience vécue: ${answers.experience}
-- Type de projet: ${answers.project_type}
-- Heures disponibles: ${answers.hours_per_week}h/semaine
-- Objectif revenu: ${answers.revenue_goal}€/mois
+PROFIL DE L'ENSEIGNANT :
+- Compétence/Passion : ${answers.passion}
+- Public cible (élèves) : ${answers.target_audience}
+- Problème principal de ses élèves : ${answers.main_problem}
+- Premier résultat rapide promis : ${answers.quick_win}
+- Transformation finale : ${answers.transformation}
+- Enseignement clé : ${answers.key_teaching}
+- Méthode unique : ${answers.unique_method}
+- Erreur à éviter : ${answers.common_mistake}
+- Histoire personnelle : ${answers.personal_story}
 
-Génère une analyse structurée avec:
-1. Validation de marché (le potentiel de cette idée)
-2. Avatar client détaillé (profil précis du client idéal)
+Génère une analyse structurée avec :
+1. Validation de marché (le potentiel de cette idée d'enseignement)
+2. Avatar élève détaillé (profil précis de l'élève idéal)
 3. Opportunité prometteuse (la meilleure direction à prendre)
 4. Message clé + phrase d'accroche (proposition de valeur claire)
 5. Vision future (projection motivante à 6 mois)
 6. Première étape stratégique (action quick win à faire maintenant)
-7. Offre suggérée (titre et description courte)
+7. Offre suggérée (titre et description courte de formation/coaching)
 8. Prix recommandé
-9. 3 objections principales que les clients pourraient avoir
+9. 3 objections principales que les élèves pourraient avoir
 10. 3 arguments de vente clés`;
 
       const result = await base44.integrations.Core.InvokeLLM({
@@ -195,7 +187,6 @@ Génère une analyse structurée avec:
         }
       });
       
-      // Update profile with results
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       if (profiles.length > 0) {
         await base44.entities.UserProfile.update(profiles[0].id, {
@@ -228,31 +219,12 @@ Génère une analyse structurée avec:
       canProceed={canProceed()}
       isLast={currentStep === totalSteps}
     >
-      {currentQuestion.type === 'text' && (
-        <TextInput
-          value={answers[currentQuestion.id] || ''}
-          onChange={updateAnswer}
-          placeholder={currentQuestion.placeholder}
-          multiline={currentQuestion.multiline}
-        />
-      )}
-      
-      {currentQuestion.type === 'number' && (
-        <NumberInput
-          value={answers[currentQuestion.id] || ''}
-          onChange={updateAnswer}
-          placeholder={currentQuestion.placeholder}
-          suffix={currentQuestion.suffix}
-        />
-      )}
-      
-      {currentQuestion.type === 'options' && (
-        <OptionCards
-          options={currentQuestion.options}
-          value={answers[currentQuestion.id]}
-          onChange={updateAnswer}
-        />
-      )}
+      <TextInput
+        value={answers[currentQuestion.id] || ''}
+        onChange={updateAnswer}
+        placeholder={currentQuestion.placeholder}
+        multiline={true}
+      />
     </OnboardingStep>
   );
 }

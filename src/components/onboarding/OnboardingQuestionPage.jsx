@@ -65,30 +65,35 @@ export default function OnboardingQuestionPage({
     setIsLoadingHelper(true);
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Tu es un coach bienveillant dans l'application Passion IA.
-Ta mission : générer un texte d'aide et des exemples concrets adaptés à l'utilisateur, en fonction de ses réponses et de la question en cours.
+        prompt: `Tu es le DynamicQuestionCoach pour Passion IA.
+
+Objectif : aider l'utilisateur à clarifier sa compétence afin de la MONÉTISER en la transmettant à d'autres (élèves, clients, communauté). Toute ta logique doit tourner autour de : enseigner, aider, résoudre un problème, structurer une offre, créer un programme.
+
+IMPORTANT : L'utilisateur MAÎTRISE déjà sa compétence. Il veut la TRANSMETTRE et en vivre. Ne parle JAMAIS comme s'il voulait l'apprendre lui-même.
 
 Données utilisateur :
 - Prénom : ${user.firstName || 'non renseigné'}
-- Compétence : ${user.coreSkill || 'non renseignée'}
+- Compétence à transmettre : ${user.coreSkill || 'non renseignée'}
 - Niveau d'expérience : ${user.experienceLevel || 'non renseigné'}
 - Années de pratique : ${user.yearsPracticing || 'non renseigné'}
-- Public cible : ${user.targetAudience || 'non renseigné'}
-- Problème principal : ${user.mainProblem || 'non renseigné'}
+- Public cible (élèves) : ${user.targetAudience || 'non renseigné'}
+- Problème principal des élèves : ${user.mainProblem || 'non renseigné'}
 - Revenu cible : ${user.targetIncome || 'non renseigné'}€/mois
 
 Question actuelle (questionId) : ${questionId}
 
 Génère un JSON avec :
-- helperText : une phrase d'aide courte et bienveillante adaptée au contexte
-- examples : 2-3 exemples concrets personnalisés si possible
+- helperText : une phrase d'aide courte, motivante, orientée transmission/monétisation
+- examples : 2-3 exemples concrets personnalisés à la compétence ${user.coreSkill || ''}
 
 Règles :
 - Tu tutoies.
 - Utilise le prénom et la compétence dès que possible.
-- Personnalise les exemples avec ce que tu sais.
-- Si tu manques d'info, reste générique.
-- Pas de conseils business avancés, focus sur clarté et inspiration.`,
+- Personnalise TOUS les exemples avec la compétence user.coreSkill si elle existe.
+- Toujours raisonner en logique de transmission : "tes élèves", "les personnes que tu veux aider", "ton audience", "ta communauté".
+- Ne JAMAIS proposer des conseils pour apprendre la compétence soi-même.
+- Ton ton : coach, expert, bienveillant, clair, motivant.
+- Si user.coreSkill n'existe pas encore, reste neutre et générique.`,
         response_json_schema: {
           type: "object",
           properties: {

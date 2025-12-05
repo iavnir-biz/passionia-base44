@@ -15,6 +15,7 @@ const offerSteps = [
   { id: 2, label: "Petit Extra", icon: Gift },
   { id: 3, label: "Offre Supérieure", icon: Award },
   { id: 4, label: "Offre Premium", icon: Crown },
+  { id: 5, label: "Résumé", icon: Check },
 ];
 
 export default function OfferBuilderLayout({ 

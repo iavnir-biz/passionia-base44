@@ -60,7 +60,7 @@ export default function OfferPremium() {
         offer: { ...currentOffer, offre_premium: offer }
       });
       setTimeout(() => {
-        navigate(createPageUrl('Results'));
+        navigate(createPageUrl('OfferResume'));
       }, 500);
     } catch (error) {
       console.error('Error saving:', error);

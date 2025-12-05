@@ -61,7 +61,7 @@ export default function OfferResume() {
   };
 
   const handleContinue = () => {
-    navigate(createPageUrl('Results'));
+    navigate(createPageUrl('BonneNouvelle'));
   };
 
   if (isLoading) {

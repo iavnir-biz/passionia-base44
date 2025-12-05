@@ -2,20 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { motion } from 'framer-motion';
-import { Loader2, Video, GraduationCap } from 'lucide-react';
+import { Loader2, Presentation, GraduationCap } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 
 const offers = [
   {
+    id: 'atelier',
     badge: "atelier (2 heures)",
     title: "Atelier 'Dessin Intuitif' : Libérez Votre Trait en Direct",
     price: "97€",
     result: "Vous ressentirez une libération créative, en remplaçant la technique rigide par un flow intuitif qui rendra vos dessins vivants et authentiquement vôtres.",
-    icon: Video
+    icon: Presentation
   },
   {
+    id: 'formation-complete',
     badge: "formation complète (12 vidéos)",
     title: "La Méthode Fondations : Le Cursus Complet pour Maîtriser les 5 Piliers du Dessin",
     price: "197€",
@@ -58,7 +59,9 @@ export default function OfferSuperieure() {
       await base44.auth.updateMe({ 
         offer: { ...currentOffer, offre_superieure: offer }
       });
-      setTimeout(() => navigate(createPageUrl('OfferPremium')), 600);
+      setTimeout(() => {
+        navigate(createPageUrl('OfferPremium'));
+      }, 500);
     } catch (error) {
       console.error('Error saving:', error);
       setIsSaving(false);
@@ -67,7 +70,7 @@ export default function OfferSuperieure() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f5f3f0] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#22c55e] animate-spin" />
       </div>
     );
@@ -75,41 +78,37 @@ export default function OfferSuperieure() {
 
   return (
     <OfferBuilderLayout currentStep={3}>
-      {/* Step title */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-6"
-      >
-        <h2 className="text-xl font-bold text-gray-800 mb-2">
-          Étape 3 sur 4 : Choisis ton Offre Supérieure
-        </h2>
-        <p className="text-gray-500 text-sm max-w-lg mx-auto">
-          Propose une solution plus complète à tes clients les plus motivés, juste après leur achat initial. Choisis l'option qui apporte le plus de valeur.
-        </p>
-      </motion.div>
-
-      {/* Offer cards */}
-      <div className="grid md:grid-cols-2 gap-5 mb-20">
-        {offers.map((offer, index) => (
-          <OfferCardNew
-            key={index}
-            offer={offer}
-            icon={offer.icon}
-            isSelected={selectedOffer?.title === offer.title}
-            onSelect={handleSelect}
-          />
-        ))}
-      </div>
-
-      {isSaving && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 flex items-center gap-3">
-            <Loader2 className="w-5 h-5 text-[#22c55e] animate-spin" />
-            <span className="text-gray-700">Enregistrement...</span>
-          </div>
+      <div className="max-w-3xl mx-auto px-4">
+        {/* Step Title */}
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-bold text-[#1e3a5f] mb-2">
+            Étape 3 sur 4 : Choisis ton Offre Supérieure
+          </h2>
+          <p className="text-gray-500 text-sm max-w-lg mx-auto">
+            Propose une solution plus complète à tes clients les plus motivés, juste après leur achat initial. Choisis l'option qui apporte le plus de valeur.
+          </p>
         </div>
-      )}
+
+        {/* Offer Cards */}
+        <div className="grid md:grid-cols-2 gap-5">
+          {offers.map((offer) => (
+            <OfferCardNew
+              key={offer.id}
+              offer={offer}
+              icon={offer.icon}
+              isSelected={selectedOffer?.id === offer.id}
+              onSelect={handleSelect}
+            />
+          ))}
+        </div>
+
+        {isSaving && (
+          <div className="mt-6 flex items-center justify-center gap-2 text-[#22c55e]">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Enregistrement...</span>
+          </div>
+        )}
+      </div>
     </OfferBuilderLayout>
   );
 }

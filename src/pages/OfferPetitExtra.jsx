@@ -70,8 +70,8 @@ export default function OfferPetitExtra() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f5f3f0] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#22c55e] animate-spin" />
+      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
   }
@@ -80,17 +80,17 @@ export default function OfferPetitExtra() {
     <OfferBuilderLayout currentStep={2}>
       <div className="max-w-3xl mx-auto px-4">
         {/* Step Title */}
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-bold text-[#1e3a5f] mb-2">
+        <div className="text-center mb-8">
+          <h2 className="text-xl font-bold text-[#61f7a2] mb-2">
             Étape 2 sur 4 : Choisis ton Petit Extra
           </h2>
           <p className="text-gray-500 text-sm max-w-lg mx-auto">
-            Il s'agit d'une petite offre complémentaire irrésistible, proposée juste avant le paiement. Sélectionne celle qui complète le mieux ton produit principal.
+            Un bonus rapide et irrésistible qui renforce ton produit principal.
           </p>
         </div>
 
         {/* Offer Cards */}
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid md:grid-cols-2 gap-6">
           {offers.map((offer) => (
             <OfferCardNew
               key={offer.id}
@@ -103,7 +103,7 @@ export default function OfferPetitExtra() {
         </div>
 
         {isSaving && (
-          <div className="mt-6 flex items-center justify-center gap-2 text-[#22c55e]">
+          <div className="mt-6 flex items-center justify-center gap-2 text-[#61f7a2]">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Enregistrement...</span>
           </div>

@@ -70,8 +70,8 @@ export default function OfferProductPrincipal() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f5f3f0] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#22c55e] animate-spin" />
+      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
   }
@@ -81,26 +81,26 @@ export default function OfferProductPrincipal() {
       <div className="max-w-3xl mx-auto px-4">
         {/* Main Title */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#1e3a5f] mb-3">
-            Construis ton offre parfaite
+          <h1 className="text-3xl font-bold text-white mb-3">
+            🏗️ Construis ton offre parfaite
           </h1>
-          <p className="text-gray-500">
+          <p className="text-gray-400">
             À chaque étape, choisis UNE offre parmi 2 propositions pour construire ta gamme complète.
           </p>
         </div>
 
         {/* Step Title */}
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-bold text-[#1e3a5f] mb-2">
+        <div className="text-center mb-8">
+          <h2 className="text-xl font-bold text-[#61f7a2] mb-2">
             Étape 1 sur 4 : Choisis ton Produit Principal
           </h2>
           <p className="text-gray-500 text-sm max-w-lg mx-auto">
-            C'est ton offre d'entrée qui attirera tes premiers clients. Choisis l'option qui te semble la plus pertinente et la plus simple à créer pour commencer.
+            C'est ton offre d'entrée. Choisis l'option la plus simple pour commencer.
           </p>
         </div>
 
         {/* Offer Cards */}
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid md:grid-cols-2 gap-6">
           {offers.map((offer) => (
             <OfferCardNew
               key={offer.id}
@@ -113,7 +113,7 @@ export default function OfferProductPrincipal() {
         </div>
 
         {isSaving && (
-          <div className="mt-6 flex items-center justify-center gap-2 text-[#22c55e]">
+          <div className="mt-6 flex items-center justify-center gap-2 text-[#61f7a2]">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Enregistrement...</span>
           </div>

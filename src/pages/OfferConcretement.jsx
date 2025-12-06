@@ -105,7 +105,7 @@ export default function OfferConcretement() {
   };
 
   const handleContinue = () => {
-    navigate(createPageUrl('Results'));
+    navigate(createPageUrl('PlanAction'));
   };
 
   if (isLoading) {

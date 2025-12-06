@@ -3,8 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp } from "lucide-react";
-import GlowButton from '@/components/ui/GlowButton';
+import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const features = [
@@ -42,33 +41,33 @@ export default function Welcome() {
   };
   
   return (
-    <div className="min-h-screen bg-[#11112b] flex flex-col">
-      {/* Header with logo and login button */}
-      <header className="w-full flex justify-between items-center p-6">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
-          <Sparkles className="w-6 h-6 text-[#11112b]" />
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+      {/* Header */}
+      <header className="w-full flex justify-between items-center px-8 py-6">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg">
+          <Sparkles className="w-6 h-6 text-white" />
         </div>
         <Button
           variant="outline"
           onClick={handleLogin}
-          className="bg-[#1b1b33] border-[#2a2a45] text-white hover:bg-[#2a2a45] px-8 py-2 rounded-xl"
+          className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-2 rounded-xl font-medium"
         >
           Connexion
         </Button>
       </header>
 
-      {/* Hero Section */}
-      <div className="flex-1 flex items-center justify-center p-6 pt-0">
-        <div className="max-w-2xl text-center">
+      {/* Hero Section with Floating Cards */}
+      <div className="relative flex items-center justify-center px-6 py-20 md:py-32">
+        <div className="max-w-4xl text-center relative z-10">
           {/* AI Badge */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-[#1b1b33] border border-[#2a2a45] rounded-full px-5 py-2.5 mb-8"
+            className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-5 py-2.5 mb-8 shadow-sm"
           >
             <Sparkles className="w-4 h-4 text-[#61f7a2]" />
-            <span className="text-[#61f7a2] text-sm font-medium">Propulsé par l'Intelligence Artificielle</span>
+            <span className="text-gray-700 text-sm font-medium">Propulsé par l'Intelligence Artificielle</span>
           </motion.div>
 
           {/* Title */}
@@ -76,9 +75,9 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight"
           >
-            Construis ton activité en ligne grâce à{' '}
+            Construis ton activité en ligne<br />grâce à{' '}
             <span className="text-[#61f7a2]">ton savoir-faire + l'IA</span>
           </motion.h1>
           
@@ -87,53 +86,130 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-xl text-gray-400 mb-10 max-w-xl mx-auto"
+            className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed"
           >
             Transforme ta passion en business rentable avec l'aide de l'intelligence artificielle
           </motion.p>
           
-          {/* CTA */}
+          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="flex flex-col items-center"
+            className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6"
           >
-            <GlowButton 
+            <Button
               onClick={handleStart}
-              size="lg"
-              className="text-lg px-12"
+              className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-8 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all"
             >
               Commencer maintenant
               <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
+            </Button>
             
-            <p className="text-gray-500 text-sm mt-4">
-              Gratuit • Aucune carte requise • 5 minutes
-            </p>
+            <Button
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-6 text-lg font-semibold rounded-2xl"
+            >
+              <Play className="w-5 h-5 mr-2" />
+              Voir comment ça marche
+            </Button>
           </motion.div>
+          
+          <p className="text-gray-500 text-sm">
+            Gratuit • Aucune carte requise • 5 minutes
+          </p>
         </div>
+
+        {/* Floating Cards around Hero */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4 }}
+          className="hidden lg:block absolute top-10 left-20 w-32 h-32 bg-white rounded-3xl shadow-xl p-4"
+        >
+          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl flex items-center justify-center">
+            <Target className="w-12 h-12 text-blue-600" />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          className="hidden lg:block absolute top-32 right-24 w-40 h-40 bg-white rounded-3xl shadow-xl p-4"
+        >
+          <div className="w-full h-full bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl flex items-center justify-center">
+            <Zap className="w-14 h-14 text-purple-600" />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6 }}
+          className="hidden lg:block absolute bottom-20 left-32 w-36 h-36 bg-white rounded-3xl shadow-xl p-4"
+        >
+          <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center">
+            <TrendingUp className="w-12 h-12 text-green-600" />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.7 }}
+          className="hidden lg:block absolute bottom-32 right-20 w-32 h-32 bg-white rounded-3xl shadow-xl p-4"
+        >
+          <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl flex items-center justify-center">
+            <FileText className="w-12 h-12 text-amber-600" />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8 }}
+          className="hidden lg:block absolute top-1/2 left-10 w-28 h-28 bg-white rounded-3xl shadow-xl p-3"
+        >
+          <div className="w-full h-full bg-gradient-to-br from-pink-100 to-pink-50 rounded-2xl flex items-center justify-center">
+            <Sparkles className="w-10 h-10 text-pink-600" />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.9 }}
+          className="hidden lg:block absolute top-1/2 right-16 w-28 h-28 bg-white rounded-3xl shadow-xl p-3"
+        >
+          <div className="w-full h-full bg-gradient-to-br from-cyan-100 to-cyan-50 rounded-2xl flex items-center justify-center">
+            <ArrowRight className="w-10 h-10 text-cyan-600" />
+          </div>
+        </motion.div>
       </div>
 
       {/* Features Section */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9 }}
-        className="w-full max-w-6xl mx-auto px-6 pb-12"
+        transition={{ delay: 1.0 }}
+        className="w-full max-w-6xl mx-auto px-6 py-20"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
-            <div 
+            <motion.div
               key={index}
-              className="bg-[#1b1b33] border border-[#2a2a45] rounded-xl p-5"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1 + index * 0.1 }}
+              className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#2a2a45] flex items-center justify-center mb-4">
-                <feature.icon className="w-6 h-6 text-[#61f7a2]" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center mb-5">
+                <feature.icon className="w-7 h-7 text-[#61f7a2]" />
               </div>
-              <h3 className="text-white font-semibold mb-2">{feature.title}</h3>
-              <p className="text-gray-400 text-sm">{feature.description}</p>
-            </div>
+              <h3 className="text-gray-900 font-bold text-lg mb-3">{feature.title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+            </motion.div>
           ))}
         </div>
       </motion.div>
@@ -142,25 +218,24 @@ export default function Welcome() {
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.1 }}
-        className="w-full bg-[#1b1b33] border-t border-[#2a2a45] py-16"
+        transition={{ delay: 1.5 }}
+        className="w-full bg-gradient-to-br from-gray-50 to-white py-24"
       >
         <div className="max-w-2xl mx-auto text-center px-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
             Prêt à transformer ta passion en business ?
           </h2>
-          <p className="text-gray-400 mb-8">
+          <p className="text-gray-600 text-lg mb-10 leading-relaxed">
             Rejoins des centaines d'entrepreneurs qui ont déjà lancé leur activité grâce à PASSION IA.
           </p>
           <div className="flex justify-center">
-            <GlowButton 
+            <Button
               onClick={handleStart}
-              size="lg"
-              className="text-lg px-10"
+              className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all"
             >
               <Sparkles className="w-5 h-5 mr-2" />
               Commencer maintenant
-            </GlowButton>
+            </Button>
           </div>
         </div>
       </motion.div>

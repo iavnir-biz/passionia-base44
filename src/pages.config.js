@@ -41,6 +41,7 @@ import OfferSuperieure from './pages/OfferSuperieure';
 import OfferPremium from './pages/OfferPremium';
 import OfferResume from './pages/OfferResume';
 import BonneNouvelle from './pages/BonneNouvelle';
+import OfferTaVieFuture from './pages/OfferTaVieFuture';
 
 
 export const PAGES = {
@@ -87,6 +88,7 @@ export const PAGES = {
     "OfferPremium": OfferPremium,
     "OfferResume": OfferResume,
     "BonneNouvelle": BonneNouvelle,
+    "OfferTaVieFuture": OfferTaVieFuture,
 }
 
 export const pagesConfig = {

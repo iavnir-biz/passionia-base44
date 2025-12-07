@@ -110,9 +110,9 @@ export default function PlanAction() {
   const mainProductPrice = revenues[0].price;
 
   return (
-    <div className="min-h-screen bg-[#11112b]">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Main Navigation Bar */}
-      <div className="bg-[#1b1b33] border-b border-[#2a2a45] py-4">
+      <div className="bg-white border-b border-gray-200 py-4 shadow-sm">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
             {mainSteps.map((step, index) => (
@@ -120,17 +120,17 @@ export default function PlanAction() {
                 <div className={cn(
                   "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
                   step.id === 5 
-                    ? "bg-[#61f7a2] text-[#11112b]" 
+                    ? "bg-[#61f7a2] text-white shadow-sm" 
                     : step.id < 5
                       ? "text-[#61f7a2]"
-                      : "text-gray-500"
+                      : "text-gray-400"
                 )}>
                   {step.id}. {step.label}
                 </div>
                 {index < mainSteps.length - 1 && (
                   <div className={cn(
                     "w-4 md:w-8 h-[2px]",
-                    step.id < 5 ? "bg-[#61f7a2]" : "bg-[#2a2a45]"
+                    step.id < 5 ? "bg-[#61f7a2]" : "bg-gray-200"
                   )} />
                 )}
               </React.Fragment>
@@ -146,22 +146,22 @@ export default function PlanAction() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-8"
+            className="bg-white rounded-3xl border border-gray-200 p-6 mb-8 shadow-sm"
           >
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <CheckCircle className="w-6 h-6 text-[#61f7a2]" />
               Tu as maintenant :
             </h2>
             <div className="space-y-3 mb-4">
               {products.map((product) => (
-                <div key={product.key} className="flex items-center gap-3 text-gray-300">
+                <div key={product.key} className="flex items-center gap-3 text-gray-600">
                   <div className="w-2 h-2 rounded-full bg-[#61f7a2]" />
-                  <span><strong className="text-white">{product.label} :</strong> {product.data?.title || '—'} ({product.data?.price || '—'})</span>
+                  <span><strong className="text-gray-900">{product.label} :</strong> {product.data?.title || '—'} ({product.data?.price || '—'})</span>
                 </div>
               ))}
-              <div className="flex items-center gap-3 text-gray-300 pt-2 border-t border-[#2a2a45]">
+              <div className="flex items-center gap-3 text-gray-600 pt-2 border-t border-gray-200">
                 <TrendingUp className="w-5 h-5 text-[#61f7a2]" />
-                <span><strong className="text-white">Ta projection de revenus :</strong> {totalMonthly.toLocaleString('fr-FR')} €/mois</span>
+                <span><strong className="text-gray-900">Ta projection de revenus :</strong> {totalMonthly.toLocaleString('fr-FR')} €/mois</span>
               </div>
             </div>
             <p className="text-[#61f7a2] text-sm">
@@ -176,11 +176,11 @@ export default function PlanAction() {
             transition={{ delay: 0.1 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Maintenant, on va mettre tout ça en place ensemble.
             </h1>
-            <p className="text-gray-400 text-lg">
-              Tu sais <strong className="text-white">QUOI</strong> vendre et à <strong className="text-white">QUEL PRIX</strong>. On va te montrer comment tout mettre en place en 4 semaines.
+            <p className="text-gray-600 text-lg leading-relaxed">
+              Tu sais <strong className="text-gray-900">QUOI</strong> vendre et à <strong className="text-gray-900">QUEL PRIX</strong>. On va te montrer comment tout mettre en place en 4 semaines.
             </p>
           </motion.div>
 
@@ -189,9 +189,9 @@ export default function PlanAction() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-8"
+            className="bg-white rounded-3xl border border-gray-200 p-6 mb-8 shadow-sm"
           >
-            <h2 className="text-xl font-bold text-white mb-4 text-center">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
               On s'est mis à ta place
             </h2>
             <div className="space-y-3 mb-4">
@@ -201,7 +201,7 @@ export default function PlanAction() {
                 "Je ne sais pas faire du marketing…",
                 "J'ai peur de me planter…"
               ].map((phrase, idx) => (
-                <div key={idx} className="bg-[#11112b] rounded-lg p-3 text-gray-300 italic border-l-4 border-[#61f7a2]/30">
+                <div key={idx} className="bg-gray-50 rounded-2xl p-3 text-gray-600 italic border-l-4 border-[#61f7a2]/40">
                   "{phrase}"
                 </div>
               ))}
@@ -218,10 +218,10 @@ export default function PlanAction() {
             transition={{ delay: 0.3 }}
             className="grid md:grid-cols-2 gap-6 mb-8"
           >
-            <div className="bg-[#1b1b33] rounded-2xl border border-red-500/30 p-6">
+            <div className="bg-white rounded-3xl border border-red-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
                 <X className="w-6 h-6 text-red-500" />
-                <h3 className="text-lg font-bold text-white">Sans ce pack</h3>
+                <h3 className="text-lg font-bold text-gray-900">Sans ce pack</h3>
               </div>
               <ul className="space-y-3">
                 {[
@@ -230,17 +230,17 @@ export default function PlanAction() {
                   "Tu vas te décourager",
                   "Tu abandonneras probablement"
                 ].map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-gray-400">
+                  <li key={idx} className="flex items-start gap-2 text-gray-600">
                     <X className="w-4 h-4 text-red-500 mt-1 flex-shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-gradient-to-br from-[#61f7a2]/10 to-[#1b1b33] rounded-2xl border border-[#61f7a2]/30 p-6">
+            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl border border-green-200 p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
                 <Check className="w-6 h-6 text-[#61f7a2]" />
-                <h3 className="text-lg font-bold text-white">Avec ce pack</h3>
+                <h3 className="text-lg font-bold text-gray-900">Avec ce pack</h3>
               </div>
               <ul className="space-y-3">
                 {[
@@ -249,7 +249,7 @@ export default function PlanAction() {
                   "Tu es guidé(e) en vidéo",
                   "Tu lances cette semaine"
                 ].map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-gray-300">
+                  <li key={idx} className="flex items-start gap-2 text-gray-700">
                     <Check className="w-4 h-4 text-[#61f7a2] mt-1 flex-shrink-0" />
                     <span>{item}</span>
                   </li>
@@ -265,14 +265,14 @@ export default function PlanAction() {
             transition={{ delay: 0.4 }}
             className="mb-8"
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">
               🎁 Voici ce qu'on a préparé pour toi :
             </h2>
 
             <div className="space-y-6">
               {/* 1. Première Vente */}
-              <div className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6">
-                <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+              <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
                   <Zap className="w-6 h-6 text-[#61f7a2]" />
                   1. Première Vente à 27€ dans les 24h
                 </h3>
@@ -290,8 +290,8 @@ export default function PlanAction() {
               </div>
 
               {/* 2. Tout le contenu */}
-              <div className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6">
-                <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+              <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
                   <FileText className="w-6 h-6 text-[#61f7a2]" />
                   2. Tout le contenu déjà créé
                 </h3>
@@ -306,8 +306,8 @@ export default function PlanAction() {
               </div>
 
               {/* 3. Protocole 4 semaines */}
-              <div className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <Clock className="w-6 h-6 text-[#61f7a2]" />
                   3. Le protocole simple à suivre (4 semaines)
                 </h3>
@@ -318,13 +318,13 @@ export default function PlanAction() {
                     { week: 3, text: "Préparer les offres supérieures + créer communauté" },
                     { week: 4, text: "Lancer les pubs autofinancées + livrer" }
                   ].map((item) => (
-                    <div key={item.week} className="flex items-start gap-3 bg-[#11112b] rounded-lg p-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#61f7a2] flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-bold text-[#11112b]">{item.week}</span>
+                    <div key={item.week} className="flex items-start gap-3 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-3 border border-blue-100">
+                      <div className="w-8 h-8 rounded-lg bg-[#61f7a2] flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <span className="text-sm font-bold text-white">{item.week}</span>
                       </div>
                       <div>
-                        <span className="text-white font-medium">Semaine {item.week}</span>
-                        <p className="text-gray-400 text-sm">{item.text}</p>
+                        <span className="text-gray-900 font-semibold">Semaine {item.week}</span>
+                        <p className="text-gray-600 text-sm">{item.text}</p>
                       </div>
                     </div>
                   ))}
@@ -335,8 +335,8 @@ export default function PlanAction() {
               </div>
 
               {/* 4. Accompagnement vidéo */}
-              <div className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6">
-                <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+              <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
                   <Video className="w-6 h-6 text-[#61f7a2]" />
                   4. L'accompagnement vidéo
                 </h3>
@@ -356,10 +356,10 @@ export default function PlanAction() {
               </div>
 
               {/* 5. Communauté Skool */}
-              <div className="bg-gradient-to-br from-yellow-500/10 to-[#1b1b33] rounded-2xl border border-yellow-500/30 p-6">
+              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-3xl border border-yellow-200 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Users className="w-6 h-6 text-yellow-500" />
+                  <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <Users className="w-6 h-6 text-yellow-600" />
                     5. Accès communauté Skool
                   </h3>
                   <span className="px-3 py-1 bg-yellow-500/20 text-yellow-500 text-xs font-bold rounded-full uppercase">
@@ -368,15 +368,15 @@ export default function PlanAction() {
                 </div>
                 <ul className="space-y-2 mb-3">
                   {["Poses tes questions", "Échanges entre membres", "1 live/semaine", "Jamais seul(e)"].map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-gray-300">
-                      <Check className="w-4 h-4 text-yellow-500" />
+                    <li key={idx} className="flex items-center gap-2 text-gray-600">
+                      <Check className="w-4 h-4 text-yellow-600" />
                       {item}
                     </li>
                   ))}
                 </ul>
                 <div className="flex items-center gap-3 text-center justify-center">
-                  <span className="text-gray-500 line-through">197€</span>
-                  <span className="text-yellow-500 font-bold text-xl">Gratuit à vie</span>
+                  <span className="text-gray-400 line-through">197€</span>
+                  <span className="text-yellow-600 font-bold text-xl">Gratuit à vie</span>
                 </div>
               </div>
             </div>
@@ -387,16 +387,16 @@ export default function PlanAction() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-gradient-to-br from-purple-500/10 to-[#1b1b33] rounded-2xl border border-purple-500/30 p-8 mb-8 text-center"
+            className="bg-gradient-to-br from-purple-100 via-pink-50 to-blue-50 rounded-3xl border border-purple-200 p-8 mb-8 text-center shadow-md"
           >
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               🚀 Offre de lancement
             </h2>
             <div className="flex items-center justify-center gap-4 mb-6">
-              <span className="text-3xl text-gray-500 line-through">197€</span>
-              <span className="text-5xl font-bold text-purple-400">67€</span>
+              <span className="text-3xl text-gray-400 line-through">197€</span>
+              <span className="text-5xl font-bold text-purple-600">67€</span>
             </div>
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-600 mb-6">
               Paiement sécurisé • Garantie 30 jours • Accès immédiat
             </p>
             <GlowButton onClick={() => {}} size="lg" className="px-12">
@@ -410,20 +410,20 @@ export default function PlanAction() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-8 text-center"
+            className="bg-white rounded-3xl border border-gray-200 p-6 mb-8 text-center shadow-sm"
           >
-            <h3 className="text-xl font-bold text-white mb-3">
+            <h3 className="text-xl font-bold text-gray-900 mb-3">
               💰 Rentabilise ton investissement dès la première vente
             </h3>
-            <p className="text-gray-300 mb-4">
+            <p className="text-gray-600 mb-4">
               Ton produit principal est à <strong className="text-[#61f7a2]">{mainProductPrice}€</strong>.
               {mainProductPrice > 67 && (
                 <> En vendant <strong className="text-white">1 seul produit</strong>, tu as déjà remboursé le pack !</>
               )}
             </p>
-            <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-lg border border-[#61f7a2]/30">
+            <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-2xl border border-[#61f7a2]/30">
               <TrendingUp className="w-5 h-5 text-[#61f7a2]" />
-              <span className="text-[#61f7a2] font-medium">ROI immédiat dès la première vente</span>
+              <span className="text-[#61f7a2] font-semibold">ROI immédiat dès la première vente</span>
             </div>
           </motion.div>
 
@@ -433,13 +433,13 @@ export default function PlanAction() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="bg-gradient-to-br from-[#61f7a2]/10 to-[#1b1b33] rounded-2xl border border-[#61f7a2]/30 p-8"
+              className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl border border-green-200 p-8 shadow-sm"
             >
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
                   ✨ Reçois ton plan complet par email
                 </h2>
-                <p className="text-gray-400">
+                <p className="text-gray-600">
                   Entre ton email pour recevoir l'accès à ton espace membre
                 </p>
               </div>
@@ -450,7 +450,7 @@ export default function PlanAction() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="ton@email.com"
-                    className="flex-1 bg-[#11112b] border-[#2a2a45] text-white"
+                    className="flex-1 bg-white border-gray-300 text-gray-900"
                     required
                   />
                   <GlowButton type="submit" disabled={isSubmitting || !email}>
@@ -463,15 +463,15 @@ export default function PlanAction() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-gradient-to-br from-[#61f7a2]/20 to-[#1b1b33] rounded-2xl border-2 border-[#61f7a2] p-8 text-center"
+              className="bg-gradient-to-br from-[#61f7a2]/20 to-green-50 rounded-3xl border-2 border-[#61f7a2] p-8 text-center shadow-lg"
             >
-              <div className="w-16 h-16 bg-[#61f7a2] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="w-8 h-8 text-[#11112b]" />
+              <div className="w-16 h-16 bg-[#61f7a2] rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <Check className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-3">
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
                 🎉 Ton plan est en route vers ta boîte mail !
               </h2>
-              <p className="text-gray-300 mb-6">
+              <p className="text-gray-700 mb-6">
                 Vérifie ta boîte ({email}) dans quelques instants
               </p>
               <GlowButton onClick={handleAccessDashboard} size="lg">
@@ -484,7 +484,7 @@ export default function PlanAction() {
       </div>
 
       {/* Footer */}
-      <footer className="py-6 text-center border-t border-[#2a2a45] bg-[#1b1b33] mt-12">
+      <footer className="py-8 text-center border-t border-gray-200 bg-white mt-12">
         <p className="text-gray-500 text-sm">Copyright Passion IA</p>
         <div className="flex items-center justify-center gap-2 mt-2">
           <div className="w-2 h-2 rounded-full bg-[#61f7a2] animate-pulse" />

@@ -17,16 +17,16 @@ export default function OfferCardNew({
       whileTap={{ scale: 0.99 }}
       onClick={() => onSelect(offer)}
       className={cn(
-        "relative cursor-pointer rounded-2xl bg-[#1b1b33] border-2 transition-all duration-300 overflow-hidden",
+        "relative cursor-pointer rounded-3xl bg-white border-2 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md",
         isSelected 
-          ? "border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20" 
-          : "border-[#2a2a45] hover:border-[#3a3a55]"
+          ? "border-[#61f7a2] shadow-lg shadow-[#61f7a2]/10" 
+          : "border-gray-200 hover:border-gray-300"
       )}
     >
       {/* Selection indicator */}
       {isSelected && (
-        <div className="absolute top-4 right-4 w-6 h-6 bg-[#61f7a2] rounded-full flex items-center justify-center">
-          <Check className="w-4 h-4 text-[#11112b]" />
+        <div className="absolute top-4 right-4 w-8 h-8 bg-[#61f7a2] rounded-full flex items-center justify-center shadow-sm">
+          <Check className="w-5 h-5 text-white" />
         </div>
       )}
 
@@ -35,11 +35,11 @@ export default function OfferCardNew({
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-2">
             {Icon && (
-              <div className="w-8 h-8 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center">
-                <Icon className="w-4 h-4 text-[#61f7a2]" />
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center">
+                <Icon className="w-5 h-5 text-[#61f7a2]" />
               </div>
             )}
-            <span className="px-3 py-1 bg-[#61f7a2]/10 text-[#61f7a2] text-xs font-medium rounded-full">
+            <span className="px-3 py-1.5 bg-[#61f7a2]/10 text-[#61f7a2] text-xs font-semibold rounded-full">
               {offer.badge}
             </span>
           </div>
@@ -49,26 +49,26 @@ export default function OfferCardNew({
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-bold text-white mb-4 leading-tight">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 leading-tight">
           {offer.title}
         </h3>
 
         {/* Blurred description zone */}
-        <div className="relative bg-[#11112b] rounded-xl p-4 mb-4 border border-[#2a2a45]">
-          <div className="blur-[6px] text-gray-500 text-sm leading-relaxed select-none">
+        <div className="relative bg-gray-50 rounded-2xl p-4 mb-4 border border-gray-200">
+          <div className="blur-[6px] text-gray-400 text-sm leading-relaxed select-none">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
           </div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-gray-400 text-sm font-medium bg-[#11112b]/90 px-4 py-2 rounded-lg border border-[#2a2a45]">
+            <span className="text-gray-600 text-sm font-medium bg-white/95 px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
               Description complète révélée à la fin
             </span>
           </div>
         </div>
 
         {/* Result section */}
-        <div className="bg-[#11112b] rounded-xl p-4 border border-[#2a2a45]">
-          <p className="text-xs text-gray-500 mb-2 uppercase tracking-wide">Résultat attendu :</p>
-          <p className="text-sm text-gray-300 leading-relaxed">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 border border-blue-100">
+          <p className="text-xs text-gray-600 mb-2 uppercase tracking-wide font-semibold">Résultat attendu :</p>
+          <p className="text-sm text-gray-700 leading-relaxed font-medium">
             {offer.result}
           </p>
         </div>

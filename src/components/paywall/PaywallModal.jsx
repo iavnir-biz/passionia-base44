@@ -27,68 +27,68 @@ export default function PaywallModal({ isOpen, onClose, onPurchase, loading }) {
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="w-full max-w-lg bg-[#1b1b33] rounded-3xl border border-[#2a2a45] overflow-hidden"
+          className="w-full max-w-lg bg-slate-700 rounded-3xl overflow-hidden shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="relative p-8 text-center bg-gradient-to-b from-[#61f7a2]/10 to-transparent">
+          <div className="relative p-8 text-center">
             <button 
               onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#2a2a45] flex items-center justify-center text-gray-400 hover:text-white transition-all"
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-all"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
             
-            <div className="w-16 h-16 rounded-2xl bg-[#61f7a2] mx-auto mb-4 flex items-center justify-center glow-green">
-              <Sparkles className="w-8 h-8 text-[#11112b]" />
+            <div className="w-16 h-16 rounded-2xl bg-[#61f7a2] mx-auto mb-4 flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-white" />
             </div>
             
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-white mb-3">
               Débloquer l'accès complet
             </h2>
-            <p className="text-gray-400">
+            <p className="text-gray-300 text-base">
               Accède à tous tes documents IA et ton plan d'action personnalisé
             </p>
           </div>
           
           {/* Features */}
-          <div className="p-8 pt-4">
-            <div className="space-y-3 mb-8">
+          <div className="px-8 pb-8">
+            <div className="space-y-3 mb-6">
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center gap-3 text-gray-300"
+                  className="flex items-center gap-3 text-white"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-slate-600 flex items-center justify-center flex-shrink-0">
                     <feature.icon className="w-4 h-4 text-[#61f7a2]" />
                   </div>
-                  <span>{feature.text}</span>
+                  <span className="text-base">{feature.text}</span>
                 </motion.div>
               ))}
             </div>
             
             {/* Price */}
             <div className="text-center mb-6">
-              <div className="flex items-baseline justify-center gap-2">
-                <span className="text-4xl font-bold text-white">47€</span>
-                <span className="text-gray-400 line-through">97€</span>
+              <div className="flex items-baseline justify-center gap-3 mb-1">
+                <span className="text-5xl font-bold text-white">47€</span>
+                <span className="text-xl text-gray-400 line-through">97€</span>
               </div>
-              <p className="text-[#61f7a2] text-sm mt-1">Offre de lancement -50%</p>
+              <p className="text-[#61f7a2] text-base font-semibold">Offre de lancement -50%</p>
             </div>
             
             {/* CTA */}
             <GlowButton 
               onClick={onPurchase}
               loading={loading}
-              className="w-full text-lg py-4"
+              className="w-full text-lg py-4 rounded-2xl"
             >
               Débloquer maintenant
             </GlowButton>
             
-            <p className="text-center text-gray-500 text-xs mt-4">
+            <p className="text-center text-gray-400 text-sm mt-4">
               Paiement sécurisé • Accès immédiat • Satisfait ou remboursé
             </p>
           </div>

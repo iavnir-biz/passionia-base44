@@ -14,7 +14,7 @@ export default function LoadingStateAI({ message, step = 0 }) {
   const currentMessage = message || loadingMessages[step % loadingMessages.length];
   
   return (
-    <div className="min-h-screen bg-[#11112b] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#0f1020] flex items-center justify-center p-6">
       <div className="text-center max-w-md">
         {/* Animated icon */}
         <motion.div 

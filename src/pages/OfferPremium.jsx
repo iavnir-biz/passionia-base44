@@ -98,6 +98,7 @@ export default function OfferPremium() {
               icon={offer.icon}
               isSelected={selectedOffer?.id === offer.id}
               onSelect={handleSelect}
+              colorScheme="gold"
             />
           ))}
         </div>

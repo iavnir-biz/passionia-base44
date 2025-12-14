@@ -7,8 +7,46 @@ export default function OfferCardNew({
   offer, 
   isSelected, 
   onSelect,
-  icon: Icon
+  icon: Icon,
+  colorScheme = 'green' // 'blue', 'green', 'purple', 'gold'
 }) {
+  // Color configurations
+  const colors = {
+    blue: {
+      bg: 'from-blue-500/20 to-blue-500/10',
+      border: 'border-blue-500/30',
+      text: 'text-blue-500',
+      shadow: 'shadow-blue-500/20',
+      glow: 'shadow-lg shadow-blue-500/30',
+      badge: 'bg-blue-500/10 text-blue-500'
+    },
+    green: {
+      bg: 'from-green-500/20 to-green-500/10',
+      border: 'border-green-500/30',
+      text: 'text-green-500',
+      shadow: 'shadow-green-500/20',
+      glow: 'shadow-lg shadow-green-500/30',
+      badge: 'bg-green-500/10 text-green-500'
+    },
+    purple: {
+      bg: 'from-purple-500/20 to-purple-500/10',
+      border: 'border-purple-500/30',
+      text: 'text-purple-500',
+      shadow: 'shadow-purple-500/20',
+      glow: 'shadow-lg shadow-purple-500/30',
+      badge: 'bg-purple-500/10 text-purple-500'
+    },
+    gold: {
+      bg: 'from-yellow-500/20 to-amber-500/10',
+      border: 'border-yellow-500/30',
+      text: 'text-yellow-500',
+      shadow: 'shadow-yellow-500/20',
+      glow: 'shadow-lg shadow-yellow-500/30',
+      badge: 'bg-yellow-500/10 text-yellow-500'
+    }
+  };
+
+  const scheme = colors[colorScheme];
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -18,17 +56,20 @@ export default function OfferCardNew({
       whileTap={{ scale: 0.98 }}
       onClick={() => onSelect(offer)}
       className={cn(
-        "relative cursor-pointer rounded-3xl bg-white border-2 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-lg",
+        "relative cursor-pointer rounded-3xl bg-white border-2 transition-all duration-300 overflow-hidden",
         isSelected 
-          ? "border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20" 
-          : "border-gray-200 hover:border-gray-300"
+          ? cn("border-2", scheme.border, scheme.glow)
+          : "border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg"
       )}
     >
       {/* Selection indicator */}
       <AnimatePresence>
         {isSelected && (
           <motion.div 
-            className="absolute top-4 right-4 w-8 h-8 bg-[#61f7a2] rounded-full flex items-center justify-center shadow-lg"
+            className={cn(
+              "absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-lg",
+              scheme.text.replace('text-', 'bg-')
+            )}
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 180 }}
@@ -45,15 +86,15 @@ export default function OfferCardNew({
           <div className="flex items-center gap-2">
             {Icon && (
               <motion.div 
-                className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center"
+                className={cn("w-10 h-10 rounded-2xl bg-gradient-to-br flex items-center justify-center", scheme.bg)}
                 whileHover={{ rotate: 5 }}
                 transition={{ duration: 0.3 }}
               >
-                <Icon className="w-5 h-5 text-[#61f7a2]" />
+                <Icon className={cn("w-5 h-5", scheme.text)} />
               </motion.div>
             )}
             <motion.span 
-              className="px-3 py-1.5 bg-[#61f7a2]/10 text-[#61f7a2] text-xs font-semibold rounded-full"
+              className={cn("px-3 py-1.5 text-xs font-semibold rounded-full", scheme.badge)}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
@@ -62,7 +103,7 @@ export default function OfferCardNew({
             </motion.span>
           </div>
           <motion.span 
-            className="text-2xl font-bold text-[#61f7a2]"
+            className={cn("text-2xl font-bold", scheme.text)}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.3 }}

@@ -98,6 +98,7 @@ export default function OfferPetitExtra() {
               icon={offer.icon}
               isSelected={selectedOffer?.id === offer.id}
               onSelect={handleSelect}
+              colorScheme="green"
             />
           ))}
         </div>

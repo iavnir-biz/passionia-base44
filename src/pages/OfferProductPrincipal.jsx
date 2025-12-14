@@ -107,7 +107,8 @@ export default function OfferProductPrincipal() {
             offer={offer}
             icon={offer.icon}
             isSelected={selectedOffer?.id === offer.id}
-            onSelect={handleSelect} />
+            onSelect={handleSelect}
+            colorScheme="blue" />
 
           )}
         </div>

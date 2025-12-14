@@ -13,8 +13,9 @@ export default function OfferCardNew({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={{ scale: 1.03, y: -5 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.2 }}
       onClick={() => onSelect(offer)}
       className={cn(
         "relative cursor-pointer rounded-3xl bg-white border-2 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md",
@@ -25,9 +26,14 @@ export default function OfferCardNew({
     >
       {/* Selection indicator */}
       {isSelected && (
-        <div className="absolute top-4 right-4 w-8 h-8 bg-[#61f7a2] rounded-full flex items-center justify-center shadow-sm">
+        <motion.div 
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
+          className="absolute top-4 right-4 w-8 h-8 bg-[#61f7a2] rounded-full flex items-center justify-center shadow-sm"
+        >
           <Check className="w-5 h-5 text-white" />
-        </div>
+        </motion.div>
       )}
 
       <div className="p-6">

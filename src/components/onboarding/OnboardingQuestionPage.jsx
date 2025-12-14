@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import LoadingStateAI from '@/components/common/LoadingStateAI';
 
 export default function OnboardingQuestionPage({
   questionId,
@@ -127,10 +128,14 @@ Règles :
     setIsSaving(true);
     try {
       await base44.auth.updateMe({ [fieldName]: value });
+      
+      // Show loading screen for 2 seconds
+      setIsLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       navigate(createPageUrl(nextPage));
     } catch (error) {
       console.error('Error saving:', error);
-    } finally {
       setIsSaving(false);
     }
   };
@@ -157,11 +162,7 @@ Règles :
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-      </div>
-    );
+    return <LoadingStateAI message="L'IA analyse vos réponses..." />;
   }
 
   return (

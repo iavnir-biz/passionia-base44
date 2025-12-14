@@ -27,9 +27,11 @@ import {
   Lightbulb,
   Calendar,
   MessageSquare,
-  BarChart
+  BarChart,
+  Lock
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
+import PaywallModal from '@/components/paywall/PaywallModal';
 import { cn } from "@/lib/utils";
 
 const mainSteps = [
@@ -50,6 +52,8 @@ export default function PlanAction() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [purchasing, setPurchasing] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -74,6 +78,32 @@ export default function PlanAction() {
 
   const handleAccessDashboard = () => {
     navigate(createPageUrl('Dashboard'));
+  };
+
+  const handlePurchase = async () => {
+    setPurchasing(true);
+    
+    try {
+      // TODO: Integrate Stripe payment here
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Update user profile as paid
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      
+      if (profiles.length > 0) {
+        await base44.entities.UserProfile.update(profiles[0].id, { has_paid: true });
+      }
+      
+      // Redirect to dashboard
+      navigate(createPageUrl('Dashboard'));
+      
+    } catch (error) {
+      console.error('Error processing payment:', error);
+    } finally {
+      setPurchasing(false);
+      setShowPaywall(false);
+    }
   };
 
   if (isLoading) {
@@ -573,20 +603,24 @@ export default function PlanAction() {
           transition={{ delay: 2 }}
           className="text-center"
         >
-          <div className="bg-gradient-to-br from-[#61f7a2]/10 via-blue-50 to-purple-50 rounded-3xl border border-[#61f7a2]/30 p-12 shadow-lg">
+          <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl border border-gray-200 p-12 shadow-lg">
+            <div className="w-16 h-16 rounded-2xl bg-[#61f7a2]/10 mx-auto mb-6 flex items-center justify-center">
+              <Lock className="w-8 h-8 text-[#61f7a2]" />
+            </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Tu es prêt(e). On t'accompagne étape par étape.
+              Débloquer tout le contenu
             </h2>
-            <p className="text-gray-600 text-lg mb-8">
-              Plus besoin de réfléchir. Tu n'as qu'à suivre le plan.
+            <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+              Accède à ton offre complète, ta page de vente, tes emails,
+              ton plan d'action et tous tes documents IA
             </p>
             
             <GlowButton 
-              onClick={handleAccessDashboard} 
+              onClick={() => setShowPaywall(true)} 
               size="lg" 
               className="px-12 text-lg"
             >
-              Accéder à mon espace membre
+              Débloquer maintenant
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
           </div>
@@ -601,6 +635,14 @@ export default function PlanAction() {
           <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
         </div>
       </footer>
+
+      {/* Paywall Modal */}
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onPurchase={handlePurchase}
+        loading={purchasing}
+      />
     </div>
   );
 }

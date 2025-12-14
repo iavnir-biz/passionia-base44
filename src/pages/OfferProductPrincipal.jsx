@@ -70,7 +70,7 @@ export default function OfferProductPrincipal() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
@@ -81,10 +81,10 @@ export default function OfferProductPrincipal() {
       <div className="max-w-3xl mx-auto px-4">
         {/* Main Title */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-3">
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">
             🏗️ Construis ton offre parfaite
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-600">
             À chaque étape, choisis UNE offre parmi 2 propositions pour construire ta gamme complète.
           </p>
         </div>

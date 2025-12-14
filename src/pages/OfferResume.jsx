@@ -122,8 +122,8 @@ export default function OfferResume() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8">
 
-          <h1 className="text-3xl font-bold text-white mb-3">
-            📋 Résumé de ton offre
+          <h1 className="text-slate-950 mb-3 text-3xl font-bold">📋 Résumé de ton offre
+
           </h1>
           <p className="text-gray-400">
             Voici la gamme complète que tu as construite pour ton activité.

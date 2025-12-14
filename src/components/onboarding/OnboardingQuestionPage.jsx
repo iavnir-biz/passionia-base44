@@ -179,65 +179,108 @@ Règles :
 
       <div className="flex-1 flex items-center justify-center p-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full max-w-2xl"
         >
           {/* Card */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
             className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
             {/* Title */}
-            <h1 className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed">
+            <motion.h1 
+              className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               {replaceVariables(title)}
-            </h1>
+            </motion.h1>
 
             {/* Subtitle (static) */}
             {subtitle && (
-              <p className="text-gray-600 mb-4">{replaceVariables(subtitle)}</p>
+              <motion.p 
+                className="text-gray-600 mb-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                {replaceVariables(subtitle)}
+              </motion.p>
             )}
 
             {/* Dynamic helper text */}
             {isLoadingHelper ? (
-              <div className="flex items-center gap-2 text-gray-500 mb-4">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Personnalisation en cours...</span>
-              </div>
+              <motion.div 
+                className="flex items-center gap-2 text-gray-500 mb-4"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <Loader2 className="w-4 h-4" />
+                </motion.div>
+                <motion.span 
+                  className="text-sm"
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  L'IA réfléchit...
+                </motion.span>
+              </motion.div>
             ) : helperText && (
-              <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-4 mb-4 border border-green-100">
+              <motion.div 
+                className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-4 mb-4 border border-green-100"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
                 <p className="text-[#61f7a2] text-sm flex items-start gap-2">
-                  <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.5, type: "spring" }}
+                  >
+                    <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  </motion.div>
                   <span className="text-gray-700">{helperText}</span>
                 </p>
-              </div>
+              </motion.div>
             )}
 
             {/* Examples */}
             {examples.length > 0 && (
-              <p className="text-gray-500 text-sm mb-6 italic">
+              <motion.p 
+                className="text-gray-500 text-sm mb-6 italic"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
                 Ex : {examples.join(' • ')}
-              </p>
+              </motion.p>
             )}
 
             {/* Input */}
-            <div className="mb-8">
+            <motion.div 
+              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
               {inputType === 'textarea' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.3 }}
-                >
-                  <Textarea
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    placeholder={placeholder}
-                    className="w-full bg-white border-gray-300 text-gray-900 min-h-[120px] text-lg p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400 transition-all duration-300 hover:shadow-md"
-                  />
-                </motion.div>
+                <Textarea
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  placeholder={placeholder}
+                  className="w-full bg-white border-gray-300 text-gray-900 min-h-[120px] text-lg p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400 transition-all duration-300"
+                />
               )}
 
               {inputType === 'radio' && (
@@ -247,13 +290,15 @@ Règles :
                       key={idx}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.3 + idx * 0.1 }}
-                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm hover:scale-[1.02] ${
+                      transition={{ duration: 0.3, delay: idx * 0.1 }}
+                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
                         value === option 
                           ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
                           : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}
                       onClick={() => setValue(option)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <RadioGroupItem value={option} id={`option-${idx}`} />
                       <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
@@ -271,13 +316,15 @@ Règles :
                       key={idx}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.3 + idx * 0.1 }}
-                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm hover:scale-[1.02] ${
+                      transition={{ duration: 0.3, delay: idx * 0.1 }}
+                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
                         value.includes(option)
                           ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
                           : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}
                       onClick={() => handleCheckboxChange(option, !value.includes(option))}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <Checkbox
                         checked={value.includes(option)}
@@ -290,23 +337,18 @@ Règles :
               )}
 
               {inputType === 'slider' && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: 0.3 }}
-                  className="space-y-6"
-                >
-                  <div className="text-center">
-                    <motion.span 
-                      key={value}
-                      initial={{ scale: 1.2 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-5xl font-bold text-[#61f7a2]"
-                    >
+                <div className="space-y-6">
+                  <motion.div 
+                    className="text-center"
+                    key={value}
+                    initial={{ scale: 1.1 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <span className="text-5xl font-bold text-[#61f7a2]">
                       {value}{sliderConfig.suffix}
-                    </motion.span>
-                  </div>
+                    </span>
+                  </motion.div>
                   <Slider
                     value={[value]}
                     onValueChange={(vals) => setValue(vals[0])}
@@ -319,77 +361,45 @@ Règles :
                     <span>{sliderConfig.min}{sliderConfig.suffix}</span>
                     <span>{sliderConfig.max}{sliderConfig.suffix}</span>
                   </div>
-                </motion.div>
+                </div>
               )}
-            </div>
+            </motion.div>
 
             {/* Buttons */}
             <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.5 }}
               className="flex gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
             >
               {prevPage && (
-                <Button
-                  variant="outline"
-                  onClick={handleBack}
-                  className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 hover:scale-105"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Retour
-                </Button>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    variant="outline"
+                    onClick={handleBack}
+                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Retour
+                  </Button>
+                </motion.div>
               )}
-              <GlowButton
-                onClick={handleNext}
-                disabled={!canProceed()}
-                loading={isSaving}
-                className="flex-1"
-                size="lg"
-              >
-                {buttonText}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </GlowButton>
-            </motion.div>
-          </motion.div>
+              <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <GlowButton
+                  onClick={handleNext}
+                  disabled={!canProceed()}
+                  loading={isSaving}
+                  className="w-full"
+                  size="lg"
+                >
+                  {buttonText}
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </GlowButton>
+              </motion.div>
+              </motion.div>
+              </motion.div>
         </motion.div>
       </div>
-      
-      {/* AI Thinking Effect */}
-      {isSaving && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-4"
-          >
-            <div className="flex gap-2">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  className="w-3 h-3 bg-[#61f7a2] rounded-full"
-                  animate={{
-                    scale: [1, 1.3, 1],
-                    opacity: [0.7, 1, 0.7]
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    repeat: Infinity,
-                    delay: i * 0.15
-                  }}
-                />
-              ))}
-            </div>
-            <span className="text-gray-700 font-medium">IA réfléchit...</span>
-          </motion.div>
-        </motion.div>
-      )}
     </div>
   );
 }

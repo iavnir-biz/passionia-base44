@@ -122,10 +122,10 @@ export default function OfferResume() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-bold text-white mb-3">
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">
             📋 Résumé de ton offre
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-600">
             Voici la gamme complète que tu as construite pour ton activité.
           </p>
         </motion.div>
@@ -135,9 +135,9 @@ export default function OfferResume() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-6"
+          className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm"
         >
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Check className="w-5 h-5 text-[#61f7a2]" />
             Tes 4 produits sélectionnés
           </h2>
@@ -149,7 +149,7 @@ export default function OfferResume() {
               return (
                 <div 
                   key={product.key}
-                  className="flex items-start gap-4 p-4 bg-[#11112b] rounded-xl border border-[#2a2a45]"
+                  className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
                 >
                   <div className="w-10 h-10 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center flex-shrink-0">
                     <Icon className="w-5 h-5 text-[#61f7a2]" />
@@ -160,10 +160,10 @@ export default function OfferResume() {
                         {product.label}
                       </span>
                       <div className="w-4 h-4 rounded-full bg-[#61f7a2] flex items-center justify-center">
-                        <Check className="w-3 h-3 text-[#11112b]" />
+                        <Check className="w-3 h-3 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-white font-semibold text-sm mb-1 truncate">
+                    <h3 className="text-gray-900 font-semibold text-sm mb-1 truncate">
                       {product.data?.title || 'Non sélectionné'}
                     </h3>
                     <p className="text-gray-500 text-xs">
@@ -186,17 +186,17 @@ export default function OfferResume() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-gradient-to-br from-[#61f7a2]/10 to-[#1b1b33] rounded-2xl border border-[#61f7a2]/30 p-6 mb-8"
+          className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 mb-8 shadow-lg shadow-blue-500/30"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-[#61f7a2] flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-[#11112b]" />
+            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+              <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">
                 Ton Potentiel de Revenus Mensuels
               </h2>
-              <p className="text-gray-400 text-sm">
+              <p className="text-blue-100 text-sm">
                 Basé sur une hypothèse d'une vente par jour
               </p>
             </div>
@@ -204,16 +204,16 @@ export default function OfferResume() {
 
           {/* Big Number */}
           <div className="text-center py-6">
-            <span className="text-5xl md:text-6xl font-bold text-[#61f7a2]">
+            <span className="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">
               {totalMonthly.toLocaleString('fr-FR')} €
             </span>
-            <p className="text-gray-400 mt-2">par mois</p>
+            <p className="text-blue-100 mt-2">par mois</p>
           </div>
 
           {/* Toggle Detail */}
           <button
             onClick={() => setShowDetail(!showDetail)}
-            className="w-full flex items-center justify-center gap-2 py-3 text-[#61f7a2] hover:text-white transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3 text-white hover:text-blue-100 transition-colors"
           >
             {showDetail ? (
               <>
@@ -232,35 +232,35 @@ export default function OfferResume() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="border-t border-[#2a2a45] pt-4 mt-2 space-y-3"
+              className="border-t border-white/20 pt-4 mt-2 space-y-3"
             >
               {revenues.map((rev) => (
                 <div 
                   key={rev.key}
-                  className="flex items-center justify-between py-2 px-3 bg-[#11112b]/50 rounded-lg"
+                  className="flex items-center justify-between py-2 px-3 bg-white/10 backdrop-blur-sm rounded-lg"
                 >
                   <div>
                     <span className="text-white text-sm font-medium">
                       {rev.label}
                     </span>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-blue-100 text-xs">
                       {rev.conversionLabel}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-[#61f7a2] font-bold">
+                    <span className="text-white font-bold">
                       {rev.total.toLocaleString('fr-FR')} €
                     </span>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-blue-100 text-xs">
                       {rev.price} € × {rev.multiplier}
                     </p>
                   </div>
                 </div>
               ))}
               
-              <div className="flex items-center justify-between py-3 px-3 bg-[#61f7a2]/10 rounded-lg border border-[#61f7a2]/30">
+              <div className="flex items-center justify-between py-3 px-3 bg-white/20 rounded-lg backdrop-blur-sm">
                 <span className="text-white font-bold">Total Mensuel</span>
-                <span className="text-[#61f7a2] font-bold text-xl">
+                <span className="text-white font-bold text-xl">
                   {totalMonthly.toLocaleString('fr-FR')} €
                 </span>
               </div>

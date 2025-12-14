@@ -158,22 +158,22 @@ Règles :
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#11112b] flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex flex-col">
       {/* Progress bar */}
-      <div className="w-full bg-[#1b1b33] h-2">
+      <div className="w-full bg-gray-100 h-2">
         <div 
           className="h-full bg-[#61f7a2] transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
-      <div className="text-center py-2 text-sm text-gray-400">
+      <div className="text-center py-2 text-sm text-gray-600 font-medium">
         {progress}%
       </div>
 
@@ -185,15 +185,15 @@ Règles :
           className="w-full max-w-2xl"
         >
           {/* Card */}
-          <div className="bg-[#1b1b33] rounded-2xl p-8 border border-[#2a2a45]">
+          <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
             {/* Title */}
-            <h1 className="text-2xl font-bold text-white mb-4 leading-relaxed">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed">
               {replaceVariables(title)}
             </h1>
 
             {/* Subtitle (static) */}
             {subtitle && (
-              <p className="text-gray-400 mb-4">{replaceVariables(subtitle)}</p>
+              <p className="text-gray-600 mb-4">{replaceVariables(subtitle)}</p>
             )}
 
             {/* Dynamic helper text */}
@@ -203,15 +203,17 @@ Règles :
                 <span className="text-sm">Personnalisation en cours...</span>
               </div>
             ) : helperText && (
-              <p className="text-[#61f7a2] text-sm mb-4 flex items-start gap-2">
-                <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                {helperText}
-              </p>
+              <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-4 mb-4 border border-green-100">
+                <p className="text-[#61f7a2] text-sm flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span className="text-gray-700">{helperText}</span>
+                </p>
+              </div>
             )}
 
             {/* Examples */}
             {examples.length > 0 && (
-              <p className="text-gray-500 text-sm mb-6">
+              <p className="text-gray-500 text-sm mb-6 italic">
                 Ex : {examples.join(' • ')}
               </p>
             )}
@@ -223,7 +225,7 @@ Règles :
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
                   placeholder={placeholder}
-                  className="w-full bg-[#11112b] border-[#2a2a45] text-white min-h-[120px] text-lg p-4 rounded-xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-500"
+                  className="w-full bg-white border-gray-300 text-gray-900 min-h-[120px] text-lg p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400"
                 />
               )}
 
@@ -232,15 +234,15 @@ Règles :
                   {options.map((option, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-center space-x-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
                         value === option 
-                          ? 'bg-[#61f7a2]/10 border-[#61f7a2]' 
-                          : 'bg-[#11112b] border-[#2a2a45] hover:border-[#3a3a55]'
+                          ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
+                          : 'bg-white border-gray-200 hover:border-gray-300'
                       }`}
                       onClick={() => setValue(option)}
                     >
                       <RadioGroupItem value={option} id={`option-${idx}`} />
-                      <Label htmlFor={`option-${idx}`} className="text-white cursor-pointer flex-1">
+                      <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
                         {option}
                       </Label>
                     </div>
@@ -253,10 +255,10 @@ Règles :
                   {options.map((option, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-center space-x-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
                         value.includes(option)
-                          ? 'bg-[#61f7a2]/10 border-[#61f7a2]'
-                          : 'bg-[#11112b] border-[#2a2a45] hover:border-[#3a3a55]'
+                          ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
+                          : 'bg-white border-gray-200 hover:border-gray-300'
                       }`}
                       onClick={() => handleCheckboxChange(option, !value.includes(option))}
                     >
@@ -264,7 +266,7 @@ Règles :
                         checked={value.includes(option)}
                         onCheckedChange={(checked) => handleCheckboxChange(option, checked)}
                       />
-                      <Label className="text-white cursor-pointer flex-1">{option}</Label>
+                      <Label className="text-gray-900 cursor-pointer flex-1 font-medium">{option}</Label>
                     </div>
                   ))}
                 </div>
@@ -273,7 +275,7 @@ Règles :
               {inputType === 'slider' && (
                 <div className="space-y-6">
                   <div className="text-center">
-                    <span className="text-4xl font-bold text-[#61f7a2]">
+                    <span className="text-5xl font-bold text-[#61f7a2]">
                       {value}{sliderConfig.suffix}
                     </span>
                   </div>
@@ -285,7 +287,7 @@ Règles :
                     step={sliderConfig.step}
                     className="w-full"
                   />
-                  <div className="flex justify-between text-sm text-gray-500">
+                  <div className="flex justify-between text-sm text-gray-600 font-medium">
                     <span>{sliderConfig.min}{sliderConfig.suffix}</span>
                     <span>{sliderConfig.max}{sliderConfig.suffix}</span>
                   </div>
@@ -299,7 +301,7 @@ Règles :
                 <Button
                   variant="outline"
                   onClick={handleBack}
-                  className="bg-[#11112b] border-[#2a2a45] text-white hover:bg-[#2a2a45]"
+                  className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Retour

@@ -1,13 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { Check, Package, Gift, Award, Crown } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 const mainSteps = [
-{ id: 1, label: "Ton Offre" },
-{ id: 2, label: "Bonne nouvelle !" },
-{ id: 3, label: "Ta Vie Future" },
-{ id: 4, label: "Concrètement ?" },
-{ id: 5, label: "Plan d'Action" }];
+{ id: 1, label: "Ton Offre", page: "OfferResume" },
+{ id: 2, label: "Bonne nouvelle !", page: "BonneNouvelle" },
+{ id: 3, label: "Ta Vie Future", page: "OfferTaVieFuture" },
+{ id: 4, label: "Concrètement ?", page: "OfferConcretement" },
+{ id: 5, label: "Plan d'Action", page: "PlanAction" }];
 
 
 const offerSteps = [
@@ -22,6 +24,14 @@ export default function OfferBuilderLayout({
   currentStep,
   children
 }) {
+  const navigate = useNavigate();
+
+  const handleStepClick = (step) => {
+    if (step.page) {
+      navigate(createPageUrl(step.page));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Main Navigation Bar */}
@@ -30,14 +40,16 @@ export default function OfferBuilderLayout({
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
             {mainSteps.map((step, index) =>
             <React.Fragment key={step.id}>
-                <div className={cn(
-                "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
-                step.id === 1 ?
-                "bg-[#61f7a2] text-white shadow-sm" :
-                "text-gray-400"
-              )}>
+                <button 
+                  onClick={() => handleStepClick(step)}
+                  className={cn(
+                  "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap cursor-pointer hover:opacity-80",
+                  step.id === currentStep ?
+                  "bg-[#61f7a2] text-white shadow-sm" :
+                  "text-gray-400 hover:text-gray-300"
+                )}>
                   {step.id}. {step.label}
-                </div>
+                </button>
                 {index < mainSteps.length - 1 &&
               <div className="w-4 md:w-8 h-[2px] bg-gray-200" />
               }

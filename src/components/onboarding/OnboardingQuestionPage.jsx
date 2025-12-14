@@ -351,9 +351,45 @@ Règles :
                 <ArrowRight className="w-5 h-5 ml-2" />
               </GlowButton>
             </motion.div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
+      
+      {/* AI Thinking Effect */}
+      {isSaving && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-4"
+          >
+            <div className="flex gap-2">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-3 h-3 bg-[#61f7a2] rounded-full"
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.7, 1, 0.7]
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    repeat: Infinity,
+                    delay: i * 0.15
+                  }}
+                />
+              ))}
+            </div>
+            <span className="text-gray-700 font-medium">IA réfléchit...</span>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

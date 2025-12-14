@@ -33,6 +33,7 @@ export default function GlowButton({
       className={cn(
         "rounded-xl transition-all duration-300 flex items-center justify-center gap-2",
         "disabled:opacity-50 disabled:cursor-not-allowed",
+        "hover:scale-105 active:scale-95 transform",
         variants[variant],
         sizes[size],
         className

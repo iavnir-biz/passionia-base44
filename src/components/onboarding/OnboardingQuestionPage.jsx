@@ -179,13 +179,18 @@ Règles :
 
       <div className="flex-1 flex items-center justify-center p-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full max-w-2xl"
         >
           {/* Card */}
-          <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm"
+          >
             {/* Title */}
             <h1 className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed">
               {replaceVariables(title)}
@@ -221,23 +226,32 @@ Règles :
             {/* Input */}
             <div className="mb-8">
               {inputType === 'textarea' && (
-                <Textarea
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder={placeholder}
-                  className="w-full bg-white border-gray-300 text-gray-900 min-h-[120px] text-lg p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400"
-                />
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                >
+                  <Textarea
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    placeholder={placeholder}
+                    className="w-full bg-white border-gray-300 text-gray-900 min-h-[120px] text-lg p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400 transition-all duration-300 hover:shadow-md"
+                  />
+                </motion.div>
               )}
 
               {inputType === 'radio' && (
                 <RadioGroup value={value} onValueChange={setValue} className="space-y-3">
                   {options.map((option, idx) => (
-                    <div
+                    <motion.div
                       key={idx}
-                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.3 + idx * 0.1 }}
+                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm hover:scale-[1.02] ${
                         value === option 
                           ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
-                          : 'bg-white border-gray-200 hover:border-gray-300'
+                          : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}
                       onClick={() => setValue(option)}
                     >
@@ -245,7 +259,7 @@ Règles :
                       <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
                         {option}
                       </Label>
-                    </div>
+                    </motion.div>
                   ))}
                 </RadioGroup>
               )}
@@ -253,12 +267,15 @@ Règles :
               {inputType === 'checkbox' && (
                 <div className="space-y-3">
                   {options.map((option, idx) => (
-                    <div
+                    <motion.div
                       key={idx}
-                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.3 + idx * 0.1 }}
+                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm hover:scale-[1.02] ${
                         value.includes(option)
                           ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
-                          : 'bg-white border-gray-200 hover:border-gray-300'
+                          : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}
                       onClick={() => handleCheckboxChange(option, !value.includes(option))}
                     >
@@ -267,17 +284,28 @@ Règles :
                         onCheckedChange={(checked) => handleCheckboxChange(option, checked)}
                       />
                       <Label className="text-gray-900 cursor-pointer flex-1 font-medium">{option}</Label>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
 
               {inputType === 'slider' && (
-                <div className="space-y-6">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: 0.3 }}
+                  className="space-y-6"
+                >
                   <div className="text-center">
-                    <span className="text-5xl font-bold text-[#61f7a2]">
+                    <motion.span 
+                      key={value}
+                      initial={{ scale: 1.2 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-5xl font-bold text-[#61f7a2]"
+                    >
                       {value}{sliderConfig.suffix}
-                    </span>
+                    </motion.span>
                   </div>
                   <Slider
                     value={[value]}
@@ -291,17 +319,22 @@ Règles :
                     <span>{sliderConfig.min}{sliderConfig.suffix}</span>
                     <span>{sliderConfig.max}{sliderConfig.suffix}</span>
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+              className="flex gap-4"
+            >
               {prevPage && (
                 <Button
                   variant="outline"
                   onClick={handleBack}
-                  className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                  className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 hover:scale-105"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Retour
@@ -317,7 +350,7 @@ Règles :
                 {buttonText}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </GlowButton>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </div>

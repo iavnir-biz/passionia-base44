@@ -79,32 +79,28 @@ export default function OfferResume() {
       label: 'Produit Principal', 
       data: offer.product_principal,
       multiplier: 30,
-      conversionLabel: '1 vente/jour × 30 jours',
-      color: 'blue'
+      conversionLabel: '1 vente/jour × 30 jours'
     },
     { 
       key: 'petit_extra', 
       label: 'Petit Extra (Order Bump)', 
       data: offer.petit_extra,
       multiplier: 15,
-      conversionLabel: '50% conversion × 30 jours',
-      color: 'green'
+      conversionLabel: '50% conversion × 30 jours'
     },
     { 
       key: 'offre_superieure', 
       label: 'Offre Supérieure (Upsell)', 
       data: offer.offre_superieure,
       multiplier: 9,
-      conversionLabel: '30% conversion × 30 jours',
-      color: 'purple'
+      conversionLabel: '30% conversion × 30 jours'
     },
     { 
       key: 'offre_premium', 
       label: 'Offre Premium', 
       data: offer.offre_premium,
       multiplier: 1,
-      conversionLabel: '3% conversion × 30 jours',
-      color: 'gold'
+      conversionLabel: '3% conversion × 30 jours'
     }
   ];
 
@@ -150,55 +146,21 @@ export default function OfferResume() {
             {products.map((product, index) => {
               const Icon = iconMap[product.data?.id] || FileText;
               
-              // Color scheme per product type
-              const colorSchemes = {
-                blue: {
-                  bg: 'bg-blue-500/10',
-                  text: 'text-blue-500',
-                  checkBg: 'bg-blue-500',
-                  border: 'border-blue-500/20',
-                  glow: 'shadow-blue-500/10'
-                },
-                green: {
-                  bg: 'bg-green-500/10',
-                  text: 'text-green-500',
-                  checkBg: 'bg-green-500',
-                  border: 'border-green-500/20',
-                  glow: 'shadow-green-500/10'
-                },
-                purple: {
-                  bg: 'bg-purple-500/10',
-                  text: 'text-purple-500',
-                  checkBg: 'bg-purple-500',
-                  border: 'border-purple-500/20',
-                  glow: 'shadow-purple-500/10'
-                },
-                gold: {
-                  bg: 'bg-yellow-500/10',
-                  text: 'text-yellow-500',
-                  checkBg: 'bg-yellow-500',
-                  border: 'border-yellow-500/20',
-                  glow: 'shadow-yellow-500/10'
-                }
-              };
-              
-              const scheme = colorSchemes[product.color] || colorSchemes.green;
-              
               return (
                 <div 
                   key={product.key}
-                  className={`flex items-start gap-4 p-4 bg-[#11112b] rounded-xl border ${scheme.border} shadow-lg ${scheme.glow}`}
+                  className="flex items-start gap-4 p-4 bg-[#11112b] rounded-xl border border-[#2a2a45]"
                 >
-                  <div className={`w-10 h-10 rounded-lg ${scheme.bg} flex items-center justify-center flex-shrink-0`}>
-                    <Icon className={`w-5 h-5 ${scheme.text}`} />
+                  <div className="w-10 h-10 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-5 h-5 text-[#61f7a2]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-xs ${scheme.text} font-medium uppercase tracking-wide`}>
+                      <span className="text-xs text-[#61f7a2] font-medium uppercase tracking-wide">
                         {product.label}
                       </span>
-                      <div className={`w-4 h-4 rounded-full ${scheme.checkBg} flex items-center justify-center`}>
-                        <Check className="w-3 h-3 text-white" />
+                      <div className="w-4 h-4 rounded-full bg-[#61f7a2] flex items-center justify-center">
+                        <Check className="w-3 h-3 text-[#11112b]" />
                       </div>
                     </div>
                     <h3 className="text-white font-semibold text-sm mb-1 truncate">
@@ -209,7 +171,7 @@ export default function OfferResume() {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <span className={`text-xl font-bold ${scheme.text}`}>
+                    <span className="text-xl font-bold text-[#61f7a2]">
                       {product.data?.price || '—'}
                     </span>
                   </div>
@@ -272,39 +234,29 @@ export default function OfferResume() {
               exit={{ opacity: 0, height: 0 }}
               className="border-t border-[#2a2a45] pt-4 mt-2 space-y-3"
             >
-              {revenues.map((rev) => {
-                const colorSchemes = {
-                  blue: { text: 'text-blue-500', bg: 'bg-blue-500/5', border: 'border-blue-500/20' },
-                  green: { text: 'text-green-500', bg: 'bg-green-500/5', border: 'border-green-500/20' },
-                  purple: { text: 'text-purple-500', bg: 'bg-purple-500/5', border: 'border-purple-500/20' },
-                  gold: { text: 'text-yellow-500', bg: 'bg-yellow-500/5', border: 'border-yellow-500/20' }
-                };
-                const scheme = colorSchemes[rev.color] || colorSchemes.green;
-                
-                return (
-                  <div 
-                    key={rev.key}
-                    className={`flex items-center justify-between py-2 px-3 ${scheme.bg} rounded-lg border ${scheme.border}`}
-                  >
-                    <div>
-                      <span className="text-white text-sm font-medium">
-                        {rev.label}
-                      </span>
-                      <p className="text-gray-500 text-xs">
-                        {rev.conversionLabel}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span className={`${scheme.text} font-bold`}>
-                        {rev.total.toLocaleString('fr-FR')} €
-                      </span>
-                      <p className="text-gray-500 text-xs">
-                        {rev.price} € × {rev.multiplier}
-                      </p>
-                    </div>
+              {revenues.map((rev) => (
+                <div 
+                  key={rev.key}
+                  className="flex items-center justify-between py-2 px-3 bg-[#11112b]/50 rounded-lg"
+                >
+                  <div>
+                    <span className="text-white text-sm font-medium">
+                      {rev.label}
+                    </span>
+                    <p className="text-gray-500 text-xs">
+                      {rev.conversionLabel}
+                    </p>
                   </div>
-                );
-              })}
+                  <div className="text-right">
+                    <span className="text-[#61f7a2] font-bold">
+                      {rev.total.toLocaleString('fr-FR')} €
+                    </span>
+                    <p className="text-gray-500 text-xs">
+                      {rev.price} € × {rev.multiplier}
+                    </p>
+                  </div>
+                </div>
+              ))}
               
               <div className="flex items-center justify-between py-3 px-3 bg-[#61f7a2]/10 rounded-lg border border-[#61f7a2]/30">
                 <span className="text-white font-bold">Total Mensuel</span>

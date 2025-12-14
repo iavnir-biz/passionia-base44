@@ -335,7 +335,7 @@ export default function OfferConcretement() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2 }}
-            className="text-center"
+            className="flex flex-col items-center"
           >
             <p className="text-gray-400 mb-4 text-lg">
               Prêt(e) à commencer le voyage ?

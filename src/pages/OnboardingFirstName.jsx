@@ -33,7 +33,7 @@ export default function OnboardingFirstName() {
   };
 
   return (
-    <div className="min-h-screen bg-[#11112b] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -42,14 +42,14 @@ export default function OnboardingFirstName() {
       >
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center glow-green">
-            <Sparkles className="w-7 h-7 text-[#11112b]" />
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg">
+            <Sparkles className="w-7 h-7 text-white" />
           </div>
         </div>
 
         {/* Card */}
-        <div className="bg-[#1b1b33] rounded-2xl p-8 border border-[#2a2a45]">
-          <h1 className="text-2xl font-bold text-white text-center mb-8">
+        <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
+          <h1 className="text-2xl font-bold text-gray-900 text-center mb-8 leading-relaxed">
             Commençons par faire connaissance.<br />
             Quel est ton prénom ?
           </h1>
@@ -60,7 +60,7 @@ export default function OnboardingFirstName() {
             onChange={(e) => setFirstName(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ton prénom"
-            className="w-full bg-[#11112b] border-[#2a2a45] text-white text-lg py-6 px-4 rounded-xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-500"
+            className="w-full bg-white border-gray-300 text-gray-900 text-lg py-6 px-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400"
             autoFocus
           />
 

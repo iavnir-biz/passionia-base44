@@ -21,11 +21,11 @@ import GlowButton from '@/components/ui/GlowButton';
 import { cn } from "@/lib/utils";
 
 const mainSteps = [
-  { id: 1, label: "Ton Offre" },
-  { id: 2, label: "Bonne nouvelle !" },
-  { id: 3, label: "Ta Vie Future" },
-  { id: 4, label: "Concrètement ?" },
-  { id: 5, label: "Plan d'Action" },
+  { id: 1, label: "Ton Offre", page: "OfferResume" },
+  { id: 2, label: "Bonne nouvelle !", page: "BonneNouvelle" },
+  { id: 3, label: "Ta Vie Future", page: "OfferTaVieFuture" },
+  { id: 4, label: "Concrètement ?", page: "OfferConcretement" },
+  { id: 5, label: "Plan d'Action", page: "PlanAction" },
 ];
 
 function parsePrice(priceStr) {
@@ -108,6 +108,12 @@ export default function OfferConcretement() {
     navigate(createPageUrl('PlanAction'));
   };
 
+  const handleStepClick = (step) => {
+    if (step.page) {
+      navigate(createPageUrl(step.page));
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
@@ -186,16 +192,18 @@ export default function OfferConcretement() {
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
             {mainSteps.map((step, index) => (
               <React.Fragment key={step.id}>
-                <div className={cn(
-                  "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
-                  step.id === 4 
-                    ? "bg-[#61f7a2] text-[#11112b]" 
-                    : step.id < 4
-                      ? "text-[#61f7a2]"
-                      : "text-gray-500"
-                )}>
+                <button
+                  onClick={() => handleStepClick(step)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap cursor-pointer hover:opacity-80",
+                    step.id === 4 
+                      ? "bg-[#61f7a2] text-[#11112b]" 
+                      : step.id < 4
+                        ? "text-[#61f7a2] hover:text-[#4de88f]"
+                        : "text-gray-500 hover:text-gray-400"
+                  )}>
                   {step.id}. {step.label}
-                </div>
+                </button>
                 {index < mainSteps.length - 1 && (
                   <div className={cn(
                     "w-4 md:w-8 h-[2px]",

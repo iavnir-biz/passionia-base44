@@ -81,8 +81,8 @@ export default function OfferProductPrincipal() {
       <div className="max-w-3xl mx-auto px-4">
         {/* Main Title */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-3">
-            🏗️ Construis ton offre parfaite
+          <h1 className="text-gray-800 mb-3 text-3xl font-bold">🏗️ Construis ton offre parfaite
+
           </h1>
           <p className="text-gray-700">À chaque étape, choisis UNE offre parmi 2 propositions pour construire ta gamme complète.
 

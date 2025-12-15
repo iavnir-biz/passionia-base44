@@ -161,6 +161,8 @@ Décide la prochaine étape: poser une question OU finir selon la règle.
 RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont remplies ET la question finale a été posée.`;
 
     // Appel OpenAI avec structured output
+    console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });
+    
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -263,6 +265,12 @@ RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont re
       }
     });
 
+    console.log("OPENAI_CALL end", { 
+      fn: "onboardingNextQuestion", 
+      sessionId, 
+      usage: completion.usage 
+    });
+
     const result = JSON.parse(completion.choices[0].message.content);
 
     // Mettre à jour la session
@@ -278,7 +286,12 @@ RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont re
     return Response.json({
       isDone: result.isDone,
       question: result.isDone ? null : result.question,
-      summary
+      summary,
+      debug: {
+        model: "gpt-4o-mini",
+        requestId: completion.id || null,
+        usage: completion.usage || null
+      }
     });
 
   } catch (error) {

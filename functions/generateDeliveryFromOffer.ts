@@ -81,6 +81,8 @@ Email 1 : Problème + Empathie
 Email 2 : Solution + Preuve sociale
 Email 3 : Urgence douce + CTA final`;
 
+    console.log("OPENAI_CALL start", { fn: "generateDeliveryFromOffer", sessionId, model: "gpt-4o-mini", type: "emails" });
+
     const emailsCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -131,6 +133,8 @@ Email 3 : Urgence douce + CTA final`;
       }
     });
 
+    console.log("OPENAI_CALL end", { fn: "generateDeliveryFromOffer", sessionId, usage: emailsCompletion.usage, type: "emails" });
+
     const emails = JSON.parse(emailsCompletion.choices[0].message.content);
 
     // --- 2. SALES PAGE ---
@@ -159,6 +163,8 @@ RÈGLES STRICTES :
    - CTA final : "Envoie INFO pour recevoir le lien d'achat"
 4. Ton : direct, anti-bullshit, orienté résultats
 5. Pas de "garantie satisfait ou remboursé" (trop classique)`;
+
+    console.log("OPENAI_CALL start", { fn: "generateDeliveryFromOffer", sessionId, model: "gpt-4o-mini", type: "salesPage" });
 
     const salesPageCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -206,6 +212,8 @@ RÈGLES STRICTES :
       }
     });
 
+    console.log("OPENAI_CALL end", { fn: "generateDeliveryFromOffer", sessionId, usage: salesPageCompletion.usage, type: "salesPage" });
+
     const salesPage = JSON.parse(salesPageCompletion.choices[0].message.content);
 
     // --- 3. ACTION PLAN ---
@@ -223,6 +231,8 @@ RÈGLES STRICTES :
 3. Pas de "prépare ton mindset" ou blabla mental
 4. Que des actions MESURABLES et RÉALISABLES
 5. Ton : coach directif mais bienveillant`;
+
+    console.log("OPENAI_CALL start", { fn: "generateDeliveryFromOffer", sessionId, model: "gpt-4o-mini", type: "actionPlan" });
 
     const actionPlanCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -345,6 +355,8 @@ RÈGLES STRICTES :
       }
     });
 
+    console.log("OPENAI_CALL end", { fn: "generateDeliveryFromOffer", sessionId, usage: actionPlanCompletion.usage, type: "actionPlan" });
+
     const actionPlan = JSON.parse(actionPlanCompletion.choices[0].message.content);
 
     // --- 4. PRODUCT IDEAS ---
@@ -366,6 +378,8 @@ RÈGLES STRICTES :
    - quickWin : résultat rapide promis (max 80 caractères)
 4. Variété de prix : de 7€ à 2000€
 5. Focus : résultats mesurables`;
+
+    console.log("OPENAI_CALL start", { fn: "generateDeliveryFromOffer", sessionId, model: "gpt-4o-mini", type: "ideas" });
 
     const ideasCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -405,6 +419,8 @@ RÈGLES STRICTES :
       }
     });
 
+    console.log("OPENAI_CALL end", { fn: "generateDeliveryFromOffer", sessionId, usage: ideasCompletion.usage, type: "ideas" });
+
     const ideas = JSON.parse(ideasCompletion.choices[0].message.content);
 
     // --- 5. FIRST SALE STRATEGY ---
@@ -429,6 +445,8 @@ RÈGLES STRICTES :
    - smallProduct : idée de mini-produit 7-14€ pour valider le marché (titre + livrable + promesse)
 3. Ton : ultra-actionnable, zéro blabla
 4. Tous les CTA : "Envoie INFO pour recevoir le lien"`;
+
+    console.log("OPENAI_CALL start", { fn: "generateDeliveryFromOffer", sessionId, model: "gpt-4o-mini", type: "firstSale" });
 
     const firstSaleCompletion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -515,6 +533,8 @@ RÈGLES STRICTES :
       }
     });
 
+    console.log("OPENAI_CALL end", { fn: "generateDeliveryFromOffer", sessionId, usage: firstSaleCompletion.usage, type: "firstSale" });
+
     const firstSaleStrategy = JSON.parse(firstSaleCompletion.choices[0].message.content);
 
     // --- SAVE TO SESSION (objets, pas de stringify) ---
@@ -545,6 +565,21 @@ RÈGLES STRICTES :
           orderBump1: finalizedOffer.orderBump1?.title,
           upsell1: finalizedOffer.upsell1?.title,
           upsell3: finalizedOffer.upsell3?.title
+        },
+        model: "gpt-4o-mini",
+        requestIds: {
+          emails: emailsCompletion.id || null,
+          salesPage: salesPageCompletion.id || null,
+          actionPlan: actionPlanCompletion.id || null,
+          ideas: ideasCompletion.id || null,
+          firstSale: firstSaleCompletion.id || null
+        },
+        usages: {
+          emails: emailsCompletion.usage || null,
+          salesPage: salesPageCompletion.usage || null,
+          actionPlan: actionPlanCompletion.usage || null,
+          ideas: ideasCompletion.usage || null,
+          firstSale: firstSaleCompletion.usage || null
         }
       }
     });

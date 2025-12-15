@@ -174,6 +174,8 @@ Important:
         });
       }
 
+      console.log("OPENAI_CALL start", { fn: "generateOfferFromOnboarding", sessionId, model: "gpt-4o-mini", attempt: retryCount + 1 });
+
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages,
@@ -312,6 +314,13 @@ Important:
         }
       });
 
+      console.log("OPENAI_CALL end", { 
+        fn: "generateOfferFromOnboarding", 
+        sessionId, 
+        usage: completion.usage,
+        attempt: retryCount + 1
+      });
+
       // Try to parse and validate
       try {
         offer = JSON.parse(completion.choices[0].message.content);
@@ -372,7 +381,9 @@ Important:
         summaryKeysFilled,
         skillUsed,
         retries: retryCount,
-        model: "gpt-4o-mini"
+        model: "gpt-4o-mini",
+        requestId: null, // completion object not accessible here
+        usage: null // completion object not accessible here
       }
     });
 

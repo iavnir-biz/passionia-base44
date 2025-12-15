@@ -19,6 +19,11 @@ Après la réponse à cette question seulement, isDone doit être true.
 
 Importante : TOUJOURS personnaliser les exemples et questions avec la compétence de l'utilisateur quand elle est connue.
 
+RÈGLES STRICTES :
+- Ne répète jamais une question déjà posée. Utilise d'abord le summary pour décider.
+- Si le summary est incomplet, pose une question qui comble le champ manquant.
+- Vérifie l'historique des questions avant de poser une nouvelle question.
+
 Tu dois retourner un JSON avec :
 - isDone (boolean)
 - question (object si isDone=false, contient text, type, options?, min?, max?, step?)
@@ -103,6 +108,8 @@ IMPORTANT: Mets à jour le summary avec les nouvelles informations extraites des
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }
       ],
+      temperature: 0.2,
+      max_tokens: 600,
       response_format: {
         type: "json_schema",
         json_schema: {

@@ -41,58 +41,58 @@ Deno.serve(async (req) => {
     const ctx = await getSessionContext(req, sessionId);
     const summary = ctx.onboarding_summary;
 
-    const userPrompt = `Contexte utilisateur :
-- Prénom : ${ctx.name}
-- Compétence à enseigner : ${ctx.skill || summary.who_to_teach || 'non renseignée'}
-- Public cible (élèves) : ${summary.who_to_teach || summary.learner_profile || 'non renseigné'}
-- Problème d'apprentissage principal : ${summary.main_learning_problem || 'non renseigné'}
-- Quick win promis : ${summary.quick_win || 'non renseigné'}
-- Transformation finale : ${summary.big_transformation || 'non renseignée'}
-- Méthode/approche unique : ${summary.method_angle || 'non renseignée'}
-- Erreur courante à éviter : ${summary.common_mistake || 'non renseignée'}
-- Histoire/preuve : ${summary.proof_or_story || 'non renseignée'}
-- Préférences de formats : ${summary.format_preferences?.join(', ') || 'non renseignées'}
+    const userPrompt = `Données utilisateur:
+- name: ${ctx.name}
+- skill: ${ctx.skill || summary.who_to_teach || 'non renseignée'}
 
-Génère une offre complète d'enseignement avec :
+onboarding_summary (source principale):
+${JSON.stringify(summary, null, 2)}
 
-1. **mainOfferIdeas** : 3 angles d'offre différents, chacun avec :
-   - title : Titre accrocheur de l'offre globale
-   - problem : Le problème d'apprentissage précis que cette offre résout
-   - stats : Une statistique crédible ou insight de marché
-   - solution : Comment cette offre résout le problème (2-3 phrases)
+Préférences de format:
+${summary.format_preferences?.join(', ') || 'non renseignées'}
 
-2. **offerChoices** : Pour chaque niveau de produit, propose 2 options :
+Tâche:
+1) Génère 3 idées "mainOfferIdeas" basées sur P.S.S.O:
+- Problem: douleur d'apprentissage précise de l'élève (basé sur main_learning_problem)
+- Stats: soit une statistique prudente, soit un "signal marché (à vérifier)"
+- Solution: transformation d'apprentissage (basé sur quick_win + big_transformation)
+- Title: titre percutant qui parle à ${summary.who_to_teach || summary.learner_profile || 'la cible'}
+
+2) Génère 2 choix pour chaque niveau de funnel:
    
-   **mainProductChoices** (Produit principal) :
-   - title : Nom du produit pédagogique
-   - price : Un prix parmi "17€", "27€", "37€", "47€"
-   - productType : Type exact (ex: "Formation vidéo", "Programme 30 jours", "Bootcamp intensif")
-   - description : Détails livrables (ex: "12 vidéos HD (8-12min), 4 fiches pratiques PDF, 1 plan d'action personnalisable")
-   - outcome : Résultat concret pour l'apprenant (commence par "Tu seras capable de...")
+   **mainProductChoices** (Produit principal - 17€/27€/37€/47€):
+   - title : Nom accrocheur du produit pédagogique
+   - price : Exactement "17€", "27€", "37€" ou "47€"
+   - productType : Type précis (ex: "Formation vidéo 5 modules", "Programme 21 jours", "Bootcamp intensif 3 semaines")
+   - description : Livrables ULTRA précis (ex: "8 vidéos HD de 12-15min chacune + 4 fiches PDF téléchargeables + 1 workbook 30 pages + accès groupe privé 30j")
+   - outcome : Résultat concret aligné avec quick_win ou big_transformation (commence par "Tu seras capable de...")
 
-   **orderBump1Choices** (Bonus additionnel) :
-   - title : Nom du bonus
-   - price : Un prix parmi "14€", "17€", "27€", "37€"
-   - productType : Type (ex: "Kit de ressources", "Boîte à outils", "Guide pratique")
-   - description : Détails livrables
-   - outcome : Bénéfice immédiat
+   **orderBump1Choices** (Bonus additionnel - 14€/17€/27€/37€):
+   - title : Nom du bonus complémentaire
+   - price : Exactement "14€", "17€", "27€" ou "37€"
+   - productType : Type (ex: "Kit de 10 templates", "Boîte à outils PDF", "Guide pratique 25 pages")
+   - description : Livrables précis avec quantités
+   - outcome : Bénéfice immédiat qui accélère le quick_win
 
-   **upsell1Choices** (Offre supérieure) :
+   **upsell1Choices** (Offre supérieure - 67€/97€/197€/297€):
    - title : Nom du programme avancé
-   - price : Un prix parmi "67€", "97€", "197€", "297€"
-   - productType : Type (ex: "Masterclass", "Coaching de groupe", "Programme Premium")
-   - description : Détails livrables (plus complet que le produit principal)
-   - outcome : Transformation plus profonde
+   - price : Exactement "67€", "97€", "197€" ou "297€"
+   - productType : Type (ex: "Masterclass 6 semaines", "Coaching de groupe 8 sessions", "Programme Premium")
+   - description : Livrables détaillés (ex: "Tout du produit principal + 6 lives Zoom de 90min + 12 modules vidéo supplémentaires + support prioritaire")
+   - outcome : Transformation plus profonde alignée avec big_transformation
 
-   **upsell3Choices** (Offre Premium/VIP) :
-   - title : Nom de l'accompagnement haut de gamme
-   - price : Un prix parmi "1000€", "2000€", "3000€", "5000€"
-   - productType : Type (ex: "Accompagnement 1-to-1", "Mentorat VIP", "Programme All-Inclusive")
-   - description : Détails livrables (ultra-complet avec suivi personnalisé)
-   - outcome : Transformation garantie et mesurable
+   **upsell3Choices** (Offre Premium/VIP - 1000€/2000€/3000€/5000€):
+   - title : Nom de l'accompagnement exclusif
+   - price : Exactement "1000€", "2000€", "3000€" ou "5000€"
+   - productType : Type (ex: "Accompagnement 1-to-1 sur 3 mois", "Mentorat VIP 12 semaines", "Programme All-Inclusive")
+   - description : Livrables ultra-complets (ex: "Tout des niveaux précédents + 12 sessions coaching individuelles de 60min + revue personnalisée hebdomadaire + accès direct WhatsApp + garantie résultats")
+   - outcome : Transformation garantie et mesurable, liée à big_transformation
 
-Chaque produit doit être ULTRA-PRÉCIS sur les livrables (nombre de vidéos, durées, PDF, exercices, etc.).
-Pas de flou, pas de service de prestation, uniquement de l'enseignement structuré.`;
+Important:
+- Tout doit être 100% aligné avec who_to_teach + main_learning_problem + quick_win + big_transformation du summary.
+- Ne propose rien qui ne peut pas être enseigné (pas de prestation de service).
+- Livrables ULTRA précis: nombre exact de vidéos/lives/PDFs/sessions, durées exactes, formats exacts.
+- Prix EXACTEMENT ceux indiqués (avec le symbole €).`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",

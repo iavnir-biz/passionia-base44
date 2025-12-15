@@ -30,6 +30,67 @@ Contraintes:
 
 Sortie: JSON STRICT selon le schéma fourni, rien d'autre.`;
 
+const ALLOWED_PRICES = {
+  mainProduct: ['17€', '27€', '37€', '47€'],
+  orderBump: ['14€', '17€', '27€', '37€'],
+  upsell1: ['67€', '97€', '197€', '297€'],
+  upsell3: ['1000€', '2000€', '3000€', '5000€']
+};
+
+function validateOffer(offer) {
+  const errors = [];
+
+  // Validate structure
+  if (!offer.mainOfferIdeas || !Array.isArray(offer.mainOfferIdeas)) {
+    errors.push('mainOfferIdeas manquant ou invalide');
+  }
+  if (!offer.offerChoices) {
+    errors.push('offerChoices manquant');
+  }
+
+  if (offer.offerChoices) {
+    // Validate each choice has exactly 2 items
+    const choices = ['mainProductChoices', 'orderBump1Choices', 'upsell1Choices', 'upsell3Choices'];
+    for (const choice of choices) {
+      if (!Array.isArray(offer.offerChoices[choice]) || offer.offerChoices[choice].length !== 2) {
+        errors.push(`${choice} doit contenir exactement 2 items`);
+      }
+    }
+
+    // Validate prices
+    if (offer.offerChoices.mainProductChoices) {
+      for (const item of offer.offerChoices.mainProductChoices) {
+        if (!ALLOWED_PRICES.mainProduct.includes(item.price)) {
+          errors.push(`Prix mainProduct invalide: ${item.price}. Autorisés: ${ALLOWED_PRICES.mainProduct.join(', ')}`);
+        }
+      }
+    }
+    if (offer.offerChoices.orderBump1Choices) {
+      for (const item of offer.offerChoices.orderBump1Choices) {
+        if (!ALLOWED_PRICES.orderBump.includes(item.price)) {
+          errors.push(`Prix orderBump invalide: ${item.price}. Autorisés: ${ALLOWED_PRICES.orderBump.join(', ')}`);
+        }
+      }
+    }
+    if (offer.offerChoices.upsell1Choices) {
+      for (const item of offer.offerChoices.upsell1Choices) {
+        if (!ALLOWED_PRICES.upsell1.includes(item.price)) {
+          errors.push(`Prix upsell1 invalide: ${item.price}. Autorisés: ${ALLOWED_PRICES.upsell1.join(', ')}`);
+        }
+      }
+    }
+    if (offer.offerChoices.upsell3Choices) {
+      for (const item of offer.offerChoices.upsell3Choices) {
+        if (!ALLOWED_PRICES.upsell3.includes(item.price)) {
+          errors.push(`Prix upsell3 invalide: ${item.price}. Autorisés: ${ALLOWED_PRICES.upsell3.join(', ')}`);
+        }
+      }
+    }
+  }
+
+  return errors;
+}
+
 Deno.serve(async (req) => {
   try {
     const { sessionId } = await req.json();
@@ -40,6 +101,13 @@ Deno.serve(async (req) => {
 
     const ctx = await getSessionContext(req, sessionId);
     const summary = ctx.onboarding_summary;
+
+    // Check if finalized_offer is missing when it should exist
+    if (ctx.session.is_onboarding_done && !ctx.session.finalized_offer) {
+      return Response.json({ 
+        error: 'Session marquée comme terminée mais finalized_offer absent. L\'utilisateur doit finaliser son offre.' 
+      }, { status: 400 });
+    }
 
     const userPrompt = `Données utilisateur:
 - name: ${ctx.name}
@@ -94,15 +162,34 @@ Important:
 - Livrables ULTRA précis: nombre exact de vidéos/lives/PDFs/sessions, durées exactes, formats exacts.
 - Prix EXACTEMENT ceux indiqués (avec le symbole €).`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
+    let offer = null;
+    let retryCount = 0;
+    const maxRetries = 1;
+
+    while (retryCount <= maxRetries) {
+      const messages = [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }
-      ],
-      temperature: 0.4,
-      max_tokens: 3000,
-      response_format: {
+      ];
+
+      // Add retry message if this is a retry
+      if (retryCount > 0) {
+        messages.push({
+          role: "assistant",
+          content: "Je comprends, je vais corriger."
+        });
+        messages.push({
+          role: "user",
+          content: "Ton JSON était invalide, renvoie strictement le schéma avec les contraintes exactes."
+        });
+      }
+
+        const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages,
+        temperature: 0.4,
+        max_tokens: 3000,
+        response_format: {
         type: "json_schema",
         json_schema: {
           name: "offer_generation",
@@ -204,33 +291,66 @@ Important:
             },
             required: ["mainOfferIdeas", "offerChoices"],
             additionalProperties: false
-          }
-        }
-      }
-    });
+            }
+            }
+            });
 
-    const offer = JSON.parse(completion.choices[0].message.content);
+            // Try to parse and validate
+            try {
+            offer = JSON.parse(completion.choices[0].message.content);
+            const validationErrors = validateOffer(offer);
 
-    // Save to Session
-    const base44 = createClientFromRequest(req);
-    await base44.asServiceRole.entities.Session.update(sessionId, {
-      offer_draft: offer,
-      skill: ctx.skill || summary.who_to_teach || '',
-      updated_at: new Date().toISOString()
-    });
+            if (validationErrors.length === 0) {
+            // Validation passed, break the loop
+            break;
+            } else {
+            // Validation failed
+            if (retryCount < maxRetries) {
+              console.log(`Validation failed (attempt ${retryCount + 1}):`, validationErrors);
+              retryCount++;
+            } else {
+              // Max retries reached, return error
+              return Response.json({
+                error: 'Validation failed after retry',
+                validationErrors
+              }, { status: 500 });
+            }
+            }
+            } catch (parseError) {
+            // JSON parse failed
+            if (retryCount < maxRetries) {
+            console.log(`JSON parse failed (attempt ${retryCount + 1}):`, parseError.message);
+            retryCount++;
+            } else {
+            return Response.json({
+              error: 'Invalid JSON after retry',
+              details: parseError.message
+            }, { status: 500 });
+            }
+            }
+            }
 
-    // Debug info
-    const summaryKeysFilled = Object.keys(summary).filter(k => summary[k] && summary[k] !== '');
+            // Save to Session
+            const base44 = createClientFromRequest(req);
+            await base44.asServiceRole.entities.Session.update(sessionId, {
+            offer_draft: offer,
+            skill: ctx.skill || summary.who_to_teach || '',
+            updated_at: new Date().toISOString()
+            });
 
-    return Response.json({
-      success: true,
-      offer,
-      debug: {
-        usedSummary: true,
-        summaryKeysFilled,
-        skill: ctx.skill
-      }
-    });
+            // Debug info
+            const summaryKeysFilled = Object.keys(summary).filter(k => summary[k] && summary[k] !== '');
+
+            return Response.json({
+            success: true,
+            offer,
+            debug: {
+            usedSummary: true,
+            summaryKeysFilled,
+            skill: ctx.skill,
+            retries: retryCount
+            }
+            });
 
   } catch (error) {
     console.error('Error in generateOfferFromOnboarding:', error);

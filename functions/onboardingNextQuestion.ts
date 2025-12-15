@@ -110,70 +110,110 @@ IMPORTANT: Mets à jour le summary avec les nouvelles informations extraites des
           strict: true,
           schema: {
             type: "object",
-            properties: {
-              isDone: {
-                type: "boolean",
-                description: "True si l'onboarding est terminé"
-              },
-              question: {
-                type: "object",
+            oneOf: [
+              {
                 properties: {
-                  text: { type: "string" },
-                  type: {
-                    type: "string",
-                    enum: ["text", "single_choice", "multiple_choice", "slider"],
-                    description: "Type de question"
-                  },
-                  options: {
-                    type: "array",
-                    items: { type: "string" },
-                    minItems: 2,
-                    description: "Options pour single_choice ou multiple_choice (min 2)"
-                  },
-                  min: { 
-                    type: "number",
-                    description: "Valeur min pour slider"
-                  },
-                  max: { 
-                    type: "number",
-                    description: "Valeur max pour slider"
-                  },
-                  step: { 
-                    type: "number",
-                    description: "Pas pour slider"
+                  isDone: { type: "boolean", const: true },
+                  summary: {
+                    type: "object",
+                    properties: {
+                      who_to_teach: { type: "string" },
+                      learner_profile: { type: "string" },
+                      main_learning_problem: { type: "string" },
+                      quick_win: { type: "string" },
+                      big_transformation: { type: "string" },
+                      method_angle: { type: "string" },
+                      common_mistake: { type: "string" },
+                      proof_or_story: { type: "string" },
+                      format_preferences: {
+                        type: "array",
+                        items: { type: "string" }
+                      }
+                    },
+                    required: [],
+                    additionalProperties: false
                   }
                 },
-                required: ["text", "type"],
+                required: ["isDone", "summary"],
                 additionalProperties: false
               },
-              summary: {
-                type: "object",
+              {
                 properties: {
-                  who_to_teach: { type: "string" },
-                  learner_profile: { type: "string" },
-                  main_learning_problem: { type: "string" },
-                  quick_win: { type: "string" },
-                  big_transformation: { type: "string" },
-                  method_angle: { type: "string" },
-                  common_mistake: { type: "string" },
-                  proof_or_story: { type: "string" },
-                  format_preferences: {
-                    type: "array",
-                    items: { type: "string" }
+                  isDone: { type: "boolean", const: false },
+                  question: {
+                    type: "object",
+                    oneOf: [
+                      {
+                        properties: {
+                          text: { type: "string" },
+                          type: { type: "string", const: "text" }
+                        },
+                        required: ["text", "type"],
+                        additionalProperties: false
+                      },
+                      {
+                        properties: {
+                          text: { type: "string" },
+                          type: { type: "string", const: "single_choice" },
+                          options: {
+                            type: "array",
+                            items: { type: "string" },
+                            minItems: 2
+                          }
+                        },
+                        required: ["text", "type", "options"],
+                        additionalProperties: false
+                      },
+                      {
+                        properties: {
+                          text: { type: "string" },
+                          type: { type: "string", const: "multiple_choice" },
+                          options: {
+                            type: "array",
+                            items: { type: "string" },
+                            minItems: 2
+                          }
+                        },
+                        required: ["text", "type", "options"],
+                        additionalProperties: false
+                      },
+                      {
+                        properties: {
+                          text: { type: "string" },
+                          type: { type: "string", const: "slider" },
+                          min: { type: "number" },
+                          max: { type: "number" },
+                          step: { type: "number" }
+                        },
+                        required: ["text", "type", "min", "max", "step"],
+                        additionalProperties: false
+                      }
+                    ]
+                  },
+                  summary: {
+                    type: "object",
+                    properties: {
+                      who_to_teach: { type: "string" },
+                      learner_profile: { type: "string" },
+                      main_learning_problem: { type: "string" },
+                      quick_win: { type: "string" },
+                      big_transformation: { type: "string" },
+                      method_angle: { type: "string" },
+                      common_mistake: { type: "string" },
+                      proof_or_story: { type: "string" },
+                      format_preferences: {
+                        type: "array",
+                        items: { type: "string" }
+                      }
+                    },
+                    required: [],
+                    additionalProperties: false
                   }
                 },
-                required: [],
+                required: ["isDone", "question", "summary"],
                 additionalProperties: false
               }
-            },
-            required: ["isDone", "summary"],
-            additionalProperties: false,
-            if: {
-              properties: { isDone: { const: false } }
-            },
-            then: {
-              required: ["isDone", "summary", "question"]
-            }
+            ]
           }
         }
       }

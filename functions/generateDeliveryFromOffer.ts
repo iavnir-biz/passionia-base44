@@ -15,34 +15,47 @@ IMPORTANT : L'utilisateur veut ENSEIGNER sa compétence (formations, cours), PAS
 Tous les contenus doivent parler de "formation", "programme", "cours", "élèves", "apprenants".`;
 
 async function generateEmails(ctx, summary, offer, openai) {
-  const prompt = `Contexte :
-- Prénom : ${ctx.name}
-- Compétence enseignée : ${ctx.skill}
-- Public cible : ${summary.who_to_teach || summary.learner_profile}
-- Problème résolu : ${summary.main_learning_problem}
-- Transformation : ${summary.big_transformation}
+  const systemPrompt = `Tu es expert en email marketing pour vendre un produit d'enseignement.
+Tu écris en français, tutoiement, ton direct et humain.
+Tu suis la cohérence stricte: onboarding_summary + finalized_offer.
 
-Offre finalisée :
-${JSON.stringify(offer, null, 2)}
+Interdiction:
+- inventer des résultats irréalistes
+- inventer des témoignages
+- contredire l'offre
 
-Génère une séquence de 5 emails pour promouvoir cette formation :
+Format EXACT:
+Email 1: Sujet: ...
+Corps: ...
 
-Email 1 (Jour 0) : Bienvenue + présentation du problème
-Email 2 (Jour 1) : Histoire personnelle + crédibilité
-Email 3 (Jour 2) : Présentation de la solution (la formation)
-Email 4 (Jour 3) : Témoignages imaginés + bénéfices
-Email 5 (Jour 4) : Urgence + call-to-action
+Email 2: Sujet: ...
+Corps: ...
 
-Pour chaque email, fournis :
-- subject (objet)
-- body (corps complet, 200-300 mots, tutoiement, ton personnel)
+Email 3: Sujet: ...
+Corps: ...
 
-Format JSON strict avec tableau de 5 emails.`;
+Pas de markdown. Beaucoup de sauts de ligne.
+CTA standard: "Réponds INFO" ou "Envoie INFO".`;
+
+  const mainProduct = offer.mainProduct || offer.product_principal || {};
+  
+  const prompt = `name: ${ctx.name}
+skill: ${ctx.skill}
+onboarding_summary: ${JSON.stringify(summary, null, 2)}
+finalized_offer: ${JSON.stringify(offer, null, 2)}
+
+Produit principal à vendre:
+${JSON.stringify(mainProduct, null, 2)}
+
+Écris 3 emails:
+- Email 1: problème + prise de conscience
+- Email 2: solution + quick win + preuve perso (si proof_or_story)
+- Email 3: urgence simple + CTA INFO`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
     temperature: 0.5,
@@ -67,8 +80,8 @@ Format JSON strict avec tableau de 5 emails.`;
                 required: ["day", "subject", "body"],
                 additionalProperties: false
               },
-              minItems: 5,
-              maxItems: 5
+              minItems: 3,
+              maxItems: 3
             }
           },
           required: ["emails"],

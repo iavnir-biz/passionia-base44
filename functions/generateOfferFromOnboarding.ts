@@ -117,9 +117,14 @@ Deno.serve(async (req) => {
       }, { status: 400 });
     }
 
+    const skill = ctx.session.skill || ctx.skill || 'non spécifié';
+    const historyText = (ctx.onboarding_history || [])
+      .map((h, idx) => `Q${idx + 1}: ${h.question}\nR${idx + 1}: ${JSON.stringify(h.answer)}`)
+      .join('\n\n');
+
     const userPrompt = `Données utilisateur:
 
-Compétence : ${ctx.skill || ctx.session.skill || 'non spécifié'}
+Compétence : ${skill}
 Audience (élève cible) : ${summary.who_to_teach || 'non spécifié'}
 Profil apprenant : ${summary.learner_profile || 'non spécifié'}
 Problème principal : ${summary.main_learning_problem || 'non spécifié'}
@@ -129,6 +134,9 @@ Méthode/angle : ${summary.method_angle || 'non spécifié'}
 Erreur courante : ${summary.common_mistake || 'non spécifié'}
 Preuve/histoire : ${summary.proof_or_story || 'non spécifié'}
 Formats préférés : ${(summary.format_preferences || []).join(', ') || 'non spécifié'}
+
+Historique brut (fallback si summary incomplet) :
+${historyText || 'Non disponible'}
 
 Génère une offre complète structurée en 4 niveaux :
 
@@ -360,14 +368,15 @@ Important:
     const base44 = createClientFromRequest(req);
     
     const summaryKeysFilled = Object.keys(summary).filter(k => summary[k] && summary[k] !== '');
-    const skillUsed = ctx.skill || ctx.session.skill || '';
+    const usedSkill = ctx.session.skill || ctx.skill || '';
     
     await base44.asServiceRole.entities.Session.update(sessionId, {
       offer_draft: offer,
-      skill: skillUsed,
+      skill: usedSkill,
       offer_generation_debug: {
+        usedSkill,
         summaryKeysFilled,
-        skillUsed,
+        historyLength: (ctx.onboarding_history || []).length,
         retries: retryCount,
         model: "gpt-4o-mini",
         generatedAt: new Date().toISOString()
@@ -378,12 +387,13 @@ Important:
       success: true,
       offer,
       debug: {
+        usedSkill,
         summaryKeysFilled,
-        skillUsed,
+        historyLength: (ctx.onboarding_history || []).length,
         retries: retryCount,
         model: "gpt-4o-mini",
-        requestId: null, // completion object not accessible here
-        usage: null // completion object not accessible here
+        requestId: null,
+        usage: null
       }
     });
 

@@ -5,43 +5,68 @@ const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const SYSTEM_PROMPT = `Tu es un coach d'affaires bienveillant et pédagogue. Ta mission est d'aider un futur expert à transformer sa compétence en une offre commerciale pour ENSEIGNER son savoir-faire. Adresse-toi à l'utilisateur en "tu" et utilise parfois son prénom.
+const SYSTEM_PROMPT = `Tu es un coach d'affaires bienveillant et pédagogue qui a une VRAIE conversation avec l'utilisateur.
 
-Règle fondamentale : l'objectif est de TRANSMETTRE/ENSEIGNER, pas vendre des services.
+Mission : transformer sa compétence en offre éducative pour ENSEIGNER son savoir-faire (pas vendre des services).
 
-Mission : poser 6 à 12 questions max, une par une, simples et concrètes. Collecter :
-(1) élève idéal, (2) problème d'apprentissage principal, (3) transformation, (4) méthode unique, (5) quick win, (6) erreur typique, (7) histoire/preuve personnelle, (8) formats préférés.
+STYLE CONVERSATIONNEL OBLIGATOIRE :
+- Commence chaque question par une micro phrase qui rebondit sur la réponse précédente
+- Ex: "Ok, donc tu veux aider X à faire Y. Maintenant, dis-moi..."
+- Ex: "Super ! J'adore cette approche. Du coup..."
+- Ex: "Intéressant ! Et concrètement..."
+- JAMAIS de ton formulaire froid
+- Tutoie et utilise le prénom quand dispo
 
-Dernière question obligatoire avant de finir :
-"Pour finir, y a-t-il autre chose que tu aimerais partager ? Une anecdote, une histoire personnelle liée à ta compétence, ou un détail qui te rend unique ? Cela m'aidera à créer une offre qui te ressemble vraiment."
-Type = text.
-nextSummaryKey = proof_or_story.
-Après la réponse à cette question seulement, isDone doit être true.
+RÈGLES :
+- 6 à 12 questions MAX
+- Une question à la fois, simple et concrète
+- Objectif : remplir progressivement le summary avec 8 clés essentielles
+- Dernière question OBLIGATOIRE : "Pour finir, y a-t-il autre chose que tu aimerais partager ? Une anecdote, une histoire personnelle liée à ta compétence, ou un détail qui te rend unique ?"
 
-Importante : TOUJOURS personnaliser les exemples et questions avec la compétence de l'utilisateur quand elle est connue.
+8 CLÉS DU SUMMARY :
+1. who_to_teach : élève idéal
+2. learner_profile : profil détaillé de l'apprenant
+3. main_learning_problem : problème d'apprentissage principal
+4. quick_win : premier résultat rapide promis
+5. big_transformation : transformation finale apportée
+6. method_angle : méthode ou approche unique
+7. common_mistake : erreur typique à éviter
+8. proof_or_story : histoire/preuve personnelle
+9. format_preferences : formats préférés (array)
 
-RÈGLES STRICTES :
-- Ne répète jamais une question déjà posée. Utilise d'abord le summary pour décider.
-- Si le summary est incomplet, pose une question qui comble le champ manquant.
-- Vérifie l'historique des questions avant de poser une nouvelle question.
-- isDone peut être true UNIQUEMENT si la question finale "Pour finir" a été posée ET répondue.
+IMPORTANT :
+- À CHAQUE réponse, tu MET À JOUR le summary complet avec les nouvelles infos
+- Tu déduis intelligemment les clés même si pas demandées directement
+- Tu NE répètes JAMAIS une question déjà posée
+- isDone=true UNIQUEMENT si les 8 clés essentielles sont remplies ET la question finale "Pour finir" a été posée
 
-Tu dois retourner un JSON avec :
+Tu retournes TOUJOURS un JSON avec :
 Si isDone=false:
 {
   "isDone": false,
   "question": {
-    "text": "string",
+    "text": "string (avec phrase de transition conversationnelle)",
     "type": "text|single_choice|multiple_choice|slider",
     "options": ["string"] (si type=single_choice ou multiple_choice),
-    "min": number, "max": number, "step": number (si type=slider),
-    "nextSummaryKey": "who_to_teach|learner_profile|main_learning_problem|quick_win|big_transformation|method_angle|common_mistake|proof_or_story|format_preferences"
+    "min": number, "max": number, "step": number (si type=slider)
+  },
+  "summary": {
+    "who_to_teach": "string",
+    "learner_profile": "string",
+    "main_learning_problem": "string",
+    "quick_win": "string",
+    "big_transformation": "string",
+    "method_angle": "string",
+    "common_mistake": "string",
+    "proof_or_story": "string",
+    "format_preferences": ["string"]
   }
 }
 
 Si isDone=true:
 {
-  "isDone": true
+  "isDone": true,
+  "summary": { ... même structure ... }
 }`;
 
 Deno.serve(async (req) => {
@@ -68,8 +93,9 @@ Deno.serve(async (req) => {
     let session = sessions[0];
     const history = session.onboarding_history || [];
     const summary = session.onboarding_summary || {};
+    const skill = session.skill || user.coreSkill || '';
 
-    // Si userAnswer fourni, l'ajouter à l'historique et au summary
+    // Si userAnswer fourni, l'ajouter à l'historique
     if (userAnswer !== undefined && userAnswer !== null) {
       const currentQuestion = session.current_question;
       
@@ -80,58 +106,21 @@ Deno.serve(async (req) => {
           answer: userAnswer,
           at: new Date().toISOString()
         });
-
-        // Update summary if nextSummaryKey exists
-        if (currentQuestion.nextSummaryKey) {
-          let valueToStore = userAnswer;
-          
-          // Transform to array for format_preferences
-          if (currentQuestion.nextSummaryKey === 'format_preferences' && typeof userAnswer === 'string') {
-            valueToStore = userAnswer
-              .split(',')
-              .map(s => s.trim())
-              .filter(s => s.length > 0);
-          }
-          
-          summary[currentQuestion.nextSummaryKey] = valueToStore;
-        }
       }
-    }
-
-    // Check if mandatory final question must be asked
-    const essentialKeys = ['who_to_teach', 'learner_profile', 'main_learning_problem', 'quick_win', 'big_transformation', 'method_angle', 'common_mistake', 'format_preferences'];
-    const allEssentialKeysFilled = essentialKeys.every(k => summary[k]);
-    const finalQuestionAsked = history.some(h => h.question && h.question.includes('Pour finir'));
-    
-    // Force final question if all essentials are filled but final question not asked yet
-    if (allEssentialKeysFilled && !finalQuestionAsked) {
-      const forcedQuestion = {
-        text: "Pour finir, y a-t-il autre chose que tu aimerais partager ? Une anecdote, une histoire personnelle liée à ta compétence, ou un détail qui te rend unique ? Cela m'aidera à créer une offre qui te ressemble vraiment.",
-        type: "text",
-        nextSummaryKey: "proof_or_story"
-      };
-      
-      await base44.asServiceRole.entities.Session.update(sessionId, {
-        onboarding_history: history,
-        onboarding_summary: summary,
-        current_question: forcedQuestion,
-        is_onboarding_done: false
-      });
-      
-      return Response.json({
-        isDone: false,
-        question: forcedQuestion,
-        summary
-      });
     }
 
     // Construire le contexte pour le LLM
     const name = user.firstName || user.full_name || '';
-    const skill = user.coreSkill || '';
     
     const historyText = history
       .map((h, idx) => `Q${idx + 1}: ${h.question}\nR${idx + 1}: ${JSON.stringify(h.answer)}`)
       .join('\n\n');
+
+    // Dernière question/réponse pour relance naturelle
+    const lastEntry = history.length > 0 ? history[history.length - 1] : null;
+    const lastQA = lastEntry 
+      ? `\n\nDERNIÈRE INTERACTION (utilise-la pour faire une relance naturelle) :\nQuestion précédente : ${lastEntry.question}\nRéponse de l'utilisateur : ${JSON.stringify(lastEntry.answer)}`
+      : '';
 
     // Anti-répétition : 3 dernières questions
     const recentQuestions = history
@@ -139,42 +128,50 @@ Deno.serve(async (req) => {
       .map(h => h.question)
       .filter(q => q);
 
-    const userPrompt = `Prénom utilisateur: ${name || 'non fourni'}
-Compétence: ${skill || 'non fournie encore'}
+    // Check si question finale posée
+    const finalQuestionAsked = history.some(h => h.question && h.question.includes('Pour finir'));
 
-Mémoire actuelle (summary):
+    const userPrompt = `CONTEXTE UTILISATEUR :
+Prénom : ${name || 'non fourni'}
+Compétence principale : ${skill || 'non fournie encore'}
+
+SUMMARY ACTUEL (à enrichir progressivement) :
 ${JSON.stringify(summary, null, 2)}
 
-Historique Q/R:
+HISTORIQUE COMPLET DES Q/R :
 ${historyText || 'Aucune question posée encore.'}
+${lastQA}
 
-${recentQuestions.length > 0 ? `ATTENTION - Ne repose pas une question équivalente aux 3 dernières :
+${recentQuestions.length > 0 ? `ATTENTION - Questions récentes (ne les repose pas) :
 ${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
 ` : ''}
 
-Contexte:
-- Nombre de questions posées: ${history.length}
-- Clés remplies dans summary: ${Object.keys(summary).filter(k => summary[k]).join(', ') || 'aucune'}
-- Question finale "Pour finir" posée: ${finalQuestionAsked ? 'OUI' : 'NON'}
+ÉTAT :
+- Nombre de questions posées : ${history.length}
+- Clés remplies dans summary : ${Object.keys(summary).filter(k => summary[k] && (typeof summary[k] === 'string' ? summary[k].trim() : true)).join(', ') || 'aucune'}
+- Question finale "Pour finir" posée : ${finalQuestionAsked ? 'OUI' : 'NON'}
 
-Décide la prochaine étape: poser une question OU finir selon la règle.
-RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont remplies ET la question finale a été posée.`;
+MISSION :
+${lastEntry ? '1. Commence ta prochaine question par UNE PHRASE DE TRANSITION qui rebondit naturellement sur la dernière réponse' : '1. Commence par une question accueillante'}
+2. Pose LA question suivante pour enrichir le summary
+3. Retourne le summary COMPLET et MIS À JOUR (déduis intelligemment les infos des réponses)
+4. isDone=true UNIQUEMENT si toutes les 8 clés essentielles sont remplies ET question finale posée`;
 
-    // Appel OpenAI avec structured output
     console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });
     
+    // Appel OpenAI avec structured output
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }
       ],
-      temperature: 0.2,
-      max_tokens: 600,
+      temperature: 0.3,
+      max_tokens: 1000,
       response_format: {
         type: "json_schema",
         json_schema: {
-          name: "onboarding_decision",
+          name: "onboarding_response",
           strict: true,
           schema: {
             type: "object",
@@ -188,13 +185,9 @@ RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont re
                       {
                         properties: {
                           text: { type: "string" },
-                          type: { type: "string", const: "text" },
-                          nextSummaryKey: { 
-                            type: "string",
-                            enum: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"]
-                          }
+                          type: { type: "string", const: "text" }
                         },
-                        required: ["text", "type", "nextSummaryKey"],
+                        required: ["text", "type"],
                         additionalProperties: false
                       },
                       {
@@ -205,13 +198,9 @@ RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont re
                             type: "array",
                             items: { type: "string" },
                             minItems: 2
-                          },
-                          nextSummaryKey: { 
-                            type: "string",
-                            enum: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"]
                           }
                         },
-                        required: ["text", "type", "options", "nextSummaryKey"],
+                        required: ["text", "type", "options"],
                         additionalProperties: false
                       },
                       {
@@ -222,13 +211,9 @@ RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont re
                             type: "array",
                             items: { type: "string" },
                             minItems: 2
-                          },
-                          nextSummaryKey: { 
-                            type: "string",
-                            enum: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"]
                           }
                         },
-                        required: ["text", "type", "options", "nextSummaryKey"],
+                        required: ["text", "type", "options"],
                         additionalProperties: false
                       },
                       {
@@ -237,26 +222,60 @@ RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont re
                           type: { type: "string", const: "slider" },
                           min: { type: "number" },
                           max: { type: "number" },
-                          step: { type: "number" },
-                          nextSummaryKey: { 
-                            type: "string",
-                            enum: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"]
-                          }
+                          step: { type: "number" }
                         },
-                        required: ["text", "type", "min", "max", "step", "nextSummaryKey"],
+                        required: ["text", "type", "min", "max", "step"],
                         additionalProperties: false
                       }
                     ]
+                  },
+                  summary: {
+                    type: "object",
+                    properties: {
+                      who_to_teach: { type: "string" },
+                      learner_profile: { type: "string" },
+                      main_learning_problem: { type: "string" },
+                      quick_win: { type: "string" },
+                      big_transformation: { type: "string" },
+                      method_angle: { type: "string" },
+                      common_mistake: { type: "string" },
+                      proof_or_story: { type: "string" },
+                      format_preferences: {
+                        type: "array",
+                        items: { type: "string" }
+                      }
+                    },
+                    required: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"],
+                    additionalProperties: false
                   }
                 },
-                required: ["isDone", "question"],
+                required: ["isDone", "question", "summary"],
                 additionalProperties: false
               },
               {
                 properties: {
-                  isDone: { type: "boolean", const: true }
+                  isDone: { type: "boolean", const: true },
+                  summary: {
+                    type: "object",
+                    properties: {
+                      who_to_teach: { type: "string" },
+                      learner_profile: { type: "string" },
+                      main_learning_problem: { type: "string" },
+                      quick_win: { type: "string" },
+                      big_transformation: { type: "string" },
+                      method_angle: { type: "string" },
+                      common_mistake: { type: "string" },
+                      proof_or_story: { type: "string" },
+                      format_preferences: {
+                        type: "array",
+                        items: { type: "string" }
+                      }
+                    },
+                    required: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"],
+                    additionalProperties: false
+                  }
                 },
-                required: ["isDone"],
+                required: ["isDone", "summary"],
                 additionalProperties: false
               }
             ]
@@ -273,10 +292,10 @@ RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont re
 
     const result = JSON.parse(completion.choices[0].message.content);
 
-    // Mettre à jour la session
+    // Mettre à jour la session avec le summary complet
     const updateData = {
       onboarding_history: history,
-      onboarding_summary: summary,
+      onboarding_summary: result.summary, // Summary complet du LLM
       is_onboarding_done: result.isDone,
       current_question: result.isDone ? null : result.question
     };
@@ -286,7 +305,7 @@ RAPPEL CRITIQUE: isDone=true UNIQUEMENT si toutes les clés essentielles sont re
     return Response.json({
       isDone: result.isDone,
       question: result.isDone ? null : result.question,
-      summary,
+      summary: result.summary,
       debug: {
         model: "gpt-4o-mini",
         requestId: completion.id || null,

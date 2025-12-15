@@ -192,31 +192,22 @@ Chaque jour:
 }
 
 async function generateIdeas(ctx, summary, offer, openai) {
-  const prompt = `Contexte :
-- Compétence enseignée : ${ctx.skill}
-- Public cible : ${summary.who_to_teach || summary.learner_profile}
-- Offre : ${JSON.stringify(offer, null, 2)}
+  const systemPrompt = `Tu es spécialiste de productisation.
+Tu proposes 10 idées de produits d'enseignement cohérentes avec l'élève cible.
+Titres courts, bénéfice clair, format précis.`;
 
-Génère 10 idées de contenus gratuits pour attirer des prospects :
+  const prompt = `skill: ${ctx.skill}
+onboarding_summary: ${JSON.stringify(summary, null, 2)}
 
-- Posts réseaux sociaux (LinkedIn, Instagram, Facebook)
-- Articles de blog
-- Vidéos YouTube
-- Lead magnets (PDF, checklist, mini-formation)
-- Lives / webinaires
-
-Pour chaque idée, fournis :
-- type (ex: "Post LinkedIn", "Article de blog", etc.)
-- title (titre accrocheur)
-- description (2-3 phrases sur le contenu)
-- goal (objectif : visibilité, lead generation, etc.)
-
-Format JSON strict avec tableau de 10 idées.`;
+Donne 10 idées structurées:
+- Titre
+- Format (PDF / mini-formation 3-5 vidéos / template / etc.)
+- Quick win promis`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
     temperature: 0.6,
@@ -224,7 +215,7 @@ Format JSON strict avec tableau de 10 idées.`;
     response_format: {
       type: "json_schema",
       json_schema: {
-        name: "content_ideas",
+        name: "product_ideas",
         strict: true,
         schema: {
           type: "object",
@@ -234,12 +225,11 @@ Format JSON strict avec tableau de 10 idées.`;
               items: {
                 type: "object",
                 properties: {
-                  type: { type: "string" },
                   title: { type: "string" },
-                  description: { type: "string" },
-                  goal: { type: "string" }
+                  format: { type: "string" },
+                  quickWin: { type: "string" }
                 },
-                required: ["type", "title", "description", "goal"],
+                required: ["title", "format", "quickWin"],
                 additionalProperties: false
               },
               minItems: 10,

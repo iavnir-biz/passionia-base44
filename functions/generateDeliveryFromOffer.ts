@@ -132,31 +132,26 @@ Génère une page de vente complète avec:
 }
 
 async function generateActionPlan(ctx, summary, offer, openai) {
-  const prompt = `Contexte :
-- Prénom : ${ctx.name}
-- Compétence enseignée : ${ctx.skill}
-- Offre : ${JSON.stringify(offer, null, 2)}
+  const systemPrompt = `Tu es coach business. Tu produis un plan d'action simple sur 7 jours.
+Tout doit être cohérent avec finalized_offer.
+Pas de jargon, pas de markdown.
+Chaque jour = 3 actions maximum, très concrètes.`;
 
-Génère un plan d'action sur 4 semaines pour lancer cette formation :
+  const prompt = `name: ${ctx.name}
+onboarding_summary: ${JSON.stringify(summary, null, 2)}
+finalized_offer: ${JSON.stringify(offer, null, 2)}
 
-Semaine 1 : Création du contenu
-Semaine 2 : Setup technique (plateforme, paiement)
-Semaine 3 : Marketing pré-lancement
-Semaine 4 : Lancement et premières ventes
-
-Pour chaque semaine, fournis :
-- weekNumber (1-4)
-- title (titre de la semaine)
-- objective (objectif principal)
-- tasks (tableau de 5-7 tâches concrètes)
-- expectedResult (résultat attendu en fin de semaine)
-
-Format JSON strict avec tableau de 4 semaines.`;
+Crée un plan d'action 7 jours:
+Jour 1 à Jour 7
+Chaque jour:
+Étape 1:
+Étape 2:
+Étape 3:`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
     temperature: 0.4,
@@ -169,28 +164,24 @@ Format JSON strict avec tableau de 4 semaines.`;
         schema: {
           type: "object",
           properties: {
-            weeks: {
+            days: {
               type: "array",
               items: {
                 type: "object",
                 properties: {
-                  weekNumber: { type: "number" },
-                  title: { type: "string" },
-                  objective: { type: "string" },
-                  tasks: {
-                    type: "array",
-                    items: { type: "string" }
-                  },
-                  expectedResult: { type: "string" }
+                  dayNumber: { type: "number" },
+                  step1: { type: "string" },
+                  step2: { type: "string" },
+                  step3: { type: "string" }
                 },
-                required: ["weekNumber", "title", "objective", "tasks", "expectedResult"],
+                required: ["dayNumber", "step1", "step2", "step3"],
                 additionalProperties: false
               },
-              minItems: 4,
-              maxItems: 4
+              minItems: 7,
+              maxItems: 7
             }
           },
-          required: ["weeks"],
+          required: ["days"],
           additionalProperties: false
         }
       }

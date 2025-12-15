@@ -66,14 +66,13 @@ export default function OnboardingDynamic() {
 
   const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
     try {
-      setIsSaving(true);
       const { data } = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId,
         userAnswer: lastAnswer
       });
 
       if (data.isDone) {
-        // Onboarding terminé, rediriger
+        // Onboarding terminé, rediriger vers le loader + génération
         await base44.auth.updateMe({ onboarding_completed: true });
         navigate(createPageUrl('OfferGenerationStart'));
       } else {
@@ -84,7 +83,6 @@ export default function OnboardingDynamic() {
     } catch (error) {
       console.error('Error fetching next question:', error);
     } finally {
-      setIsSaving(false);
       setIsLoading(false);
     }
   };

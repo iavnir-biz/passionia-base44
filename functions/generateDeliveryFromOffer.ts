@@ -95,37 +95,33 @@ ${JSON.stringify(mainProduct, null, 2)}
 }
 
 async function generateSalesPage(ctx, summary, offer, openai) {
-  const prompt = `Contexte :
-- Prénom : ${ctx.name}
-- Compétence enseignée : ${ctx.skill}
-- Public cible : ${summary.who_to_teach || summary.learner_profile}
-- Problème résolu : ${summary.main_learning_problem}
-- Quick win : ${summary.quick_win}
-- Transformation : ${summary.big_transformation}
-- Méthode unique : ${summary.method_angle}
+  const systemPrompt = `Tu es copywriter. Objectif: page de vente d'un produit d'enseignement.
+Tu suis PAS (Problem-Agitate-Solution) + sections claires.
+Pas de markdown. Sections séparées par des sauts de ligne.
+Interdiction d'inventer des stats "source X" si non certain.`;
 
-Offre finalisée :
-${JSON.stringify(offer, null, 2)}
+  const mainProduct = offer.mainProduct || offer.product_principal || {};
+  
+  const prompt = `name: ${ctx.name}
+skill: ${ctx.skill}
+onboarding_summary: ${JSON.stringify(summary, null, 2)}
+finalized_offer: ${JSON.stringify(offer, null, 2)}
+produit: ${JSON.stringify(mainProduct, null, 2)}
 
-Rédige une page de vente complète (format Markdown) avec :
-
-1. **Titre accrocheur** (H1)
-2. **Sous-titre** qui identifie le problème
-3. **Section "Tu te reconnais ?" (3-4 points douleur)
-4. **Histoire personnelle** (2-3 paragraphes basés sur proof_or_story)
-5. **Présentation de la formation** (titre + description)
-6. **Programme détaillé** (modules, ce qui est inclus)
-7. **Bénéfices / Résultats attendus** (liste à puces)
-8. **Garantie** (satisfait ou remboursé 30j)
-9. **Call-to-action** (bouton inscription)
-10. **FAQ** (3-4 questions courantes)
-
-Ton : personnel, tutoiement, motivant mais honnête. 1500-2000 mots.`;
+Génère une page de vente complète avec:
+- Promesse claire
+- À qui c'est destiné / pas destiné
+- Le problème + agitation
+- Le mécanisme/méthode (method_angle)
+- Ce que contient le produit (ultra précis)
+- Résultat attendu (outcome)
+- FAQ (5 questions)
+- CTA final: "Envoie INFO"`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
     temperature: 0.5,

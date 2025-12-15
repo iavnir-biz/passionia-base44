@@ -75,6 +75,12 @@ Deno.serve(async (req) => {
 
     const currentSummary = session.onboarding_summary || {};
 
+    // Anti-répétition : 3 dernières questions
+    const recentQuestions = (session.onboarding_history || [])
+      .slice(-3)
+      .map(h => h.question)
+      .filter(q => q);
+
     const userPrompt = `Prénom utilisateur: ${name || 'non fourni'}
 Compétence: ${skill || 'non fournie encore'}
 
@@ -84,6 +90,9 @@ ${JSON.stringify(currentSummary, null, 2)}
 Historique Q/R:
 ${historyText || 'Aucune question posée encore.'}
 
+${recentQuestions.length > 0 ? `ATTENTION - Ne repose pas une question équivalente aux 3 dernières :
+${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
+` : ''}
 Décide la prochaine étape: poser une question OU finir selon la règle.
 IMPORTANT: Mets à jour le summary avec les nouvelles informations extraites des réponses.`;
 
@@ -112,15 +121,27 @@ IMPORTANT: Mets à jour le summary avec les nouvelles informations extraites des
                   text: { type: "string" },
                   type: {
                     type: "string",
-                    enum: ["text", "single_choice", "multiple_choice", "slider"]
+                    enum: ["text", "single_choice", "multiple_choice", "slider"],
+                    description: "Type de question"
                   },
                   options: {
                     type: "array",
-                    items: { type: "string" }
+                    items: { type: "string" },
+                    minItems: 2,
+                    description: "Options pour single_choice ou multiple_choice (min 2)"
                   },
-                  min: { type: "number" },
-                  max: { type: "number" },
-                  step: { type: "number" }
+                  min: { 
+                    type: "number",
+                    description: "Valeur min pour slider"
+                  },
+                  max: { 
+                    type: "number",
+                    description: "Valeur max pour slider"
+                  },
+                  step: { 
+                    type: "number",
+                    description: "Pas pour slider"
+                  }
                 },
                 required: ["text", "type"],
                 additionalProperties: false
@@ -146,13 +167,40 @@ IMPORTANT: Mets à jour le summary avec les nouvelles informations extraites des
               }
             },
             required: ["isDone", "summary"],
-            additionalProperties: false
+            additionalProperties: false,
+            if: {
+              properties: { isDone: { const: false } }
+            },
+            then: {
+              required: ["isDone", "summary", "question"]
+            }
           }
         }
       }
     });
 
     const result = JSON.parse(completion.choices[0].message.content);
+
+    // Validation post-LLM
+    if (!result.isDone && result.question) {
+      const qType = result.question.type;
+      
+      // Valider options pour single/multiple choice
+      if ((qType === 'single_choice' || qType === 'multiple_choice') && 
+          (!result.question.options || result.question.options.length < 2)) {
+        throw new Error('Options required for single/multiple choice with at least 2 items');
+      }
+      
+      // Valider slider
+      if (qType === 'slider') {
+        if (result.question.min === undefined || result.question.max === undefined || result.question.step === undefined) {
+          throw new Error('min, max, step required for slider');
+        }
+        if (result.question.min >= result.question.max) {
+          throw new Error('slider: min must be < max');
+        }
+      }
+    }
 
     // Mettre à jour la session
     const updateData = {

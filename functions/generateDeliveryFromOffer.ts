@@ -247,32 +247,32 @@ Donne 10 idées structurées:
 }
 
 async function generateFirstSaleStrategy(ctx, summary, offer, openai) {
-  const prompt = `Contexte :
-- Prénom : ${ctx.name}
-- Compétence enseignée : ${ctx.skill}
-- Public cible : ${summary.who_to_teach || summary.learner_profile}
-- Offre : ${JSON.stringify(offer, null, 2)}
+  const systemPrompt = `Tu es expert acquisition/closing.
+Tu livres un plan "première vente en 24h".
+Tout doit être copiable-collable. Français. Tutoiement.
+Pas de markdown. Beaucoup de sauts de ligne.
+CTA standard: "Envoie INFO".
+Pas de promesses irréalistes.`;
 
-Génère une stratégie détaillée pour faire ta PREMIÈRE VENTE dans les 7 jours (format Markdown) :
+  const mainProduct = offer.mainProduct || offer.product_principal || {};
 
-1. **Jour 1-2** : Préparation (quoi créer, où poster)
-2. **Jour 3-4** : Activation réseau chaud (famille, amis, contacts)
-3. **Jour 5-6** : Contenu viral + promo ciblée
-4. **Jour 7** : Push final + urgence
+  const prompt = `name: ${ctx.name}
+skill: ${ctx.skill}
+onboarding_summary: ${JSON.stringify(summary, null, 2)}
+produit: ${JSON.stringify(mainProduct, null, 2)}
 
-Inclus :
-- Actions concrètes quotidiennes
-- Scripts de messages à envoyer
-- Plateformes à utiliser
-- Prix d'appel recommandé (offre early bird)
-- Mindset / conseils psychologiques
-
-Ton : motivant, direct, actionnable. 800-1000 mots.`;
+Génère exactement ces sections:
+SECTION 1 : OÙ TROUVER TES CLIENTS MAINTENANT
+SECTION 2 : MESSAGES DM PRÊTS À ENVOYER
+SECTION 3 : STORIES À PUBLIER
+SECTION 4 : SCRIPT REEL VIRAL
+SECTION 5 : CARROUSEL 7 SLIDES
+SECTION 6 : STRUCTURE DU PETIT PRODUIT`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
     temperature: 0.5,

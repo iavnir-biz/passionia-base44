@@ -102,7 +102,10 @@ export default function OnboardingDynamic() {
   const handleNext = async () => {
     if (!canProceed()) return;
     
+    setIsSaving(true);
     await fetchNextQuestion(session.id, value);
+    setValue('');
+    setIsSaving(false);
   };
 
   const canProceed = () => {

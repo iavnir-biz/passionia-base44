@@ -60,7 +60,7 @@ export default function OfferTaVieFuture() {
   };
 
   const generateFutureVision = async () => {
-    if (!user?.coreSkill) return;
+    if (!user?.sessionId) return;
     
     setIsGenerating(true);
     try {
@@ -76,49 +76,23 @@ export default function OfferTaVieFuture() {
         total: parsePrice(p.data?.price) * p.multiplier
       }));
       const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
+      const revenueGoal = parseInt(user?.targetIncome) || 500;
 
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Tu es un coach de vie et expert en projection de succès entrepreneurial.
+      const selectedProducts = {
+        product_principal: offer.product_principal?.title || 'non sélectionné',
+        petit_extra: offer.petit_extra?.title || 'non sélectionné',
+        offre_superieure: offer.offre_superieure?.title || 'non sélectionné',
+        offre_premium: offer.offre_premium?.title || 'non sélectionné'
+      };
 
-Contexte utilisateur :
-- Compétence/Passion : ${user.coreSkill || 'non renseignée'}
-- Public cible : ${user.targetAudience || 'non renseigné'}
-- Niveau d'expérience : ${user.experienceLevel || 'non renseigné'}
-- Années de pratique : ${user.yearsPracticing || 'non renseigné'}
-- Objectif de revenus : ${user.targetIncome || '500'}€/mois
-- Revenu potentiel calculé : ${totalMonthly}€/mois
-- Transformation finale souhaitée : ${user.transformation || 'non renseignée'}
-- Style de vie souhaité : ${user.lifestyle || 'non renseigné'}
-
-Produits sélectionnés :
-- Produit Principal : ${offer.product_principal?.title || 'non sélectionné'}
-- Petit Extra : ${offer.petit_extra?.title || 'non sélectionné'}
-- Offre Supérieure : ${offer.offre_superieure?.title || 'non sélectionné'}
-- Offre Premium : ${offer.offre_premium?.title || 'non sélectionné'}
-
-Rédige un texte narratif immersif et inspirant (4-5 paragraphes) qui projette l'utilisateur dans sa vie future.
-
-Le texte doit :
-- Commencer par une scène de vie concrète (ex: "Imagine-toi, dans 6 mois...")
-- Être à la 2ème personne du singulier (tu)
-- Mentionner directement sa compétence "${user.coreSkill}"
-- Intégrer des éléments concrets : revenus, élèves, impact, liberté
-- Être émotionnel mais réaliste
-- Parler de l'impact sur son audience/élèves
-- Évoquer le sentiment de fierté et d'accomplissement
-- Terminer sur une note motivante et actionnable
-
-Ton : doux, émotionnel, inspirant, réaliste, motivant.
-Pas de promesses irréalistes, mais une vision concrète et atteignable.`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            narrativeText: { type: "string" }
-          }
-        }
+      const { data } = await base44.functions.invoke('generateFutureVision', {
+        sessionId: user.sessionId,
+        totalMonthly,
+        revenueGoal,
+        selectedProducts
       });
       
-      setFutureVision(result);
+      setFutureVision(data);
     } catch (error) {
       console.error('Error generating vision:', error);
       // Fallback text

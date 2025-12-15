@@ -90,56 +90,15 @@ export default function BonneNouvelle() {
   };
 
   const generateMarketAnalysis = async () => {
-    if (!user?.coreSkill) return;
+    if (!user?.sessionId) return;
     
     setIsGenerating(true);
     try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Tu es un expert en analyse de marché e-learning et monétisation de compétences.
-
-Contexte utilisateur :
-- Compétence/Passion : ${user.coreSkill || 'non renseignée'}
-- Public cible : ${user.targetAudience || 'non renseigné'}
-- Problème principal des élèves : ${user.mainProblem || 'non renseigné'}
-- Niveau d'expérience : ${user.experienceLevel || 'non renseigné'}
-- Objectif de revenus : ${user.targetIncome || 'non renseigné'}€/mois
-
-Génère une analyse de marché personnalisée avec :
-
-1. validationText : Un texte de 3-4 phrases PERSONNALISÉ qui valide le marché de l'utilisateur. Le texte doit :
-   - Mentionner directement sa compétence "${user.coreSkill}"
-   - Rassurer sur le potentiel de monétisation
-   - Être motivant et encourageant
-   - Mentionner des tendances actuelles du e-learning
-   - Rester professionnel et crédible
-
-2. marketScores : Un objet avec 5 scores (entre 70 et 95) adaptés à la compétence :
-   - elearningMarket : Taille du marché e-learning pour cette compétence
-   - digitalDemand : Demande numérique croissante
-   - recurringRevenue : Potentiel de revenus récurrents
-   - globalAccess : Accessibilité globale
-   - techEase : Facilité technique & outils modernes
-
-Les scores doivent être réalistes et cohérents avec la compétence déclarée.`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            validationText: { type: "string" },
-            marketScores: {
-              type: "object",
-              properties: {
-                elearningMarket: { type: "number" },
-                digitalDemand: { type: "number" },
-                recurringRevenue: { type: "number" },
-                globalAccess: { type: "number" },
-                techEase: { type: "number" }
-              }
-            }
-          }
-        }
+      const { data } = await base44.functions.invoke('generateMarketAnalysis', {
+        sessionId: user.sessionId
       });
       
-      setMarketAnalysis(result);
+      setMarketAnalysis(data);
     } catch (error) {
       console.error('Error generating analysis:', error);
       // Fallback values

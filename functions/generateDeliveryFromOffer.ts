@@ -1,349 +1,558 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import OpenAI from 'npm:openai@4.73.1';
+import OpenAI from 'npm:openai';
 import { getSessionContext } from './getSessionContext.js';
 
 const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const BASE_SYSTEM_PROMPT = `Tu es un expert en marketing et lancement de formations en ligne.
+const SYSTEM_PROMPT = `Tu es le ContentDeliveryCoach de Passion IA.
 
-RÈGLE CRITIQUE : Tu dois baser tes choix sur onboarding_summary ET finalized_offer en priorité.
-Si une info manque, pose l'hypothèse la plus raisonnable MAIS reste cohérent avec le contexte fourni.
+Mission : générer 5 documents marketing/vente prêts à l'emploi pour lancer une offre éducative en ligne.
 
-IMPORTANT : L'utilisateur veut ENSEIGNER sa compétence (formations, cours), PAS vendre des services.
-Tous les contenus doivent parler de "formation", "programme", "cours", "élèves", "apprenants".`;
+RÈGLES CRITIQUES :
+1. Utilise EN PRIORITÉ onboarding_summary (données structurées riches).
+2. Complète avec finalized_offer (l'offre validée par l'user).
+3. Ton ton : direct, anti-bullshit, coach bienveillant mais cash.
+4. Pas de blabla marketing creux. Que du concret.
+5. Tout est orienté ACTION et RÉSULTATS mesurables.
 
-async function generateEmails(ctx, summary, offer, openai) {
-  const systemPrompt = `Tu es expert en email marketing pour vendre un produit d'enseignement.
-Tu écris en français, tutoiement, ton direct et humain.
-Tu suis la cohérence stricte: onboarding_summary + finalized_offer.
+Tu génères :
+- emails : séquence d'emails de vente
+- salesPage : page de vente PAS (Problème-Agitate-Solution)
+- actionPlan : plan d'action 7 jours
+- ideas : 10 idées de produits éducatifs
+- firstSaleStrategy : stratégie "première vente en 24h"
 
-Interdiction:
-- inventer des résultats irréalistes
-- inventer des témoignages
-- contredire l'offre
+LOGIQUE :
+- who_to_teach → cible précise
+- main_learning_problem → douleur N°1
+- quick_win → promesse rapide
+- big_transformation → transformation finale
+- method_angle → ton approche unique
+- common_mistake → l'erreur à éviter
 
-Format EXACT:
-Email 1: Sujet: ...
-Corps: ...
-
-Email 2: Sujet: ...
-Corps: ...
-
-Email 3: Sujet: ...
-Corps: ...
-
-Pas de markdown. Beaucoup de sauts de ligne.
-CTA standard: "Réponds INFO" ou "Envoie INFO".`;
-
-  const mainProduct = offer.mainProduct || offer.product_principal || {};
-  
-  const prompt = `name: ${ctx.name}
-skill: ${ctx.skill}
-onboarding_summary: ${JSON.stringify(summary, null, 2)}
-finalized_offer: ${JSON.stringify(offer, null, 2)}
-
-Produit principal à vendre:
-${JSON.stringify(mainProduct, null, 2)}
-
-Écris 3 emails:
-- Email 1: problème + prise de conscience
-- Email 2: solution + quick win + preuve perso (si proof_or_story)
-- Email 3: urgence simple + CTA INFO`;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: prompt }
-    ],
-    temperature: 0.5,
-    max_tokens: 2500,
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "email_sequence",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            emails: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  day: { type: "number" },
-                  subject: { type: "string" },
-                  body: { type: "string" }
-                },
-                required: ["day", "subject", "body"],
-                additionalProperties: false
-              },
-              minItems: 3,
-              maxItems: 3
-            }
-          },
-          required: ["emails"],
-          additionalProperties: false
-        }
-      }
-    }
-  });
-
-  return JSON.parse(completion.choices[0].message.content);
-}
-
-async function generateSalesPage(ctx, summary, offer, openai) {
-  const systemPrompt = `Tu es copywriter. Objectif: page de vente d'un produit d'enseignement.
-Tu suis PAS (Problem-Agitate-Solution) + sections claires.
-Pas de markdown. Sections séparées par des sauts de ligne.
-Interdiction d'inventer des stats "source X" si non certain.`;
-
-  const mainProduct = offer.mainProduct || offer.product_principal || {};
-  
-  const prompt = `name: ${ctx.name}
-skill: ${ctx.skill}
-onboarding_summary: ${JSON.stringify(summary, null, 2)}
-finalized_offer: ${JSON.stringify(offer, null, 2)}
-produit: ${JSON.stringify(mainProduct, null, 2)}
-
-Génère une page de vente complète avec:
-- Promesse claire
-- À qui c'est destiné / pas destiné
-- Le problème + agitation
-- Le mécanisme/méthode (method_angle)
-- Ce que contient le produit (ultra précis)
-- Résultat attendu (outcome)
-- FAQ (5 questions)
-- CTA final: "Envoie INFO"`;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: prompt }
-    ],
-    temperature: 0.5,
-    max_tokens: 3000
-  });
-
-  return completion.choices[0].message.content;
-}
-
-async function generateActionPlan(ctx, summary, offer, openai) {
-  const systemPrompt = `Tu es coach business. Tu produis un plan d'action simple sur 7 jours.
-Tout doit être cohérent avec finalized_offer.
-Pas de jargon, pas de markdown.
-Chaque jour = 3 actions maximum, très concrètes.`;
-
-  const prompt = `name: ${ctx.name}
-onboarding_summary: ${JSON.stringify(summary, null, 2)}
-finalized_offer: ${JSON.stringify(offer, null, 2)}
-
-Crée un plan d'action 7 jours:
-Jour 1 à Jour 7
-Chaque jour:
-Étape 1:
-Étape 2:
-Étape 3:`;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: prompt }
-    ],
-    temperature: 0.4,
-    max_tokens: 2000,
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "action_plan",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            days: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  dayNumber: { type: "number" },
-                  step1: { type: "string" },
-                  step2: { type: "string" },
-                  step3: { type: "string" }
-                },
-                required: ["dayNumber", "step1", "step2", "step3"],
-                additionalProperties: false
-              },
-              minItems: 7,
-              maxItems: 7
-            }
-          },
-          required: ["days"],
-          additionalProperties: false
-        }
-      }
-    }
-  });
-
-  return JSON.parse(completion.choices[0].message.content);
-}
-
-async function generateIdeas(ctx, summary, offer, openai) {
-  const systemPrompt = `Tu es spécialiste de productisation.
-Tu proposes 10 idées de produits d'enseignement cohérentes avec l'élève cible.
-Titres courts, bénéfice clair, format précis.`;
-
-  const prompt = `skill: ${ctx.skill}
-onboarding_summary: ${JSON.stringify(summary, null, 2)}
-
-Donne 10 idées structurées:
-- Titre
-- Format (PDF / mini-formation 3-5 vidéos / template / etc.)
-- Quick win promis`;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: prompt }
-    ],
-    temperature: 0.6,
-    max_tokens: 2000,
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "product_ideas",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            ideas: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  format: { type: "string" },
-                  quickWin: { type: "string" }
-                },
-                required: ["title", "format", "quickWin"],
-                additionalProperties: false
-              },
-              minItems: 10,
-              maxItems: 10
-            }
-          },
-          required: ["ideas"],
-          additionalProperties: false
-        }
-      }
-    }
-  });
-
-  return JSON.parse(completion.choices[0].message.content);
-}
-
-async function generateFirstSaleStrategy(ctx, summary, offer, openai) {
-  const systemPrompt = `Tu es expert acquisition/closing.
-Tu livres un plan "première vente en 24h".
-Tout doit être copiable-collable. Français. Tutoiement.
-Pas de markdown. Beaucoup de sauts de ligne.
-CTA standard: "Envoie INFO".
-Pas de promesses irréalistes.`;
-
-  const mainProduct = offer.mainProduct || offer.product_principal || {};
-
-  const prompt = `name: ${ctx.name}
-skill: ${ctx.skill}
-onboarding_summary: ${JSON.stringify(summary, null, 2)}
-produit: ${JSON.stringify(mainProduct, null, 2)}
-
-Génère exactement ces sections:
-SECTION 1 : OÙ TROUVER TES CLIENTS MAINTENANT
-SECTION 2 : MESSAGES DM PRÊTS À ENVOYER
-SECTION 3 : STORIES À PUBLIER
-SECTION 4 : SCRIPT REEL VIRAL
-SECTION 5 : CARROUSEL 7 SLIDES
-SECTION 6 : STRUCTURE DU PETIT PRODUIT`;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: prompt }
-    ],
-    temperature: 0.5,
-    max_tokens: 2000
-  });
-
-  return completion.choices[0].message.content;
-}
+Aucun contenu générique. Tout doit être personnalisé avec la compétence et le profil apprenant.`;
 
 Deno.serve(async (req) => {
   try {
     const { sessionId } = await req.json();
-    
+
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
     const ctx = await getSessionContext(req, sessionId);
     const summary = ctx.onboarding_summary;
-    
-    // Retrieve finalized offer
-    const offer = ctx.session.finalized_offer;
-    if (!offer) {
+    const finalizedOffer = ctx.session.finalized_offer;
+
+    if (!finalizedOffer) {
       return Response.json({ 
-        error: 'No finalized offer found. User must select offer choices first.' 
+        error: 'finalized_offer manquant. L\'utilisateur doit d\'abord finaliser son offre.' 
       }, { status: 400 });
     }
 
-    // Generate all content in parallel
-    const [emails, salesPage, actionPlan, ideas, firstSaleStrategy] = await Promise.all([
-      generateEmails(ctx, summary, offer, openai),
-      generateSalesPage(ctx, summary, offer, openai),
-      generateActionPlan(ctx, summary, offer, openai),
-      generateIdeas(ctx, summary, offer, openai),
-      generateFirstSaleStrategy(ctx, summary, offer, openai)
-    ]);
+    const skill = ctx.skill || ctx.session.skill || '';
+    
+    // --- 1. EMAILS ---
+    const emailsPrompt = `Génère une séquence de 3 emails de vente pour lancer "${finalizedOffer.mainProduct?.title || 'le produit'}".
 
+Contexte :
+- Compétence : ${skill}
+- Audience (élève cible) : ${summary.who_to_teach || 'non spécifié'}
+- Profil apprenant : ${summary.learner_profile || 'non spécifié'}
+- Problème principal : ${summary.main_learning_problem || 'non spécifié'}
+- Quick win : ${summary.quick_win || 'non spécifié'}
+- Grande transformation : ${summary.big_transformation || 'non spécifié'}
+- Méthode/angle : ${summary.method_angle || 'non spécifié'}
+- Preuve/histoire : ${summary.proof_or_story || 'non spécifié'}
+
+RÈGLES STRICTES :
+1. Système "anti-bullshit" : zéro blabla, que du concret
+2. Format : plain text, pas de HTML
+3. Structure par email :
+   - Objet percutant (max 50 caractères)
+   - Corps : 150-200 mots MAX
+   - 1 seul CTA : "Réponds INFO pour recevoir le lien"
+4. Ton : direct, bienveillant, cash
+5. Pas de "cher ami", "tu sais quoi", etc.
+
+Email 1 : Problème + Empathie
+Email 2 : Solution + Preuve sociale
+Email 3 : Urgence douce + CTA final`;
+
+    const emailsCompletion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: emailsPrompt }
+      ],
+      temperature: 0.5,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "email_sequence",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              email1: {
+                type: "object",
+                properties: {
+                  subject: { type: "string" },
+                  body: { type: "string" }
+                },
+                required: ["subject", "body"],
+                additionalProperties: false
+              },
+              email2: {
+                type: "object",
+                properties: {
+                  subject: { type: "string" },
+                  body: { type: "string" }
+                },
+                required: ["subject", "body"],
+                additionalProperties: false
+              },
+              email3: {
+                type: "object",
+                properties: {
+                  subject: { type: "string" },
+                  body: { type: "string" }
+                },
+                required: ["subject", "body"],
+                additionalProperties: false
+              }
+            },
+            required: ["email1", "email2", "email3"],
+            additionalProperties: false
+          }
+        }
+      }
+    });
+
+    const emails = JSON.parse(emailsCompletion.choices[0].message.content);
+
+    // --- 2. SALES PAGE ---
+    const salesPagePrompt = `Génère une page de vente pour "${finalizedOffer.mainProduct?.title || 'le produit'}".
+
+Contexte :
+- Compétence : ${skill}
+- Audience (élève cible) : ${summary.who_to_teach || 'non spécifié'}
+- Profil apprenant : ${summary.learner_profile || 'non spécifié'}
+- Problème principal : ${summary.main_learning_problem || 'non spécifié'}
+- Quick win : ${summary.quick_win || 'non spécifié'}
+- Grande transformation : ${summary.big_transformation || 'non spécifié'}
+- Méthode/angle : ${summary.method_angle || 'non spécifié'}
+- Prix : ${finalizedOffer.mainProduct?.price || 'N/A'}
+
+RÈGLES STRICTES :
+1. Structure PAS (Problème-Agitate-Solution)
+2. Format : plain text, pas de HTML
+3. Sections obligatoires :
+   - Titre accrocheur (max 80 caractères)
+   - Sous-titre (problème + promesse, max 120 caractères)
+   - Le Problème (150 mots)
+   - Ce que tu vas recevoir (liste à puces des livrables)
+   - La Transformation (100 mots)
+   - FAQ (5 questions/réponses courtes)
+   - CTA final : "Envoie INFO pour recevoir le lien d'achat"
+4. Ton : direct, anti-bullshit, orienté résultats
+5. Pas de "garantie satisfait ou remboursé" (trop classique)`;
+
+    const salesPageCompletion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: salesPagePrompt }
+      ],
+      temperature: 0.5,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "sales_page",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              title: { type: "string" },
+              subtitle: { type: "string" },
+              problem: { type: "string" },
+              deliverables: {
+                type: "array",
+                items: { type: "string" }
+              },
+              transformation: { type: "string" },
+              faq: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    q: { type: "string" },
+                    a: { type: "string" }
+                  },
+                  required: ["q", "a"],
+                  additionalProperties: false
+                },
+                minItems: 5,
+                maxItems: 5
+              },
+              cta: { type: "string" }
+            },
+            required: ["title", "subtitle", "problem", "deliverables", "transformation", "faq", "cta"],
+            additionalProperties: false
+          }
+        }
+      }
+    });
+
+    const salesPage = JSON.parse(salesPageCompletion.choices[0].message.content);
+
+    // --- 3. ACTION PLAN ---
+    const actionPlanPrompt = `Génère un plan d'action 7 jours pour lancer "${finalizedOffer.mainProduct?.title || 'le produit'}".
+
+Contexte :
+- Compétence : ${skill}
+- Audience (élève cible) : ${summary.who_to_teach || 'non spécifié'}
+- Profil apprenant : ${summary.learner_profile || 'non spécifié'}
+- Formats préférés : ${(summary.format_preferences || []).join(', ') || 'non spécifié'}
+
+RÈGLES STRICTES :
+1. 7 jours, 1 focus par jour
+2. Maximum 3 actions concrètes par jour
+3. Pas de "prépare ton mindset" ou blabla mental
+4. Que des actions MESURABLES et RÉALISABLES
+5. Ton : coach directif mais bienveillant`;
+
+    const actionPlanCompletion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: actionPlanPrompt }
+      ],
+      temperature: 0.5,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "action_plan_7days",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              day1: {
+                type: "object",
+                properties: {
+                  focus: { type: "string" },
+                  actions: {
+                    type: "array",
+                    items: { type: "string" },
+                    minItems: 3,
+                    maxItems: 3
+                  }
+                },
+                required: ["focus", "actions"],
+                additionalProperties: false
+              },
+              day2: {
+                type: "object",
+                properties: {
+                  focus: { type: "string" },
+                  actions: {
+                    type: "array",
+                    items: { type: "string" },
+                    minItems: 3,
+                    maxItems: 3
+                  }
+                },
+                required: ["focus", "actions"],
+                additionalProperties: false
+              },
+              day3: {
+                type: "object",
+                properties: {
+                  focus: { type: "string" },
+                  actions: {
+                    type: "array",
+                    items: { type: "string" },
+                    minItems: 3,
+                    maxItems: 3
+                  }
+                },
+                required: ["focus", "actions"],
+                additionalProperties: false
+              },
+              day4: {
+                type: "object",
+                properties: {
+                  focus: { type: "string" },
+                  actions: {
+                    type: "array",
+                    items: { type: "string" },
+                    minItems: 3,
+                    maxItems: 3
+                  }
+                },
+                required: ["focus", "actions"],
+                additionalProperties: false
+              },
+              day5: {
+                type: "object",
+                properties: {
+                  focus: { type: "string" },
+                  actions: {
+                    type: "array",
+                    items: { type: "string" },
+                    minItems: 3,
+                    maxItems: 3
+                  }
+                },
+                required: ["focus", "actions"],
+                additionalProperties: false
+              },
+              day6: {
+                type: "object",
+                properties: {
+                  focus: { type: "string" },
+                  actions: {
+                    type: "array",
+                    items: { type: "string" },
+                    minItems: 3,
+                    maxItems: 3
+                  }
+                },
+                required: ["focus", "actions"],
+                additionalProperties: false
+              },
+              day7: {
+                type: "object",
+                properties: {
+                  focus: { type: "string" },
+                  actions: {
+                    type: "array",
+                    items: { type: "string" },
+                    minItems: 3,
+                    maxItems: 3
+                  }
+                },
+                required: ["focus", "actions"],
+                additionalProperties: false
+              }
+            },
+            required: ["day1", "day2", "day3", "day4", "day5", "day6", "day7"],
+            additionalProperties: false
+          }
+        }
+      }
+    });
+
+    const actionPlan = JSON.parse(actionPlanCompletion.choices[0].message.content);
+
+    // --- 4. PRODUCT IDEAS ---
+    const ideasPrompt = `Génère 10 idées de produits éducatifs pour monétiser "${skill}".
+
+Contexte :
+- Compétence : ${skill}
+- Audience (élève cible) : ${summary.who_to_teach || 'non spécifié'}
+- Profil apprenant : ${summary.learner_profile || 'non spécifié'}
+- Problème principal : ${summary.main_learning_problem || 'non spécifié'}
+- Formats préférés : ${(summary.format_preferences || []).join(', ') || 'non spécifié'}
+
+RÈGLES STRICTES :
+1. Uniquement des produits ÉDUCATIFS (formations, ebooks, templates, communautés)
+2. Pas de coaching 1-1, pas de prestations de service
+3. Chaque idée :
+   - title : nom du produit (max 60 caractères)
+   - format : type (ex: "Mini-cours vidéo", "Ebook PDF", "Template Notion", "Communauté Telegram")
+   - quickWin : résultat rapide promis (max 80 caractères)
+4. Variété de prix : de 7€ à 2000€
+5. Focus : résultats mesurables`;
+
+    const ideasCompletion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: ideasPrompt }
+      ],
+      temperature: 0.6,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "product_ideas",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              ideas: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    format: { type: "string" },
+                    quickWin: { type: "string" }
+                  },
+                  required: ["title", "format", "quickWin"],
+                  additionalProperties: false
+                },
+                minItems: 10,
+                maxItems: 10
+              }
+            },
+            required: ["ideas"],
+            additionalProperties: false
+          }
+        }
+      }
+    });
+
+    const ideas = JSON.parse(ideasCompletion.choices[0].message.content);
+
+    // --- 5. FIRST SALE STRATEGY ---
+    const firstSalePrompt = `Génère une stratégie "première vente en 24h" pour "${finalizedOffer.mainProduct?.title || 'le produit'}".
+
+Contexte :
+- Compétence : ${skill}
+- Audience (élève cible) : ${summary.who_to_teach || 'non spécifié'}
+- Profil apprenant : ${summary.learner_profile || 'non spécifié'}
+- Problème principal : ${summary.main_learning_problem || 'non spécifié'}
+- Quick win : ${summary.quick_win || 'non spécifié'}
+- Prix : ${finalizedOffer.mainProduct?.price || 'N/A'}
+
+RÈGLES STRICTES :
+1. Stratégie ULTRA concrète, applicable en 24h
+2. 6 sections obligatoires :
+   - clientAcquisition : 3 canaux précis pour toucher la cible (ex: "Groupes Facebook X", "Reddit r/...", "LinkedIn hashtag Y")
+   - dmMessages : 2 messages DM courts (max 100 mots chacun) avec CTA "Envoie INFO"
+   - stories : 3 idées de stories Instagram/TikTok (titre + hook + CTA)
+   - reelScript : script détaillé d'un reel (30-45 sec) avec hook + body + CTA
+   - carouselStructure : structure d'un carrousel LinkedIn (10 slides, titres + 1 phrase par slide)
+   - smallProduct : idée de mini-produit 7-14€ pour valider le marché (titre + livrable + promesse)
+3. Ton : ultra-actionnable, zéro blabla
+4. Tous les CTA : "Envoie INFO pour recevoir le lien"`;
+
+    const firstSaleCompletion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: firstSalePrompt }
+      ],
+      temperature: 0.6,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "first_sale_strategy",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              clientAcquisition: {
+                type: "array",
+                items: { type: "string" },
+                minItems: 3,
+                maxItems: 3
+              },
+              dmMessages: {
+                type: "array",
+                items: { type: "string" },
+                minItems: 2,
+                maxItems: 2
+              },
+              stories: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    hook: { type: "string" },
+                    cta: { type: "string" }
+                  },
+                  required: ["title", "hook", "cta"],
+                  additionalProperties: false
+                },
+                minItems: 3,
+                maxItems: 3
+              },
+              reelScript: {
+                type: "object",
+                properties: {
+                  hook: { type: "string" },
+                  body: { type: "string" },
+                  cta: { type: "string" }
+                },
+                required: ["hook", "body", "cta"],
+                additionalProperties: false
+              },
+              carouselStructure: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    slide: { type: "number" },
+                    title: { type: "string" },
+                    text: { type: "string" }
+                  },
+                  required: ["slide", "title", "text"],
+                  additionalProperties: false
+                },
+                minItems: 10,
+                maxItems: 10
+              },
+              smallProduct: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  deliverable: { type: "string" },
+                  promise: { type: "string" }
+                },
+                required: ["title", "deliverable", "promise"],
+                additionalProperties: false
+              }
+            },
+            required: ["clientAcquisition", "dmMessages", "stories", "reelScript", "carouselStructure", "smallProduct"],
+            additionalProperties: false
+          }
+        }
+      }
+    });
+
+    const firstSaleStrategy = JSON.parse(firstSaleCompletion.choices[0].message.content);
+
+    // --- SAVE TO SESSION (objets, pas de stringify) ---
     const generatedContent = {
-      emails: JSON.stringify(emails),
+      emails,
       salesPage,
-      actionPlan: JSON.stringify(actionPlan),
-      ideas: JSON.stringify(ideas),
+      actionPlan,
+      ideas,
       firstSaleStrategy,
       generatedAt: new Date().toISOString()
     };
 
-    // Save to Session
     const base44 = createClientFromRequest(req);
     await base44.asServiceRole.entities.Session.update(sessionId, {
       generatedContent
     });
 
-    // Debug info
     const summaryKeysFilled = Object.keys(summary).filter(k => summary[k] && summary[k] !== '');
 
     return Response.json({
       success: true,
-      data: generatedContent,
+      generatedContent,
       debug: {
-        usedSummary: true,
+        skill,
         summaryKeysFilled,
-        usedOffer: true,
-        skill: ctx.skill
+        productsUsed: {
+          mainProduct: finalizedOffer.mainProduct?.title,
+          orderBump1: finalizedOffer.orderBump1?.title,
+          upsell1: finalizedOffer.upsell1?.title,
+          upsell3: finalizedOffer.upsell3?.title
+        }
       }
     });
 
   } catch (error) {
-    console.error('Error in generateDeliveryFromOffer:', error);
-    return Response.json({ 
+    return Response.json({
       error: error.message,
-      details: error.stack 
+      stack: error.stack
     }, { status: 500 });
   }
 });

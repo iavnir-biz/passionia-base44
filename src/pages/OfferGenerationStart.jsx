@@ -14,13 +14,10 @@ export default function OfferGenerationStart() {
       setDots(prev => (prev + 1) % 4);
     }, 500);
 
-    const timer = setTimeout(() => {
-      generateOffer();
-    }, 3000);
+    generateOffer();
 
     return () => {
       clearInterval(dotsInterval);
-      clearTimeout(timer);
     };
   }, []);
 

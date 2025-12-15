@@ -156,7 +156,7 @@ export default function OfferResume() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[#11112b] text-xs font-medium uppercase tracking-wide">
+                      <span className="bg-transparent text-[#ffffff] text-xs font-medium uppercase tracking-wide">
                         {product.label}
                       </span>
                       <div className="w-4 h-4 rounded-full bg-[#61f7a2] flex items-center justify-center">

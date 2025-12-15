@@ -28,6 +28,22 @@ export default function OfferGenerationStart() {
     try {
       const user = await base44.auth.me();
       
+      // Get user's session
+      const sessions = await base44.entities.Session.filter({ 
+        created_by: user.email 
+      });
+      
+      if (!sessions || sessions.length === 0) {
+        throw new Error('Session not found');
+      }
+      
+      const sessionId = sessions[0].id;
+      
+      // Generate offer from onboarding data
+      await base44.functions.invoke('generateOfferFromOnboarding', {
+        sessionId
+      });
+      
       // Mark onboarding as completed
       await base44.auth.updateMe({ onboardingCompleted: true });
       

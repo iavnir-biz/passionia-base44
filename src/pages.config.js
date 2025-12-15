@@ -43,6 +43,7 @@ import OfferResume from './pages/OfferResume';
 import BonneNouvelle from './pages/BonneNouvelle';
 import OfferTaVieFuture from './pages/OfferTaVieFuture';
 import OfferConcretement from './pages/OfferConcretement';
+import OnboardingDynamic from './pages/OnboardingDynamic';
 
 
 export const PAGES = {
@@ -91,6 +92,7 @@ export const PAGES = {
     "BonneNouvelle": BonneNouvelle,
     "OfferTaVieFuture": OfferTaVieFuture,
     "OfferConcretement": OfferConcretement,
+    "OnboardingDynamic": OnboardingDynamic,
 }
 
 export const pagesConfig = {

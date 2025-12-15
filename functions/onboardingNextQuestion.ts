@@ -10,12 +10,19 @@ const SYSTEM_PROMPT = `Tu es un coach d'affaires bienveillant et pédagogue. Ta 
 Règle fondamentale : l'objectif est de TRANSMETTRE/ENSEIGNER, pas vendre des services.
 
 Mission : poser 6 à 12 questions max, une par une, simples et concrètes. Collecter :
-(1) élève idéal, (2) problème d'apprentissage principal, (3) transformation.
+(1) élève idéal, (2) problème d'apprentissage principal, (3) transformation, (4) méthode unique, (5) quick win, (6) erreur typique, (7) histoire/preuve personnelle.
 
 Dernière question obligatoire avant de finir :
 "Pour finir, y a-t-il autre chose que tu aimerais partager ? Une anecdote, une histoire personnelle liée à ta compétence, ou un détail qui te rend unique ? Cela m'aidera à créer une offre qui te ressemble vraiment."
 Type = text.
-Après la réponse à cette question seulement, la prochaine réponse doit être { "isDone": true }.`;
+Après la réponse à cette question seulement, isDone doit être true.
+
+Importante : TOUJOURS personnaliser les exemples et questions avec la compétence de l'utilisateur quand elle est connue.
+
+Tu dois retourner un JSON avec :
+- isDone (boolean)
+- question (object si isDone=false, contient text, type, options?, min?, max?, step?)
+- summary (object avec who_to_teach, learner_profile, main_learning_problem, quick_win, big_transformation, method_angle, common_mistake, proof_or_story, format_preferences)`;
 
 Deno.serve(async (req) => {
   try {
@@ -43,11 +50,10 @@ Deno.serve(async (req) => {
     // Si userAnswer fourni, l'ajouter à l'historique
     if (userAnswer !== undefined && userAnswer !== null) {
       const historyEntry = {
-        idx: (session.onboarding_history || []).length,
-        questionText: session.current_question?.text || '',
-        questionType: session.current_question?.type || 'text',
+        question: session.current_question?.text || '',
+        type: session.current_question?.type || 'text',
         answer: userAnswer,
-        created_at: new Date().toISOString()
+        at: new Date().toISOString()
       };
 
       const updatedHistory = [...(session.onboarding_history || []), historyEntry];
@@ -64,16 +70,22 @@ Deno.serve(async (req) => {
     const skill = user.coreSkill || '';
     
     const historyText = (session.onboarding_history || [])
-      .map(h => `Q${h.idx + 1}: ${h.questionText}\nR${h.idx + 1}: ${JSON.stringify(h.answer)}`)
+      .map((h, idx) => `Q${idx + 1}: ${h.question}\nR${idx + 1}: ${JSON.stringify(h.answer)}`)
       .join('\n\n');
+
+    const currentSummary = session.onboarding_summary || {};
 
     const userPrompt = `Prénom utilisateur: ${name || 'non fourni'}
 Compétence: ${skill || 'non fournie encore'}
 
+Mémoire actuelle (summary):
+${JSON.stringify(currentSummary, null, 2)}
+
 Historique Q/R:
 ${historyText || 'Aucune question posée encore.'}
 
-Décide la prochaine étape: poser une question OU finir selon la règle.`;
+Décide la prochaine étape: poser une question OU finir selon la règle.
+IMPORTANT: Mets à jour le summary avec les nouvelles informations extraites des réponses.`;
 
     // Appel OpenAI avec structured output
     const completion = await openai.chat.completions.create({
@@ -97,38 +109,43 @@ Décide la prochaine étape: poser une question OU finir selon la règle.`;
               question: {
                 type: "object",
                 properties: {
-                  text: {
-                    type: "string",
-                    description: "Texte de la question"
-                  },
+                  text: { type: "string" },
                   type: {
                     type: "string",
-                    enum: ["text", "single_choice", "multiple_choice", "slider"],
-                    description: "Type de question"
+                    enum: ["text", "single_choice", "multiple_choice", "slider"]
                   },
                   options: {
                     type: "array",
-                    items: { type: "string" },
-                    description: "Options pour single/multiple choice"
+                    items: { type: "string" }
                   },
-                  min: {
-                    type: "number",
-                    description: "Valeur min pour slider"
-                  },
-                  max: {
-                    type: "number",
-                    description: "Valeur max pour slider"
-                  },
-                  step: {
-                    type: "number",
-                    description: "Pas pour slider"
-                  }
+                  min: { type: "number" },
+                  max: { type: "number" },
+                  step: { type: "number" }
                 },
                 required: ["text", "type"],
                 additionalProperties: false
+              },
+              summary: {
+                type: "object",
+                properties: {
+                  who_to_teach: { type: "string" },
+                  learner_profile: { type: "string" },
+                  main_learning_problem: { type: "string" },
+                  quick_win: { type: "string" },
+                  big_transformation: { type: "string" },
+                  method_angle: { type: "string" },
+                  common_mistake: { type: "string" },
+                  proof_or_story: { type: "string" },
+                  format_preferences: {
+                    type: "array",
+                    items: { type: "string" }
+                  }
+                },
+                required: [],
+                additionalProperties: false
               }
             },
-            required: ["isDone"],
+            required: ["isDone", "summary"],
             additionalProperties: false
           }
         }
@@ -139,6 +156,7 @@ Décide la prochaine étape: poser une question OU finir selon la règle.`;
 
     // Mettre à jour la session
     const updateData = {
+      onboarding_summary: result.summary || {},
       is_onboarding_done: result.isDone,
       current_question: result.isDone ? null : result.question
     };
@@ -147,7 +165,8 @@ Décide la prochaine étape: poser une question OU finir selon la règle.`;
 
     return Response.json({
       isDone: result.isDone,
-      question: result.question || null
+      question: result.question || null,
+      summary: result.summary || {}
     });
 
   } catch (error) {

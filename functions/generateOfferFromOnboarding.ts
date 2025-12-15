@@ -6,16 +6,19 @@ const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const SYSTEM_PROMPT = `Tu es un expert en création d'offres pédagogiques pour l'enseignement en ligne.
+const SYSTEM_PROMPT = `Tu es un expert en création d'offres pour l'enseignement en ligne.
 
 RÈGLE CRITIQUE : Tu dois baser tes choix sur onboarding_summary en priorité.
 Si une info manque, pose l'hypothèse la plus raisonnable MAIS reste cohérent avec le summary.
 Tu n'as pas le droit d'ignorer le summary.
 
-IMPORTANT : L'utilisateur veut ENSEIGNER sa compétence à d'autres, pas vendre des services.
-Tous les produits doivent être des formations, cours, programmes d'accompagnement pédagogique.
+IMPORTANT : L'utilisateur veut ENSEIGNER sa compétence (formations, cours, programmes), PAS vendre des services de prestation.
 
-Livrables hyper précis : durée exacte, nombre de vidéos/modules, support inclus, format concret.`;
+Tous les produits doivent être :
+- Des livrables pédagogiques concrets (vidéos, modules, exercices, ressources)
+- Avec durées/quantités précises (ex: "10 vidéos de 15min", "guide PDF 50 pages")
+- Orientés transformation de l'apprenant
+- Prix cohérents avec le marché e-learning francophone`;
 
 Deno.serve(async (req) => {
   try {
@@ -29,54 +32,57 @@ Deno.serve(async (req) => {
     const summary = ctx.onboarding_summary;
 
     const userPrompt = `Contexte utilisateur :
-- Nom : ${ctx.name}
+- Prénom : ${ctx.name}
 - Compétence à enseigner : ${ctx.skill || summary.who_to_teach || 'non renseignée'}
-- Élèves idéaux : ${summary.who_to_teach || summary.learner_profile || 'non renseigné'}
+- Public cible (élèves) : ${summary.who_to_teach || summary.learner_profile || 'non renseigné'}
 - Problème d'apprentissage principal : ${summary.main_learning_problem || 'non renseigné'}
-- Transformation finale promise : ${summary.big_transformation || 'non renseignée'}
-- Quick win : ${summary.quick_win || 'non renseigné'}
-- Méthode unique : ${summary.method_angle || 'non renseignée'}
-- Erreur courante : ${summary.common_mistake || 'non renseignée'}
+- Quick win promis : ${summary.quick_win || 'non renseigné'}
+- Transformation finale : ${summary.big_transformation || 'non renseignée'}
+- Méthode/approche unique : ${summary.method_angle || 'non renseignée'}
+- Erreur courante à éviter : ${summary.common_mistake || 'non renseignée'}
 - Histoire/preuve : ${summary.proof_or_story || 'non renseignée'}
-- Préférences format : ${ctx.format_preferences.join(', ') || 'non renseigné'}
+- Préférences de formats : ${summary.format_preferences?.join(', ') || 'non renseignées'}
 
 Génère une offre complète d'enseignement avec :
 
-1. mainOfferIdeas : 3 angles différents pour positionner l'offre d'enseignement
-   Chaque idée doit avoir :
-   - title : titre accrocheur orienté bénéfice pédagogique
-   - problem : le problème d'apprentissage qu'on résout
-   - stats : une stat ou tendance du marché e-learning
-   - solution : comment l'enseignement va résoudre ce problème
+1. **mainOfferIdeas** : 3 angles d'offre différents, chacun avec :
+   - title : Titre accrocheur de l'offre globale
+   - problem : Le problème d'apprentissage précis que cette offre résout
+   - stats : Une statistique crédible ou insight de marché
+   - solution : Comment cette offre résout le problème (2-3 phrases)
 
-2. offerChoices : 4 niveaux de produits pédagogiques avec 2 choix chacun
-
-   mainProductChoices (prix: 17, 27, 37 ou 47€) :
-   - Formation de base ou cours d'introduction
-   - Durée précise (ex: "Formation de 3h en 12 vidéos")
-   - Livrables concrets (vidéos, PDF, exercices)
+2. **offerChoices** : Pour chaque niveau de produit, propose 2 options :
    
-   orderBump1Choices (prix: 14, 17, 27 ou 37€) :
-   - Bonus pédagogique complémentaire
-   - Templates, checklists, workbooks
-   
-   upsell1Choices (prix: 67, 97, 197 ou 297€) :
-   - Programme avancé ou accompagnement
-   - Durée + support (ex: "6 semaines avec 3 appels de groupe")
-   
-   upsell3Choices (prix: 1000, 2000, 3000 ou 5000€) :
-   - Coaching/mentorat premium
-   - Accompagnement personnalisé
-   - Durée précise (ex: "3 mois en 1-to-1")
+   **mainProductChoices** (Produit principal) :
+   - title : Nom du produit pédagogique
+   - price : Un prix parmi "17€", "27€", "37€", "47€"
+   - productType : Type exact (ex: "Formation vidéo", "Programme 30 jours", "Bootcamp intensif")
+   - description : Détails livrables (ex: "12 vidéos HD (8-12min), 4 fiches pratiques PDF, 1 plan d'action personnalisable")
+   - outcome : Résultat concret pour l'apprenant (commence par "Tu seras capable de...")
 
-Chaque produit doit avoir :
-- title : nom du produit pédagogique
-- price : exactement l'un des prix indiqués (string)
-- productType : type exact (ex: "Formation vidéo", "Programme", "Coaching", "Templates")
-- description : description claire du contenu pédagogique
-- outcome : résultat d'apprentissage précis pour l'élève
+   **orderBump1Choices** (Bonus additionnel) :
+   - title : Nom du bonus
+   - price : Un prix parmi "14€", "17€", "27€", "37€"
+   - productType : Type (ex: "Kit de ressources", "Boîte à outils", "Guide pratique")
+   - description : Détails livrables
+   - outcome : Bénéfice immédiat
 
-Garde une cohérence thématique : tous les produits enseignent la compétence "${ctx.skill}".`;
+   **upsell1Choices** (Offre supérieure) :
+   - title : Nom du programme avancé
+   - price : Un prix parmi "67€", "97€", "197€", "297€"
+   - productType : Type (ex: "Masterclass", "Coaching de groupe", "Programme Premium")
+   - description : Détails livrables (plus complet que le produit principal)
+   - outcome : Transformation plus profonde
+
+   **upsell3Choices** (Offre Premium/VIP) :
+   - title : Nom de l'accompagnement haut de gamme
+   - price : Un prix parmi "1000€", "2000€", "3000€", "5000€"
+   - productType : Type (ex: "Accompagnement 1-to-1", "Mentorat VIP", "Programme All-Inclusive")
+   - description : Détails livrables (ultra-complet avec suivi personnalisé)
+   - outcome : Transformation garantie et mesurable
+
+Chaque produit doit être ULTRA-PRÉCIS sur les livrables (nombre de vidéos, durées, PDF, exercices, etc.).
+Pas de flou, pas de service de prestation, uniquement de l'enseignement structuré.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -84,8 +90,8 @@ Garde une cohérence thématique : tous les produits enseignent la compétence "
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }
       ],
-      temperature: 0.3,
-      max_tokens: 2000,
+      temperature: 0.4,
+      max_tokens: 3000,
       response_format: {
         type: "json_schema",
         json_schema: {
@@ -199,7 +205,7 @@ Garde une cohérence thématique : tous les produits enseignent la compétence "
     const base44 = createClientFromRequest(req);
     await base44.asServiceRole.entities.Session.update(sessionId, {
       offer_draft: offer,
-      skill: ctx.skill,
+      skill: ctx.skill || summary.who_to_teach || '',
       updated_at: new Date().toISOString()
     });
 
@@ -211,7 +217,7 @@ Garde une cohérence thématique : tous les produits enseignent la compétence "
       offer,
       debug: {
         usedSummary: true,
-        summaryKeysFilled: summaryKeysFilled,
+        summaryKeysFilled,
         skill: ctx.skill
       }
     });

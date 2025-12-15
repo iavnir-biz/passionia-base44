@@ -6,53 +6,47 @@ const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const BASE_SYSTEM_PROMPT = `RÈGLE CRITIQUE : Tu dois baser tes choix sur onboarding_summary en priorité.
-Si une info manque, pose l'hypothèse la plus raisonnable MAIS reste cohérent avec le summary.
-Tu n'as pas le droit d'ignorer le summary.
+const BASE_SYSTEM_PROMPT = `Tu es un expert en marketing et lancement de formations en ligne.
 
-IMPORTANT : L'utilisateur veut ENSEIGNER sa compétence à d'autres, pas vendre des services.
-Toute communication doit refléter une approche pédagogique, pas commerciale.`;
+RÈGLE CRITIQUE : Tu dois baser tes choix sur onboarding_summary ET finalized_offer en priorité.
+Si une info manque, pose l'hypothèse la plus raisonnable MAIS reste cohérent avec le contexte fourni.
 
-async function generateEmails(ctx, offer) {
-  const prompt = `${BASE_SYSTEM_PROMPT}
+IMPORTANT : L'utilisateur veut ENSEIGNER sa compétence (formations, cours), PAS vendre des services.
+Tous les contenus doivent parler de "formation", "programme", "cours", "élèves", "apprenants".`;
 
-Tu es un expert en email marketing pour formateurs et créateurs de cours en ligne.
-
-Contexte :
+async function generateEmails(ctx, summary, offer, openai) {
+  const prompt = `Contexte :
+- Prénom : ${ctx.name}
 - Compétence enseignée : ${ctx.skill}
-- Élèves idéaux : ${ctx.onboarding_summary.who_to_teach || 'non renseigné'}
-- Problème d'apprentissage : ${ctx.onboarding_summary.main_learning_problem || 'non renseigné'}
-- Transformation promise : ${ctx.onboarding_summary.big_transformation || 'non renseignée'}
-- Quick win : ${ctx.onboarding_summary.quick_win || 'non renseigné'}
+- Public cible : ${summary.who_to_teach || summary.learner_profile}
+- Problème résolu : ${summary.main_learning_problem}
+- Transformation : ${summary.big_transformation}
 
-Offre principale : ${JSON.stringify(offer.mainProductChoices?.[0] || {})}
+Offre finalisée :
+${JSON.stringify(offer, null, 2)}
 
-Rédige une séquence de 3 emails de lancement :
+Génère une séquence de 5 emails pour promouvoir cette formation :
 
-Email 1 - Problème/Agitation (J-2) :
-- Sujet accrocheur
-- Identifie le problème d'apprentissage
-- Agite la frustration de ne pas progresser
-- Annonce une solution
+Email 1 (Jour 0) : Bienvenue + présentation du problème
+Email 2 (Jour 1) : Histoire personnelle + crédibilité
+Email 3 (Jour 2) : Présentation de la solution (la formation)
+Email 4 (Jour 3) : Témoignages imaginés + bénéfices
+Email 5 (Jour 4) : Urgence + call-to-action
 
-Email 2 - Solution/Valeur (J-1) :
-- Présente la méthode d'enseignement
-- Partage un aperçu gratuit (quick win)
-- Crée l'anticipation
+Pour chaque email, fournis :
+- subject (objet)
+- body (corps complet, 200-300 mots, tutoiement, ton personnel)
 
-Email 3 - Lancement (J-0) :
-- Annonce l'ouverture
-- Présente l'offre complète
-- Call-to-action clair
-- Urgence/scarcité
-
-Retourne un objet JSON avec email1, email2, email3 (chacun avec subject et body).`;
+Format JSON strict avec tableau de 5 emails.`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.4,
-    max_tokens: 2000,
+    messages: [
+      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.5,
+    max_tokens: 2500,
     response_format: {
       type: "json_schema",
       json_schema: {
@@ -61,35 +55,23 @@ Retourne un objet JSON avec email1, email2, email3 (chacun avec subject et body)
         schema: {
           type: "object",
           properties: {
-            email1: {
-              type: "object",
-              properties: {
-                subject: { type: "string" },
-                body: { type: "string" }
+            emails: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  day: { type: "number" },
+                  subject: { type: "string" },
+                  body: { type: "string" }
+                },
+                required: ["day", "subject", "body"],
+                additionalProperties: false
               },
-              required: ["subject", "body"],
-              additionalProperties: false
-            },
-            email2: {
-              type: "object",
-              properties: {
-                subject: { type: "string" },
-                body: { type: "string" }
-              },
-              required: ["subject", "body"],
-              additionalProperties: false
-            },
-            email3: {
-              type: "object",
-              properties: {
-                subject: { type: "string" },
-                body: { type: "string" }
-              },
-              required: ["subject", "body"],
-              additionalProperties: false
+              minItems: 5,
+              maxItems: 5
             }
           },
-          required: ["email1", "email2", "email3"],
+          required: ["emails"],
           additionalProperties: false
         }
       }
@@ -99,92 +81,77 @@ Retourne un objet JSON avec email1, email2, email3 (chacun avec subject et body)
   return JSON.parse(completion.choices[0].message.content);
 }
 
-async function generateSalesPage(ctx, offer) {
-  const prompt = `${BASE_SYSTEM_PROMPT}
-
-Tu es un expert en rédaction de pages de vente pour formations en ligne.
-
-Contexte :
+async function generateSalesPage(ctx, summary, offer, openai) {
+  const prompt = `Contexte :
+- Prénom : ${ctx.name}
 - Compétence enseignée : ${ctx.skill}
-- Élèves idéaux : ${ctx.onboarding_summary.who_to_teach || 'non renseigné'}
-- Problème d'apprentissage : ${ctx.onboarding_summary.main_learning_problem || 'non renseigné'}
-- Transformation promise : ${ctx.onboarding_summary.big_transformation || 'non renseignée'}
-- Méthode unique : ${ctx.onboarding_summary.method_angle || 'non renseignée'}
-- Erreur courante : ${ctx.onboarding_summary.common_mistake || 'non renseignée'}
-- Histoire/preuve : ${ctx.onboarding_summary.proof_or_story || 'non renseignée'}
+- Public cible : ${summary.who_to_teach || summary.learner_profile}
+- Problème résolu : ${summary.main_learning_problem}
+- Quick win : ${summary.quick_win}
+- Transformation : ${summary.big_transformation}
+- Méthode unique : ${summary.method_angle}
 
-Offre principale : ${JSON.stringify(offer.mainProductChoices?.[0] || {})}
+Offre finalisée :
+${JSON.stringify(offer, null, 2)}
 
-Rédige une page de vente complète en format Markdown avec :
+Rédige une page de vente complète (format Markdown) avec :
 
-1. Headline accrocheur (bénéfice transformation)
-2. Sous-titre (pour qui / problème)
-3. Section problème (3-4 douleurs d'apprentissage)
-4. Section solution (ta méthode unique)
-5. Présentation de l'offre (contenu détaillé)
-6. Bénéfices pédagogiques (liste à puces)
-7. Pour qui c'est fait / pas fait
-8. Garantie satisfaction
-9. Call-to-action puissant
-10. FAQ (5 questions)
+1. **Titre accrocheur** (H1)
+2. **Sous-titre** qui identifie le problème
+3. **Section "Tu te reconnais ?" (3-4 points douleur)
+4. **Histoire personnelle** (2-3 paragraphes basés sur proof_or_story)
+5. **Présentation de la formation** (titre + description)
+6. **Programme détaillé** (modules, ce qui est inclus)
+7. **Bénéfices / Résultats attendus** (liste à puces)
+8. **Garantie** (satisfait ou remboursé 30j)
+9. **Call-to-action** (bouton inscription)
+10. **FAQ** (3-4 questions courantes)
 
-Ton : pédagogique, bienveillant, expert, motivant. Pas agressif.`;
+Ton : personnel, tutoiement, motivant mais honnête. 1500-2000 mots.`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.4,
-    max_tokens: 2500
+    messages: [
+      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.5,
+    max_tokens: 3000
   });
 
   return completion.choices[0].message.content;
 }
 
-async function generateActionPlan(ctx, offer) {
-  const prompt = `${BASE_SYSTEM_PROMPT}
-
-Tu es un expert en stratégie de lancement pour formateurs.
-
-Contexte :
+async function generateActionPlan(ctx, summary, offer, openai) {
+  const prompt = `Contexte :
+- Prénom : ${ctx.name}
 - Compétence enseignée : ${ctx.skill}
-- Élèves idéaux : ${ctx.onboarding_summary.who_to_teach || 'non renseigné'}
-- Transformation promise : ${ctx.onboarding_summary.big_transformation || 'non renseignée'}
+- Offre : ${JSON.stringify(offer, null, 2)}
 
-Offre : ${JSON.stringify(offer)}
+Génère un plan d'action sur 4 semaines pour lancer cette formation :
 
-Crée un plan d'action 30 jours pour lancer la formation.
+Semaine 1 : Création du contenu
+Semaine 2 : Setup technique (plateforme, paiement)
+Semaine 3 : Marketing pré-lancement
+Semaine 4 : Lancement et premières ventes
 
-Structure : 4 semaines avec actions quotidiennes concrètes.
+Pour chaque semaine, fournis :
+- weekNumber (1-4)
+- title (titre de la semaine)
+- objective (objectif principal)
+- tasks (tableau de 5-7 tâches concrètes)
+- expectedResult (résultat attendu en fin de semaine)
 
-Semaine 1 : Préparation
-- Créer le contenu pédagogique
-- Préparer les premiers modules
-- Setup technique
-
-Semaine 2 : Audience
-- Créer du contenu gratuit
-- Construire une liste email
-- Engagement communauté
-
-Semaine 3 : Pré-lancement
-- Séquence emails
-- Webinaire ou masterclass gratuite
-- Témoignages/social proof
-
-Semaine 4 : Lancement
-- Ouverture des inscriptions
-- Suivi quotidien
-- Clôture avec bonus
-
-Pour chaque jour : une action précise, actionnable, mesurable.
-
-Retourne un objet JSON avec week1, week2, week3, week4 (chacun avec day1 à day7, chaque jour ayant action et description).`;
+Format JSON strict avec tableau de 4 semaines.`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.3,
-    max_tokens: 2500,
+    messages: [
+      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.4,
+    max_tokens: 2000,
     response_format: {
       type: "json_schema",
       json_schema: {
@@ -193,64 +160,28 @@ Retourne un objet JSON avec week1, week2, week3, week4 (chacun avec day1 à day7
         schema: {
           type: "object",
           properties: {
-            week1: {
-              type: "object",
-              properties: {
-                day1: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day2: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day3: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day4: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day5: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day6: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day7: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false }
+            weeks: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  weekNumber: { type: "number" },
+                  title: { type: "string" },
+                  objective: { type: "string" },
+                  tasks: {
+                    type: "array",
+                    items: { type: "string" }
+                  },
+                  expectedResult: { type: "string" }
+                },
+                required: ["weekNumber", "title", "objective", "tasks", "expectedResult"],
+                additionalProperties: false
               },
-              required: ["day1", "day2", "day3", "day4", "day5", "day6", "day7"],
-              additionalProperties: false
-            },
-            week2: {
-              type: "object",
-              properties: {
-                day1: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day2: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day3: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day4: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day5: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day6: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day7: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false }
-              },
-              required: ["day1", "day2", "day3", "day4", "day5", "day6", "day7"],
-              additionalProperties: false
-            },
-            week3: {
-              type: "object",
-              properties: {
-                day1: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day2: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day3: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day4: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day5: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day6: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day7: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false }
-              },
-              required: ["day1", "day2", "day3", "day4", "day5", "day6", "day7"],
-              additionalProperties: false
-            },
-            week4: {
-              type: "object",
-              properties: {
-                day1: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day2: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day3: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day4: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day5: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day6: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false },
-                day7: { type: "object", properties: { action: { type: "string" }, description: { type: "string" } }, required: ["action", "description"], additionalProperties: false }
-              },
-              required: ["day1", "day2", "day3", "day4", "day5", "day6", "day7"],
-              additionalProperties: false
+              minItems: 4,
+              maxItems: 4
             }
           },
-          required: ["week1", "week2", "week3", "week4"],
+          required: ["weeks"],
           additionalProperties: false
         }
       }
@@ -260,35 +191,36 @@ Retourne un objet JSON avec week1, week2, week3, week4 (chacun avec day1 à day7
   return JSON.parse(completion.choices[0].message.content);
 }
 
-async function generateIdeas(ctx, offer) {
-  const prompt = `${BASE_SYSTEM_PROMPT}
-
-Tu es un expert en stratégie de contenu pour formateurs.
-
-Contexte :
+async function generateIdeas(ctx, summary, offer, openai) {
+  const prompt = `Contexte :
 - Compétence enseignée : ${ctx.skill}
-- Élèves idéaux : ${ctx.onboarding_summary.who_to_teach || 'non renseigné'}
-- Quick win : ${ctx.onboarding_summary.quick_win || 'non renseigné'}
+- Public cible : ${summary.who_to_teach || summary.learner_profile}
+- Offre : ${JSON.stringify(offer, null, 2)}
 
-Génère 10 idées de contenu gratuit (lead magnets) pour attirer des élèves potentiels.
+Génère 10 idées de contenus gratuits pour attirer des prospects :
 
-Format : titre + description courte + valeur pédagogique
+- Posts réseaux sociaux (LinkedIn, Instagram, Facebook)
+- Articles de blog
+- Vidéos YouTube
+- Lead magnets (PDF, checklist, mini-formation)
+- Lives / webinaires
 
-Exemples de types :
-- Checklist
-- Mini-cours PDF
-- Vidéo tuto
-- Template/Workbook
-- Guide pas-à-pas
-- Masterclass gratuite
+Pour chaque idée, fournis :
+- type (ex: "Post LinkedIn", "Article de blog", etc.)
+- title (titre accrocheur)
+- description (2-3 phrases sur le contenu)
+- goal (objectif : visibilité, lead generation, etc.)
 
-Retourne un tableau JSON d'objets avec title, type, description, learningValue.`;
+Format JSON strict avec tableau de 10 idées.`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.5,
-    max_tokens: 1500,
+    messages: [
+      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.6,
+    max_tokens: 2000,
     response_format: {
       type: "json_schema",
       json_schema: {
@@ -302,12 +234,12 @@ Retourne un tableau JSON d'objets avec title, type, description, learningValue.`
               items: {
                 type: "object",
                 properties: {
-                  title: { type: "string" },
                   type: { type: "string" },
+                  title: { type: "string" },
                   description: { type: "string" },
-                  learningValue: { type: "string" }
+                  goal: { type: "string" }
                 },
-                required: ["title", "type", "description", "learningValue"],
+                required: ["type", "title", "description", "goal"],
                 additionalProperties: false
               },
               minItems: 10,
@@ -324,94 +256,40 @@ Retourne un tableau JSON d'objets avec title, type, description, learningValue.`
   return JSON.parse(completion.choices[0].message.content);
 }
 
-async function generateFirstSaleStrategy(ctx, offer) {
-  const prompt = `${BASE_SYSTEM_PROMPT}
-
-Tu es un expert en lancement pour nouveaux formateurs.
-
-Contexte :
+async function generateFirstSaleStrategy(ctx, summary, offer, openai) {
+  const prompt = `Contexte :
+- Prénom : ${ctx.name}
 - Compétence enseignée : ${ctx.skill}
-- Élèves idéaux : ${ctx.onboarding_summary.who_to_teach || 'non renseigné'}
-- Quick win : ${ctx.onboarding_summary.quick_win || 'non renseigné'}
+- Public cible : ${summary.who_to_teach || summary.learner_profile}
+- Offre : ${JSON.stringify(offer, null, 2)}
 
-Offre principale : ${JSON.stringify(offer.mainProductChoices?.[0] || {})}
+Génère une stratégie détaillée pour faire ta PREMIÈRE VENTE dans les 7 jours (format Markdown) :
 
-Rédige une stratégie "Première Vente en 7 Jours" ultra-concrète.
+1. **Jour 1-2** : Préparation (quoi créer, où poster)
+2. **Jour 3-4** : Activation réseau chaud (famille, amis, contacts)
+3. **Jour 5-6** : Contenu viral + promo ciblée
+4. **Jour 7** : Push final + urgence
 
-Structure :
-1. Mindset (paragraphe motivation)
-2. Étape par étape (7 jours, 1 action/jour)
-3. Scripts de messages (pour réseaux sociaux / email / DM)
-4. Objections courantes + réponses
-5. Célébration première vente
+Inclus :
+- Actions concrètes quotidiennes
+- Scripts de messages à envoyer
+- Plateformes à utiliser
+- Prix d'appel recommandé (offre early bird)
+- Mindset / conseils psychologiques
 
-Ton : pragmatique, bienveillant, réaliste, pas de bullshit.
-
-Retourne un objet JSON avec mindset, steps (array de 7 objets avec day, action, details), scripts (object avec social, email, dm), objections (array de 5 objets avec objection et response), celebration (string).`;
+Ton : motivant, direct, actionnable. 800-1000 mots.`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.3,
-    max_tokens: 2000,
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "first_sale_strategy",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            mindset: { type: "string" },
-            steps: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  day: { type: "number" },
-                  action: { type: "string" },
-                  details: { type: "string" }
-                },
-                required: ["day", "action", "details"],
-                additionalProperties: false
-              },
-              minItems: 7,
-              maxItems: 7
-            },
-            scripts: {
-              type: "object",
-              properties: {
-                social: { type: "string" },
-                email: { type: "string" },
-                dm: { type: "string" }
-              },
-              required: ["social", "email", "dm"],
-              additionalProperties: false
-            },
-            objections: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  objection: { type: "string" },
-                  response: { type: "string" }
-                },
-                required: ["objection", "response"],
-                additionalProperties: false
-              },
-              minItems: 5,
-              maxItems: 5
-            },
-            celebration: { type: "string" }
-          },
-          required: ["mindset", "steps", "scripts", "objections", "celebration"],
-          additionalProperties: false
-        }
-      }
-    }
+    messages: [
+      { role: "system", content: BASE_SYSTEM_PROMPT },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.5,
+    max_tokens: 2000
   });
 
-  return JSON.parse(completion.choices[0].message.content);
+  return completion.choices[0].message.content;
 }
 
 Deno.serve(async (req) => {
@@ -423,23 +301,23 @@ Deno.serve(async (req) => {
     }
 
     const ctx = await getSessionContext(req, sessionId);
+    const summary = ctx.onboarding_summary;
     
-    // Get finalized offer (or draft)
-    const offer = ctx.session.finalized_offer || ctx.session.offer_draft;
-    
+    // Retrieve finalized offer
+    const offer = ctx.session.finalized_offer;
     if (!offer) {
       return Response.json({ 
-        error: 'No offer found. Please generate offer first.' 
+        error: 'No finalized offer found. User must select offer choices first.' 
       }, { status: 400 });
     }
 
     // Generate all content in parallel
     const [emails, salesPage, actionPlan, ideas, firstSaleStrategy] = await Promise.all([
-      generateEmails(ctx, offer),
-      generateSalesPage(ctx, offer),
-      generateActionPlan(ctx, offer),
-      generateIdeas(ctx, offer),
-      generateFirstSaleStrategy(ctx, offer)
+      generateEmails(ctx, summary, offer, openai),
+      generateSalesPage(ctx, summary, offer, openai),
+      generateActionPlan(ctx, summary, offer, openai),
+      generateIdeas(ctx, summary, offer, openai),
+      generateFirstSaleStrategy(ctx, summary, offer, openai)
     ]);
 
     const generatedContent = {
@@ -447,19 +325,17 @@ Deno.serve(async (req) => {
       salesPage,
       actionPlan: JSON.stringify(actionPlan),
       ideas: JSON.stringify(ideas),
-      firstSaleStrategy: JSON.stringify(firstSaleStrategy),
+      firstSaleStrategy,
       generatedAt: new Date().toISOString()
     };
 
     // Save to Session
     const base44 = createClientFromRequest(req);
     await base44.asServiceRole.entities.Session.update(sessionId, {
-      generatedContent,
-      updated_at: new Date().toISOString()
+      generatedContent
     });
 
     // Debug info
-    const summary = ctx.onboarding_summary;
     const summaryKeysFilled = Object.keys(summary).filter(k => summary[k] && summary[k] !== '');
 
     return Response.json({
@@ -467,9 +343,9 @@ Deno.serve(async (req) => {
       data: generatedContent,
       debug: {
         usedSummary: true,
-        summaryKeysFilled: summaryKeysFilled,
-        skill: ctx.skill,
-        offerUsed: !!offer
+        summaryKeysFilled,
+        usedOffer: true,
+        skill: ctx.skill
       }
     });
 

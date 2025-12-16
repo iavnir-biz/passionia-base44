@@ -204,110 +204,49 @@ ${lastEntry ? '1. Commence ta prochaine question par UNE PHRASE DE TRANSITION qu
           strict: true,
           schema: {
             type: "object",
-            oneOf: [
-              {
+            properties: {
+              isDone: { type: "boolean" },
+              question: {
+                type: "object",
                 properties: {
-                  isDone: { type: "boolean", const: false },
-                  question: {
-                    type: "object",
-                    oneOf: [
-                      {
-                        properties: {
-                          text: { type: "string" },
-                          type: { type: "string", const: "text" }
-                        },
-                        required: ["text", "type"],
-                        additionalProperties: false
-                      },
-                      {
-                        properties: {
-                          text: { type: "string" },
-                          type: { type: "string", const: "single_choice" },
-                          options: {
-                            type: "array",
-                            items: { type: "string" },
-                            minItems: 2
-                          }
-                        },
-                        required: ["text", "type", "options"],
-                        additionalProperties: false
-                      },
-                      {
-                        properties: {
-                          text: { type: "string" },
-                          type: { type: "string", const: "multiple_choice" },
-                          options: {
-                            type: "array",
-                            items: { type: "string" },
-                            minItems: 2
-                          }
-                        },
-                        required: ["text", "type", "options"],
-                        additionalProperties: false
-                      },
-                      {
-                        properties: {
-                          text: { type: "string" },
-                          type: { type: "string", const: "slider" },
-                          min: { type: "number" },
-                          max: { type: "number" },
-                          step: { type: "number" }
-                        },
-                        required: ["text", "type", "min", "max", "step"],
-                        additionalProperties: false
-                      }
-                    ]
+                  text: { type: "string" },
+                  type: { 
+                    type: "string",
+                    enum: ["text", "single_choice", "multiple_choice", "slider"]
                   },
-                  summary: {
-                    type: "object",
-                    properties: {
-                      who_to_teach: { type: "string" },
-                      learner_profile: { type: "string" },
-                      main_learning_problem: { type: "string" },
-                      quick_win: { type: "string" },
-                      big_transformation: { type: "string" },
-                      method_angle: { type: "string" },
-                      common_mistake: { type: "string" },
-                      proof_or_story: { type: "string" },
-                      format_preferences: {
-                        type: "array",
-                        items: { type: "string" }
-                      }
-                    },
-                    required: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"],
-                    additionalProperties: false
-                  }
+                  options: {
+                    type: "array",
+                    items: { type: "string" }
+                  },
+                  min: { type: "number" },
+                  max: { type: "number" },
+                  step: { type: "number" }
                 },
-                required: ["isDone", "question", "summary"],
+                required: ["text", "type"],
                 additionalProperties: false
               },
-              {
+              summary: {
+                type: "object",
                 properties: {
-                  isDone: { type: "boolean", const: true },
-                  summary: {
-                    type: "object",
-                    properties: {
-                      who_to_teach: { type: "string" },
-                      learner_profile: { type: "string" },
-                      main_learning_problem: { type: "string" },
-                      quick_win: { type: "string" },
-                      big_transformation: { type: "string" },
-                      method_angle: { type: "string" },
-                      common_mistake: { type: "string" },
-                      proof_or_story: { type: "string" },
-                      format_preferences: {
-                        type: "array",
-                        items: { type: "string" }
-                      }
-                    },
-                    required: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"],
-                    additionalProperties: false
+                  who_to_teach: { type: "string" },
+                  learner_profile: { type: "string" },
+                  main_learning_problem: { type: "string" },
+                  quick_win: { type: "string" },
+                  big_transformation: { type: "string" },
+                  method_angle: { type: "string" },
+                  common_mistake: { type: "string" },
+                  proof_or_story: { type: "string" },
+                  format_preferences: {
+                    type: "array",
+                    items: { type: "string" }
                   }
                 },
-                required: ["isDone", "summary"],
+                required: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"],
                 additionalProperties: false
               }
-            ]
+            },
+            required: ["isDone", "summary"],
+            additionalProperties: false
           }
         }
       }

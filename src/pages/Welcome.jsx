@@ -96,7 +96,7 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-6"
+            className="flex justify-center mb-6"
           >
             <Button
               onClick={handleStart}
@@ -104,14 +104,6 @@ export default function Welcome() {
             >
               Commencer maintenant
               <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-6 text-lg font-semibold rounded-2xl"
-            >
-              <Play className="w-5 h-5 mr-2" />
-              Voir comment ça marche
             </Button>
           </motion.div>
           

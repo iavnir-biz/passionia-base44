@@ -84,6 +84,10 @@ RÈGLES GÉNÉRALES :
 - ADAPTE et REFORMULE chaque question pour qu'elle soit naturelle et conversationnelle
 - Fais TOUJOURS référence aux réponses précédentes dans ta reformulation
 
+RÈGLE SPÉCIALE POUR LA QUESTION #3 (Années de pratique) :
+- OBLIGATOIRE : Utilise "15+ ans" comme maximum (pas 30, pas 20, exactement "15+ ans")
+- Exemple attendu : "D'accord. Depuis combien d'années pratiques-tu cette compétence ou cette passion ? (0 à 15+ ans)"
+
 8 CLÉS DU SUMMARY à remplir progressivement :
 1. who_to_teach : élève idéal
 2. learner_profile : profil détaillé de l'apprenant

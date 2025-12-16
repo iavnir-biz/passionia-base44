@@ -185,12 +185,17 @@ export default function OnboardingDynamic() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <div className="flex items-start gap-2 mb-6">
+              <div className="flex items-start gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-[#61f7a2] mt-1 flex-shrink-0" />
                 <h1 className="text-2xl font-bold text-gray-900 leading-relaxed">
                   {currentQuestion.text}
                 </h1>
               </div>
+              {currentQuestion.subtitle && (
+                <p className="text-gray-500 text-sm mb-6 ml-7">
+                  {currentQuestion.subtitle}
+                </p>
+              )}
             </motion.div>
 
             {/* Input */}

@@ -287,11 +287,16 @@ ${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
 ${nextQuestionConfig ? `PROCHAINE QUESTION À POSER :
 Structure : ${JSON.stringify(nextQuestionConfig, null, 2)}
 
-MISSION :
-1. ${lastEntry ? 'Commence par UNE PHRASE DE TRANSITION qui rebondit naturellement sur la dernière réponse' : 'Commence par une question accueillante'}
-2. Reformule la question "${nextQuestionConfig.theme}" pour qu'elle soit naturelle, conversationnelle et personnalisée
-3. Utilise le type "${nextQuestionConfig.type}" ${nextQuestionConfig.options ? `avec les options : ${JSON.stringify(nextQuestionConfig.options)}` : ''}${nextQuestionConfig.min !== undefined ? `avec min=${nextQuestionConfig.min}, max=${nextQuestionConfig.max}, step=${nextQuestionConfig.step}` : ''}
-4. Retourne le summary COMPLET et MIS À JOUR (mappe ${nextQuestionConfig.field} vers les bonnes clés du summary)` : 
+MISSION CRITIQUE :
+Tu DOIS poser la question #${nextQuestionConfig.id} (${nextQuestionConfig.theme}).
+
+INSTRUCTIONS PRÉCISES :
+1. TYPE : Utilise OBLIGATOIREMENT le type "${nextQuestionConfig.type}"
+2. OPTIONS : ${nextQuestionConfig.options ? `Utilise EXACTEMENT ces options : ${JSON.stringify(nextQuestionConfig.options)}` : 'Pas d\'options prédéfinies'}
+3. SLIDER : ${nextQuestionConfig.min !== undefined ? `min=${nextQuestionConfig.min}, max=${nextQuestionConfig.max}, step=${nextQuestionConfig.step}` : 'N/A'}
+4. TITRE : ${nextQuestionConfig.titleGuide ? `OBLIGATOIRE : "${nextQuestionConfig.titleGuide}" ${nextQuestionConfig.titleGuide.includes('{{skill}}') ? '(remplace {{skill}} par la compétence)' : ''}` : `Reformule "${nextQuestionConfig.theme}" de manière courte et naturelle${lastEntry ? ', en reprenant la réponse précédente' : ''}`}
+5. SOUS-TEXTE : ${nextQuestionConfig.subtitle ? `OBLIGATOIRE : "${nextQuestionConfig.subtitle}"` : 'Ajoute des exemples concrets'}
+6. SUMMARY : Mets à jour le summary en mappant ${nextQuestionConfig.field} vers les bonnes clés` : 
 'MISSION : Toutes les 26 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
 
     console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });

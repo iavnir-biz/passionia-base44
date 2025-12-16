@@ -9,7 +9,7 @@ const openai = new OpenAI({
 const QUESTION_STRUCTURE = [
   { id: 1, field: "coreSkill", theme: "Compétence principale à enseigner", type: "text" },
   { id: 2, field: "experienceLevel", theme: "Niveau d'expérience", type: "single_choice", options: ["Débutant", "Intermédiaire", "Avancé", "Expert"] },
-  { id: 3, field: "years", theme: "Années de pratique", type: "slider", min: 0, max: 30, step: 1 },
+  { id: 3, field: "years", theme: "Années de pratique", type: "slider", min: 0, max: 15, step: 1 },
   { id: 4, field: "targetAudience", theme: "Public cible idéal", type: "text" },
   { id: 5, field: "mainProblem", theme: "Problème N°1 des apprenants", type: "text" },
   { id: 6, field: "firstResult", theme: "Premier résultat rapide", type: "text" },

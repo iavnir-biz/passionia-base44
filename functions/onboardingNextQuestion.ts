@@ -321,12 +321,16 @@ ${lastEntry ? '1. Commence ta prochaine question par UNE PHRASE DE TRANSITION qu
 
     const result = JSON.parse(completion.choices[0].message.content);
 
+    // Extraire le skill depuis summary.who_to_teach pour le sauvegarder dans session.skill
+    const updatedSkill = result.summary?.who_to_teach || session.skill || '';
+    
     // Mettre à jour la session avec le summary complet
     const updateData = {
       onboarding_history: history,
       onboarding_summary: result.summary, // Summary complet du LLM
       is_onboarding_done: result.isDone,
-      current_question: result.isDone ? null : result.question
+      current_question: result.isDone ? null : result.question,
+      skill: updatedSkill
     };
 
     await base44.asServiceRole.entities.Session.update(sessionId, updateData);

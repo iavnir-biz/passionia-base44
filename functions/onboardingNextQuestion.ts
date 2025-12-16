@@ -173,10 +173,18 @@ Deno.serve(async (req) => {
       const currentQuestion = session.current_question;
       
       if (currentQuestion) {
+        // Convertir answer en string pour éviter erreurs de validation
+        let answerValue = userAnswer;
+        if (typeof answerValue === 'number') {
+          answerValue = String(answerValue);
+        } else if (Array.isArray(answerValue)) {
+          answerValue = answerValue.join(', ');
+        }
+        
         history.push({
           question: currentQuestion.text,
           type: currentQuestion.type,
-          answer: userAnswer,
+          answer: answerValue,
           at: new Date().toISOString()
         });
       }

@@ -48,7 +48,10 @@ export default function OnboardingDynamic() {
       }
 
       setSession(activeSession);
-      setQuestionCount((activeSession.onboarding_history || []).length);
+      const history = activeSession.onboarding_history || [];
+      
+      // Calculer le vrai nombre de questions basé sur les 11 questions actuelles
+      setQuestionCount(Math.min(history.length, 11) + 1);
 
       // Si pas de question courante, demander la première
       if (!activeSession.current_question) {
@@ -72,34 +75,22 @@ export default function OnboardingDynamic() {
       });
 
       if (data.isDone) {
-        // Onboarding terminé, sauvegarder les données clés sur le user et rediriger
-        const sessions = await base44.entities.Session.filter({ id: session.id });
+        // Sauvegarder coreSkill sur le user avant de passer aux questions statiques
+        const sessions = await base44.entities.Session.filter({ id: sessionId });
         if (sessions.length > 0) {
           const finalSession = sessions[0];
           const summary = finalSession.onboarding_summary || {};
-
-          // Sauvegarder les données principales sur le user pour compatibilité
           await base44.auth.updateMe({ 
-            onboarding_completed: true,
-            coreSkill: summary.who_to_teach || finalSession.skill || '',
-            targetAudience: summary.learner_profile || '',
-            mainProblem: summary.main_learning_problem || '',
-            firstResult: summary.quick_win || '',
-            finalTransformation: summary.big_transformation || '',
-            uniqueMethod: summary.method_angle || '',
-            typicalMistake: summary.common_mistake || '',
-            extraDetail: summary.proof_or_story || '',
-            deliveryPreferences: summary.format_preferences || []
+            coreSkill: summary.who_to_teach || finalSession.skill || ''
           });
-        } else {
-          await base44.auth.updateMe({ onboarding_completed: true });
         }
-
-        navigate(createPageUrl('OfferGenerationStart'));
+        // Passer à l'écran de transition
+        navigate(createPageUrl('OnboardingTransition'));
       } else {
         setCurrentQuestion(data.question);
         initializeValue(data.question.type);
-        setQuestionCount(prev => prev + 1);
+        // Incrémenter seulement si on n'a pas dépassé 11
+        setQuestionCount(prev => Math.min(prev + 1, 11));
       }
     } catch (error) {
       console.error('Error fetching next question:', error);
@@ -151,7 +142,7 @@ export default function OnboardingDynamic() {
     );
   }
 
-  const progress = Math.min((questionCount / 10) * 100, 100);
+  const progress = Math.min((questionCount / 11) * 100, 100);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex flex-col">

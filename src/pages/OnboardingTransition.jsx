@@ -2,17 +2,68 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Sparkles, CheckCircle2, Package, DollarSign, Mail, FileText, Rocket, Brain, Zap } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 
 export default function OnboardingTransition() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [visibleItems, setVisibleItems] = useState(0);
+  const [progress, setProgress] = useState(78);
+  const [statusText, setStatusText] = useState('Analyse de ton positionnement…');
+
+  const items = [
+    { icon: CheckCircle2, title: 'Validation complète de ton idée', subtitle: 'Marché, cible et positionnement clair' },
+    { icon: Package, title: 'Tes 4 offres prêtes à vendre', subtitle: 'Structure complète, pensée pour démarrer vite' },
+    { icon: DollarSign, title: 'Les prix parfaits', subtitle: 'Optimisés pour vendre sans brader ta valeur' },
+    { icon: Mail, title: 'Les emails marketing essentiels', subtitle: 'Pour générer tes premières ventes simplement' },
+    { icon: FileText, title: 'Une page de vente à haute conversion', subtitle: 'Avec la structure et les messages qui fonctionnent' },
+    { icon: Rocket, title: 'Un plan d\'action sur 7 jours', subtitle: 'Étape par étape, sans dispersion' },
+    { icon: Brain, title: 'Le protocole complet pour créer ton activité de formation en ligne', subtitle: '' }
+  ];
+
+  const statusTexts = [
+    'Analyse de ton positionnement…',
+    'Structuration de tes offres…',
+    'Optimisation des prix…',
+    'Préparation du plan d\'action…'
+  ];
 
   useEffect(() => {
     loadUser();
+  }, []);
+
+  useEffect(() => {
+    // Animation des items qui apparaissent un par un
+    if (visibleItems < items.length) {
+      const timer = setTimeout(() => {
+        setVisibleItems(prev => prev + 1);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [visibleItems, items.length]);
+
+  useEffect(() => {
+    // Animation de la barre de progression
+    const progressTimer = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 92) return 92;
+        return prev + 2;
+      });
+    }, 800);
+    return () => clearInterval(progressTimer);
+  }, []);
+
+  useEffect(() => {
+    // Changement du texte de statut
+    let index = 0;
+    const statusTimer = setInterval(() => {
+      index = (index + 1) % statusTexts.length;
+      setStatusText(statusTexts[index]);
+    }, 1800);
+    return () => clearInterval(statusTimer);
   }, []);
 
   const loadUser = async () => {
@@ -39,37 +90,170 @@ export default function OnboardingTransition() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-2xl"
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-3xl"
       >
-        {/* Card */}
-        <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
-          {/* Nova Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
+        <div className="bg-white rounded-3xl p-10 border border-gray-200 shadow-lg">
+          {/* Cerveau IA animé au centre */}
+          <div className="flex justify-center mb-8">
+            <motion.div
+              animate={{ 
+                scale: [1, 1.05, 1],
+                rotate: [0, 5, -5, 0]
+              }}
+              transition={{ 
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="relative"
+            >
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-2xl">
+                <Brain className="w-10 h-10 text-white" />
+              </div>
+              {/* Particules animées autour */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                className="absolute -inset-4"
+              >
+                <Zap className="absolute top-0 left-1/2 w-4 h-4 text-[#61f7a2] opacity-60" />
+                <Sparkles className="absolute bottom-0 right-0 w-4 h-4 text-[#4de88f] opacity-60" />
+              </motion.div>
+            </motion.div>
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center leading-relaxed">
-            J'analyse... merci pour toutes ces réponses, {user?.firstName} ! 
+          {/* Titre principal */}
+          <motion.h1 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-3xl font-bold text-gray-900 mb-4 text-center leading-relaxed"
+          >
+            Merci pour toutes ces réponses, {user?.firstName} !<br />
             Je peux déjà te dire que ta passion vaut de l'or 💎
-          </h1>
+          </motion.h1>
 
-          <p className="text-gray-700 text-center mb-8 leading-relaxed">
-            J'ai encore quelques questions à te poser, puis je te montrerai toutes tes offres personnalisées.
-          </p>
+          {/* Sous-titre */}
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-gray-600 text-center mb-8 leading-relaxed"
+          >
+            J'analyse tes réponses pour construire une stratégie claire, simple et rentable, totalement personnalisée pour toi.
+            <br />
+            <span className="font-medium text-gray-700">Encore quelques questions, et je te montre tout.</span>
+          </motion.p>
 
-          <div className="mt-8">
+          {/* Barre de progression intelligente */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mb-8"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold text-gray-700">🔍 Analyse de ton potentiel en cours</span>
+              <span className="text-sm font-bold text-[#61f7a2]">{progress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-full"
+                initial={{ width: '78%' }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+            <motion.p
+              key={statusText}
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-xs text-gray-500 mt-2"
+            >
+              {statusText}
+            </motion.p>
+          </motion.div>
+
+          {/* Bloc central - Ce qui se construit */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mb-8"
+          >
+            <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
+              🎁 Ce que je suis en train de construire pour toi
+            </h2>
+            
+            <div className="space-y-4">
+              <AnimatePresence>
+                {items.slice(0, visibleItems).map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="flex items-start gap-4 p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl border border-green-200"
+                  >
+                    <div className="flex-shrink-0 w-10 h-10 bg-[#61f7a2] rounded-xl flex items-center justify-center">
+                      <item.icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                      {item.subtitle && (
+                        <p className="text-sm text-gray-600">{item.subtitle}</p>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+
+          {/* Micro-feedback personnalisé */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.5 }}
+            className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-200"
+          >
+            <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#61f7a2]" />
+              💬 Ce que j'ai déjà compris de toi
+            </h3>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li className="flex items-start gap-2">
+                <span className="text-[#61f7a2] font-bold">–</span>
+                <span>Tu veux transmettre ton savoir, pas vendre un service</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#61f7a2] font-bold">–</span>
+                <span>Tu cherches quelque chose de simple mais structuré</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#61f7a2] font-bold">–</span>
+                <span>Ton objectif est réaliste et atteignable</span>
+              </li>
+            </ul>
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2 }}
+          >
             <GlowButton
               onClick={handleNext}
               className="w-full"
               size="lg"
             >
-              C'est parti pour la suite
+              Découvrir ce que l'IA a préparé pour moi
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </div>

@@ -1,0 +1,23 @@
+import React from 'react';
+import OnboardingQuestionPage from '../components/onboarding/OnboardingQuestionPage';
+
+export default function OnboardingQ12Age() {
+  return (
+    <OnboardingQuestionPage
+      questionId="q12_age"
+      title="Pour mieux te connaître, dans quelle tranche d'âge te situes-tu ?"
+      inputType="radio"
+      options={[
+        "Moins de 25 ans",
+        "25–34 ans",
+        "35–44 ans",
+        "45–54 ans",
+        "55 ans et plus"
+      ]}
+      fieldName="ageRange"
+      nextPage="OnboardingQ13Gender"
+      prevPage="OnboardingDynamic"
+      progress={46}
+    />
+  );
+}

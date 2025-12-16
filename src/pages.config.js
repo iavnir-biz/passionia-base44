@@ -44,6 +44,13 @@ import BonneNouvelle from './pages/BonneNouvelle';
 import OfferTaVieFuture from './pages/OfferTaVieFuture';
 import OfferConcretement from './pages/OfferConcretement';
 import OnboardingDynamic from './pages/OnboardingDynamic';
+import OnboardingQ12Age from './pages/OnboardingQ12Age';
+import OnboardingQ15Income from './pages/OnboardingQ15Income';
+import OnboardingQ16TargetRevenue from './pages/OnboardingQ16TargetRevenue';
+import OnboardingQ18Impact from './pages/OnboardingQ18Impact';
+import OnboardingQ19DesiredImpact from './pages/OnboardingQ19DesiredImpact';
+import OnboardingQ24Future from './pages/OnboardingQ24Future';
+import OnboardingQ26Delivery from './pages/OnboardingQ26Delivery';
 
 
 export const PAGES = {
@@ -93,6 +100,13 @@ export const PAGES = {
     "OfferTaVieFuture": OfferTaVieFuture,
     "OfferConcretement": OfferConcretement,
     "OnboardingDynamic": OnboardingDynamic,
+    "OnboardingQ12Age": OnboardingQ12Age,
+    "OnboardingQ15Income": OnboardingQ15Income,
+    "OnboardingQ16TargetRevenue": OnboardingQ16TargetRevenue,
+    "OnboardingQ18Impact": OnboardingQ18Impact,
+    "OnboardingQ19DesiredImpact": OnboardingQ19DesiredImpact,
+    "OnboardingQ24Future": OnboardingQ24Future,
+    "OnboardingQ26Delivery": OnboardingQ26Delivery,
 }
 
 export const pagesConfig = {

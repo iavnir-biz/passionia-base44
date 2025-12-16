@@ -1,11 +1,12 @@
 import React from 'react';
-import OnboardingQuestionPage from '@/components/onboarding/OnboardingQuestionPage';
+import OnboardingQuestionPage from '../components/onboarding/OnboardingQuestionPage';
 
 export default function OnboardingQ13Gender() {
   return (
     <OnboardingQuestionPage
-      questionId="gender"
-      title="C'est noté. Peux-tu indiquer ton genre ? (Cela m'aidera à personnaliser les textes pour toi)"
+      questionId="q13_gender"
+      title="C'est noté. Peux-tu indiquer ton genre ?"
+      subtitle="Cela m'aidera à personnaliser certains textes pour toi."
       inputType="radio"
       options={[
         "Homme",
@@ -14,8 +15,8 @@ export default function OnboardingQ13Gender() {
       ]}
       fieldName="gender"
       nextPage="OnboardingQ14Family"
-      prevPage="OnboardingQ12AgeRange"
-      progress={54}
+      prevPage="OnboardingQ12Age"
+      progress={50}
     />
   );
 }

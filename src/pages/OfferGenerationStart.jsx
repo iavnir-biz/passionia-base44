@@ -36,6 +36,11 @@ export default function OfferGenerationStart() {
       
       const sessionId = sessions[0].id;
       
+      // Sync User onboarding data to Session first
+      await base44.functions.invoke('syncOnboardingToSession', {
+        sessionId
+      });
+      
       // Generate offer from onboarding data
       await base44.functions.invoke('generateOfferFromOnboarding', {
         sessionId

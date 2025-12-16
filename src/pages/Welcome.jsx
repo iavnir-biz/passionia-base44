@@ -33,7 +33,7 @@ export default function Welcome() {
   const navigate = useNavigate();
   
   const handleStart = () => {
-    base44.auth.redirectToLogin(createPageUrl('OnboardingFirstName'));
+    navigate(createPageUrl('OnboardingFirstName'));
   };
 
   const handleLogin = () => {

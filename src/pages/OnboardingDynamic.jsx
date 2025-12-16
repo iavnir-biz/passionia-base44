@@ -30,6 +30,12 @@ export default function OnboardingDynamic() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
+      // Si l'utilisateur a déjà terminé l'onboarding, rediriger
+      if (currentUser.onboardingCompleted) {
+        navigate(createPageUrl('Dashboard'));
+        return;
+      }
+
       // Chercher ou créer une session
       const sessions = await base44.entities.Session.filter({ 
         created_by: currentUser.email 
@@ -38,10 +44,20 @@ export default function OnboardingDynamic() {
       let activeSession;
       if (sessions.length > 0) {
         activeSession = sessions[0];
+        // Si la session est marquée comme terminée, réinitialiser
+        if (activeSession.is_onboarding_done) {
+          await base44.entities.Session.update(activeSession.id, {
+            is_onboarding_done: false,
+            current_question: null
+          });
+          activeSession.is_onboarding_done = false;
+          activeSession.current_question = null;
+        }
       } else {
         activeSession = await base44.entities.Session.create({
           onboarding_history: [],
           onboarding_summary: {},
+          onboarding_full: {},
           current_question: null,
           is_onboarding_done: false
         });
@@ -73,7 +89,7 @@ export default function OnboardingDynamic() {
 
       if (data.isDone) {
         // Onboarding terminé, sauvegarder les données clés sur le user et rediriger
-        const sessions = await base44.entities.Session.filter({ id: session.id });
+        const sessions = await base44.entities.Session.filter({ id: sessionId });
         if (sessions.length > 0) {
           const finalSession = sessions[0];
           const summary = finalSession.onboarding_summary || {};
@@ -81,6 +97,7 @@ export default function OnboardingDynamic() {
           // Sauvegarder les données principales sur le user pour compatibilité
           await base44.auth.updateMe({ 
             onboarding_completed: true,
+            sessionId: sessionId,
             coreSkill: summary.who_to_teach || finalSession.skill || '',
             targetAudience: summary.learner_profile || '',
             mainProblem: summary.main_learning_problem || '',
@@ -92,18 +109,21 @@ export default function OnboardingDynamic() {
             deliveryPreferences: summary.format_preferences || []
           });
         } else {
-          await base44.auth.updateMe({ onboarding_completed: true });
+          await base44.auth.updateMe({ onboarding_completed: true, sessionId: sessionId });
         }
 
         navigate(createPageUrl('OfferGenerationStart'));
-      } else {
+      } else if (data.question) {
         setCurrentQuestion(data.question);
         initializeValue(data.question.type);
         setQuestionCount(prev => prev + 1);
+        setIsLoading(false);
+      } else {
+        console.error('No question returned from API');
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Error fetching next question:', error);
-    } finally {
       setIsLoading(false);
     }
   };

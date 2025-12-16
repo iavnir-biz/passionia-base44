@@ -55,7 +55,7 @@ export default function OnboardingDynamic() {
         await fetchNextQuestion(activeSession.id);
       } else {
         setCurrentQuestion(activeSession.current_question);
-        initializeValue(activeSession.current_question.type);
+        initializeValue(activeSession.current_question.type, activeSession.current_question);
         setIsLoading(false);
       }
     } catch (error) {
@@ -98,7 +98,7 @@ export default function OnboardingDynamic() {
         navigate(createPageUrl('OfferGenerationStart'));
       } else {
         setCurrentQuestion(data.question);
-        initializeValue(data.question.type);
+        initializeValue(data.question.type, data.question);
         setQuestionCount(prev => prev + 1);
       }
     } catch (error) {
@@ -108,11 +108,11 @@ export default function OnboardingDynamic() {
     }
   };
 
-  const initializeValue = (type) => {
+  const initializeValue = (type, question = null) => {
     if (type === 'multiple_choice') {
       setValue([]);
     } else if (type === 'slider') {
-      setValue(currentQuestion?.min || 0);
+      setValue(question?.min || 0);
     } else {
       setValue('');
     }

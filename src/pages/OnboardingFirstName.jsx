@@ -73,10 +73,21 @@ export default function OnboardingFirstName() {
 
         {/* Card */}
         <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-8 leading-relaxed">
-            Commençons par faire connaissance.<br />
-            Quel est ton prénom ?
+          <h1 className="text-2xl font-bold text-gray-900 mb-6 leading-relaxed">
+            Enchanté 🙂
           </h1>
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            Je suis Nova, l'IA de Passion IA — et aujourd'hui, je vais devenir ton alliée pour t'aider à monétiser ton savoir-faire intelligemment.
+          </p>
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            Je vais te poser quelques questions pour comprendre ce que tu sais faire, les personnes que tu veux aider, et comment transformer tout ça en une offre claire.
+          </p>
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            Mais d'abord, faisons connaissance.
+          </p>
+          <p className="text-gray-900 font-semibold mb-4">
+            Quel est ton prénom ?
+          </p>
 
           <Input
             type="text"
@@ -96,7 +107,7 @@ export default function OnboardingFirstName() {
               className="w-full"
               size="lg"
             >
-              Suivant
+              Oui, on commence
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
           </div>

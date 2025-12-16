@@ -12,6 +12,21 @@ export default function OnboardingFirstName() {
   const [firstName, setFirstName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Vérifier l'authentification au montage
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth) {
+          base44.auth.redirectToLogin(window.location.href);
+        }
+      } catch (error) {
+        base44.auth.redirectToLogin(window.location.href);
+      }
+    };
+    checkAuth();
+  }, []);
+
   const handleNext = async () => {
     if (!firstName.trim()) return;
     

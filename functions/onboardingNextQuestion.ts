@@ -239,7 +239,7 @@ MISSION :
     
     // Appel OpenAI avec structured output
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }

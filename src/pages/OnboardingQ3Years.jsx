@@ -5,7 +5,7 @@ export default function OnboardingQ3Years() {
   return (
     <OnboardingQuestionPage
       questionId="yearsPracticing"
-      title="Depuis combien d'années pratiques-tu cette compétence ou passion ?"
+      title="D'accord. Depuis combien d'années pratiques-tu cette compétence ou cette passion ?"
       inputType="slider"
       sliderConfig={{ min: 0, max: 15, step: 1, suffix: ' ans' }}
       fieldName="yearsPracticing"

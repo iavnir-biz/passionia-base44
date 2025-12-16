@@ -310,12 +310,13 @@ titleTemplate: "${nextQuestionConfig.titleTemplate}"
 subtitleTemplate: "${nextQuestionConfig.subtitleTemplate}"
 
 MISSION :
-1. Prends le titleTemplate et remplace {{firstName}} par "${name}" et {{coreSkill}} par "${skill || 'ta compétence'}"
-2. Prends le subtitleTemplate et utilise-le tel quel (avec les exemples)
-3. Retourne ces textes dans les champs "title" et "subtitle" de la question
-4. Copie "title" dans "text" aussi
-5. Inclus les options/min/max/step selon le type
-6. Mets à jour le summary en mappant ${nextQuestionConfig.field} vers les bonnes clés` : 
+1. Prends le titleTemplate et remplace {{firstName}} par "${name}" et {{coreSkill}} par "${skill || 'ton savoir-faire'}"
+2. IMPORTANT: Si coreSkill est disponible ("${skill}"), utilise-le EXACTEMENT tel quel (ex: "le piano", "la photographie")
+3. Prends le subtitleTemplate et utilise-le tel quel (avec les exemples)
+4. Retourne ces textes dans les champs "title" et "subtitle" de la question
+5. Copie "title" dans "text" aussi
+6. Inclus les options/min/max/step selon le type
+7. Mets à jour le summary en mappant ${nextQuestionConfig.field} vers les bonnes clés` : 
 'MISSION : Les 11 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
 
     console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });

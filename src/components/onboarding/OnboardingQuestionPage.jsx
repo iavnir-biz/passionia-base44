@@ -102,29 +102,53 @@ export default function OnboardingQuestionPage({
       // Sauvegarder sur le user
       await base44.auth.updateMe({ [fieldName]: value });
       
-      // Mapper vers Session.onboarding_summary si sessionId existe
-      if (user.sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-        if (sessions.length > 0) {
-          const session = sessions[0];
-          const summary = session.onboarding_summary || {};
-          
-          // Mapping des champs vers onboarding_summary
-          const fieldMapping = {
-            coreSkill: 'who_to_teach',
-            targetAudience: 'learner_profile',
-            mainProblem: 'main_learning_problem',
-            firstResult: 'quick_win',
-            finalTransformation: 'big_transformation',
-            uniqueMethod: 'method_angle',
-            typicalMistake: 'common_mistake',
-            extraDetail: 'proof_or_story',
-            deliveryPreferences: 'format_preferences'
-          };
-          
-          if (fieldMapping[fieldName]) {
-            summary[fieldMapping[fieldName]] = value;
-            await base44.entities.Session.update(user.sessionId, { onboarding_summary: summary });
+      // Si c'est la dernière question (Q26), sauvegarder aussi onboarding_completed
+      if (nextPage === 'OfferGenerationStart') {
+        // Mapper vers Session.onboarding_full pour sauvegarder toutes les données statiques
+        if (user.sessionId) {
+          const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+          if (sessions.length > 0) {
+            const session = sessions[0];
+            const onboardingFull = session.onboarding_full || {};
+            const summary = session.onboarding_summary || {};
+            
+            // Sauvegarder la dernière réponse
+            onboardingFull[fieldName] = value;
+            
+            // Mapper deliveryPreferences vers format_preferences dans le summary
+            if (fieldName === 'deliveryPreferences') {
+              summary.format_preferences = value;
+            }
+            
+            await base44.entities.Session.update(user.sessionId, { 
+              onboarding_full: onboardingFull,
+              onboarding_summary: summary
+            });
+          }
+        }
+        
+        // Sauvegarder les données principales sur le user
+        const currentUser = await base44.auth.me();
+        await base44.auth.updateMe({ 
+          onboarding_completed: true,
+          targetAudience: currentUser.targetAudience || '',
+          mainProblem: currentUser.mainProblem || '',
+          firstResult: currentUser.firstResult || '',
+          finalTransformation: currentUser.finalTransformation || '',
+          uniqueMethod: currentUser.uniqueMethod || '',
+          typicalMistake: currentUser.typicalMistake || '',
+          extraDetail: currentUser.extraDetail || '',
+          deliveryPreferences: currentUser.deliveryPreferences || []
+        });
+      } else {
+        // Questions intermédiaires : sauvegarder dans onboarding_full
+        if (user.sessionId) {
+          const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+          if (sessions.length > 0) {
+            const session = sessions[0];
+            const onboardingFull = session.onboarding_full || {};
+            onboardingFull[fieldName] = value;
+            await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
           }
         }
       }

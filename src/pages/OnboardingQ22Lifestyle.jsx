@@ -1,11 +1,11 @@
 import React from 'react';
-import OnboardingQuestionPage from '../components/onboarding/OnboardingQuestionPage';
+import OnboardingQuestionPage from '@/components/onboarding/OnboardingQuestionPage';
 
 export default function OnboardingQ22Lifestyle() {
   return (
     <OnboardingQuestionPage
-      questionId="q22_lifestyle"
-      title="Grâce à ces revenus, quel style de vie aimerais-tu avoir ?"
+      questionId="lifestyleGoals"
+      title="Grâce à ces revenus, quel style de vie aimerais-tu avoir ? (plusieurs choix possibles)"
       inputType="checkbox"
       options={[
         "Voyager quand je veux",
@@ -15,10 +15,10 @@ export default function OnboardingQ22Lifestyle() {
         "Vivre de ce que j'aime vraiment",
         "Autre"
       ]}
-      fieldName="lifestyle"
+      fieldName="lifestyleGoals"
       nextPage="OnboardingQ23Obstacles"
       prevPage="OnboardingQ21Relatives"
-      progress={85}
+      progress={88}
     />
   );
 }

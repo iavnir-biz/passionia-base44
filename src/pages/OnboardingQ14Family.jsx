@@ -1,10 +1,10 @@
 import React from 'react';
-import OnboardingQuestionPage from '../components/onboarding/OnboardingQuestionPage';
+import OnboardingQuestionPage from '@/components/onboarding/OnboardingQuestionPage';
 
 export default function OnboardingQ14Family() {
   return (
     <OnboardingQuestionPage
-      questionId="q14_family"
+      questionId="familyStatus"
       title="Quelle est ta situation familiale actuelle ?"
       inputType="radio"
       options={[
@@ -14,9 +14,9 @@ export default function OnboardingQ14Family() {
         "En couple avec enfant(s)"
       ]}
       fieldName="familyStatus"
-      nextPage="OnboardingQ15Income"
+      nextPage="OnboardingQ15CurrentIncome"
       prevPage="OnboardingQ13Gender"
-      progress={54}
+      progress={58}
     />
   );
 }

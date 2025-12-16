@@ -62,8 +62,27 @@ export default function OnboardingQuestionPage({
   };
 
   const loadDynamicHelper = async () => {
-    // Désactivé pour éviter le loader entre chaque question
-    // Le helper text sera simplement le subtitle statique
+    if (!user.sessionId) return;
+    
+    setIsLoadingHelper(true);
+    try {
+      const { data } = await base44.functions.invoke('onboardingHelper', {
+        sessionId: user.sessionId,
+        questionId,
+        fieldName
+      });
+      
+      if (data.helperText) {
+        setHelperText(data.helperText);
+      }
+      if (data.examples && data.examples.length > 0) {
+        setExamples(data.examples);
+      }
+    } catch (error) {
+      console.error('Error loading helper:', error);
+    } finally {
+      setIsLoadingHelper(false);
+    }
   };
 
   const replaceVariables = (text) => {
@@ -194,6 +213,33 @@ export default function OnboardingQuestionPage({
               >
                 {replaceVariables(subtitle)}
               </motion.p>
+            )}
+
+            {/* Helper IA avec mémoire */}
+            {isLoadingHelper && (
+              <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>L'IA analyse ton parcours...</span>
+              </div>
+            )}
+
+            {helperText && !isLoadingHelper && (
+              <motion.div 
+                className="mb-4 p-4 bg-gradient-to-br from-green-50 to-blue-50 border border-green-200 rounded-2xl"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <p className="text-sm text-gray-700 mb-2">💡 {helperText}</p>
+                {examples.length > 0 && (
+                  <div className="space-y-1 mt-2">
+                    <p className="text-xs text-gray-500 font-semibold">Exemples :</p>
+                    {examples.map((ex, idx) => (
+                      <p key={idx} className="text-xs text-gray-600">• {ex}</p>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
             )}
 
 

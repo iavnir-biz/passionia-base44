@@ -5,6 +5,36 @@ const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
+// Structure des 26 questions à suivre
+const QUESTION_STRUCTURE = [
+  { id: 1, field: "coreSkill", theme: "Compétence principale à enseigner", type: "text" },
+  { id: 2, field: "experienceLevel", theme: "Niveau d'expérience", type: "single_choice", options: ["Débutant", "Intermédiaire", "Avancé", "Expert"] },
+  { id: 3, field: "years", theme: "Années de pratique", type: "slider", min: 0, max: 30, step: 1 },
+  { id: 4, field: "targetAudience", theme: "Public cible idéal", type: "text" },
+  { id: 5, field: "mainProblem", theme: "Problème N°1 des apprenants", type: "text" },
+  { id: 6, field: "firstResult", theme: "Premier résultat rapide", type: "text" },
+  { id: 7, field: "finalTransformation", theme: "Transformation finale", type: "text" },
+  { id: 8, field: "mainTeaching", theme: "Enseignement clé prioritaire", type: "text" },
+  { id: 9, field: "uniqueMethod", theme: "Méthode ou approche unique", type: "text" },
+  { id: 10, field: "typicalMistake", theme: "Erreur typique à éviter", type: "text" },
+  { id: 11, field: "extraDetail", theme: "Histoire ou preuve personnelle", type: "text" },
+  { id: 12, field: "ageRange", theme: "Tranche d'âge du public", type: "single_choice", options: ["18-25 ans", "26-35 ans", "36-45 ans", "46-55 ans", "56+ ans"] },
+  { id: 13, field: "gender", theme: "Genre du public", type: "single_choice", options: ["Majoritairement des hommes", "Majoritairement des femmes", "Mixte"] },
+  { id: 14, field: "family", theme: "Situation familiale", type: "single_choice", options: ["Célibataire sans enfants", "En couple sans enfants", "Parent avec enfants", "Mixte"] },
+  { id: 15, field: "currentIncome", theme: "Revenus mensuels actuels", type: "single_choice", options: ["Moins de 1500€", "1500€ - 2500€", "2500€ - 3500€", "3500€ - 4500€", "Plus de 4500€"] },
+  { id: 16, field: "targetIncome", theme: "Objectif de revenus mensuels", type: "single_choice", options: ["2000€/mois", "3000€/mois", "5000€/mois", "10 000€/mois", "Plus de 10 000€/mois"] },
+  { id: 17, field: "targetDelay", theme: "Délai pour atteindre l'objectif", type: "single_choice", options: ["3 mois", "6 mois", "1 an", "2 ans ou plus"] },
+  { id: 18, field: "lifeChange", theme: "Changement de vie souhaité", type: "text" },
+  { id: 19, field: "impact", theme: "Impact sur les autres", type: "text" },
+  { id: 20, field: "emotions", theme: "Émotions recherchées", type: "text" },
+  { id: 21, field: "relatives", theme: "Ce que les proches diront", type: "text" },
+  { id: 22, field: "lifestyle", theme: "Style de vie idéal", type: "text" },
+  { id: 23, field: "obstacles", theme: "Obstacles actuels", type: "text" },
+  { id: 24, field: "ifNothingChanges", theme: "Si rien ne change dans 5 ans", type: "text" },
+  { id: 25, field: "readiness", theme: "Niveau de préparation", type: "slider", min: 1, max: 10, step: 1 },
+  { id: 26, field: "deliveryPreferences", theme: "Formats de délivrance préférés", type: "multiple_choice", options: ["Enregistrer des vidéos (partage d'écran, sans montrer ma tête)", "Enregistrer des vidéos de cours (face caméra)", "Créer des PDFs / Google Docs", "Animer des lives en groupe", "Animer des sessions 1-on-1 en visio", "Organiser des événements en présentiel (pour le high-ticket)"] }
+];
+
 const SYSTEM_PROMPT = `Tu es un coach d'affaires expert qui a une VRAIE conversation naturelle avec l'utilisateur.
 
 Mission : transformer sa compétence en offre éducative pour ENSEIGNER son savoir-faire (pas vendre des services).
@@ -47,10 +77,12 @@ VALIDATION : Si ta question ne fait AUCUNE référence à la réponse précéden
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 RÈGLES GÉNÉRALES :
-- 6 à 12 questions MAX
+- Tu dois poser EXACTEMENT 26 questions dans l'ordre prédéfini
+- Chaque question correspond à un thème spécifique de QUESTION_STRUCTURE
 - Tutoie TOUJOURS, utilise le prénom si dispo
 - Ton : bienveillant mais direct, pas bullshit
-- Dernière question OBLIGATOIRE : "Pour finir, y a-t-il autre chose que tu aimerais partager ? Une anecdote, une histoire personnelle liée à ta compétence, ou un détail qui te rend unique ?"
+- ADAPTE et REFORMULE chaque question pour qu'elle soit naturelle et conversationnelle
+- Fais TOUJOURS référence aux réponses précédentes dans ta reformulation
 
 8 CLÉS DU SUMMARY à remplir progressivement :
 1. who_to_teach : élève idéal
@@ -64,10 +96,20 @@ RÈGLES GÉNÉRALES :
 9. format_preferences : formats préférés (array)
 
 LOGIQUE :
-- Utilise onboarding_summary + dernière réponse pour formuler la question suivante
-- MET À JOUR le summary complet à chaque réponse (déduis intelligemment)
-- NE répète JAMAIS une question déjà posée
-- isDone=true UNIQUEMENT si les 8 clés sont remplies ET la question finale "Pour finir" a été posée
+- Utilise QUESTION_STRUCTURE pour savoir quelle question poser (basé sur le nombre de questions déjà posées)
+- Reformule la question du QUESTION_STRUCTURE en la rendant naturelle et contextualisée
+- MET À JOUR le summary complet à chaque réponse (mappe les fields aux clés du summary)
+- isDone=true UNIQUEMENT après avoir posé les 26 questions
+
+MAPPING DES FIELDS VERS LE SUMMARY :
+- targetAudience, ageRange, gender, family → who_to_teach + learner_profile
+- mainProblem, obstacles → main_learning_problem
+- firstResult → quick_win
+- finalTransformation, lifeChange, impact → big_transformation
+- uniqueMethod, mainTeaching → method_angle
+- typicalMistake → common_mistake
+- extraDetail → proof_or_story
+- deliveryPreferences → format_preferences
 
 Tu retournes TOUJOURS un JSON avec :
 Si isDone=false:
@@ -157,8 +199,11 @@ Deno.serve(async (req) => {
       .map(h => h.question)
       .filter(q => q);
 
-    // Check si question finale posée
-    const finalQuestionAsked = history.some(h => h.question && h.question.includes('Pour finir'));
+    // Déterminer quelle question poser (basé sur l'index)
+    const nextQuestionIndex = history.length; // 0-based
+    const nextQuestionConfig = nextQuestionIndex < QUESTION_STRUCTURE.length 
+      ? QUESTION_STRUCTURE[nextQuestionIndex] 
+      : null;
 
     const userPrompt = `CONTEXTE UTILISATEUR :
 Prénom : ${name || 'non fourni'}
@@ -176,15 +221,19 @@ ${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
 ` : ''}
 
 ÉTAT :
-- Nombre de questions posées : ${history.length}
+- Nombre de questions posées : ${history.length}/26
+- Prochaine question à poser : ${nextQuestionConfig ? `#${nextQuestionConfig.id} - ${nextQuestionConfig.theme}` : 'TERMINÉ'}
 - Clés remplies dans summary : ${Object.keys(summary).filter(k => summary[k] && (typeof summary[k] === 'string' ? summary[k].trim() : true)).join(', ') || 'aucune'}
-- Question finale "Pour finir" posée : ${finalQuestionAsked ? 'OUI' : 'NON'}
+
+${nextQuestionConfig ? `PROCHAINE QUESTION À POSER :
+Structure : ${JSON.stringify(nextQuestionConfig, null, 2)}
 
 MISSION :
-${lastEntry ? '1. Commence ta prochaine question par UNE PHRASE DE TRANSITION qui rebondit naturellement sur la dernière réponse' : '1. Commence par une question accueillante'}
-2. Pose LA question suivante pour enrichir le summary
-3. Retourne le summary COMPLET et MIS À JOUR (déduis intelligemment les infos des réponses)
-4. isDone=true UNIQUEMENT si toutes les 8 clés essentielles sont remplies ET question finale posée`;
+1. ${lastEntry ? 'Commence par UNE PHRASE DE TRANSITION qui rebondit naturellement sur la dernière réponse' : 'Commence par une question accueillante'}
+2. Reformule la question "${nextQuestionConfig.theme}" pour qu'elle soit naturelle, conversationnelle et personnalisée
+3. Utilise le type "${nextQuestionConfig.type}" ${nextQuestionConfig.options ? `avec les options : ${JSON.stringify(nextQuestionConfig.options)}` : ''}${nextQuestionConfig.min !== undefined ? `avec min=${nextQuestionConfig.min}, max=${nextQuestionConfig.max}, step=${nextQuestionConfig.step}` : ''}
+4. Retourne le summary COMPLET et MIS À JOUR (mappe ${nextQuestionConfig.field} vers les bonnes clés du summary)` : 
+'MISSION : Toutes les 26 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
 
     console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });
     

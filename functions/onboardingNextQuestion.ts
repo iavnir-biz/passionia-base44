@@ -118,8 +118,8 @@ Si isDone=false:
   "question": {
     "text": "string (avec phrase de transition conversationnelle)",
     "type": "text|single_choice|multiple_choice|slider",
-    "options": ["string"] (si type=single_choice ou multiple_choice),
-    "min": number, "max": number, "step": number (si type=slider)
+    "options": ["string"] (si type=single_choice ou multiple_choice, OBLIGATOIRE),
+    "min": number, "max": number, "step": number (si type=slider, OBLIGATOIRE)
   },
   "summary": {
     "who_to_teach": "string",
@@ -133,6 +133,8 @@ Si isDone=false:
     "format_preferences": ["string"]
   }
 }
+
+IMPORTANT : Tu DOIS ABSOLUMENT inclure les champs "options" si type=single_choice ou multiple_choice, et "min", "max", "step" si type=slider, SINON l'interface ne pourra pas afficher la question !
 
 Si isDone=true:
 {
@@ -256,22 +258,48 @@ MISSION :
             properties: {
               isDone: { type: "boolean" },
               question: {
-                type: "object",
-                properties: {
-                  text: { type: "string" },
-                  type: { 
-                    type: "string",
-                    enum: ["text", "single_choice", "multiple_choice", "slider"]
+                anyOf: [
+                  {
+                    type: "object",
+                    properties: {
+                      text: { type: "string" },
+                      type: { 
+                        type: "string",
+                        enum: ["text"]
+                      }
+                    },
+                    required: ["text", "type"]
                   },
-                  options: {
-                    type: "array",
-                    items: { type: "string" }
+                  {
+                    type: "object",
+                    properties: {
+                      text: { type: "string" },
+                      type: { 
+                        type: "string",
+                        enum: ["single_choice", "multiple_choice"]
+                      },
+                      options: {
+                        type: "array",
+                        items: { type: "string" }
+                      }
+                    },
+                    required: ["text", "type", "options"]
                   },
-                  min: { type: "number" },
-                  max: { type: "number" },
-                  step: { type: "number" }
-                },
-                required: ["text", "type"]
+                  {
+                    type: "object",
+                    properties: {
+                      text: { type: "string" },
+                      type: { 
+                        type: "string",
+                        enum: ["slider"]
+                      },
+                      min: { type: "number" },
+                      max: { type: "number" },
+                      step: { type: "number" }
+                    },
+                    required: ["text", "type", "min", "max", "step"]
+                  }
+                ]
               },
               summary: {
                 type: "object",

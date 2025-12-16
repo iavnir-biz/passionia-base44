@@ -7,33 +7,9 @@ const openai = new OpenAI({
 
 // Structure des 26 questions à suivre
 const QUESTION_STRUCTURE = [
-  { 
-    id: 1, 
-    field: "coreSkill", 
-    theme: "Compétence/passion à monétiser", 
-    type: "text",
-    titleGuide: "Pour commencer, quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu et enseigner ?",
-    subtitle: "Sois précis. Par exemple : peindre des aquarelles, conseiller en décoration intérieure, consulting RH, créer des programmes de fitness à la maison…"
-  },
-  { 
-    id: 2, 
-    field: "experienceLevel", 
-    theme: "Niveau d'expérience réel", 
-    type: "single_choice", 
-    options: ["C'est une passion, je débute", "J'ai déjà aidé des amis ou des proches gratuitement", "Je suis professionnel, j'ai déjà eu des clients"],
-    titleGuide: "Super, tu souhaites enseigner {{skill}}. Quel est ton niveau d'expérience actuel ?"
-  },
-  { 
-    id: 3, 
-    field: "years", 
-    theme: "Années de pratique", 
-    type: "slider", 
-    min: 0, 
-    max: 15, 
-    step: 1,
-    titleGuide: "D'accord. Depuis combien d'années pratiques-tu cette compétence ou cette passion ?",
-    subtitle: "De 0 à 15+ ans"
-  },
+  { id: 1, field: "coreSkill", theme: "Compétence principale à enseigner", type: "text" },
+  { id: 2, field: "experienceLevel", theme: "Niveau d'expérience", type: "single_choice", options: ["Débutant", "Intermédiaire", "Avancé", "Expert"] },
+  { id: 3, field: "years", theme: "Années de pratique", type: "slider", min: 0, max: 30, step: 1 },
   { id: 4, field: "targetAudience", theme: "Public cible idéal", type: "text" },
   { id: 5, field: "mainProblem", theme: "Problème N°1 des apprenants", type: "text" },
   { id: 6, field: "firstResult", theme: "Premier résultat rapide", type: "text" },
@@ -64,54 +40,14 @@ const SYSTEM_PROMPT = `Tu es un coach d'affaires expert qui a une VRAIE conversa
 Mission : transformer sa compétence en offre éducative pour ENSEIGNER son savoir-faire (pas vendre des services).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 RÈGLES DE FORMULATION – TITRES ET SOUS-TEXTES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-STRUCTURE OBLIGATOIRE pour chaque question :
-
-1. TITRE (text) : Court, naturel, conversationnel
-   - Reprend le contexte de la réponse précédente (sauf Q1)
-   - Humanise sans être trop long
-   - Utilise le prénom si disponible
-
-2. SOUS-TEXTE (subtitle) : Aide contextuelle avec exemples concrets
-   - Toujours présent pour guider l'utilisateur
-   - Exemples réels et précis
-   - Ton gris, non titré
-
-POUR LES 3 PREMIÈRES QUESTIONS, UTILISE LES GUIDES FOURNIS :
-- Question 1 : titleGuide et subtitle sont OBLIGATOIRES (première question = pas de contexte précédent)
-- Question 2 : titleGuide avec {{skill}} à remplacer par la compétence mentionnée
-- Question 3 : titleGuide avec subtitle "De 0 à 15+ ans"
-
-EXEMPLE Q1 (OBLIGATOIRE) :
-{
-  "text": "Pour commencer, quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu et enseigner ?",
-  "subtitle": "Sois précis. Par exemple : peindre des aquarelles, conseiller en décoration intérieure, consulting RH, créer des programmes de fitness à la maison…"
-}
-
-EXEMPLE Q2 (après réponse "photographie de portrait") :
-{
-  "text": "Super, tu souhaites enseigner la photographie de portrait. Quel est ton niveau d'expérience actuel ?",
-  "subtitle": null
-}
-
-EXEMPLE Q3 (après réponse "J'ai déjà aidé des amis gratuitement") :
-{
-  "text": "D'accord. Depuis combien d'années pratiques-tu cette compétence ou cette passion ?",
-  "subtitle": "De 0 à 15+ ans"
-}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔴 RÈGLE CRITIQUE – STYLE CONVERSATIONNEL INTELLIGENT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-CHAQUE nouvelle question (à partir de Q2) DOIT OBLIGATOIREMENT :
+CHAQUE nouvelle question DOIT OBLIGATOIREMENT :
 
 1. REPRENDRE EXPLICITEMENT un élément de la réponse précédente
 2. MONTRER que tu as compris (reformulation courte et précise)
 3. ENCHAÎNER naturellement, comme un coach humain
-4. Être COURTE : pas de phrases inutilement longues
 
 Exemples ATTENDUS (à reproduire) :
 
@@ -119,7 +55,13 @@ Exemples ATTENDUS (à reproduire) :
 ✅ BON : "Ok, donc si j'ai bien compris, tes élèves savent prendre des photos, mais bloquent quand il faut diriger un modèle. C'est quoi exactement LE moment où ça coince le plus pour eux ?"
 
 ❌ INTERDIT : "Quelle transformation veux-tu apporter ?"
-✅ BON : "Super ! Donc tu veux qu'ils passent de « coincés devant le modèle » à « capables de créer des images naturelles et émotionnelles ». Et concrètement, à quoi ça ressemble quand c'est réussi ?"
+✅ BON : "Super ! Donc tu veux qu'ils passent de « coincés devant le modèle » à « capables de créer des images naturelles et émotionnelles ». Et concrètement, à quoi ça ressemble quand c'est réussi ? Genre après ta formation, ils font quoi différemment ?"
+
+❌ INTERDIT : "Quelle est ta méthode unique ?"
+✅ BON : "Intéressant. Tu m'as dit qu'ils galèrent avec la direction de modèle. Est-ce que t'as développé une approche spécifique pour leur apprendre ça ? Un truc qui marche à tous les coups ?"
+
+❌ INTERDIT : "Quels formats préfères-tu ?"
+✅ BON : "Ok, donc l'erreur typique c'est de croire qu'il faut tout contrôler. Maintenant, côté pratique : pour transmettre ça, tu préfères plutôt vidéos, PDFs, lives, ou un mix ?"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔴 INTERDICTIONS STRICTES
@@ -128,10 +70,9 @@ Exemples ATTENDUS (à reproduire) :
 ❌ Questions génériques type formulaire Typeform
 ❌ Répétition sèche des champs (ex: "Quel est ton learner_profile ?")
 ❌ Ton administratif ou robotique
-❌ Questions qui n'utilisent PAS le contexte précédent (sauf Q1)
-❌ Phrases trop longues ou trop complexes
+❌ Questions qui n'utilisent PAS le contexte précédent
 
-VALIDATION : Si ta question (Q2+) ne fait AUCUNE référence à la réponse précédente → elle est INVALIDE.
+VALIDATION : Si ta question ne fait AUCUNE référence à la réponse précédente → elle est INVALIDE.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -141,7 +82,7 @@ RÈGLES GÉNÉRALES :
 - Tutoie TOUJOURS, utilise le prénom si dispo
 - Ton : bienveillant mais direct, pas bullshit
 - ADAPTE et REFORMULE chaque question pour qu'elle soit naturelle et conversationnelle
-- Fais TOUJOURS référence aux réponses précédentes dans ta reformulation (sauf Q1)
+- Fais TOUJOURS référence aux réponses précédentes dans ta reformulation
 
 8 CLÉS DU SUMMARY à remplir progressivement :
 1. who_to_teach : élève idéal
@@ -287,16 +228,11 @@ ${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
 ${nextQuestionConfig ? `PROCHAINE QUESTION À POSER :
 Structure : ${JSON.stringify(nextQuestionConfig, null, 2)}
 
-MISSION CRITIQUE :
-Tu DOIS poser la question #${nextQuestionConfig.id} (${nextQuestionConfig.theme}).
-
-INSTRUCTIONS PRÉCISES :
-1. TYPE : Utilise OBLIGATOIREMENT le type "${nextQuestionConfig.type}"
-2. OPTIONS : ${nextQuestionConfig.options ? `Utilise EXACTEMENT ces options : ${JSON.stringify(nextQuestionConfig.options)}` : 'Pas d\'options prédéfinies'}
-3. SLIDER : ${nextQuestionConfig.min !== undefined ? `min=${nextQuestionConfig.min}, max=${nextQuestionConfig.max}, step=${nextQuestionConfig.step}` : 'N/A'}
-4. TITRE : ${nextQuestionConfig.titleGuide ? `OBLIGATOIRE : "${nextQuestionConfig.titleGuide}" ${nextQuestionConfig.titleGuide.includes('{{skill}}') ? '(remplace {{skill}} par la compétence)' : ''}` : `Reformule "${nextQuestionConfig.theme}" de manière courte et naturelle${lastEntry ? ', en reprenant la réponse précédente' : ''}`}
-5. SOUS-TEXTE : ${nextQuestionConfig.subtitle ? `OBLIGATOIRE : "${nextQuestionConfig.subtitle}"` : 'Ajoute des exemples concrets'}
-6. SUMMARY : Mets à jour le summary en mappant ${nextQuestionConfig.field} vers les bonnes clés` : 
+MISSION :
+1. ${lastEntry ? 'Commence par UNE PHRASE DE TRANSITION qui rebondit naturellement sur la dernière réponse' : 'Commence par une question accueillante'}
+2. Reformule la question "${nextQuestionConfig.theme}" pour qu'elle soit naturelle, conversationnelle et personnalisée
+3. Utilise le type "${nextQuestionConfig.type}" ${nextQuestionConfig.options ? `avec les options : ${JSON.stringify(nextQuestionConfig.options)}` : ''}${nextQuestionConfig.min !== undefined ? `avec min=${nextQuestionConfig.min}, max=${nextQuestionConfig.max}, step=${nextQuestionConfig.step}` : ''}
+4. Retourne le summary COMPLET et MIS À JOUR (mappe ${nextQuestionConfig.field} vers les bonnes clés du summary)` : 
 'MISSION : Toutes les 26 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
 
     console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });
@@ -323,7 +259,6 @@ INSTRUCTIONS PRÉCISES :
                 type: "object",
                 properties: {
                   text: { type: "string" },
-                  subtitle: { type: "string" },
                   type: { 
                     type: "string",
                     enum: ["text", "single_choice", "multiple_choice", "slider"]

@@ -55,7 +55,7 @@ export default function OnboardingDynamic() {
         await fetchNextQuestion(activeSession.id);
       } else {
         setCurrentQuestion(activeSession.current_question);
-        initializeValue(activeSession.current_question.type, activeSession.current_question);
+        initializeValue(activeSession.current_question.type);
         setIsLoading(false);
       }
     } catch (error) {
@@ -98,7 +98,7 @@ export default function OnboardingDynamic() {
         navigate(createPageUrl('OfferGenerationStart'));
       } else {
         setCurrentQuestion(data.question);
-        initializeValue(data.question.type, data.question);
+        initializeValue(data.question.type);
         setQuestionCount(prev => prev + 1);
       }
     } catch (error) {
@@ -108,11 +108,11 @@ export default function OnboardingDynamic() {
     }
   };
 
-  const initializeValue = (type, question = null) => {
+  const initializeValue = (type) => {
     if (type === 'multiple_choice') {
       setValue([]);
     } else if (type === 'slider') {
-      setValue(question?.min || 0);
+      setValue(currentQuestion?.min || 0);
     } else {
       setValue('');
     }
@@ -185,17 +185,12 @@ export default function OnboardingDynamic() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <div className="flex items-start gap-2 mb-4">
+              <div className="flex items-start gap-2 mb-6">
                 <Sparkles className="w-5 h-5 text-[#61f7a2] mt-1 flex-shrink-0" />
                 <h1 className="text-2xl font-bold text-gray-900 leading-relaxed">
                   {currentQuestion.text}
                 </h1>
               </div>
-              {currentQuestion.subtitle && (
-                <p className="text-gray-500 text-sm mb-6 ml-7">
-                  {currentQuestion.subtitle}
-                </p>
-              )}
             </motion.div>
 
             {/* Input */}
@@ -264,31 +259,31 @@ export default function OnboardingDynamic() {
               )}
 
               {currentQuestion.type === 'slider' && (
-               <div className="space-y-6">
-                 <motion.div 
-                   className="text-center"
-                   key={value}
-                   initial={{ scale: 1.1 }}
-                   animate={{ scale: 1 }}
-                   transition={{ duration: 0.2 }}
-                 >
-                   <span className="text-5xl font-bold text-[#61f7a2]">
-                     {value}{currentQuestion.max >= 15 && value >= 15 ? '+' : ''}
-                   </span>
-                 </motion.div>
-                 <Slider
-                   value={[value]}
-                   onValueChange={(vals) => setValue(vals[0])}
-                   min={currentQuestion.min || 0}
-                   max={currentQuestion.max || 10}
-                   step={currentQuestion.step || 1}
-                   className="w-full"
-                 />
-                 <div className="flex justify-between text-sm text-gray-600 font-medium">
-                   <span>{currentQuestion.min || 0} an</span>
-                   <span>{currentQuestion.max || 10}{currentQuestion.max >= 15 ? '+' : ''} ans</span>
-                 </div>
-               </div>
+                <div className="space-y-6">
+                  <motion.div 
+                    className="text-center"
+                    key={value}
+                    initial={{ scale: 1.1 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <span className="text-5xl font-bold text-[#61f7a2]">
+                      {value}
+                    </span>
+                  </motion.div>
+                  <Slider
+                    value={[value]}
+                    onValueChange={(vals) => setValue(vals[0])}
+                    min={currentQuestion.min || 0}
+                    max={currentQuestion.max || 10}
+                    step={currentQuestion.step || 1}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 font-medium">
+                    <span>{currentQuestion.min || 0}</span>
+                    <span>{currentQuestion.max || 10}</span>
+                  </div>
+                </div>
               )}
             </motion.div>
 

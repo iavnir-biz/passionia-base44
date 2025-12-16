@@ -6,48 +6,54 @@ const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const SYSTEM_PROMPT = `Tu es un expert en analyse de marché e-learning et monétisation de compétences.
+const SYSTEM_PROMPT = `Tu es un expert en e-learning et validation de marché.
 
-RÈGLE CRITIQUE : Tu dois baser tes choix sur onboarding_summary en priorité.
-Si une info manque, pose l'hypothèse la plus raisonnable MAIS reste cohérent avec le summary.
-Tu n'as pas le droit d'ignorer le summary.`;
+Mission : rassurer l'utilisateur que sa compétence a un VRAI potentiel commercial.
+
+RÈGLES :
+1. Utilise TOUJOURS Session.skill + onboarding_summary pour personnaliser
+2. validationText : 2-3 phrases ultra-personnalisées, ton bienveillant et direct
+3. marketScores : scores réalistes (60-95) basés sur la compétence et le profil
+4. Tutoie, sois cash, pas de bullshit marketing
+
+Exemple de validationText :
+"Ok, donc enseigner [skill] à [learner_profile], c'est un marché énorme. Des milliers de gens cherchent exactement ça chaque mois. Ta promesse de [quick_win] ? C'est pile ce que les gens veulent."`;
 
 Deno.serve(async (req) => {
   try {
     const { sessionId } = await req.json();
-    
+
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
     const ctx = await getSessionContext(req, sessionId);
-    const summary = ctx.onboarding_summary;
+    const summary = ctx.onboarding_summary || {};
+    const full = ctx.session.onboarding_full || {};
+    const skill = ctx.skill || ctx.session.skill || summary.who_to_teach || '';
 
-    const userPrompt = `Contexte utilisateur :
-- Compétence/Passion : ${ctx.skill || summary.who_to_teach || 'non renseignée'}
-- Public cible (élèves) : ${summary.who_to_teach || summary.learner_profile || 'non renseigné'}
-- Problème principal des élèves : ${summary.main_learning_problem || 'non renseigné'}
-- Transformation promise : ${summary.big_transformation || 'non renseignée'}
-- Quick win : ${summary.quick_win || 'non renseigné'}
+    const userPrompt = `CONTEXTE UTILISATEUR :
+Compétence : ${skill}
+Audience cible : ${summary.learner_profile || 'non spécifié'}
+Problème principal : ${summary.main_learning_problem || 'non spécifié'}
+Quick win : ${summary.quick_win || 'non spécifié'}
+Grande transformation : ${summary.big_transformation || 'non spécifié'}
+Revenus actuels : ${full.currentIncome || 'non spécifié'}
+Revenus cibles : ${full.targetIncome || 'non spécifié'}
+Délai : ${full.targetIncomeDelay || 'non spécifié'}
 
-Génère une analyse de marché personnalisée avec :
+GÉNÈRE :
+1. validationText : 2-3 phrases ultra-personnalisées qui RASSURENT sur le potentiel commercial (reprends les termes exacts de skill, learner_profile, quick_win)
+2. marketScores : scores réalistes (60-95) basés sur :
+   - elearningMarket : potentiel e-learning de cette compétence
+   - digitalDemand : demande digitale pour cette audience
+   - recurringRevenue : potentiel de revenus récurrents
+   - globalAccess : accessibilité mondiale du sujet
+   - techEase : facilité de livraison technique
 
-1. validationText : Un texte de 3-4 phrases PERSONNALISÉ qui valide le marché de l'utilisateur. Le texte doit :
-   - Mentionner directement sa compétence "${ctx.skill}"
-   - Parler de l'enseignement de cette compétence (pas de vente de services)
-   - Rassurer sur le potentiel de monétisation via l'enseignement
-   - Être motivant et encourageant
-   - Mentionner des tendances actuelles du e-learning
-   - Rester professionnel et crédible
+Ton : direct, bienveillant, pas de blabla.`;
 
-2. marketScores : Un objet avec 5 scores (entre 70 et 95) adaptés à la compétence :
-   - elearningMarket : Taille du marché e-learning pour cette compétence
-   - digitalDemand : Demande numérique croissante
-   - recurringRevenue : Potentiel de revenus récurrents
-   - globalAccess : Accessibilité globale
-   - techEase : Facilité technique & outils modernes
-
-Les scores doivent être réalistes et cohérents avec la compétence déclarée.`;
+    console.log("OPENAI_CALL start", { fn: "generateMarketAnalysis", sessionId, model: "gpt-4o-mini" });
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -55,8 +61,8 @@ Les scores doivent être réalistes et cohérents avec la compétence déclarée
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }
       ],
-      temperature: 0.3,
-      max_tokens: 600,
+      temperature: 0.4,
+      max_tokens: 500,
       response_format: {
         type: "json_schema",
         json_schema: {
@@ -69,11 +75,11 @@ Les scores doivent être réalistes et cohérents avec la compétence déclarée
               marketScores: {
                 type: "object",
                 properties: {
-                  elearningMarket: { type: "number" },
-                  digitalDemand: { type: "number" },
-                  recurringRevenue: { type: "number" },
-                  globalAccess: { type: "number" },
-                  techEase: { type: "number" }
+                  elearningMarket: { type: "number", minimum: 0, maximum: 100 },
+                  digitalDemand: { type: "number", minimum: 0, maximum: 100 },
+                  recurringRevenue: { type: "number", minimum: 0, maximum: 100 },
+                  globalAccess: { type: "number", minimum: 0, maximum: 100 },
+                  techEase: { type: "number", minimum: 0, maximum: 100 }
                 },
                 required: ["elearningMarket", "digitalDemand", "recurringRevenue", "globalAccess", "techEase"],
                 additionalProperties: false
@@ -86,17 +92,25 @@ Les scores doivent être réalistes et cohérents avec la compétence déclarée
       }
     });
 
+    console.log("OPENAI_CALL end", { 
+      fn: "generateMarketAnalysis", 
+      sessionId, 
+      usage: completion.usage 
+    });
+
     const result = JSON.parse(completion.choices[0].message.content);
 
-    // Debug info
-    const summaryKeysFilled = Object.keys(summary).filter(k => summary[k] && summary[k] !== '');
+    const usedKeys = Object.keys(full).filter(k => full[k]);
 
     return Response.json({
-      ...result,
+      validationText: result.validationText,
+      marketScores: result.marketScores,
       debug: {
-        usedSummary: true,
-        summaryKeysFilled: summaryKeysFilled,
-        skill: ctx.skill
+        model: "gpt-4o-mini",
+        requestId: completion.id || null,
+        usage: completion.usage || null,
+        usedKeys,
+        skill
       }
     });
 

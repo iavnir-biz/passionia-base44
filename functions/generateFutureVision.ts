@@ -6,53 +6,77 @@ const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const SYSTEM_PROMPT = `Tu es un coach de vie et expert en projection de succès entrepreneurial dans l'enseignement en ligne.
+const SYSTEM_PROMPT = `Tu es un coach d'affaires qui projette l'utilisateur dans SA vie future.
 
-RÈGLE CRITIQUE : Tu dois baser tes choix sur onboarding_summary en priorité.
-Si une info manque, pose l'hypothèse la plus raisonnable MAIS reste cohérent avec le summary.
-Tu n'as pas le droit d'ignorer le summary.
+Mission : créer une narration ultra-personnalisée de sa vie dans X mois (selon targetIncomeDelay).
 
-L'utilisateur veut ENSEIGNER sa compétence, pas vendre des services.`;
+RÈGLES CRITIQUES :
+1. REPRENDS EXACTEMENT les mots de lifeChangeStory, lifestyleGoals, emotionalBenefits, relativesThoughts
+2. Utilise revenueGoal + selectedProducts pour ancrer dans le concret
+3. Ton : tu, présent de narration ("Tu te réveilles...", "Ton compte...")
+4. 3-5 paragraphes maximum
+5. Pas de bullshit générique type "tu es libre", "tu vis de ta passion" SAUF si c'est dans lifeChangeStory
+
+Exemple :
+"Dans 6 mois, tu te réveilles et ton compte affiche 3 247€ ce mois-ci. Tes 47 élèves actifs apprennent [skill] avec ton système [method_angle]. [Reprendre lifeChangeStory]. [Reprendre emotionalBenefits]. [Reprendre relativesThoughts si dispo]."`;
 
 Deno.serve(async (req) => {
   try {
     const { sessionId, totalMonthly, revenueGoal, selectedProducts } = await req.json();
-    
+
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
     const ctx = await getSessionContext(req, sessionId);
-    const summary = ctx.onboarding_summary;
+    const summary = ctx.onboarding_summary || {};
+    const full = ctx.session.onboarding_full || {};
+    const skill = ctx.skill || ctx.session.skill || summary.who_to_teach || '';
 
-    const userPrompt = `Contexte utilisateur :
-- Compétence/Passion : ${ctx.skill || summary.who_to_teach || 'non renseignée'}
-- Public cible (élèves idéaux) : ${summary.who_to_teach || summary.learner_profile || 'non renseigné'}
-- Problème principal des élèves : ${summary.main_learning_problem || 'non renseigné'}
-- Transformation finale promise aux élèves : ${summary.big_transformation || 'non renseignée'}
-- Quick win pour les élèves : ${summary.quick_win || 'non renseigné'}
-- Méthode/approche unique : ${summary.method_angle || 'non renseignée'}
-- Histoire personnelle : ${summary.proof_or_story || 'non renseignée'}
-- Objectif de revenus : ${revenueGoal || 500}€/mois
-- Revenu potentiel calculé : ${totalMonthly || 0}€/mois
+    const delay = full.targetIncomeDelay || '6 mois';
+    const lifeChange = full.lifeChangeStory || '';
+    const lifestyle = full.lifestyleGoals || '';
+    const emotions = full.emotionalBenefits || '';
+    const relatives = full.relativesThoughts || '';
+    const targetIncome = full.targetIncome || revenueGoal || totalMonthly || '';
 
-Produits sélectionnés pour l'offre d'enseignement :
-${selectedProducts ? JSON.stringify(selectedProducts, null, 2) : 'non renseignés'}
+    const productsText = selectedProducts 
+      ? JSON.stringify(selectedProducts, null, 2) 
+      : 'Produit principal + upsells';
 
-Rédige un texte narratif immersif et inspirant (4-5 paragraphes) qui projette l'utilisateur dans sa vie future en tant qu'enseignant/formateur.
+    const userPrompt = `CONTEXTE UTILISATEUR :
+Compétence : ${skill}
+Méthode unique : ${summary.method_angle || 'non spécifié'}
+Quick win : ${summary.quick_win || 'non spécifié'}
+Grande transformation : ${summary.big_transformation || 'non spécifié'}
 
-Le texte doit :
-- Commencer par une scène de vie concrète (ex: "Imagine-toi, dans 6 mois...")
-- Être à la 2ème personne du singulier (tu)
-- Mentionner directement sa compétence "${ctx.skill}"
-- Intégrer des éléments concrets : revenus d'enseignement, élèves transformés, impact pédagogique, liberté
-- Être émotionnel mais réaliste
-- Parler de l'impact sur ses élèves/apprenants
-- Évoquer le sentiment de fierté d'avoir transmis son savoir
-- Terminer sur une note motivante et actionnable
+Délai : ${delay}
+Revenu cible : ${targetIncome}
+Revenu mensuel projeté : ${totalMonthly || 'non spécifié'}
 
-Ton : doux, émotionnel, inspirant, réaliste, motivant.
-Pas de promesses irréalistes, mais une vision concrète et atteignable d'une activité d'enseignement.`;
+Produits sélectionnés :
+${productsText}
+
+DONNÉES PERSONNELLES (UTILISE-LES EXPLICITEMENT) :
+- Histoire de vie souhaitée : "${lifeChange}"
+- Style de vie souhaité : "${lifestyle}"
+- Bénéfices émotionnels : "${emotions}"
+- Ce que pensent les proches : "${relatives}"
+
+MISSION :
+Écris une narration de SA VIE FUTURE dans ${delay}.
+- Commence par une scène concrète (réveil, compte bancaire, élèves actifs)
+- REPRENDS TEXTUELLEMENT des morceaux de lifeChange, lifestyle, emotions, relatives
+- Ancre avec les chiffres : ${totalMonthly}/mois, ${revenueGoal} objectif
+- Ton : tu, présent de narration, 3-5 paragraphes max
+- Pas de phrases vides, que du concret tiré de SES réponses
+
+Format JSON strict :
+{
+  "narrativeText": "string (narration complète)"
+}`;
+
+    console.log("OPENAI_CALL start", { fn: "generateFutureVision", sessionId, model: "gpt-4o-mini" });
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -60,7 +84,7 @@ Pas de promesses irréalistes, mais une vision concrète et atteignable d'une ac
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }
       ],
-      temperature: 0.4,
+      temperature: 0.5,
       max_tokens: 800,
       response_format: {
         type: "json_schema",
@@ -79,17 +103,31 @@ Pas de promesses irréalistes, mais une vision concrète et atteignable d'une ac
       }
     });
 
+    console.log("OPENAI_CALL end", { 
+      fn: "generateFutureVision", 
+      sessionId, 
+      usage: completion.usage 
+    });
+
     const result = JSON.parse(completion.choices[0].message.content);
 
-    // Debug info
-    const summaryKeysFilled = Object.keys(summary).filter(k => summary[k] && summary[k] !== '');
+    const usedKeys = Object.keys(full).filter(k => full[k]);
 
     return Response.json({
-      ...result,
+      narrativeText: result.narrativeText,
       debug: {
-        usedSummary: true,
-        summaryKeysFilled: summaryKeysFilled,
-        skill: ctx.skill
+        model: "gpt-4o-mini",
+        requestId: completion.id || null,
+        usage: completion.usage || null,
+        usedKeys,
+        dataUsed: {
+          lifeChange: !!lifeChange,
+          lifestyle: !!lifestyle,
+          emotions: !!emotions,
+          relatives: !!relatives,
+          delay,
+          targetIncome
+        }
       }
     });
 

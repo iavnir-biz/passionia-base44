@@ -216,13 +216,23 @@ ${lastEntry ? '1. Commence ta prochaine question par UNE PHRASE DE TRANSITION qu
                   },
                   options: {
                     type: "array",
-                    items: { type: "string" }
+                    items: { type: "string" },
+                    default: []
                   },
-                  min: { type: "number" },
-                  max: { type: "number" },
-                  step: { type: "number" }
+                  min: { 
+                    type: "number",
+                    default: 0
+                  },
+                  max: { 
+                    type: "number",
+                    default: 10
+                  },
+                  step: { 
+                    type: "number",
+                    default: 1
+                  }
                 },
-                required: ["text", "type"],
+                required: ["text", "type", "options", "min", "max", "step"],
                 additionalProperties: false
               },
               summary: {

@@ -72,8 +72,29 @@ export default function OnboardingDynamic() {
       });
 
       if (data.isDone) {
-        // Onboarding terminé, rediriger vers le loader + génération
-        await base44.auth.updateMe({ onboarding_completed: true });
+        // Onboarding terminé, sauvegarder les données clés sur le user et rediriger
+        const sessions = await base44.entities.Session.filter({ id: session.id });
+        if (sessions.length > 0) {
+          const finalSession = sessions[0];
+          const summary = finalSession.onboarding_summary || {};
+
+          // Sauvegarder les données principales sur le user pour compatibilité
+          await base44.auth.updateMe({ 
+            onboarding_completed: true,
+            coreSkill: summary.who_to_teach || finalSession.skill || '',
+            targetAudience: summary.learner_profile || '',
+            mainProblem: summary.main_learning_problem || '',
+            firstResult: summary.quick_win || '',
+            finalTransformation: summary.big_transformation || '',
+            uniqueMethod: summary.method_angle || '',
+            typicalMistake: summary.common_mistake || '',
+            extraDetail: summary.proof_or_story || '',
+            deliveryPreferences: summary.format_preferences || []
+          });
+        } else {
+          await base44.auth.updateMe({ onboarding_completed: true });
+        }
+
         navigate(createPageUrl('OfferGenerationStart'));
       } else {
         setCurrentQuestion(data.question);

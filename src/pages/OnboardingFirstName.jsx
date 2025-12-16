@@ -42,7 +42,7 @@ export default function OnboardingFirstName() {
       }
       
       await base44.auth.updateMe({ firstName: firstName.trim() });
-      navigate(createPageUrl('OnboardingQ1CoreSkill'));
+      navigate(createPageUrl('OnboardingDynamic'));
     } catch (error) {
       console.error('Error saving firstName:', error);
     } finally {

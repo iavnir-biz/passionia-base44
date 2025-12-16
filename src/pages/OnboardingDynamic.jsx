@@ -264,31 +264,31 @@ export default function OnboardingDynamic() {
               )}
 
               {currentQuestion.type === 'slider' && (
-                <div className="space-y-6">
-                  <motion.div 
-                    className="text-center"
-                    key={value}
-                    initial={{ scale: 1.1 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <span className="text-5xl font-bold text-[#61f7a2]">
-                      {value}
-                    </span>
-                  </motion.div>
-                  <Slider
-                    value={[value]}
-                    onValueChange={(vals) => setValue(vals[0])}
-                    min={currentQuestion.min || 0}
-                    max={currentQuestion.max || 10}
-                    step={currentQuestion.step || 1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 font-medium">
-                    <span>{currentQuestion.min || 0}</span>
-                    <span>{currentQuestion.max || 10}</span>
-                  </div>
-                </div>
+               <div className="space-y-6">
+                 <motion.div 
+                   className="text-center"
+                   key={value}
+                   initial={{ scale: 1.1 }}
+                   animate={{ scale: 1 }}
+                   transition={{ duration: 0.2 }}
+                 >
+                   <span className="text-5xl font-bold text-[#61f7a2]">
+                     {value}{currentQuestion.max >= 15 && value >= 15 ? '+' : ''}
+                   </span>
+                 </motion.div>
+                 <Slider
+                   value={[value]}
+                   onValueChange={(vals) => setValue(vals[0])}
+                   min={currentQuestion.min || 0}
+                   max={currentQuestion.max || 10}
+                   step={currentQuestion.step || 1}
+                   className="w-full"
+                 />
+                 <div className="flex justify-between text-sm text-gray-600 font-medium">
+                   <span>{currentQuestion.min || 0} an</span>
+                   <span>{currentQuestion.max || 10}{currentQuestion.max >= 15 ? '+' : ''} ans</span>
+                 </div>
+               </div>
               )}
             </motion.div>
 

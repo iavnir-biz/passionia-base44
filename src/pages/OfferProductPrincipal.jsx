@@ -6,28 +6,14 @@ import { Loader2, Video, FileText } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 
-const offers = [
-{
-  id: 'mini-formation',
-  badge: "mini-formation (4 vidéos)",
-  title: "Le Déclic du Dessinateur : Votre Kit de Démarrage pour Vaincre la Page Blanche",
-  price: "27€",
-  result: "Vous ne regarderez plus jamais une page blanche avec anxiété, mais avec l'excitation de savoir exactement par où commencer pour créer quelque chose de personnel.",
-  icon: Video
-},
-{
-  id: 'ebook',
-  badge: "ebook (PDF)",
-  title: "Le Guide 'Zéro Talent' : 21 Exercices Guidés pour Apprendre à Voir en Artiste",
-  price: "17€",
-  result: "Vous développerez un 'œil d'artiste' et comprendrez que le dessin n'est pas une question de talent, mais d'observation, une compétence que vous maîtriserez.",
-  icon: FileText
-}];
+
 
 
 export default function OfferProductPrincipal() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -40,6 +26,26 @@ export default function OfferProductPrincipal() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
+      // Charger la session et les offres générées
+      if (currentUser.sessionId) {
+        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+        if (sessions.length > 0) {
+          const userSession = sessions[0];
+          setSession(userSession);
+          
+          // Récupérer les offres depuis offer_draft
+          if (userSession.offer_draft?.offerChoices?.mainProductChoices) {
+            const choices = userSession.offer_draft.offerChoices.mainProductChoices.map(choice => ({
+              ...choice,
+              icon: Video
+            }));
+            setOffers(choices);
+          }
+        }
+      }
+      
+      // Fallback sur l'ancien système si pas de session
       if (currentUser.offer?.product_principal) {
         setSelectedOffer(currentUser.offer.product_principal);
       }
@@ -55,10 +61,19 @@ export default function OfferProductPrincipal() {
     setIsSaving(true);
 
     try {
+      // Sauvegarder dans Session.finalized_offer
+      if (session) {
+        const finalizedOffer = session.finalized_offer || {};
+        finalizedOffer.mainProduct = offer;
+        await base44.entities.Session.update(session.id, { finalized_offer: finalizedOffer });
+      }
+      
+      // Sauvegarder aussi sur user pour compatibilité
       const currentOffer = user?.offer || {};
       await base44.auth.updateMe({
         offer: { ...currentOffer, product_principal: offer }
       });
+      
       setTimeout(() => {
         navigate(createPageUrl('OfferPetitExtra'));
       }, 500);
@@ -100,18 +115,24 @@ export default function OfferProductPrincipal() {
         </div>
 
         {/* Offer Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {offers.map((offer) =>
-          <OfferCardNew
-            key={offer.id}
-            offer={offer}
-            icon={offer.icon}
-            isSelected={selectedOffer?.id === offer.id}
-            onSelect={handleSelect}
-            colorScheme="blue" />
-
-          )}
-        </div>
+        {offers.length === 0 ? (
+          <div className="text-center py-12">
+            <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Chargement des offres générées...</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {offers.map((offer) =>
+            <OfferCardNew
+              key={offer.id}
+              offer={offer}
+              icon={offer.icon}
+              isSelected={selectedOffer?.id === offer.id}
+              onSelect={handleSelect}
+              colorScheme="blue" />
+            )}
+          </div>
+        )}
 
         {isSaving &&
         <div className="mt-6 flex items-center justify-center gap-2 text-[#61f7a2]">

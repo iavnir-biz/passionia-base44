@@ -11,7 +11,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import LoadingStateAI from '@/components/common/LoadingStateAI';
 
 export default function OnboardingQuestionPage({
   questionId,
@@ -63,54 +62,8 @@ export default function OnboardingQuestionPage({
   };
 
   const loadDynamicHelper = async () => {
-    setIsLoadingHelper(true);
-    try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Tu es le DynamicQuestionCoach pour Passion IA.
-
-Objectif : aider l'utilisateur à clarifier sa compétence afin de la MONÉTISER en la transmettant à d'autres (élèves, clients, communauté). Toute ta logique doit tourner autour de : enseigner, aider, résoudre un problème, structurer une offre, créer un programme.
-
-IMPORTANT : L'utilisateur MAÎTRISE déjà sa compétence. Il veut la TRANSMETTRE et en vivre. Ne parle JAMAIS comme s'il voulait l'apprendre lui-même.
-
-Données utilisateur :
-- Prénom : ${user.firstName || 'non renseigné'}
-- Compétence à transmettre : ${user.coreSkill || 'non renseignée'}
-- Niveau d'expérience : ${user.experienceLevel || 'non renseigné'}
-- Années de pratique : ${user.yearsPracticing || 'non renseigné'}
-- Public cible (élèves) : ${user.targetAudience || 'non renseigné'}
-- Problème principal des élèves : ${user.mainProblem || 'non renseigné'}
-- Revenu cible : ${user.targetIncome || 'non renseigné'}€/mois
-
-Question actuelle (questionId) : ${questionId}
-
-Génère un JSON avec :
-- helperText : une phrase d'aide courte, motivante, orientée transmission/monétisation
-- examples : 2-3 exemples concrets personnalisés à la compétence ${user.coreSkill || ''}
-
-Règles :
-- Tu tutoies.
-- Utilise le prénom et la compétence dès que possible.
-- Personnalise TOUS les exemples avec la compétence user.coreSkill si elle existe.
-- Toujours raisonner en logique de transmission : "tes élèves", "les personnes que tu veux aider", "ton audience", "ta communauté".
-- Ne JAMAIS proposer des conseils pour apprendre la compétence soi-même.
-- Ton ton : coach, expert, bienveillant, clair, motivant.
-- Si user.coreSkill n'existe pas encore, reste neutre et générique.`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            helperText: { type: "string" },
-            examples: { type: "array", items: { type: "string" } }
-          }
-        }
-      });
-      
-      if (result.helperText) setHelperText(result.helperText);
-      if (result.examples) setExamples(result.examples);
-    } catch (error) {
-      console.error('Error loading helper:', error);
-    } finally {
-      setIsLoadingHelper(false);
-    }
+    // Désactivé pour éviter le loader entre chaque question
+    // Le helper text sera simplement le subtitle statique
   };
 
   const replaceVariables = (text) => {
@@ -127,15 +80,40 @@ Règles :
     
     setIsSaving(true);
     try {
+      // Sauvegarder sur le user
       await base44.auth.updateMe({ [fieldName]: value });
       
-      // Show loading screen for 2 seconds
-      setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Mapper vers Session.onboarding_summary si sessionId existe
+      if (user.sessionId) {
+        const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+        if (sessions.length > 0) {
+          const session = sessions[0];
+          const summary = session.onboarding_summary || {};
+          
+          // Mapping des champs vers onboarding_summary
+          const fieldMapping = {
+            coreSkill: 'who_to_teach',
+            targetAudience: 'learner_profile',
+            mainProblem: 'main_learning_problem',
+            firstResult: 'quick_win',
+            finalTransformation: 'big_transformation',
+            uniqueMethod: 'method_angle',
+            typicalMistake: 'common_mistake',
+            extraDetail: 'proof_or_story',
+            deliveryPreferences: 'format_preferences'
+          };
+          
+          if (fieldMapping[fieldName]) {
+            summary[fieldMapping[fieldName]] = value;
+            await base44.entities.Session.update(user.sessionId, { onboarding_summary: summary });
+          }
+        }
+      }
       
       navigate(createPageUrl(nextPage));
     } catch (error) {
       console.error('Error saving:', error);
+    } finally {
       setIsSaving(false);
     }
   };
@@ -162,7 +140,11 @@ Règles :
   };
 
   if (isLoading) {
-    return <LoadingStateAI message="L'IA analyse vos réponses..." />;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -214,59 +196,7 @@ Règles :
               </motion.p>
             )}
 
-            {/* Dynamic helper text */}
-            {isLoadingHelper ? (
-              <motion.div 
-                className="flex items-center gap-2 text-gray-500 mb-4"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
-                  <Loader2 className="w-4 h-4" />
-                </motion.div>
-                <motion.span 
-                  className="text-sm"
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  L'IA réfléchit...
-                </motion.span>
-              </motion.div>
-            ) : helperText && (
-              <motion.div 
-                className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-4 mb-4 border border-green-100"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <p className="text-[#61f7a2] text-sm flex items-start gap-2">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.5, type: "spring" }}
-                  >
-                    <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  </motion.div>
-                  <span className="text-gray-700">{helperText}</span>
-                </p>
-              </motion.div>
-            )}
 
-            {/* Examples */}
-            {examples.length > 0 && (
-              <motion.p 
-                className="text-gray-500 text-sm mb-6 italic"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                Ex : {examples.join(' • ')}
-              </motion.p>
-            )}
 
             {/* Input */}
             <motion.div 

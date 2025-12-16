@@ -17,6 +17,30 @@ export default function OnboardingFirstName() {
     
     setIsLoading(true);
     try {
+      const currentUser = await base44.auth.me();
+      
+      // Créer ou récupérer une session
+      let sessionId = currentUser.sessionId;
+      if (!sessionId) {
+        const sessions = await base44.entities.Session.filter({ 
+          created_by: currentUser.email 
+        });
+        
+        if (sessions.length > 0) {
+          sessionId = sessions[0].id;
+        } else {
+          const newSession = await base44.entities.Session.create({
+            onboarding_history: [],
+            onboarding_summary: {},
+            current_question: null,
+            is_onboarding_done: false
+          });
+          sessionId = newSession.id;
+        }
+        
+        await base44.auth.updateMe({ sessionId });
+      }
+      
       await base44.auth.updateMe({ firstName: firstName.trim() });
       navigate(createPageUrl('OnboardingQ1CoreSkill'));
     } catch (error) {

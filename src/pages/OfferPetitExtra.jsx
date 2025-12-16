@@ -6,28 +6,11 @@ import { Loader2, Layers, CheckSquare } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 
-const offers = [
-  {
-    id: 'modeles',
-    badge: "modèles",
-    title: "La Boîte à Outils Anti-Panne : 50 Modèles & Structures pour Pratiquer Sans Pression",
-    price: "17€",
-    result: "Vous aurez toujours une base solide pour démarrer un dessin, transformant le manque d'inspiration en une session de pratique productive et amusante.",
-    icon: Layers
-  },
-  {
-    id: 'checklist',
-    badge: "check-list",
-    title: "La Checklist du Matériel Essentiel : Le Guide pour Choisir Vos Outils sans Vous Ruiner",
-    price: "14€",
-    result: "Vous ferez des choix éclairés et économiques, en ayant le matériel parfait pour commencer sans gaspiller d'argent dans des outils inutiles ou intimidants.",
-    icon: CheckSquare
-  }
-];
-
 export default function OfferPetitExtra() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -40,6 +23,26 @@ export default function OfferPetitExtra() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
+      // Charger la session et les offres générées
+      if (currentUser.sessionId) {
+        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+        if (sessions.length > 0) {
+          const userSession = sessions[0];
+          setSession(userSession);
+          
+          // Récupérer les offres depuis offer_draft
+          if (userSession.offer_draft?.offerChoices?.orderBump1Choices) {
+            const choices = userSession.offer_draft.offerChoices.orderBump1Choices.map(choice => ({
+              ...choice,
+              icon: Layers,
+              result: choice.outcome
+            }));
+            setOffers(choices);
+          }
+        }
+      }
+      
       if (currentUser.offer?.petit_extra) {
         setSelectedOffer(currentUser.offer.petit_extra);
       }
@@ -55,6 +58,13 @@ export default function OfferPetitExtra() {
     setIsSaving(true);
     
     try {
+      // Sauvegarder dans Session.finalized_offer
+      if (session) {
+        const finalizedOffer = session.finalized_offer || {};
+        finalizedOffer.orderBump = offer;
+        await base44.entities.Session.update(session.id, { finalized_offer: finalizedOffer });
+      }
+      
       const currentOffer = user?.offer || {};
       await base44.auth.updateMe({ 
         offer: { ...currentOffer, petit_extra: offer }
@@ -90,18 +100,25 @@ export default function OfferPetitExtra() {
         </div>
 
         {/* Offer Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {offers.map((offer) => (
-            <OfferCardNew
-              key={offer.id}
-              offer={offer}
-              icon={offer.icon}
-              isSelected={selectedOffer?.id === offer.id}
-              onSelect={handleSelect}
-              colorScheme="green"
-            />
-          ))}
-        </div>
+        {offers.length === 0 ? (
+          <div className="text-center py-12">
+            <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Chargement des offres générées...</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {offers.map((offer) => (
+              <OfferCardNew
+                key={offer.id}
+                offer={offer}
+                icon={offer.icon}
+                isSelected={selectedOffer?.id === offer.id}
+                onSelect={handleSelect}
+                colorScheme="green"
+              />
+            ))}
+          </div>
+        )}
 
         {isSaving && (
           <div className="mt-6 flex items-center justify-center gap-2 text-[#61f7a2]">

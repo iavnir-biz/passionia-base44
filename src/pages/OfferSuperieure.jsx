@@ -6,28 +6,11 @@ import { Loader2, Presentation, GraduationCap } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 
-const offers = [
-  {
-    id: 'atelier',
-    badge: "atelier (2 heures)",
-    title: "Atelier 'Dessin Intuitif' : Libérez Votre Trait en Direct",
-    price: "97€",
-    result: "Vous ressentirez une libération créative, en remplaçant la technique rigide par un flow intuitif qui rendra vos dessins vivants et authentiquement vôtres.",
-    icon: Presentation
-  },
-  {
-    id: 'formation-complete',
-    badge: "formation complète (12 vidéos)",
-    title: "La Méthode Fondations : Le Cursus Complet pour Maîtriser les 5 Piliers du Dessin",
-    price: "197€",
-    result: "Vous posséderez une compréhension solide et durable des fondamentaux du dessin, vous donnant la confiance et la compétence pour aborder n'importe quel sujet.",
-    icon: GraduationCap
-  }
-];
-
 export default function OfferSuperieure() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -40,6 +23,26 @@ export default function OfferSuperieure() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
+      // Charger la session et les offres générées
+      if (currentUser.sessionId) {
+        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+        if (sessions.length > 0) {
+          const userSession = sessions[0];
+          setSession(userSession);
+          
+          // Récupérer les offres depuis offer_draft
+          if (userSession.offer_draft?.offerChoices?.upsell1Choices) {
+            const choices = userSession.offer_draft.offerChoices.upsell1Choices.map(choice => ({
+              ...choice,
+              icon: Presentation,
+              result: choice.outcome
+            }));
+            setOffers(choices);
+          }
+        }
+      }
+      
       if (currentUser.offer?.offre_superieure) {
         setSelectedOffer(currentUser.offer.offre_superieure);
       }
@@ -55,6 +58,13 @@ export default function OfferSuperieure() {
     setIsSaving(true);
     
     try {
+      // Sauvegarder dans Session.finalized_offer
+      if (session) {
+        const finalizedOffer = session.finalized_offer || {};
+        finalizedOffer.upsell1 = offer;
+        await base44.entities.Session.update(session.id, { finalized_offer: finalizedOffer });
+      }
+      
       const currentOffer = user?.offer || {};
       await base44.auth.updateMe({ 
         offer: { ...currentOffer, offre_superieure: offer }
@@ -90,18 +100,25 @@ export default function OfferSuperieure() {
         </div>
 
         {/* Offer Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {offers.map((offer) => (
-            <OfferCardNew
-              key={offer.id}
-              offer={offer}
-              icon={offer.icon}
-              isSelected={selectedOffer?.id === offer.id}
-              onSelect={handleSelect}
-              colorScheme="purple"
-            />
-          ))}
-        </div>
+        {offers.length === 0 ? (
+          <div className="text-center py-12">
+            <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Chargement des offres générées...</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {offers.map((offer) => (
+              <OfferCardNew
+                key={offer.id}
+                offer={offer}
+                icon={offer.icon}
+                isSelected={selectedOffer?.id === offer.id}
+                onSelect={handleSelect}
+                colorScheme="purple"
+              />
+            ))}
+          </div>
+        )}
 
         {isSaving && (
           <div className="mt-6 flex items-center justify-center gap-2 text-[#61f7a2]">

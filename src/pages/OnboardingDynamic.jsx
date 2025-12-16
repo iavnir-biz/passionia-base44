@@ -58,7 +58,7 @@ export default function OnboardingDynamic() {
         await fetchNextQuestion(activeSession.id);
       } else {
         setCurrentQuestion(activeSession.current_question);
-        initializeValue(activeSession.current_question.type);
+        initializeValue(activeSession.current_question.type, activeSession.current_question);
         setIsLoading(false);
       }
     } catch (error) {
@@ -88,7 +88,7 @@ export default function OnboardingDynamic() {
         navigate(createPageUrl('OnboardingTransition'));
       } else {
         setCurrentQuestion(data.question);
-        initializeValue(data.question.type);
+        initializeValue(data.question.type, data.question);
         // Incrémenter seulement si on n'a pas dépassé 11
         setQuestionCount(prev => Math.min(prev + 1, 11));
       }
@@ -99,11 +99,11 @@ export default function OnboardingDynamic() {
     }
   };
 
-  const initializeValue = (type) => {
+  const initializeValue = (type, question = null) => {
     if (type === 'multiple_choice') {
       setValue([]);
     } else if (type === 'slider') {
-      setValue(currentQuestion?.min || 0);
+      setValue(question?.min || 0);
     } else {
       setValue('');
     }

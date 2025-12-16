@@ -201,7 +201,7 @@ ${lastEntry ? '1. Commence ta prochaine question par UNE PHRASE DE TRANSITION qu
         type: "json_schema",
         json_schema: {
           name: "onboarding_response",
-          strict: true,
+          strict: false,
           schema: {
             type: "object",
             properties: {
@@ -216,24 +216,13 @@ ${lastEntry ? '1. Commence ta prochaine question par UNE PHRASE DE TRANSITION qu
                   },
                   options: {
                     type: "array",
-                    items: { type: "string" },
-                    default: []
+                    items: { type: "string" }
                   },
-                  min: { 
-                    type: "number",
-                    default: 0
-                  },
-                  max: { 
-                    type: "number",
-                    default: 10
-                  },
-                  step: { 
-                    type: "number",
-                    default: 1
-                  }
+                  min: { type: "number" },
+                  max: { type: "number" },
+                  step: { type: "number" }
                 },
-                required: ["text", "type", "options", "min", "max", "step"],
-                additionalProperties: false
+                required: ["text", "type"]
               },
               summary: {
                 type: "object",
@@ -251,12 +240,10 @@ ${lastEntry ? '1. Commence ta prochaine question par UNE PHRASE DE TRANSITION qu
                     items: { type: "string" }
                   }
                 },
-                required: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"],
-                additionalProperties: false
+                required: ["who_to_teach", "learner_profile", "main_learning_problem", "quick_win", "big_transformation", "method_angle", "common_mistake", "proof_or_story", "format_preferences"]
               }
             },
-            required: ["isDone", "summary"],
-            additionalProperties: false
+            required: ["isDone", "summary"]
           }
         }
       }

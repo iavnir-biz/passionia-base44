@@ -1,80 +1,119 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 import OpenAI from 'npm:openai@4.73.1';
-import { getSessionContext } from './getSessionContext.js';
 
 const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const SYSTEM_PROMPT = `Tu es un coach d'affaires qui projette l'utilisateur dans SA vie future.
+const SYSTEM_PROMPT = `Tu es un expert en storytelling de transformation et copywriting émotionnel.
 
-Mission : créer une narration ultra-personnalisée de sa vie dans X mois (selon targetIncomeDelay).
+Ta mission : créer un récit de transformation UNIQUE, personnalisé et percutant, qui projette l'utilisateur dans sa "vie future" après avoir lancé son activité de formation.
 
-RÈGLES CRITIQUES :
-1. REPRENDS EXACTEMENT les mots de lifeChangeStory, lifestyleGoals, emotionalBenefits, relativesThoughts
-2. Utilise revenueGoal + selectedProducts pour ancrer dans le concret
-3. Ton : tu, présent de narration ("Tu te réveilles...", "Ton compte...")
-4. 3-5 paragraphes maximum
-5. Pas de bullshit générique type "tu es libre", "tu vis de ta passion" SAUF si c'est dans lifeChangeStory
+TON & STYLE
+- Tutoiement obligatoire (tu/ton/tes). Jamais "vous".
+- Très aéré : beaucoup de sauts de ligne, paragraphes courts.
+- Émotionnel, imagé, motivant, mais crédible.
+- 1 à 2 emojis max (✨ 🚀 ❤️), pas plus.
 
-Exemple :
-"Dans 6 mois, tu te réveilles et ton compte affiche 3 247€ ce mois-ci. Tes 47 élèves actifs apprennent [skill] avec ton système [method_angle]. [Reprendre lifeChangeStory]. [Reprendre emotionalBenefits]. [Reprendre relativesThoughts si dispo]."`;
+FORMATAGE INTERDIT
+- Texte brut uniquement.
+- Aucun Markdown : pas d'astérisques, pas de listes avec tirets, pas de titres.
+- Pas de sections type "Étape 1", "Conclusion", etc. Le récit doit être un texte fluide.
+
+STRUCTURE OBLIGATOIRE (8 ÉTAPES À RESPECTER)
+1) Effet miroir : sa situation actuelle (doutes, frustrations) avec ses propres mots.
+2) Élément déclencheur : le déclic, décision de passer à l'action.
+3) Validation : première vente du produit principal, moment précis (notification, excitation).
+4) Transformation identitaire : il se voit différemment, fierté, confiance.
+5) Ascension : il met en place upsell/premium, les revenus montent progressivement jusqu'au revenu potentiel.
+6) Nouvelle réalité : liberté, style de vie, impact (utiliser ses réponses sur ce que ça changerait).
+7) Impact : ses élèves, la transmission, les résultats chez eux.
+8) Appel au destin : phrase finale inspirante, "ça commence maintenant".
+
+IMPORTANT
+- Ne saute aucune étape.
+- Développe chaque étape avec assez de détails : pas un résumé.
+- Intègre naturellement les éléments personnels (réponses perso + objectifs).`;
 
 Deno.serve(async (req) => {
   try {
-    const { sessionId, totalMonthly, revenueGoal, selectedProducts } = await req.json();
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+    
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { sessionId } = await req.json();
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    const ctx = await getSessionContext(req, sessionId);
-    const summary = ctx.onboarding_summary || {};
-    const full = ctx.session.onboarding_full || {};
-    const skill = ctx.skill || ctx.session.skill || summary.who_to_teach || '';
+    // Get session
+    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+    if (!sessions || sessions.length === 0) {
+      return Response.json({ error: 'Session not found' }, { status: 404 });
+    }
 
-    const delay = full.targetIncomeDelay || '6 mois';
-    const lifeChange = full.lifeChangeStory || '';
-    const lifestyle = full.lifestyleGoals || '';
-    const emotions = full.emotionalBenefits || '';
-    const relatives = full.relativesThoughts || '';
-    const targetIncome = full.targetIncome || revenueGoal || totalMonthly || '';
+    const session = sessions[0];
+    
+    // Check if already generated
+    if (session.future_vision) {
+      console.log("Future vision already generated, returning existing");
+      return Response.json({
+        success: true,
+        narrativeText: session.future_vision,
+        fromCache: true
+      });
+    }
 
-    const productsText = selectedProducts 
-      ? JSON.stringify(selectedProducts, null, 2) 
-      : 'Produit principal + upsells';
+    const finalizedOffer = session.finalized_offer || {};
+    const onboardingSummary = session.onboarding_summary || {};
+    const onboardingFull = session.onboarding_full || {};
+    const potentialRevenue = session.potential_revenue || 0;
+    
+    const name = user.firstName || onboardingFull.firstName || 'l\'entrepreneur';
+    const skill = onboardingSummary.who_to_teach || onboardingFull.coreSkill || onboardingFull.skill || 'cette compétence';
+    
+    // Personal answers (effet miroir + nouvelle réalité)
+    const personalAnswers = {
+      obstacles: onboardingFull.obstacles || '',
+      ifNothingChanges: onboardingFull.ifNothingChanges || ''
+    };
+    
+    // Goal answers (vision + style de vie)
+    const goalAnswers = {
+      lifeChange: onboardingFull.lifeChange || '',
+      impact: onboardingFull.impact || '',
+      emotions: onboardingFull.emotions || '',
+      relatives: onboardingFull.relatives || '',
+      lifestyle: onboardingFull.lifestyle || ''
+    };
 
-    const userPrompt = `CONTEXTE UTILISATEUR :
+    const mainProductTitle = finalizedOffer.mainProduct?.title || 'ton produit principal';
+    const upsell1Title = finalizedOffer.upsell1?.title || '';
+    const premiumTitle = finalizedOffer.upsell3?.title || '';
+
+    const userPrompt = `Écris l'histoire de transformation de ${name} qui lance son activité de formation en "${skill}".
+
+Infos à intégrer naturellement :
+Prénom : ${name}
 Compétence : ${skill}
-Méthode unique : ${summary.method_angle || 'non spécifié'}
-Quick win : ${summary.quick_win || 'non spécifié'}
-Grande transformation : ${summary.big_transformation || 'non spécifié'}
+Objectif : ${potentialRevenue}€/mois
 
-Délai : ${delay}
-Revenu cible : ${targetIncome}
-Revenu mensuel projeté : ${totalMonthly || 'non spécifié'}
+Réponses personnelles (à réutiliser pour l'effet miroir et la nouvelle réalité) :
+${JSON.stringify(personalAnswers, null, 2)}
 
-Produits sélectionnés :
-${productsText}
+Objectifs (à réutiliser pour la vision et le style de vie) :
+${JSON.stringify(goalAnswers, null, 2)}
 
-DONNÉES PERSONNELLES (UTILISE-LES EXPLICITEMENT) :
-- Histoire de vie souhaitée : "${lifeChange}"
-- Style de vie souhaité : "${lifestyle}"
-- Bénéfices émotionnels : "${emotions}"
-- Ce que pensent les proches : "${relatives}"
+Offres sélectionnées (à mentionner au bon moment, surtout la première vente) :
+Produit Principal : ${mainProductTitle}
+Upsell : ${upsell1Title}
+Premium : ${premiumTitle}
 
-MISSION :
-Écris une narration de SA VIE FUTURE dans ${delay}.
-- Commence par une scène concrète (réveil, compte bancaire, élèves actifs)
-- REPRENDS TEXTUELLEMENT des morceaux de lifeChange, lifestyle, emotions, relatives
-- Ancre avec les chiffres : ${totalMonthly}/mois, ${revenueGoal} objectif
-- Ton : tu, présent de narration, 3-5 paragraphes max
-- Pas de phrases vides, que du concret tiré de SES réponses
-
-Format JSON strict :
-{
-  "narrativeText": "string (narration complète)"
-}`;
+RAPPEL : Respecte les 8 étapes obligatoires dans l'ordre. Développe chaque étape, ne résume pas.`;
 
     console.log("OPENAI_CALL start", { fn: "generateFutureVision", sessionId, model: "gpt-4o-mini" });
 
@@ -110,25 +149,16 @@ Format JSON strict :
     });
 
     const result = JSON.parse(completion.choices[0].message.content);
+    const narrativeText = result.narrativeText;
 
-    const usedKeys = Object.keys(full).filter(k => full[k]);
+    // Save to session
+    await base44.asServiceRole.entities.Session.update(sessionId, {
+      future_vision: narrativeText
+    });
 
     return Response.json({
-      narrativeText: result.narrativeText,
-      debug: {
-        model: "gpt-4o-mini",
-        requestId: completion.id || null,
-        usage: completion.usage || null,
-        usedKeys,
-        dataUsed: {
-          lifeChange: !!lifeChange,
-          lifestyle: !!lifestyle,
-          emotions: !!emotions,
-          relatives: !!relatives,
-          delay,
-          targetIncome
-        }
-      }
+      success: true,
+      narrativeText
     });
 
   } catch (error) {

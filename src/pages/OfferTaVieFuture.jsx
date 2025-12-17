@@ -64,35 +64,15 @@ export default function OfferTaVieFuture() {
     
     setIsGenerating(true);
     try {
-      const offer = user?.offer || {};
-      const products = [
-        { data: offer.product_principal, multiplier: 30 },
-        { data: offer.petit_extra, multiplier: 15 },
-        { data: offer.offre_superieure, multiplier: 9 },
-        { data: offer.offre_premium, multiplier: 1 }
-      ];
-      const revenues = products.map(p => ({
-        price: parsePrice(p.data?.price),
-        total: parsePrice(p.data?.price) * p.multiplier
-      }));
-      const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
-      const revenueGoal = parseInt(user?.targetIncome) || 500;
-
-      const selectedProducts = {
-        product_principal: offer.product_principal?.title || 'non sélectionné',
-        petit_extra: offer.petit_extra?.title || 'non sélectionné',
-        offre_superieure: offer.offre_superieure?.title || 'non sélectionné',
-        offre_premium: offer.offre_premium?.title || 'non sélectionné'
-      };
-
       const { data } = await base44.functions.invoke('generateFutureVision', {
-        sessionId: user.sessionId,
-        totalMonthly,
-        revenueGoal,
-        selectedProducts
+        sessionId: user.sessionId
       });
       
-      setFutureVision(data);
+      if (data.success) {
+        setFutureVision({
+          narrativeText: data.narrativeText
+        });
+      }
     } catch (error) {
       console.error('Error generating vision:', error);
       // Fallback text

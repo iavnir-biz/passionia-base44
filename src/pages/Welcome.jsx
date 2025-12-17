@@ -304,8 +304,6 @@ export default function Welcome() {
               <a href="#" className="hover:text-gray-900 transition-colors">Politique de confidentialité</a>
               <span className="text-gray-300">•</span>
               <a href="#" className="hover:text-gray-900 transition-colors">Mentions légales</a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">Contact</a>
             </div>
           </div>
         </div>

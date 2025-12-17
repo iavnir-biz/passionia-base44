@@ -4,7 +4,7 @@ import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
 import { base44 } from '@/api/base44Client';
-import { Mail, Copy, Download, Eye, Loader2, Sparkles, Lock } from 'lucide-react';
+import { Send, Copy, Download, Eye, Loader2, Sparkles, Lock } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
@@ -15,7 +15,7 @@ const emailTypes = [
     title: 'Email de Bienvenue',
     subtitle: 'Premier contact avec ton audience',
     description: 'Crée un lien fort dès le début',
-    icon: Mail,
+    icon: Send,
     color: 'from-blue-500 to-cyan-500',
     locked: false
   },
@@ -24,7 +24,7 @@ const emailTypes = [
     title: 'Email de Nurturing',
     subtitle: 'Entretiens la relation',
     description: 'Apporte de la valeur régulièrement',
-    icon: Mail,
+    icon: Send,
     color: 'from-purple-500 to-pink-500',
     locked: true
   },
@@ -33,7 +33,7 @@ const emailTypes = [
     title: 'Email Promotionnel',
     subtitle: 'Vends ton offre',
     description: 'Transforme tes prospects en clients',
-    icon: Mail,
+    icon: Send,
     color: 'from-orange-500 to-red-500',
     locked: true
   },
@@ -42,7 +42,7 @@ const emailTypes = [
     title: 'Email de Réengagement',
     subtitle: 'Réactive tes inactifs',
     description: 'Récupère ton audience dormante',
-    icon: Mail,
+    icon: Send,
     color: 'from-green-500 to-emerald-500',
     locked: true
   }

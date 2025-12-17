@@ -153,150 +153,180 @@ ${avatar.how_to_reach}
               </p>
             </div>
 
-            {/* Generate Button */}
-            {avatars.length === 0 ? (
-              <div className="flex justify-center">
-                <GlowButton
-                  onClick={() => handleGenerate()}
-                  variant="primary"
-                  size="lg"
-                  loading={loading}
-                  className="px-12"
-                >
-                  {loading ? 'Génération en cours...' : 'Générer mes avatars'}
-                </GlowButton>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                
-                {/* Avatar Cards */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {avatars.map((avatar, index) => {
-                    const colors = avatarColors[index];
-                    const isExpanded = expandedAvatar === index;
+            {/* Avatar Cards - Always visible */}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {[0, 1, 2].map((index) => {
+                  const avatar = avatars[index];
+                  const colors = avatarColors[index];
+                  const isExpanded = expandedAvatar === index;
 
-                    return (
-                      <div
-                        key={index}
-                        className={cn(
-                          "bg-[#1b1b33] border rounded-2xl p-6 transition-all duration-300 animate-fade-in",
-                          isExpanded ? "lg:col-span-3" : "",
-                          colors.border
-                        )}
-                        style={{ animationDelay: `${index * 0.1}s` }}
-                      >
-                        {/* Avatar Header */}
-                        <div className="flex items-start gap-4 mb-4">
-                          <div className={cn(
-                            "w-16 h-16 rounded-2xl bg-gradient-to-br flex items-center justify-center flex-shrink-0",
-                            colors.gradient
-                          )}>
-                            <User className="w-8 h-8 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-2xl font-bold text-white mb-1">
-                              {avatar.name}
-                            </h3>
-                            <p className="text-[#61f7a2] text-sm font-medium">
-                              {avatar.tagline}
-                            </p>
-                          </div>
+                  return avatar ? (
+                    <div
+                      key={index}
+                      className={cn(
+                        "bg-[#1b1b33] border rounded-2xl p-6 transition-all duration-300 animate-fade-in",
+                        isExpanded ? "lg:col-span-3" : "",
+                        colors.border
+                      )}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      {/* Avatar Header */}
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className={cn(
+                          "w-16 h-16 rounded-2xl bg-gradient-to-br flex items-center justify-center flex-shrink-0",
+                          colors.gradient
+                        )}>
+                          <User className="w-8 h-8 text-white" />
                         </div>
-
-                        {/* Quick Overview */}
-                        {!isExpanded && (
-                          <div className={cn("p-4 rounded-xl mb-4", colors.bg)}>
-                            <p className="text-gray-300 text-sm line-clamp-3">
-                              {avatar.profile}
-                            </p>
-                          </div>
-                        )}
-
-                        {/* Expanded Content */}
-                        {isExpanded && (
-                          <div className="space-y-4 mb-4">
-                            {/* Profile */}
-                            <div className={cn("p-4 rounded-xl", colors.bg)}>
-                              <div className="flex items-center gap-2 mb-2">
-                                <User className="w-4 h-4 text-[#61f7a2]" />
-                                <h4 className="font-semibold text-white">Profil</h4>
-                              </div>
-                              <p className="text-gray-300 text-sm">{avatar.profile}</p>
-                            </div>
-
-                            {/* Frustrations */}
-                            <div className={cn("p-4 rounded-xl", colors.bg)}>
-                              <div className="flex items-center gap-2 mb-2">
-                                <AlertCircle className="w-4 h-4 text-[#61f7a2]" />
-                                <h4 className="font-semibold text-white">Frustrations</h4>
-                              </div>
-                              <p className="text-gray-300 text-sm">{avatar.frustrations}</p>
-                            </div>
-
-                            {/* Goals */}
-                            <div className={cn("p-4 rounded-xl", colors.bg)}>
-                              <div className="flex items-center gap-2 mb-2">
-                                <Target className="w-4 h-4 text-[#61f7a2]" />
-                                <h4 className="font-semibold text-white">Objectifs</h4>
-                              </div>
-                              <p className="text-gray-300 text-sm">{avatar.goals}</p>
-                            </div>
-
-                            {/* Desires */}
-                            <div className={cn("p-4 rounded-xl", colors.bg)}>
-                              <div className="flex items-center gap-2 mb-2">
-                                <Heart className="w-4 h-4 text-[#61f7a2]" />
-                                <h4 className="font-semibold text-white">Désirs profonds</h4>
-                              </div>
-                              <p className="text-gray-300 text-sm">{avatar.desires}</p>
-                            </div>
-
-                            {/* Fears */}
-                            <div className={cn("p-4 rounded-xl", colors.bg)}>
-                              <div className="flex items-center gap-2 mb-2">
-                                <AlertCircle className="w-4 h-4 text-[#61f7a2]" />
-                                <h4 className="font-semibold text-white">Peurs & Freins</h4>
-                              </div>
-                              <p className="text-gray-300 text-sm">{avatar.fears}</p>
-                            </div>
-
-                            {/* How to Reach */}
-                            <div className={cn("p-4 rounded-xl", colors.bg)}>
-                              <div className="flex items-center gap-2 mb-2">
-                                <TrendingUp className="w-4 h-4 text-[#61f7a2]" />
-                                <h4 className="font-semibold text-white">Comment les atteindre</h4>
-                              </div>
-                              <p className="text-gray-300 text-sm">{avatar.how_to_reach}</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Actions */}
-                        <div className="flex gap-2">
-                          <GlowButton
-                            onClick={() => setExpandedAvatar(isExpanded ? null : index)}
-                            variant="secondary"
-                            size="sm"
-                            className="flex-1"
-                          >
-                            {isExpanded ? 'Réduire' : 'Voir le profil complet'}
-                          </GlowButton>
-                          <GlowButton
-                            onClick={() => handleCopyAvatar(avatar)}
-                            variant="ghost"
-                            size="sm"
-                            icon={Copy}
-                          >
-                            Copier
-                          </GlowButton>
+                        <div className="flex-1">
+                          <h3 className="text-2xl font-bold text-white mb-1">
+                            {avatar.name}
+                          </h3>
+                          <p className="text-[#61f7a2] text-sm font-medium">
+                            {avatar.tagline}
+                          </p>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
 
-                {/* Regenerate Button */}
-                <div className="flex justify-center pt-4">
+                      {/* Quick Overview */}
+                      {!isExpanded && (
+                        <div className={cn("p-4 rounded-xl mb-4", colors.bg)}>
+                          <p className="text-gray-300 text-sm line-clamp-3">
+                            {avatar.profile}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Expanded Content */}
+                      {isExpanded && (
+                        <div className="space-y-4 mb-4">
+                          {/* Profile */}
+                          <div className={cn("p-4 rounded-xl", colors.bg)}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <User className="w-4 h-4 text-[#61f7a2]" />
+                              <h4 className="font-semibold text-white">Profil</h4>
+                            </div>
+                            <p className="text-gray-300 text-sm">{avatar.profile}</p>
+                          </div>
+
+                          {/* Frustrations */}
+                          <div className={cn("p-4 rounded-xl", colors.bg)}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertCircle className="w-4 h-4 text-[#61f7a2]" />
+                              <h4 className="font-semibold text-white">Frustrations</h4>
+                            </div>
+                            <p className="text-gray-300 text-sm">{avatar.frustrations}</p>
+                          </div>
+
+                          {/* Goals */}
+                          <div className={cn("p-4 rounded-xl", colors.bg)}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Target className="w-4 h-4 text-[#61f7a2]" />
+                              <h4 className="font-semibold text-white">Objectifs</h4>
+                            </div>
+                            <p className="text-gray-300 text-sm">{avatar.goals}</p>
+                          </div>
+
+                          {/* Desires */}
+                          <div className={cn("p-4 rounded-xl", colors.bg)}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Heart className="w-4 h-4 text-[#61f7a2]" />
+                              <h4 className="font-semibold text-white">Désirs profonds</h4>
+                            </div>
+                            <p className="text-gray-300 text-sm">{avatar.desires}</p>
+                          </div>
+
+                          {/* Fears */}
+                          <div className={cn("p-4 rounded-xl", colors.bg)}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertCircle className="w-4 h-4 text-[#61f7a2]" />
+                              <h4 className="font-semibold text-white">Peurs & Freins</h4>
+                            </div>
+                            <p className="text-gray-300 text-sm">{avatar.fears}</p>
+                          </div>
+
+                          {/* How to Reach */}
+                          <div className={cn("p-4 rounded-xl", colors.bg)}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <TrendingUp className="w-4 h-4 text-[#61f7a2]" />
+                              <h4 className="font-semibold text-white">Comment les atteindre</h4>
+                            </div>
+                            <p className="text-gray-300 text-sm">{avatar.how_to_reach}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex gap-2">
+                        <GlowButton
+                          onClick={() => setExpandedAvatar(isExpanded ? null : index)}
+                          variant="secondary"
+                          size="sm"
+                          className="flex-1"
+                        >
+                          {isExpanded ? 'Réduire' : 'Voir le profil complet'}
+                        </GlowButton>
+                        <GlowButton
+                          onClick={() => handleCopyAvatar(avatar)}
+                          variant="ghost"
+                          size="sm"
+                          icon={Copy}
+                        >
+                          Copier
+                        </GlowButton>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      key={index}
+                      className={cn(
+                        "bg-[#1b1b33] border rounded-2xl p-6 transition-all duration-300 animate-fade-in",
+                        colors.border
+                      )}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      {/* Empty Avatar Card */}
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className={cn(
+                          "w-16 h-16 rounded-2xl bg-gradient-to-br flex items-center justify-center flex-shrink-0",
+                          colors.gradient
+                        )}>
+                          <User className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-2xl font-bold text-white mb-1">
+                            Avatar {index + 1}
+                          </h3>
+                          <p className="text-gray-400 text-sm">
+                            En attente de génération
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className={cn("p-4 rounded-xl mb-4 border-2 border-dashed", colors.border)}>
+                        <p className="text-gray-500 text-sm text-center py-8">
+                          Clique sur "Générer" pour créer cet avatar
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Generate/Regenerate Button */}
+              <div className="flex justify-center pt-4">
+                {avatars.length === 0 ? (
+                  <GlowButton
+                    onClick={() => handleGenerate()}
+                    variant="primary"
+                    size="lg"
+                    loading={loading}
+                    className="px-12"
+                  >
+                    {loading ? 'Génération en cours...' : 'Générer mes avatars'}
+                  </GlowButton>
+                ) : (
                   <GlowButton
                     onClick={() => handleGenerate(true)}
                     variant="secondary"
@@ -306,9 +336,10 @@ ${avatar.how_to_reach}
                   >
                     {!hasPremium ? 'Premium - Régénérer' : 'Régénérer'}
                   </GlowButton>
-                </div>
+                )}
               </div>
-            )}
+            </div>
+
           </div>
         </main>
       </div>

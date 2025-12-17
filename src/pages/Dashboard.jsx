@@ -404,7 +404,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <GlowButton
-                onClick={() => window.open('https://www.skool.com/votre-groupe', '_blank')}
+                onClick={() => window.open('https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa', '_blank')}
                 variant="outline"
                 size="lg"
               >

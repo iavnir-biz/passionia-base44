@@ -27,11 +27,9 @@ import {
   Lightbulb,
   Calendar,
   MessageSquare,
-  BarChart,
-  Lock
+  BarChart
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
-import PaywallModal from '@/components/paywall/PaywallModal';
 import { cn } from "@/lib/utils";
 
 const mainSteps = [
@@ -51,9 +49,10 @@ function parsePrice(priceStr) {
 export default function PlanAction() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [content, setContent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [purchasing, setPurchasing] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -63,10 +62,38 @@ export default function PlanAction() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      if (currentUser.sessionId) {
+        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+        if (sessions.length > 0) {
+          const userSession = sessions[0];
+          setSession(userSession);
+
+          if (userSession.plan_action_content) {
+            setContent(userSession.plan_action_content);
+          } else {
+            await generateContent(currentUser.sessionId);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const generateContent = async (sessionId) => {
+    setIsGenerating(true);
+    try {
+      const { data } = await base44.functions.invoke('generatePlanActionContent', { sessionId });
+      if (data.success) {
+        setContent(data.content);
+      }
+    } catch (error) {
+      console.error('Error generating content:', error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -80,36 +107,24 @@ export default function PlanAction() {
     navigate(createPageUrl('Dashboard'));
   };
 
-  const handlePurchase = async () => {
-    setPurchasing(true);
-    
-    try {
-      // TODO: Integrate Stripe payment here
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Update user profile as paid
-      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-      
-      if (profiles.length > 0) {
-        await base44.entities.UserProfile.update(profiles[0].id, { has_paid: true });
-      }
-      
-      // Redirect to dashboard
-      navigate(createPageUrl('Dashboard'));
-      
-    } catch (error) {
-      console.error('Error processing payment:', error);
-    } finally {
-      setPurchasing(false);
-      setShowPaywall(false);
-    }
-  };
+  if (isLoading || isGenerating) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mb-4" />
+        <p className="text-gray-600">{isGenerating ? 'Nova personnalise ton pack...' : 'Chargement...'}</p>
+      </div>
+    );
+  }
 
-  if (isLoading) {
+  if (!content) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Impossible de charger le contenu</p>
+          <GlowButton onClick={() => window.location.reload()}>
+            Réessayer
+          </GlowButton>
+        </div>
       </div>
     );
   }
@@ -241,9 +256,17 @@ export default function PlanAction() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-gray-600 text-xl"
+              className="text-gray-600 text-xl mb-4"
             >
               Maintenant, on va mettre tout ça en place ensemble
+            </motion.p>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-gray-700 text-base max-w-2xl mx-auto"
+            >
+              {content.heroSubtext}
             </motion.p>
           </div>
 
@@ -327,10 +350,10 @@ export default function PlanAction() {
           <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl border border-gray-200 p-8">
             <div className="grid md:grid-cols-2 gap-4">
               {[
-                { icon: Heart, text: "J'ai mon offre, mais comment je fais maintenant ?" },
-                { icon: Lightbulb, text: "Je n'y connais rien en technique…" },
-                { icon: Target, text: "Je ne sais pas faire du marketing…" },
-                { icon: Shield, text: "J'ai peur de me planter…" }
+                { icon: Heart, text: content.objections[0] },
+                { icon: Lightbulb, text: content.objections[1] },
+                { icon: Target, text: content.objections[2] },
+                { icon: Shield, text: content.objections[3] }
               ].map((item, idx) => (
                 <motion.div
                   key={idx}
@@ -347,7 +370,7 @@ export default function PlanAction() {
               ))}
             </div>
             <p className="text-center text-[#61f7a2] font-semibold text-lg mt-6">
-              ✨ On est passés par là. Et on a créé ce pack pour toi.
+              {content.objectionConclusion}
             </p>
           </div>
         </motion.div>
@@ -369,12 +392,7 @@ export default function PlanAction() {
                 <h3 className="text-xl font-bold text-gray-900">Sans ce pack</h3>
               </div>
               <ul className="space-y-3">
-                {[
-                  "Tu vas galérer des semaines",
-                  "Tu ne sauras pas par où commencer",
-                  "Tu vas te décourager",
-                  "Tu abandonneras probablement"
-                ].map((item, idx) => (
+                {content.withoutPack.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-gray-600">
                     <X className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
                     <span>{item}</span>
@@ -392,12 +410,7 @@ export default function PlanAction() {
                 <h3 className="text-xl font-bold text-gray-900">Avec ce pack</h3>
               </div>
               <ul className="space-y-3">
-                {[
-                  "Tout est déjà prêt",
-                  "Tu as un plan étape par étape",
-                  "Tu es guidé(e) en vidéo",
-                  "Tu lances cette semaine"
-                ].map((item, idx) => (
+                {content.withPack.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-gray-700 font-medium">
                     <Check className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
                     <span>{item}</span>
@@ -429,29 +442,29 @@ export default function PlanAction() {
               {
                 week: 1,
                 icon: Zap,
-                title: "Valider l'offre + premières ventes",
-                description: "Messages générés, plan exact, première vente dans les 24h",
+                title: content.weeklyPlan[0].title,
+                description: content.weeklyPlan[0].description,
                 color: "blue"
               },
               {
                 week: 2,
                 icon: Gift,
-                title: "Créer l'order bump + continuer à vendre",
-                description: "Contenu prêt, page web automatique, emails rédigés",
+                title: content.weeklyPlan[1].title,
+                description: content.weeklyPlan[1].description,
                 color: "green"
               },
               {
                 week: 3,
                 icon: Award,
-                title: "Préparer les offres supérieures + créer communauté",
-                description: "Upsells prêts, première communauté, témoignages",
+                title: content.weeklyPlan[2].title,
+                description: content.weeklyPlan[2].description,
                 color: "purple"
               },
               {
                 week: 4,
                 icon: Crown,
-                title: "Lancer les pubs autofinancées + livrer",
-                description: "Publicités intelligentes, système automatisé, croissance",
+                title: content.weeklyPlan[3].title,
+                description: content.weeklyPlan[3].description,
                 color: "gold"
               }
             ].map((week, index) => {
@@ -504,23 +517,23 @@ export default function PlanAction() {
             {[
               {
                 icon: FileText,
-                title: "Textes générés",
-                description: "Descriptions, bénéfices, témoignages, tout est écrit"
+                title: content.readyFeatures[0].title,
+                description: content.readyFeatures[0].description
               },
               {
                 icon: Video,
-                title: "Page de vente",
-                description: "Template premium, design pro, prêt à personnaliser"
+                title: content.readyFeatures[1].title,
+                description: content.readyFeatures[1].description
               },
               {
                 icon: Mail,
-                title: "Emails automatiques",
-                description: "Séquences complètes, relances, offres complémentaires"
+                title: content.readyFeatures[2].title,
+                description: content.readyFeatures[2].description
               },
               {
                 icon: MessageSquare,
-                title: "Scripts / messages",
-                description: "Messages de vente, réponses aux objections, suivi"
+                title: content.readyFeatures[3].title,
+                description: content.readyFeatures[3].description
               }
             ].map((feature, idx) => {
               const Icon = feature.icon;
@@ -603,24 +616,20 @@ export default function PlanAction() {
           transition={{ delay: 2 }}
           className="text-center"
         >
-          <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl border border-gray-200 p-12 shadow-lg">
-            <div className="w-16 h-16 rounded-2xl bg-[#61f7a2]/10 mx-auto mb-6 flex items-center justify-center">
-              <Lock className="w-8 h-8 text-[#61f7a2]" />
-            </div>
+          <div className="bg-gradient-to-br from-[#61f7a2]/10 via-blue-50 to-purple-50 rounded-3xl border border-[#61f7a2]/30 p-12 shadow-lg">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Débloquer tout le contenu
+              {content.finalCTA.title}
             </h2>
-            <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
-              Accède à ton offre complète, ta page de vente, tes emails,
-              ton plan d'action et tous tes documents IA
+            <p className="text-gray-600 text-lg mb-8">
+              {content.finalCTA.subtitle}
             </p>
             
             <GlowButton 
-              onClick={() => setShowPaywall(true)} 
+              onClick={handleAccessDashboard} 
               size="lg" 
               className="px-12 text-lg"
             >
-              Débloquer maintenant
+              Accéder à mon espace membre
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
           </div>
@@ -635,14 +644,6 @@ export default function PlanAction() {
           <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
         </div>
       </footer>
-
-      {/* Paywall Modal */}
-      <PaywallModal
-        isOpen={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onPurchase={handlePurchase}
-        loading={purchasing}
-      />
     </div>
   );
 }

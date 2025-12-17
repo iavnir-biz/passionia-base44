@@ -20,12 +20,22 @@ export default function NovaChat() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
       loadUser();
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    // Afficher le paywall après 3 secondes
+    const timer = setTimeout(() => {
+      setShowPaywall(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const loadUser = async () => {
     try {
@@ -71,9 +81,6 @@ export default function NovaChat() {
       </div>
     );
   }
-
-  // Nova est réservé à l'abonnement ultime uniquement
-  const showPaywall = true;
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">

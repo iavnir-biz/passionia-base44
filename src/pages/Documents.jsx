@@ -33,9 +33,9 @@ const categories = [
     icon: MessageSquare,
     documents: [
       { subcategory: 'Identifier le problème', title: 'Message 1 : Le Diagnostic' },
-      { subcategory: 'Créer la connexion', title: 'Message 2 : L\'Empathie' },
-      { subcategory: 'Présenter l\'offre', title: 'Message 3 : La Solution' },
-      { subcategory: 'Appel à l\'action', title: 'Message 4 : L\'Achat' },
+      { subcategory: 'Créer la connexion', title: 'Message 2 : L\'empathie' },
+      { subcategory: 'Présenter l\'offre', title: 'Message 3 : La solution' },
+      { subcategory: 'Appel à l\'action', title: 'Message 4 : L\'achat' },
     ]
   },
   { 

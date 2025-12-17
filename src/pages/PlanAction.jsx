@@ -58,6 +58,15 @@ export default function PlanAction() {
 
   useEffect(() => {
     loadUser();
+    
+    // Vérifier si retour de paiement réussi
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+      // Recharger les données utilisateur pour vérifier has_purchased
+      setTimeout(() => {
+        window.location.href = createPageUrl('Dashboard');
+      }, 2000);
+    }
   }, []);
 
   const loadUser = async () => {
@@ -110,11 +119,20 @@ export default function PlanAction() {
   };
 
   const handleCheckout = async () => {
-    // TODO: Intégrer Stripe checkout
-    console.log('Checkout Stripe...');
-    // Après paiement réussi:
-    // await base44.auth.updateMe({ has_purchased: true });
-    // navigate(createPageUrl('Dashboard'));
+    try {
+      const { data } = await base44.functions.invoke('createCheckout');
+      
+      if (data.success && data.url) {
+        // Rediriger vers Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        console.error('Checkout failed:', data.error);
+        alert('Erreur lors de la création du paiement. Veuillez réessayer.');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Erreur lors de la création du paiement. Veuillez réessayer.');
+    }
   };
 
   if (isLoading || isGenerating) {

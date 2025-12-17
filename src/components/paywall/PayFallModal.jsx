@@ -5,6 +5,18 @@ import GlowButton from '@/components/ui/GlowButton';
 import { cn } from "@/lib/utils";
 
 export default function PayFallModal({ isOpen, onClose, onCheckout }) {
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handleCheckout = async () => {
+    setIsLoading(true);
+    try {
+      await onCheckout();
+    } catch (error) {
+      console.error('Checkout error:', error);
+      setIsLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   const includedItems = [
@@ -169,7 +181,9 @@ export default function PayFallModal({ isOpen, onClose, onCheckout }) {
                 className="rounded-xl"
               >
                 <GlowButton
-                  onClick={onCheckout}
+                  onClick={handleCheckout}
+                  loading={isLoading}
+                  disabled={isLoading}
                   size="lg"
                   className="px-20 py-5 text-xl font-bold shadow-2xl"
                 >

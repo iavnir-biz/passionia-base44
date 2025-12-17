@@ -1,6 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 import OpenAI from 'npm:openai@4.73.1';
 
+console.log('generateFullStackOffer loaded');
+
 const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
@@ -153,13 +155,17 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
     
+    console.log('Starting generateFullStackOffer', { sessionId });
+    
     // Get session
     const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (!sessions || sessions.length === 0) {
+      console.error('Session not found', { sessionId });
       return Response.json({ error: 'Session not found' }, { status: 404 });
     }
 
     const session = sessions[0];
+    console.log('Session loaded', { sessionId, hasOfferGeneration: !!session.offer_generation });
     
     // Check if already generated
     if (session.offer_generation && session.offer_generation.offerChoices) {

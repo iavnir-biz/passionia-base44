@@ -27,12 +27,27 @@ export default function OfferProductPrincipal() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
+      console.log('OfferProductPrincipal: User loaded', { 
+        hasSessionId: !!currentUser.sessionId,
+        sessionId: currentUser.sessionId 
+      });
+      
       // Charger la session et les offres générées
       if (currentUser.sessionId) {
         const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+        console.log('OfferProductPrincipal: Sessions fetched', { 
+          count: sessions.length,
+          sessionId: currentUser.sessionId 
+        });
+        
         if (sessions.length > 0) {
           const userSession = sessions[0];
           setSession(userSession);
+          
+          console.log('OfferProductPrincipal: Session loaded', {
+            hasOfferGeneration: !!userSession.offer_generation,
+            hasMainProductChoices: !!userSession.offer_generation?.offerChoices?.mainProductChoices
+          });
           
           // Récupérer les offres depuis offer_generation (Full Stack Offer)
           if (userSession.offer_generation?.offerChoices?.mainProductChoices) {
@@ -42,9 +57,16 @@ export default function OfferProductPrincipal() {
               icon: Video,
               badge: choice.productType || choice.badge || 'Formation'
             }));
+            console.log('OfferProductPrincipal: Offers loaded', { count: choices.length });
             setOffers(choices);
+          } else {
+            console.warn('OfferProductPrincipal: No offers found in session.offer_generation');
           }
+        } else {
+          console.error('OfferProductPrincipal: No session found with this ID');
         }
+      } else {
+        console.error('OfferProductPrincipal: User has no sessionId');
       }
       
       // Fallback sur l'ancien système si pas de session

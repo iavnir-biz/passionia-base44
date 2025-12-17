@@ -18,6 +18,10 @@ const EMAIL_PROMPTS = {
         title: "Email Promotionnel",
         instruction: "Crée un email promotionnel persuasif qui présente l'offre, ses bénéfices, crée l'urgence, et pousse à l'action. Utilise des techniques de copywriting avancées."
     },
+    story: {
+        title: "Email Storytelling",
+        instruction: "Crée un email basé sur le storytelling et le parcours personnel. Raconte une histoire authentique qui crée de l'identification, inspire et connecte émotionnellement avec le lecteur."
+    },
     reengagement: {
         title: "Email de Réengagement",
         instruction: "Crée un email de réengagement pour réactiver des abonnés inactifs. L'email doit être empathique, créer la curiosité, et donner une raison forte de revenir."

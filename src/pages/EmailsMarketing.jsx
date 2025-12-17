@@ -26,7 +26,7 @@ const emailTypes = [
     description: 'Apporte de la valeur régulièrement',
     icon: Send,
     color: 'from-purple-500 to-pink-500',
-    locked: true
+    locked: false
   },
   {
     id: 'promo',
@@ -35,7 +35,16 @@ const emailTypes = [
     description: 'Transforme tes prospects en clients',
     icon: Send,
     color: 'from-orange-500 to-red-500',
-    locked: true
+    locked: false
+  },
+  {
+    id: 'story',
+    title: 'Email Storytelling',
+    subtitle: 'Raconte ton histoire',
+    description: 'Crée une connexion authentique',
+    icon: Send,
+    color: 'from-amber-500 to-yellow-500',
+    locked: false
   },
   {
     id: 'reengagement',
@@ -44,7 +53,7 @@ const emailTypes = [
     description: 'Récupère ton audience dormante',
     icon: Send,
     color: 'from-green-500 to-emerald-500',
-    locked: true
+    locked: false
   }
 ];
 
@@ -156,7 +165,7 @@ export default function EmailsMarketing() {
             </div>
 
             {/* Email Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {emailTypes.map((email, index) => {
                 const generated = generatedEmails[email.id];
                 const isGenerating = loading;

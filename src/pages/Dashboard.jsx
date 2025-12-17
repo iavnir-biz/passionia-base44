@@ -51,19 +51,16 @@ export default function Dashboard() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
+      // Check if purchased, redirect to PlanAction if not
+      if (!currentUser.has_purchased) {
+        navigate(createPageUrl('PlanAction'));
+        return;
+      }
+      
       // Load profile
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
-        
-        // Check if paid, redirect if not
-        if (!profiles[0].has_paid) {
-          navigate(createPageUrl('Results'));
-          return;
-        }
-      } else {
-        navigate(createPageUrl('Welcome'));
-        return;
       }
       
       // Load or create plan steps

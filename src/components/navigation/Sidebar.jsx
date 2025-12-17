@@ -27,6 +27,7 @@ const menuItems = [
   { name: 'Messages de vente', icon: MessageCircle, page: 'SalesMessages' },
   { name: 'Emails Marketing', icon: Send, page: 'EmailsMarketing' },
   { name: 'Page de vente', icon: FileText, page: 'SalesPage' },
+  { name: 'Mes offres', icon: Target, page: 'MyOffers' },
   { name: 'Avatars clients', icon: User, page: 'AvatarClients' },
   { name: 'Publicité ADS', icon: Magnet, page: 'AdCopies', locked: true },
   { name: 'Réseaux sociaux', icon: Share2, page: 'SocialMedia', locked: true },

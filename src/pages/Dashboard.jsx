@@ -19,6 +19,8 @@ import ProgressBar from '@/components/ui/ProgressBar';
 import ActionOfTheDayCard from '@/components/dashboard/ActionOfTheDayCard';
 import PlanStepCard from '@/components/dashboard/PlanStepCard';
 import GlowButton from '@/components/ui/GlowButton';
+import ChatBubble from '@/components/chat/ChatBubble';
+import NovaSection from '@/components/chat/NovaSection';
 
 const planSteps = [
   { step_number: 1, title: "Trouver une idée", description: "Identifier ta passion rentable" },
@@ -238,8 +240,8 @@ export default function Dashboard() {
                   Voir tout <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
-              
-              <div className="space-y-3">
+
+              <div className="space-y-3 mb-8">
                 {dailyActions.slice(0, 3).map((action, index) => (
                   <ActionOfTheDayCard
                     key={action.id}
@@ -249,8 +251,11 @@ export default function Dashboard() {
                   />
                 ))}
               </div>
+
+              {/* Nova Chat Section */}
+              <NovaSection />
             </motion.div>
-            
+
             {/* Plan d'action */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -269,7 +274,7 @@ export default function Dashboard() {
                   Voir tout <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
-              
+
               <div className="space-y-3">
                 {steps.slice(0, 4).map((step, index) => (
                   <PlanStepCard
@@ -322,7 +327,10 @@ export default function Dashboard() {
             </div>
           </motion.div>
         </main>
-      </div>
-    </div>
-  );
-}
+        </div>
+
+        {/* Chat Bubble */}
+        <ChatBubble />
+        </div>
+        );
+        }

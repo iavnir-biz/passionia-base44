@@ -11,7 +11,8 @@ import {
   LogOut,
   Sparkles,
   ChevronRight,
-  MessageCircle
+  MessageCircle,
+  Lock
 } from "lucide-react";
 import ProgressBar from '@/components/ui/ProgressBar';
 
@@ -19,7 +20,7 @@ const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Plan d\'action', icon: Target, page: 'PlanAction' },
   { name: 'Actions du jour', icon: Calendar, page: 'DailyActions' },
-  { name: 'Discuter avec Nova', icon: MessageCircle, page: 'NovaChat' },
+  { name: 'Discuter avec Nova', icon: MessageCircle, page: 'NovaChat', locked: true },
   { name: 'Documents IA', icon: FileText, page: 'Documents' },
   { name: 'Paramètres', icon: Settings, page: 'Settings' },
 ];
@@ -66,6 +67,7 @@ export default function Sidebar({ currentPage, progress = 0 }) {
             >
               <item.icon className="w-5 h-5" />
               <span className="flex-1 font-medium">{item.name}</span>
+              {item.locked && <Lock className="w-3.5 h-3.5 text-gray-500" />}
               {isActive && <ChevronRight className="w-4 h-4" />}
             </Link>
           );

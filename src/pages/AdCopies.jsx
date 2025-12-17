@@ -113,7 +113,7 @@ export default function AdCopies() {
         
         <div className="flex-1 ml-72">
           <TopBar 
-            title="Vos publicités" 
+            title="Publicité ADS" 
             subtitle="Générez vos copies publicitaires"
             user={user}
           />
@@ -151,7 +151,7 @@ export default function AdCopies() {
       
       <div className="flex-1 ml-72">
         <TopBar 
-          title="Vos publicités" 
+          title="Publicité ADS" 
           subtitle="Génère tes copies publicitaires avec l'IA"
           user={user}
         />

@@ -13,7 +13,10 @@ import {
   ChevronRight,
   MessageCircle,
   Lock,
-  Send
+  Send,
+  User,
+  Magnet,
+  Share2
 } from "lucide-react";
 import ProgressBar from '@/components/ui/ProgressBar';
 
@@ -25,8 +28,8 @@ const menuItems = [
   { name: 'Emails Marketing', icon: Send, page: 'EmailsMarketing' },
   { name: 'Page de vente', icon: FileText, page: 'SalesPage' },
   { name: 'Avatars clients', icon: User, page: 'AvatarClients' },
-  { name: 'Vos publicités', icon: FileText, page: 'AdCopies', locked: true },
-  { name: 'Contenus réseaux sociaux', icon: MessageCircle, page: 'SocialMedia', locked: true },
+  { name: 'Publicité ADS', icon: Magnet, page: 'AdCopies', locked: true },
+  { name: 'Réseaux sociaux', icon: Share2, page: 'SocialMedia', locked: true },
   { name: 'Discuter avec Nova', icon: MessageCircle, page: 'NovaChat', locked: true },
   { name: 'Documents IA', icon: FileText, page: 'Documents' },
   { name: 'Paramètres', icon: Settings, page: 'Settings' },

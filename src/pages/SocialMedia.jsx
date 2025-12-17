@@ -142,7 +142,7 @@ export default function SocialMedia() {
         
         <div className="flex-1 ml-72">
           <TopBar 
-            title="Contenus réseaux sociaux" 
+            title="Réseaux sociaux" 
             subtitle="Générez vos contenus pour les réseaux"
             user={user}
           />
@@ -180,7 +180,7 @@ export default function SocialMedia() {
       
       <div className="flex-1 ml-72">
         <TopBar 
-          title="Contenus réseaux sociaux" 
+          title="Réseaux sociaux" 
           subtitle="Génère tes contenus avec l'IA"
           user={user}
         />

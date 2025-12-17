@@ -158,7 +158,7 @@ export default function Dashboard() {
   
   if (authLoading || loading) {
     return (
-      <div className="flex min-h-screen bg-white">
+      <div className="flex min-h-screen bg-[#11112b]">
         <Sidebar currentPage="Dashboard" progress={0} />
         <div className="flex-1 ml-72">
           <div className="flex items-center justify-center h-screen">
@@ -170,7 +170,7 @@ export default function Dashboard() {
   }
   
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-[#11112b]">
       <Sidebar currentPage="Dashboard" progress={calculateProgress()} />
       
       <div className="flex-1 ml-72">
@@ -180,17 +180,17 @@ export default function Dashboard() {
           user={user}
         />
         
-        <main className="p-8 bg-white">
+        <main className="p-8">
           {/* Bandeau supérieur - Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-2xl p-6 mb-8 shadow-sm"
+            className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 mb-8"
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 text-sm">Progression globale</span>
+                  <span className="text-gray-400 text-sm">Progression globale</span>
                   <span className="text-[#61f7a2] font-bold text-lg">{calculateProgress()}%</span>
                 </div>
                 <ProgressBar value={calculateProgress()} max={100} size="sm" />
@@ -198,7 +198,7 @@ export default function Dashboard() {
               
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 text-sm">Actions du jour</span>
+                  <span className="text-gray-400 text-sm">Actions du jour</span>
                   <span className="text-[#61f7a2] font-bold text-lg">
                     {dailyActions.filter(a => a.generated).length}/{dailyActions.length}
                   </span>
@@ -211,10 +211,10 @@ export default function Dashboard() {
               </div>
               
               <div>
-                <span className="text-gray-600 text-sm block mb-2">Étape actuelle</span>
+                <span className="text-gray-400 text-sm block mb-2">Étape actuelle</span>
                 <div className="flex items-center gap-2">
                   <span className="text-[#61f7a2] font-bold text-lg">{getCurrentStep()}/7</span>
-                  <span className="text-gray-900 text-sm truncate">
+                  <span className="text-white text-sm truncate">
                     {planSteps7Days[getCurrentStep() - 1]?.title}
                   </span>
                 </div>
@@ -232,7 +232,7 @@ export default function Dashboard() {
             >
               <div className="flex items-center gap-2 mb-4">
                 <Calendar className="w-5 h-5 text-[#61f7a2]" />
-                <h3 className="text-xl font-bold text-gray-900">Actions du jour</h3>
+                <h3 className="text-xl font-bold text-white">Actions du jour</h3>
               </div>
 
               <div className="space-y-3">
@@ -242,24 +242,24 @@ export default function Dashboard() {
                     <Link
                       key={action.id}
                       to={createPageUrl(action.page)}
-                      className="block bg-white border border-gray-200 rounded-xl p-4 hover:border-[#61f7a2] hover:shadow-md transition-all group"
+                      className="block bg-[#1b1b33] border border-[#2a2a45] rounded-xl p-4 hover:border-[#61f7a2]/50 transition-all group"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center">
                           <Icon className="w-5 h-5 text-[#61f7a2]" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-gray-900 font-medium">{action.title}</p>
+                          <p className="text-white font-medium">{action.title}</p>
                           {action.generated ? (
                             <div className="flex items-center gap-1 mt-1">
                               <CheckCircle className="w-3 h-3 text-[#61f7a2]" />
                               <span className="text-[#61f7a2] text-xs">Généré</span>
                             </div>
                           ) : (
-                            <span className="text-gray-500 text-xs">À générer</span>
+                            <span className="text-gray-400 text-xs">À générer</span>
                           )}
                         </div>
-                        <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#61f7a2] transition-colors" />
+                        <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-[#61f7a2] transition-colors" />
                       </div>
                     </Link>
                   );
@@ -275,7 +275,7 @@ export default function Dashboard() {
             >
               <div className="flex items-center gap-2 mb-4">
                 <Target className="w-5 h-5 text-[#61f7a2]" />
-                <h3 className="text-xl font-bold text-gray-900">Plan d'action 7 jours</h3>
+                <h3 className="text-xl font-bold text-white">Plan d'action 7 jours</h3>
               </div>
 
               <div className="space-y-3">
@@ -287,12 +287,12 @@ export default function Dashboard() {
                   return (
                     <div
                       key={step.step_number}
-                      className={`bg-white border rounded-xl p-4 transition-all shadow-sm ${
+                      className={`bg-[#1b1b33] border rounded-xl p-4 transition-all ${
                         isUnlocked 
                           ? isCurrent 
                             ? 'border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20' 
-                            : 'border-gray-200'
-                          : 'border-gray-200 opacity-50'
+                            : 'border-[#2a2a45]'
+                          : 'border-[#2a2a45] opacity-50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -301,17 +301,17 @@ export default function Dashboard() {
                             ? 'bg-[#61f7a2] text-[#11112b]' 
                             : isCurrent 
                               ? 'bg-[#61f7a2]/20 text-[#61f7a2] border border-[#61f7a2]' 
-                              : 'bg-gray-100 text-gray-500'
+                              : 'bg-[#2a2a45] text-gray-500'
                         }`}>
                           {isCompleted ? <CheckCircle className="w-4 h-4" /> : step.step_number}
                         </div>
                         <div className="flex-1">
-                          <p className={`font-medium ${isUnlocked ? 'text-gray-900' : 'text-gray-500'}`}>
+                          <p className={`font-medium ${isUnlocked ? 'text-white' : 'text-gray-500'}`}>
                             {step.title}
                           </p>
-                          <p className="text-gray-500 text-xs">{step.description}</p>
+                          <p className="text-gray-400 text-xs">{step.description}</p>
                         </div>
-                        {!isUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
+                        {!isUnlocked && <Lock className="w-4 h-4 text-gray-600" />}
                       </div>
                     </div>
                   );
@@ -329,7 +329,7 @@ export default function Dashboard() {
           >
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="w-5 h-5 text-[#61f7a2]" />
-              <h3 className="text-xl font-bold text-gray-900">Ressources IA</h3>
+              <h3 className="text-xl font-bold text-white">Ressources IA</h3>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -339,19 +339,19 @@ export default function Dashboard() {
                   <Link
                     key={resource.title}
                     to={createPageUrl(resource.page)}
-                    className="bg-white border border-gray-200 rounded-xl p-4 hover:border-[#61f7a2] hover:shadow-md transition-all group"
+                    className="bg-[#1b1b33] border border-[#2a2a45] rounded-xl p-4 hover:border-[#61f7a2]/50 transition-all group"
                   >
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${resource.color} flex items-center justify-center mb-3`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-gray-900 font-medium text-sm mb-1">{resource.title}</p>
+                    <p className="text-white font-medium text-sm mb-1">{resource.title}</p>
                     {resource.generated ? (
                       <div className="flex items-center gap-1">
                         <CheckCircle className="w-3 h-3 text-[#61f7a2]" />
                         <span className="text-[#61f7a2] text-xs">Généré</span>
                       </div>
                     ) : (
-                      <span className="text-gray-500 text-xs">À générer</span>
+                      <span className="text-gray-400 text-xs">À générer</span>
                     )}
                   </Link>
                 );
@@ -364,7 +364,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-2xl p-8 mb-8 shadow-sm"
+            className="bg-gradient-to-br from-[#1b1b33] to-[#2a2a45] border border-[#61f7a2]/30 rounded-2xl p-8 mb-8"
           >
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-4">
@@ -372,8 +372,8 @@ export default function Dashboard() {
                   <Video className="w-8 h-8 text-[#11112b]" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">Besoin d'accompagnement ?</h3>
-                  <p className="text-gray-700">Prends rendez-vous avec un expert pour accélérer</p>
+                  <h3 className="text-2xl font-bold text-white mb-1">Besoin d'accompagnement ?</h3>
+                  <p className="text-gray-400">Prends rendez-vous avec un expert pour accélérer</p>
                 </div>
               </div>
               <GlowButton
@@ -391,7 +391,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8 shadow-sm"
+            className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-8"
           >
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-4">
@@ -399,8 +399,8 @@ export default function Dashboard() {
                   <Users className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">Rejoins la communauté</h3>
-                  <p className="text-gray-700">Partage avec d'autres créateurs et reçois du soutien</p>
+                  <h3 className="text-2xl font-bold text-white mb-1">Rejoins la communauté</h3>
+                  <p className="text-gray-400">Partage avec d'autres créateurs et reçois du soutien</p>
                 </div>
               </div>
               <GlowButton

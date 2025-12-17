@@ -46,6 +46,7 @@ import OfferConcretement from './pages/OfferConcretement';
 import OnboardingDynamic from './pages/OnboardingDynamic';
 import OnboardingTransition from './pages/OnboardingTransition';
 import NovaChat from './pages/NovaChat';
+import SalesPage from './pages/SalesPage';
 
 
 export const PAGES = {
@@ -97,6 +98,7 @@ export const PAGES = {
     "OnboardingDynamic": OnboardingDynamic,
     "OnboardingTransition": OnboardingTransition,
     "NovaChat": NovaChat,
+    "SalesPage": SalesPage,
 }
 
 export const pagesConfig = {

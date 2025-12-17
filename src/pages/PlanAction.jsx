@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import { cn } from "@/lib/utils";
+import ChatBubble from '@/components/chat/ChatBubble';
 
 const mainSteps = [
   { id: 1, label: "Ton Offre", page: "OfferResume" },
@@ -698,6 +699,9 @@ export default function PlanAction() {
         onClose={() => setIsPayFallOpen(false)}
         onCheckout={handleCheckout}
       />
+
+      {/* Chat Bubble */}
+      <ChatBubble />
     </div>
   );
 }

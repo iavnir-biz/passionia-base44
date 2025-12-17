@@ -8,6 +8,7 @@ import TopBar from '@/components/navigation/TopBar';
 import ActionOfTheDayCard from '@/components/dashboard/ActionOfTheDayCard';
 import ProgressBar from '@/components/ui/ProgressBar';
 import GlowButton from '@/components/ui/GlowButton';
+import ChatBubble from '@/components/chat/ChatBubble';
 
 export default function DailyActions() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
@@ -256,6 +257,9 @@ Réponds en JSON avec un tableau de 3 actions.`,
           )}
         </main>
       </div>
+
+      {/* Chat Bubble */}
+      <ChatBubble />
     </div>
   );
 }

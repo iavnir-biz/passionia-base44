@@ -49,6 +49,7 @@ import NovaChat from './pages/NovaChat';
 import SalesPage from './pages/SalesPage';
 import EmailsMarketing from './pages/EmailsMarketing';
 import SalesMessages from './pages/SalesMessages';
+import AdCopies from './pages/AdCopies';
 
 
 export const PAGES = {
@@ -103,6 +104,7 @@ export const PAGES = {
     "SalesPage": SalesPage,
     "EmailsMarketing": EmailsMarketing,
     "SalesMessages": SalesMessages,
+    "AdCopies": AdCopies,
 }
 
 export const pagesConfig = {

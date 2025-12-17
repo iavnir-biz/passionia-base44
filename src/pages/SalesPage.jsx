@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import UpgradeModal from '@/components/paywall/UpgradeModal';
 import { Sparkles, Loader2, Eye, Copy, Download, Lock, Package, ShoppingCart, TrendingUp, Crown } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -23,7 +24,8 @@ export default function SalesPage() {
   });
   const [selectedType, setSelectedType] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [hasPremium, setHasPremium] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -41,6 +43,7 @@ export default function SalesPage() {
       });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
+        setHasPremium(profiles[0].has_paid === true);
       }
 
       const sessions = await base44.entities.Session.filter({ 
@@ -58,9 +61,14 @@ export default function SalesPage() {
     }
   };
 
-  const handleGenerate = async (type) => {
-    if (type !== 'low') {
-      alert('Cette fonctionnalité est réservée à l\'abonnement premium');
+  const handleGenerate = async (type, isRegenerate = false) => {
+    if (type !== 'low' && !hasPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    
+    if (isRegenerate && !hasPremium) {
+      setShowUpgradeModal(true);
       return;
     }
     
@@ -237,12 +245,13 @@ export default function SalesPage() {
                             </GlowButton>
                           </div>
                           <GlowButton
-                            onClick={() => handleGenerate(offer.id)}
+                            onClick={() => handleGenerate(offer.id, true)}
                             variant="secondary"
                             size="sm"
                             className="w-full"
+                            icon={!hasPremium ? Lock : undefined}
                           >
-                            Régénérer
+                            {!hasPremium ? 'Premium' : 'Régénérer'}
                           </GlowButton>
                         </div>
                       ) : (
@@ -314,6 +323,8 @@ export default function SalesPage() {
           </div>
         </div>
       )}
+
+      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </div>
   );
 }

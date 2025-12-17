@@ -8,6 +8,7 @@ import { Send, Copy, Download, Eye, Loader2, Sparkles, Lock } from 'lucide-react
 import { cn } from "@/lib/utils";
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
+import UpgradeModal from '@/components/paywall/UpgradeModal';
 
 const emailTypes = [
   {
@@ -288,6 +289,8 @@ export default function EmailsMarketing() {
           </div>
         </div>
       )}
+
+      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </div>
   );
 }

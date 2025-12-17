@@ -6,6 +6,7 @@ import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
 import { toast } from 'sonner';
+import UpgradeModal from '@/components/paywall/UpgradeModal';
 
 export default function SalesMessages() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
@@ -16,6 +17,7 @@ export default function SalesMessages() {
   const [generatedMessages, setGeneratedMessages] = useState({});
   const [showPreview, setShowPreview] = useState(null);
   const [hasPremium, setHasPremium] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -86,7 +88,12 @@ export default function SalesMessages() {
     }
   ];
 
-  const handleGenerate = async (messageType) => {
+  const handleGenerate = async (messageType, isRegenerate = false) => {
+    if (isRegenerate && !hasPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    
     setLoading({ ...loading, [messageType]: true });
 
     try {
@@ -281,6 +288,8 @@ export default function SalesMessages() {
           </div>
         </div>
       )}
+
+      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </div>
   );
 }

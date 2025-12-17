@@ -31,6 +31,12 @@ export default function NovaChat() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      
+      // Load user profile to check payment status
+      const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
+      if (profiles.length > 0) {
+        setUser({ ...currentUser, has_paid: profiles[0].has_paid });
+      }
     } catch (error) {
       console.error('Error loading user:', error);
     }
@@ -72,6 +78,8 @@ export default function NovaChat() {
     );
   }
 
+  const showPaywall = user && !user.has_paid;
+
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       <Sidebar currentPage="NovaChat" progress={0} />
@@ -83,11 +91,11 @@ export default function NovaChat() {
           user={user}
         />
         
-        <main className="p-8 max-w-5xl mx-auto">
+        <main className="p-8 max-w-5xl mx-auto relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
+            className={`space-y-6 ${showPaywall ? 'blur-lg pointer-events-none' : ''}`}
           >
             {/* Header avec description */}
             <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl p-8 border border-green-200 shadow-sm">
@@ -197,6 +205,37 @@ export default function NovaChat() {
               </div>
             </div>
           </motion.div>
+
+          {/* Paywall Overlay */}
+          {showPaywall && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="absolute inset-0 flex items-center justify-center z-10 mt-20"
+            >
+              <div className="bg-white rounded-3xl border border-gray-200 shadow-2xl p-10 max-w-lg text-center">
+                <div className="w-20 h-20 bg-[#61f7a2]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="w-10 h-10 text-[#61f7a2]" />
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Débloque Nova IA
+                </h2>
+                <p className="text-gray-600 text-lg mb-8">
+                  Accède au coaching IA personnalisé illimité, à tous les templates, stratégies et outils pour transformer ton savoir-faire en business rentable.
+                </p>
+                <Button
+                  onClick={() => window.location.href = '/plan-action'}
+                  className="bg-[#61f7a2] hover:bg-[#4de88f] text-white text-lg font-semibold px-8 py-6 h-auto"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Débloquer maintenant
+                </Button>
+                <p className="text-gray-500 text-sm mt-4">
+                  Rejoins les créateurs qui transforment leur passion en revenus
+                </p>
+              </div>
+            </motion.div>
+          )}
         </main>
       </div>
 

@@ -21,6 +21,7 @@ import {
 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import GlowButton from '@/components/ui/GlowButton';
+import OfferDetailCard from '@/components/offer/OfferDetailCard';
 
 const iconMap = {
   'mini-formation': Video,
@@ -44,6 +45,7 @@ export default function OfferResume() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showDetail, setShowDetail] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
 
   useEffect(() => {
     loadUser();
@@ -53,6 +55,9 @@ export default function OfferResume() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      if (currentUser.sessionId) {
+        setSessionId(currentUser.sessionId);
+      }
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
@@ -76,28 +81,32 @@ export default function OfferResume() {
   const products = [
   {
     key: 'product_principal',
-    label: 'Produit Principal',
+    offerType: 'low',
+    label: 'Produit d\'appel (Low ticket)',
     data: offer.product_principal,
     multiplier: 30,
     conversionLabel: '1 vente/jour × 30 jours'
   },
   {
     key: 'petit_extra',
-    label: 'Petit Extra (Order Bump)',
+    offerType: 'bump',
+    label: 'Vente additionnelle (Order bump)',
     data: offer.petit_extra,
     multiplier: 15,
     conversionLabel: '50% conversion × 30 jours'
   },
   {
     key: 'offre_superieure',
-    label: 'Offre Supérieure (Upsell)',
+    offerType: 'mid',
+    label: 'Offre intermédiaire (Mid ticket)',
     data: offer.offre_superieure,
     multiplier: 9,
     conversionLabel: '30% conversion × 30 jours'
   },
   {
     key: 'offre_premium',
-    label: 'Offre Premium',
+    offerType: 'high',
+    label: 'Offre premium (High ticket)',
     data: offer.offre_premium,
     multiplier: 1,
     conversionLabel: '3% conversion × 30 jours'
@@ -115,7 +124,7 @@ export default function OfferResume() {
 
   return (
     <OfferBuilderLayout currentStep={5}>
-      <div className="max-w-3xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -130,54 +139,28 @@ export default function OfferResume() {
           </p>
         </motion.div>
 
-        {/* Products Summary */}
+        {/* Products Detail Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-6">
+          className="mb-6">
 
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <Check className="w-5 h-5 text-[#61f7a2]" />
-            Tes 4 produits sélectionnés
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Check className="w-6 h-6 text-[#61f7a2]" />
+            Tes 4 offres complètes
           </h2>
           
-          <div className="space-y-4">
-            {products.map((product, index) => {
-              const Icon = iconMap[product.data?.id] || FileText;
-
-              return (
-                <div
-                  key={product.key}
-                  className="flex items-start gap-4 p-4 bg-[#11112b] rounded-xl border border-[#2a2a45]">
-
-                  <div className="w-10 h-10 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-5 h-5 text-[#61f7a2]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="bg-transparent text-[#ffffff] text-xs font-medium uppercase tracking-wide">
-                        {product.label}
-                      </span>
-                      <div className="w-4 h-4 rounded-full bg-[#61f7a2] flex items-center justify-center">
-                        <Check className="w-3 h-3 text-[#11112b]" />
-                      </div>
-                    </div>
-                    <h3 className="text-white font-semibold text-sm mb-1 truncate">
-                      {product.data?.title || 'Non sélectionné'}
-                    </h3>
-                    <p className="text-gray-500 text-xs">
-                      {product.data?.badge || '—'}
-                    </p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <span className="text-xl font-bold text-[#61f7a2]">
-                      {product.data?.price || '—'}
-                    </span>
-                  </div>
-                </div>);
-
-            })}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {products.map((product) => (
+              <OfferDetailCard
+                key={product.key}
+                offerType={product.offerType}
+                offerTitle={product.label}
+                baseOffer={product.data}
+                sessionId={sessionId}
+              />
+            ))}
           </div>
         </motion.div>
 

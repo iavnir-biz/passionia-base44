@@ -272,7 +272,7 @@ export default function SalesPage() {
                     </div>
                     
                     {offer.locked && (
-                      <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-sm flex items-center justify-center">
+                      <div className="absolute inset-0 bg-white/40 backdrop-blur-md flex items-center justify-center">
                         <div className="text-center">
                           <Lock className="w-10 h-10 text-gray-400 mx-auto mb-2" />
                           <p className="text-sm font-semibold text-gray-600">Premium</p>

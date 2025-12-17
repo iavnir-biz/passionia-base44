@@ -94,11 +94,22 @@ export default function BonneNouvelle() {
     
     setIsGenerating(true);
     try {
-      const { data } = await base44.functions.invoke('generateMarketAnalysis', {
+      const { data } = await base44.functions.invoke('generateMarketValidation', {
         sessionId: user.sessionId
       });
       
-      setMarketAnalysis(data);
+      if (data.success) {
+        setMarketAnalysis({
+          validationText: data.marketValidation,
+          marketScores: {
+            elearningMarket: 85,
+            digitalDemand: 88,
+            recurringRevenue: 82,
+            globalAccess: 90,
+            techEase: 87
+          }
+        });
+      }
     } catch (error) {
       console.error('Error generating analysis:', error);
       // Fallback values

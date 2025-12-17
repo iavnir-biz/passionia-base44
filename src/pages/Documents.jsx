@@ -18,6 +18,7 @@ import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import DocumentCard from '@/components/dashboard/DocumentCard';
 import GlowButton from '@/components/ui/GlowButton';
+import OfferGenerationCard from '@/components/offer/OfferGenerationCard';
 
 const categories = [
   { 
@@ -99,6 +100,8 @@ export default function Documents() {
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
+  const [generatedOffersCount, setGeneratedOffersCount] = useState(0);
   
   useEffect(() => {
     if (isAuthenticated) {
@@ -110,6 +113,9 @@ export default function Documents() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+      if (currentUser.sessionId) {
+        setSessionId(currentUser.sessionId);
+      }
       
       // Load plan steps for progress
       const steps = await base44.entities.PlanStep.filter({ created_by: currentUser.email });
@@ -212,6 +218,43 @@ Sois concis mais complet. Format markdown.`,
     return documents.filter(d => d.category === categoryId);
   };
   
+  const handleOfferGenerated = () => {
+    setGeneratedOffersCount(prev => prev + 1);
+  };
+  
+  const offerCards = [
+    {
+      id: 'high',
+      title: 'Offre premium',
+      subtitle: 'High ticket',
+      type: 'offre_premium'
+    },
+    {
+      id: 'mid',
+      title: 'Offre intermédiaire',
+      subtitle: 'Mid ticket',
+      type: 'offre_superieure'
+    },
+    {
+      id: 'bump',
+      title: 'Vente additionnelle',
+      subtitle: 'Order bump',
+      type: 'petit_extra'
+    },
+    {
+      id: 'low',
+      title: 'Produit d\'appel',
+      subtitle: 'Low ticket',
+      type: 'product_principal'
+    },
+    {
+      id: 'complete',
+      title: 'Ton offre structurée',
+      subtitle: 'Offre complète',
+      type: 'complete'
+    }
+  ];
+  
   return (
     <div className="flex min-h-screen bg-[#11112b]">
       <Sidebar currentPage="Documents" progress={progress} />
@@ -259,12 +302,38 @@ Sois concis mais complet. Format markdown.`,
                 {generating ? 'Génération de vos documents en cours...' : 'Chargement...'}
               </p>
             </div>
+          ) : activeCategory === 'offre' ? (
+            // Show offer generation cards
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-[#61f7a2]/10 flex items-center justify-center">
+                  <Package className="w-5 h-5 text-[#61f7a2]" />
+                </div>
+                <h3 className="text-xl font-bold text-white">Tes offres</h3>
+                <span className="text-gray-500 text-sm">
+                  {generatedOffersCount}/5 générées
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {offerCards.map((card, index) => (
+                  <OfferGenerationCard
+                    key={card.id}
+                    offer={card}
+                    user={user}
+                    sessionId={sessionId}
+                    onGenerated={handleOfferGenerated}
+                    delay={index * 0.1}
+                  />
+                ))}
+              </div>
+            </div>
           ) : activeCategory === 'all' ? (
             // Show by category
             <div className="space-y-8">
               {categories.map((category) => {
                 const categoryDocs = getCategoryDocuments(category.id);
-                if (categoryDocs.length === 0) return null;
+                if (categoryDocs.length === 0 && category.id !== 'offre') return null;
                 
                 return (
                   <motion.div
@@ -277,22 +346,43 @@ Sois concis mais complet. Format markdown.`,
                         <category.icon className="w-5 h-5 text-[#61f7a2]" />
                       </div>
                       <h3 className="text-xl font-bold text-white">{category.name}</h3>
-                      <span className="text-gray-500 text-sm">
-                        {categoryDocs.filter(d => d.is_generated).length}/{categoryDocs.length} générés
-                      </span>
+                      {category.id === 'offre' ? (
+                        <span className="text-gray-500 text-sm">
+                          {generatedOffersCount}/5 générées
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 text-sm">
+                          {categoryDocs.filter(d => d.is_generated).length}/{categoryDocs.length} générés
+                        </span>
+                      )}
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {categoryDocs.map((doc, index) => (
-                        <DocumentCard
-                          key={doc.id}
-                          document={doc}
-                          onView={handleViewDocument}
-                          onDownload={handleDownload}
-                          index={index}
-                        />
-                      ))}
-                    </div>
+                    {category.id === 'offre' ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {offerCards.map((card, index) => (
+                          <OfferGenerationCard
+                            key={card.id}
+                            offer={card}
+                            user={user}
+                            sessionId={sessionId}
+                            onGenerated={handleOfferGenerated}
+                            delay={index * 0.1}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {categoryDocs.map((doc, index) => (
+                          <DocumentCard
+                            key={doc.id}
+                            document={doc}
+                            onView={handleViewDocument}
+                            onDownload={handleDownload}
+                            index={index}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
                 );
               })}

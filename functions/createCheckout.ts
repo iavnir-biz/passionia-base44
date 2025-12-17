@@ -20,9 +20,6 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Already purchased' }, { status: 400 });
     }
 
-    // Récupérer l'URL de l'app depuis les headers
-    const origin = req.headers.get('origin') || 'https://your-app.base44.com';
-
     // Créer ou récupérer le client Stripe
     let customerId = user.stripe_customer_id;
     if (!customerId) {
@@ -39,6 +36,11 @@ Deno.serve(async (req) => {
       // Sauvegarder l'ID client Stripe
       await base44.auth.updateMe({ stripe_customer_id: customerId });
     }
+
+    // Récupérer l'URL de l'app depuis les headers
+    const origin = req.headers.get('origin') || req.headers.get('referer')?.replace(/\/$/, '') || '';
+    const successUrl = origin ? `${origin}/PlanAction?payment=success` : 'https://passionprofit.base44.run/PlanAction?payment=success';
+    const cancelUrl = origin ? `${origin}/PlanAction` : 'https://passionprofit.base44.run/PlanAction';
 
     // Créer la session de paiement
     const session = await stripe.checkout.sessions.create({
@@ -59,8 +61,8 @@ Deno.serve(async (req) => {
         },
       ],
       mode: 'payment',
-      success_url: `${origin}?payment=success`,
-      cancel_url: `${origin}?payment=cancelled`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       metadata: {
         user_id: user.id,
         user_email: user.email

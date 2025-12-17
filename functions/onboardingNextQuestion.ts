@@ -418,13 +418,19 @@ titleTemplate: "${nextQuestionConfig.titleTemplate}"
 subtitleTemplate: "${nextQuestionConfig.subtitleTemplate}"
 
 MISSION :
-1. Prends le titleTemplate et remplace {{firstName}} par "${name}" et {{coreSkill}} par "${skill || 'ton savoir-faire'}"
-2. IMPORTANT: Si coreSkill est disponible ("${skill}"), utilise-le EXACTEMENT tel quel (ex: "le piano", "la photographie")
-3. Prends le subtitleTemplate et utilise-le tel quel (avec les exemples)
-4. Retourne ces textes dans les champs "title" et "subtitle" de la question
-5. Copie "title" dans "text" aussi
+1. ACCUSE RÉCEPTION de la dernière réponse (sauf si Q1)
+2. RÉSUME la compétence de façon humaine et courte (ne répète pas textuellement la réponse brute de Q2)
+3. PERSONNALISE la question en utilisant :
+   - Le prénom : "${name}"
+   - La compétence de façon résumée/contextualisée
+   - Le niveau d'expérience si disponible
+   - Les réponses précédentes
+4. GÉNÈRE des exemples SPÉCIFIQUES au domaine de "${skill || 'la compétence'}" dans le subtitle
+5. RESPECTE les règles spécifiques pour cette question #${nextQuestionConfig.id}
 6. Inclus les options/min/max/step selon le type
-7. Mets à jour le summary en mappant ${nextQuestionConfig.field} vers les bonnes clés` : 
+7. Mets à jour le summary en mappant ${nextQuestionConfig.field} vers les bonnes clés
+
+⚠️ CRITIQUE : Ne copie PAS mot à mot la compétence. Humanise-la, résume-la, contextualise-la.` : 
 'MISSION : Les 11 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
 
     console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });

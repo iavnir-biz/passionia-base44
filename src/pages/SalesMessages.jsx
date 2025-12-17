@@ -7,6 +7,7 @@ import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
 import { toast } from 'sonner';
 import UpgradeModal from '@/components/paywall/UpgradeModal';
+import ChatBubble from '@/components/chat/ChatBubble';
 
 export default function SalesMessages() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
@@ -288,6 +289,9 @@ export default function SalesMessages() {
           </div>
         </div>
       )}
+
+      {/* Chat Bubble */}
+      <ChatBubble />
 
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </div>

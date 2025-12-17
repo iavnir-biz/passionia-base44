@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 import UpgradeModal from '@/components/paywall/UpgradeModal';
+import ChatBubble from '@/components/chat/ChatBubble';
 
 const emailTypes = [
   {
@@ -311,6 +312,9 @@ export default function EmailsMarketing() {
           </div>
         </div>
       )}
+
+      {/* Chat Bubble */}
+      <ChatBubble />
 
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </div>

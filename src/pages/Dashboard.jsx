@@ -377,7 +377,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <GlowButton
-                onClick={() => window.open('https://calendly.com/votre-lien', '_blank')}
+                onClick={() => navigate(createPageUrl('Booking'))}
                 variant="primary"
                 size="lg"
               >

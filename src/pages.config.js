@@ -53,6 +53,7 @@ import AdCopies from './pages/AdCopies';
 import SocialMedia from './pages/SocialMedia';
 import AvatarClients from './pages/AvatarClients';
 import MyOffers from './pages/MyOffers';
+import Booking from './pages/Booking';
 
 
 export const PAGES = {
@@ -111,6 +112,7 @@ export const PAGES = {
     "SocialMedia": SocialMedia,
     "AvatarClients": AvatarClients,
     "MyOffers": MyOffers,
+    "Booking": Booking,
 }
 
 export const pagesConfig = {

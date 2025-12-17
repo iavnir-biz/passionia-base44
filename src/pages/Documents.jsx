@@ -336,6 +336,10 @@ Sois concis mais complet. Format markdown.`,
                         <span className="text-gray-600 text-sm">
                           {generatedOffersCount}/4 générées
                         </span>
+                      ) : category.id === 'messages' ? (
+                        <span className="text-gray-600 text-sm">
+                          {categoryDocs.filter(d => d.is_generated).length}/4 générés
+                        </span>
                       ) : (
                         <span className="text-gray-600 text-sm">
                           {categoryDocs.filter(d => d.is_generated).length}/{categoryDocs.length} générés
@@ -358,7 +362,7 @@ Sois concis mais complet. Format markdown.`,
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {categoryDocs.map((doc, index) => (
+                        {categoryDocs.slice(0, category.id === 'messages' ? 4 : categoryDocs.length).map((doc, index) => (
                           <DocumentCard
                             key={doc.id}
                             document={doc}
@@ -376,7 +380,7 @@ Sois concis mais complet. Format markdown.`,
           ) : (
             // Show filtered
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredDocuments.map((doc, index) => (
+              {(activeCategory === 'messages' ? filteredDocuments.slice(0, 4) : filteredDocuments).map((doc, index) => (
                 <DocumentCard
                   key={doc.id}
                   document={doc}

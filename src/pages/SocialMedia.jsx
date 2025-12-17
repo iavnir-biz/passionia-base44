@@ -23,12 +23,21 @@ export default function SocialMedia() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showBlur, setShowBlur] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
       loadData();
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowBlur(true);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const loadData = async () => {
     try {
@@ -140,7 +149,8 @@ export default function SocialMedia() {
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className={cn(
-                      "bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 animate-fade-in blur-content"
+                      "bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 animate-fade-in",
+                      showBlur && "blur-sm"
                     )}>
                       {/* Gradient Header */}
                       <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-4`}>

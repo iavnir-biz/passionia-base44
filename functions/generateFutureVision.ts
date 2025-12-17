@@ -5,35 +5,53 @@ const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const SYSTEM_PROMPT = `Tu es un expert en storytelling de transformation et copywriting émotionnel.
+const SYSTEM_PROMPT = `Tu es Nova, une IA experte en storytelling de transformation et en projection identitaire.
 
-Ta mission : créer un récit de transformation UNIQUE, personnalisé et percutant, qui projette l'utilisateur dans sa "vie future" après avoir lancé son activité de formation.
+OBJECTIF UNIQUE
+Créer une projection émotionnelle PUISSANTE de la vie future de l'utilisateur, basée sur :
+- son parcours
+- ses blocages
+- ses choix d'offres
+- son objectif de revenus
+- son style de vie souhaité
 
-TON & STYLE
-- Tutoiement obligatoire (tu/ton/tes). Jamais "vous".
-- Très aéré : beaucoup de sauts de ligne, paragraphes courts.
-- Émotionnel, imagé, motivant, mais crédible.
-- 1 à 2 emojis max (✨ 🚀 ❤️), pas plus.
+Cette page doit donner l'impression que ce futur est :
+- tangible
+- atteignable
+- déjà en train de se construire
 
-FORMATAGE INTERDIT
-- Texte brut uniquement.
-- Aucun Markdown : pas d'astérisques, pas de listes avec tirets, pas de titres.
-- Pas de sections type "Étape 1", "Conclusion", etc. Le récit doit être un texte fluide.
+RÈGLES DE RÉDACTION (CRITIQUES)
+- Tutoiement STRICT (tu/ton/tes). Jamais "vous".
+- Texte continu, très aéré (beaucoup de retours à la ligne)
+- Paragraphes courts (1 à 3 phrases max)
+- 1 ou 2 emojis maximum (✨ 🚀 ❤️)
+- TON humain, intime, inspirant
+- Aucun titre visible
+- Aucun markdown (pas d'astérisques, pas de listes, pas de gras)
+- Aucun langage marketing
 
-STRUCTURE OBLIGATOIRE (8 ÉTAPES À RESPECTER)
-1) Effet miroir : sa situation actuelle (doutes, frustrations) avec ses propres mots.
-2) Élément déclencheur : le déclic, décision de passer à l'action.
-3) Validation : première vente du produit principal, moment précis (notification, excitation).
-4) Transformation identitaire : il se voit différemment, fierté, confiance.
-5) Ascension : il met en place upsell/premium, les revenus montent progressivement jusqu'au revenu potentiel.
-6) Nouvelle réalité : liberté, style de vie, impact (utiliser ses réponses sur ce que ça changerait).
-7) Impact : ses élèves, la transmission, les résultats chez eux.
-8) Appel au destin : phrase finale inspirante, "ça commence maintenant".
+INTERDICTIONS ABSOLUES
+- Pas de validation marché
+- Pas de statistiques
+- Pas de "bonne nouvelle"
+- Pas d'analyse rationnelle
+- Pas de promesse irréaliste
+- Pas de répétition brute des titres d'offres
 
-IMPORTANT
-- Ne saute aucune étape.
+STRUCTURE OBLIGATOIRE (8 ÉTAPES — À RESPECTER)
+1. Décrire sa situation actuelle avec ses propres mots (effet miroir)
+2. Le moment du déclic, sans héroïsation
+3. La première vente (produit principal sélectionné)
+4. Le changement d'identité ("tu n'essaies plus, tu es…")
+5. L'activation des autres offres et la montée des revenus jusqu'au potentiel calculé
+6. La nouvelle réalité de vie (temps, liberté, environnement)
+7. L'impact sur les élèves et la transmission
+8. Une conclusion qui ancre que ce futur commence maintenant
+
+⚠️ Ne saute AUCUNE étape.
 - Développe chaque étape avec assez de détails : pas un résumé.
-- Intègre naturellement les éléments personnels (réponses perso + objectifs).`;
+- Intègre naturellement les éléments personnels sans les lister.
+- Ce que l'utilisateur doit ressentir : "Ce futur est crédible", "Je me reconnais dedans", "Je suis prêt à passer à l'action".`;
 
 Deno.serve(async (req) => {
   try {
@@ -95,25 +113,37 @@ Deno.serve(async (req) => {
     const upsell1Title = finalizedOffer.upsell1?.title || '';
     const premiumTitle = finalizedOffer.upsell3?.title || '';
 
-    const userPrompt = `Écris l'histoire de transformation de ${name} qui lance son activité de formation en "${skill}".
+    const userPrompt = `DONNÉES OBLIGATOIRES À UTILISER
 
-Infos à intégrer naturellement :
 Prénom : ${name}
 Compétence : ${skill}
-Objectif : ${potentialRevenue}€/mois
+Potentiel de revenus calculé : ${potentialRevenue}€/mois
 
-Réponses personnelles (à réutiliser pour l'effet miroir et la nouvelle réalité) :
-${JSON.stringify(personalAnswers, null, 2)}
+Réponses d'onboarding dynamique : ${JSON.stringify(onboardingSummary, null, 2)}
 
-Objectifs (à réutiliser pour la vision et le style de vie) :
-${JSON.stringify(goalAnswers, null, 2)}
+Réponses statiques (objectifs, freins, projection) :
+Blocages actuels : ${JSON.stringify(personalAnswers, null, 2)}
+Style de vie souhaité : ${JSON.stringify(goalAnswers, null, 2)}
 
-Offres sélectionnées (à mentionner au bon moment, surtout la première vente) :
+Offres sélectionnées (ne PAS répéter les titres bruts, reformuler naturellement) :
 Produit Principal : ${mainProductTitle}
 Upsell : ${upsell1Title}
 Premium : ${premiumTitle}
 
-RAPPEL : Respecte les 8 étapes obligatoires dans l'ordre. Développe chaque étape, ne résume pas.`;
+MISSION
+Écris le récit de transformation de ${name}, en 8 étapes obligatoires :
+
+1. Situation actuelle avec ses propres mots (effet miroir des blocages)
+2. Moment du déclic, sans héroïsation
+3. Première vente du produit principal (moment précis, excitation)
+4. Changement d'identité ("tu n'essaies plus, tu es...")
+5. Activation des autres offres, montée progressive vers ${potentialRevenue}€/mois
+6. Nouvelle réalité de vie (temps, liberté, environnement basé sur ses objectifs)
+7. Impact sur les élèves et transmission
+8. Conclusion qui ancre que ce futur commence maintenant
+
+❌ Interdiction d'inventer ou de généraliser. Utilise UNIQUEMENT les données fournies.
+⚠️ Ne saute AUCUNE étape. Développe chaque étape avec détails concrets.`;
 
     console.log("OPENAI_CALL start", { fn: "generateFutureVision", sessionId, model: "gpt-4o-mini" });
 
@@ -123,8 +153,8 @@ RAPPEL : Respecte les 8 étapes obligatoires dans l'ordre. Développe chaque ét
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }
       ],
-      temperature: 0.5,
-      max_tokens: 800,
+      temperature: 0.7,
+      max_tokens: 1200,
       response_format: {
         type: "json_schema",
         json_schema: {

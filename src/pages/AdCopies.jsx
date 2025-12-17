@@ -1,22 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
-import { Sparkles, Loader2, Copy, Image as ImageIcon, Type, FileText, MousePointer, Lock } from 'lucide-react';
+import { Sparkles, Loader2, Lock, Type, Image as ImageIcon } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
-import { toast } from 'sonner';
+import { cn } from "@/lib/utils";
 import UpgradeModal from '@/components/paywall/UpgradeModal';
 
 export default function AdCopies() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [generatedAd, setGeneratedAd] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [hasPremium, setHasPremium] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -28,119 +23,34 @@ export default function AdCopies() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-
-      const profiles = await base44.entities.UserProfile.filter({ 
-        created_by: currentUser.email 
-      });
-      if (profiles.length > 0) {
-        setProfile(profiles[0]);
-        setHasPremium(profiles[0].has_paid === true);
-      }
-
-      const sessions = await base44.entities.Session.filter({ 
-        created_by: currentUser.email 
-      });
-      
-      if (sessions.length > 0) {
-        setSession(sessions[0]);
-        if (sessions[0].generated_ad_copy) {
-          setGeneratedAd(sessions[0].generated_ad_copy);
-        }
-      }
     } catch (error) {
       console.error('Error loading data:', error);
     }
   };
 
-  const handleGenerate = async (isRegenerate = false) => {
-    if (!hasPremium) {
-      setShowUpgradeModal(true);
-      return;
+  const adTypes = [
+    {
+      id: 'copies',
+      title: 'Ad Copies',
+      subtitle: 'Textes publicitaires',
+      description: 'Génère 5 titres, 5 descriptions et 5 CTAs',
+      icon: Type,
+      color: 'from-blue-500 to-cyan-500',
+    },
+    {
+      id: 'visuals',
+      title: 'Visuels',
+      subtitle: 'Images publicitaires',
+      description: 'Génère des concepts visuels pour tes ads',
+      icon: ImageIcon,
+      color: 'from-purple-500 to-pink-500',
     }
-
-    if (isRegenerate && !hasPremium) {
-      setShowUpgradeModal(true);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await base44.functions.invoke('generateAdCopy', {
-        profile,
-        session
-      });
-
-      setGeneratedAd(response.data);
-
-      // Save to session
-      await base44.entities.Session.update(session.id, {
-        generated_ad_copy: response.data
-      });
-
-      toast.success('Publicités générées avec succès !');
-    } catch (error) {
-      console.error('Error generating ad copy:', error);
-      toast.error('Erreur lors de la génération');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text);
-    toast.success('Copié dans le presse-papier !');
-  };
-
-  const handleCopyAll = (items) => {
-    const text = items.join('\n\n');
-    navigator.clipboard.writeText(text);
-    toast.success('Tous les éléments copiés !');
-  };
+  ];
 
   if (authLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-[#11112b]">
         <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
-      </div>
-    );
-  }
-
-  if (!hasPremium) {
-    return (
-      <div className="flex min-h-screen bg-[#11112b]">
-        <Sidebar currentPage="AdCopies" progress={0} />
-        
-        <div className="flex-1 ml-72">
-          <TopBar 
-            title="Publicité ADS" 
-            subtitle="Générez vos copies publicitaires"
-            user={user}
-          />
-          
-          <main className="p-8 flex items-center justify-center min-h-[calc(100vh-80px)]">
-            <div className="text-center max-w-md">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center mx-auto mb-6">
-                <Lock className="w-10 h-10 text-white" />
-              </div>
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Fonctionnalité Premium
-              </h2>
-              <p className="text-gray-400 mb-8">
-                Accédez à la génération de copies publicitaires professionnelles avec l'abonnement Premium
-              </p>
-              <GlowButton
-                onClick={() => setShowUpgradeModal(true)}
-                variant="primary"
-                size="lg"
-              >
-                Passer à Premium
-              </GlowButton>
-            </div>
-          </main>
-        </div>
-
-        <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
       </div>
     );
   }
@@ -152,7 +62,7 @@ export default function AdCopies() {
       <div className="flex-1 ml-72">
         <TopBar 
           title="Publicité ADS" 
-          subtitle="Génère tes copies publicitaires avec l'IA"
+          subtitle="Génère tes publicités avec l'IA"
           user={user}
         />
         
@@ -163,216 +73,69 @@ export default function AdCopies() {
             <div className="text-center mb-12 animate-fade-in">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1b1b33] rounded-full mb-4">
                 <Sparkles className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm text-gray-300">Copies générées par IA</span>
+                <span className="text-sm text-gray-300">Publicités générées par IA</span>
               </div>
               <h1 className="text-4xl font-bold text-white mb-3">
                 Tes Publicités
               </h1>
               <p className="text-gray-400 text-lg">
-                Génère une image et 5 variantes de copies pour tes publicités
+                Copies et visuels pour maximiser tes conversions
               </p>
             </div>
 
-            {/* Generate Button */}
-            {!generatedAd ? (
-              <div className="flex justify-center">
-                <GlowButton
-                  onClick={() => handleGenerate()}
-                  variant="primary"
-                  size="lg"
-                  loading={loading}
-                  className="px-12"
-                >
-                  {loading ? 'Génération en cours...' : 'Générer mes publicités'}
-                </GlowButton>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Visual Image */}
-                {generatedAd.image_url && (
-                  <div className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 animate-fade-in">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                          <ImageIcon className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-white">Visuel publicitaire</h3>
-                          <p className="text-sm text-gray-400">Image générée pour ta publicité</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="rounded-xl overflow-hidden">
-                      <img 
-                        src={generatedAd.image_url} 
-                        alt="Visuel publicitaire" 
-                        className="w-full h-auto"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Headlines */}
-                <div className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 animate-fade-in">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                        <Type className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-white">Titres (Headlines)</h3>
-                        <p className="text-sm text-gray-400">5 variantes de titres accrocheurs</p>
-                      </div>
-                    </div>
-                    <GlowButton
-                      onClick={() => handleCopyAll(generatedAd.headlines)}
-                      variant="ghost"
-                      size="sm"
-                      icon={Copy}
-                    >
-                      Copier tout
-                    </GlowButton>
-                  </div>
-                  <div className="space-y-3">
-                    {generatedAd.headlines?.map((headline, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-[#0f0f1f] rounded-xl hover:bg-[#1a1a2f] transition-colors group">
-                        <span className="text-[#61f7a2] font-bold text-sm">{index + 1}</span>
-                        <p className="flex-1 text-white">{headline}</p>
-                        <button
-                          onClick={() => handleCopy(headline)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#61f7a2]"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Subtitles */}
-                <div className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 animate-fade-in">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-                        <FileText className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-white">Sous-titres</h3>
-                        <p className="text-sm text-gray-400">5 variantes de sous-titres percutants</p>
-                      </div>
-                    </div>
-                    <GlowButton
-                      onClick={() => handleCopyAll(generatedAd.subtitles)}
-                      variant="ghost"
-                      size="sm"
-                      icon={Copy}
-                    >
-                      Copier tout
-                    </GlowButton>
-                  </div>
-                  <div className="space-y-3">
-                    {generatedAd.subtitles?.map((subtitle, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-[#0f0f1f] rounded-xl hover:bg-[#1a1a2f] transition-colors group">
-                        <span className="text-[#61f7a2] font-bold text-sm">{index + 1}</span>
-                        <p className="flex-1 text-white">{subtitle}</p>
-                        <button
-                          onClick={() => handleCopy(subtitle)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#61f7a2]"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Descriptions */}
-                <div className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 animate-fade-in">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
-                        <FileText className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-white">Descriptions</h3>
-                        <p className="text-sm text-gray-400">5 variantes de descriptions convaincantes</p>
-                      </div>
-                    </div>
-                    <GlowButton
-                      onClick={() => handleCopyAll(generatedAd.descriptions)}
-                      variant="ghost"
-                      size="sm"
-                      icon={Copy}
-                    >
-                      Copier tout
-                    </GlowButton>
-                  </div>
-                  <div className="space-y-3">
-                    {generatedAd.descriptions?.map((description, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-[#0f0f1f] rounded-xl hover:bg-[#1a1a2f] transition-colors group">
-                        <span className="text-[#61f7a2] font-bold text-sm">{index + 1}</span>
-                        <p className="flex-1 text-white">{description}</p>
-                        <button
-                          onClick={() => handleCopy(description)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#61f7a2]"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* CTAs */}
-                <div className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 animate-fade-in">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
-                        <MousePointer className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-white">Call-to-Action (CTA)</h3>
-                        <p className="text-sm text-gray-400">5 variantes de boutons d'action</p>
-                      </div>
-                    </div>
-                    <GlowButton
-                      onClick={() => handleCopyAll(generatedAd.ctas)}
-                      variant="ghost"
-                      size="sm"
-                      icon={Copy}
-                    >
-                      Copier tout
-                    </GlowButton>
-                  </div>
-                  <div className="space-y-3">
-                    {generatedAd.ctas?.map((cta, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-[#0f0f1f] rounded-xl hover:bg-[#1a1a2f] transition-colors group">
-                        <span className="text-[#61f7a2] font-bold text-sm">{index + 1}</span>
-                        <p className="flex-1 text-white font-semibold">{cta}</p>
-                        <button
-                          onClick={() => handleCopy(cta)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#61f7a2]"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Regenerate Button */}
-                <div className="flex justify-center pt-4">
-                  <GlowButton
-                    onClick={() => handleGenerate(true)}
-                    variant="secondary"
-                    size="default"
-                    loading={loading}
+            {/* Ad Type Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {adTypes.map((type, index) => {
+                const Icon = type.icon;
+                
+                return (
+                  <div
+                    key={type.id}
+                    className="relative"
+                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    Régénérer
-                  </GlowButton>
-                </div>
-              </div>
-            )}
+                    <div className={cn(
+                      "bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 animate-fade-in blur-content"
+                    )}>
+                      {/* Gradient Header */}
+                      <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-4`}>
+                        <Icon className="w-8 h-8 text-white" />
+                      </div>
+
+                      {/* Content */}
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        {type.title}
+                      </h3>
+                      <p className="text-[#61f7a2] text-sm mb-1">{type.subtitle}</p>
+                      <p className="text-gray-400 text-sm mb-6">{type.description}</p>
+
+                      {/* Fake content */}
+                      <div className="space-y-3">
+                        <div className="h-16 bg-[#0f0f1f] rounded-xl" />
+                        <div className="h-16 bg-[#0f0f1f] rounded-xl" />
+                        <div className="h-16 bg-[#0f0f1f] rounded-xl" />
+                      </div>
+                    </div>
+
+                    {/* Lock Overlay */}
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl">
+                      <Lock className="w-12 h-12 text-[#61f7a2] mb-4" />
+                      <h4 className="text-xl font-bold text-white mb-2">Premium</h4>
+                      <p className="text-gray-400 text-sm mb-4 text-center px-6">
+                        Débloque cette fonctionnalité
+                      </p>
+                      <GlowButton
+                        onClick={() => setShowUpgradeModal(true)}
+                        variant="primary"
+                        size="sm"
+                      >
+                        Passer à Premium
+                      </GlowButton>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </main>
       </div>

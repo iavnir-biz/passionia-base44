@@ -87,7 +87,10 @@ function PhaseCard({ number, title, objective, plan, result, delay = 0 }) {
 export default function OfferConcretement() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [planDeRoute, setPlanDeRoute] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -97,10 +100,38 @@ export default function OfferConcretement() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      if (currentUser.sessionId) {
+        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+        if (sessions.length > 0) {
+          const userSession = sessions[0];
+          setSession(userSession);
+
+          if (userSession.plan_de_route) {
+            setPlanDeRoute(userSession.plan_de_route);
+          } else {
+            await generatePlanDeRoute(currentUser.sessionId);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const generatePlanDeRoute = async (sessionId) => {
+    setIsGenerating(true);
+    try {
+      const { data } = await base44.functions.invoke('generatePlanDeRoute', { sessionId });
+      if (data.success) {
+        setPlanDeRoute(data.planDeRoute);
+      }
+    } catch (error) {
+      console.error('Error generating plan de route:', error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -114,75 +145,40 @@ export default function OfferConcretement() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isGenerating) {
     return (
-      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+      <div className="min-h-screen bg-[#11112b] flex flex-col items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mb-4" />
+        <p className="text-gray-400">{isGenerating ? 'Nova prépare ton plan personnalisé...' : 'Chargement...'}</p>
       </div>
     );
   }
 
-  const offer = user?.offer || {};
-  const productPrincipal = offer.product_principal || {};
-  const petitExtra = offer.petit_extra || {};
-  const offreSuperieure = offer.offre_superieure || {};
-  const offrePremium = offer.offre_premium || {};
-  
-  const coreSkill = user?.coreSkill || 'ta compétence';
+  if (!planDeRoute) {
+    return (
+      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">Impossible de charger le plan de route</p>
+          <GlowButton onClick={() => window.location.reload()}>
+            Réessayer
+          </GlowButton>
+        </div>
+      </div>
+    );
+  }
 
   const phases = [
-    {
-      number: 1,
-      title: "Validation : Ta Première Vente",
-      objective: `Valider ton offre en vendant ton premier produit : ${productPrincipal.title || 'ton produit principal'} au prix de ${productPrincipal.price || '—'}. C'est la preuve ultime que ton offre intéresse des vrais gens.`,
-      plan: `Tu vas créer une offre simple et irrésistible autour de ${coreSkill}. On te guide pour identifier les bons canaux (réseaux sociaux, groupes, contacts directs) et présenter ton offre de manière convaincante. L'objectif : décrocher ta première vente rapidement pour valider le concept.`,
-      result: "Ta première vente est réalisée. Tu sais que tu peux le faire. Tu as un début de business validé par le marché."
-    },
-    {
-      number: 2,
-      title: "Création : La Construction",
-      objective: `Créer et livrer ton ${productPrincipal.title || 'produit principal'} de qualité qui apporte une vraie transformation à ton premier client.`,
-      plan: `Grâce à notre système IA et aux templates fournis, tu vas structurer ton contenu étape par étape. Que ce soit une formation vidéo, un ebook, ou un atelier, on te donne la méthode pour créer rapidement sans te perdre. Tu livres ton premier client et récoltes son témoignage.`,
-      result: "Ton produit est prêt et ton premier client est satisfait. Tu as la légitimité pour continuer et faire grandir ton activité."
-    },
-    {
-      number: 3,
-      title: "Automatisation : La Machine",
-      objective: "Mettre en place un système simple (page de vente + emails automatiques) pour vendre tes offres 24/7, même quand tu dors.",
-      plan: `On te fournit tous les textes (page de vente, emails de suivi, offres complémentaires) générés par IA et adaptés à ton offre. Tu n'as qu'à les intégrer dans les outils gratuits ou peu coûteux qu'on te recommande. Ton système devient autonome et peut accueillir des clients automatiquement.`,
-      result: "Ton système tourne même quand tu n'es pas là. Tes offres sont prêtes à accueillir des clients automatiquement."
-    },
-    {
-      number: 4,
-      title: "Croissance : L'Expansion",
-      objective: `Attirer davantage de clients pour vendre ton ${offreSuperieure.title || 'offre supérieure'} et ton ${offrePremium.title || 'offre premium'}, et atteindre tes objectifs de revenus.`,
-      plan: `Avec les revenus générés par ton produit principal, tu peux maintenant investir intelligemment dans ta croissance : publicités ciblées, création de contenu régulier, témoignages clients. On te montre comment réinvestir une partie de tes gains pour multiplier ton impact et tes revenus.`,
-      result: "Tu sais maintenant faire grandir ton activité et atteindre tes objectifs financiers. Ton business devient pérenne et scalable."
-    }
+    { number: 1, ...planDeRoute.phase1 },
+    { number: 2, ...planDeRoute.phase2 },
+    { number: 3, ...planDeRoute.phase3 },
+    { number: 4, ...planDeRoute.phase4 }
   ];
 
-  const advantages = [
-    {
-      icon: Rocket,
-      title: "Tu vends AVANT de créer",
-      description: "Valide ton idée avant d'investir du temps. Pas de risque de créer dans le vide."
-    },
-    {
-      icon: DollarSign,
-      title: "Tes pubs sont autofinancées",
-      description: "Les revenus du début financent ta croissance. Pas besoin de gros budget initial."
-    },
-    {
-      icon: Shield,
-      title: "Fini le syndrome de l'imposteur",
-      description: "Ta première vente prouve que les gens veulent ce que tu proposes."
-    },
-    {
-      icon: Sparkles,
-      title: "Tout le travail est fait pour toi",
-      description: "IA + templates + méthode éprouvée. Tu n'as qu'à suivre le plan."
-    }
-  ];
+  const advantageIcons = [Rocket, DollarSign, Shield, Sparkles];
+  const advantages = planDeRoute.advantages.map((adv, idx) => ({
+    icon: advantageIcons[idx] || Sparkles,
+    ...adv
+  }));
 
   return (
     <div className="min-h-screen bg-[#11112b]">
@@ -254,9 +250,7 @@ export default function OfferConcretement() {
             className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-8"
           >
             <p className="text-gray-300 leading-relaxed text-center">
-              Construire ton activité en ligne n'est pas un sprint, c'est un parcours intelligent.
-              On a découpé le chemin en <strong className="text-white">4 grandes phases logiques</strong>. 
-              Tu n'as qu'à suivre le plan, on s'occupe de te guider à chaque étape.
+              {planDeRoute.introduction}
             </p>
           </motion.div>
 
@@ -271,7 +265,7 @@ export default function OfferConcretement() {
               🗺️ Ton Parcours Guidé
             </h2>
             <p className="text-gray-400">
-              Adapté à ton savoir-faire : <span className="text-[#61f7a2] font-medium">{coreSkill}</span>
+              {planDeRoute.parcoursGuide}
             </p>
           </motion.div>
 
@@ -332,9 +326,8 @@ export default function OfferConcretement() {
             <h2 className="text-2xl font-bold text-white mb-4">
               💡 Tu comprends maintenant ?
             </h2>
-            <p className="text-gray-300 leading-relaxed text-lg mb-6">
-              Ce n'est pas compliqué. C'est juste un chemin à suivre.<br />
-              On te donne le plan, les outils et on te guide à chaque phase.
+            <p className="text-gray-300 leading-relaxed text-lg">
+              {planDeRoute.conclusion}
             </p>
           </motion.div>
 

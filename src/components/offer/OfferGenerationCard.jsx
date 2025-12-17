@@ -6,12 +6,52 @@ import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 import jsPDF from 'jspdf';
 
+const colorSchemes = {
+  low: {
+    bg: 'from-blue-50 to-blue-100',
+    border: 'border-blue-200',
+    text: 'text-blue-600',
+    badge: 'bg-blue-500',
+    cardBg: 'bg-gradient-to-br from-blue-50 to-blue-100'
+  },
+  bump: {
+    bg: 'from-green-50 to-green-100',
+    border: 'border-green-200',
+    text: 'text-green-600',
+    badge: 'bg-green-500',
+    cardBg: 'bg-gradient-to-br from-green-50 to-green-100'
+  },
+  mid: {
+    bg: 'from-purple-50 to-purple-100',
+    border: 'border-purple-200',
+    text: 'text-purple-600',
+    badge: 'bg-purple-500',
+    cardBg: 'bg-gradient-to-br from-purple-50 to-purple-100'
+  },
+  high: {
+    bg: 'from-yellow-50 to-amber-100',
+    border: 'border-yellow-200',
+    text: 'text-yellow-600',
+    badge: 'bg-yellow-500',
+    cardBg: 'bg-gradient-to-br from-yellow-50 to-amber-100'
+  },
+  complete: {
+    bg: 'from-gray-50 to-gray-100',
+    border: 'border-gray-200',
+    text: 'text-gray-600',
+    badge: 'bg-gray-500',
+    cardBg: 'bg-gradient-to-br from-gray-50 to-gray-100'
+  }
+};
+
 export default function OfferGenerationCard({ offer, user, sessionId, onGenerated, delay = 0 }) {
   const [version, setVersion] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedOffer, setGeneratedOffer] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [copied, setCopied] = useState(false);
+  
+  const scheme = colorSchemes[offer.id] || colorSchemes.complete;
 
   useEffect(() => {
     loadExistingOffer();

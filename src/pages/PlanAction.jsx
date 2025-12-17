@@ -624,14 +624,33 @@ export default function PlanAction() {
               {content.finalCTA.subtitle}
             </p>
             
-            <GlowButton 
-              onClick={handleAccessDashboard} 
-              size="lg" 
-              className="px-12 text-lg"
-            >
-              Accéder à mon espace membre
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
+            <div className="flex justify-center">
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  boxShadow: [
+                    '0 0 0px rgba(97, 247, 162, 0.5)',
+                    '0 0 30px rgba(97, 247, 162, 0.8)',
+                    '0 0 0px rgba(97, 247, 162, 0.5)'
+                  ]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="rounded-xl"
+              >
+                <GlowButton 
+                  onClick={handleAccessDashboard} 
+                  size="lg" 
+                  className="px-12 text-lg shadow-2xl"
+                >
+                  Accéder à mon espace membre
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </GlowButton>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
       </div>

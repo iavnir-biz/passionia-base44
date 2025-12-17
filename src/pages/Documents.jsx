@@ -5,14 +5,14 @@ import { motion } from "framer-motion";
 import { 
   FileText, 
   Package, 
-  DollarSign, 
   MessageSquare, 
   Target, 
   Users,
   Search,
   Sparkles,
   Download,
-  Eye
+  Eye,
+  Mail
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -25,37 +25,29 @@ const categories = [
     id: 'offre', 
     name: 'Offre', 
     icon: Package,
-    documents: [
-      { subcategory: 'Offre complète', title: 'Ton offre structurée' },
-      { subcategory: 'Low ticket', title: 'Produit d\'appel' },
-      { subcategory: 'Order bump', title: 'Vente additionnelle' },
-      { subcategory: 'Mid ticket', title: 'Offre intermédiaire' },
-      { subcategory: 'High ticket', title: 'Offre premium' },
-    ]
-  },
-  { 
-    id: 'pricing', 
-    name: 'Pricing', 
-    icon: DollarSign,
-    documents: [
-      { subcategory: 'Grille tarifaire', title: 'Structure de prix' },
-      { subcategory: 'Promesse de valeur', title: 'Proposition de valeur' },
-    ]
+    documents: []
   },
   { 
     id: 'messages', 
-    name: 'Messages & Copies', 
+    name: 'Messages de vente', 
     icon: MessageSquare,
     documents: [
-      { subcategory: 'Page de vente', title: 'Landing page complète' },
-      { subcategory: 'Email 1', title: 'Email de bienvenue' },
-      { subcategory: 'Email 2', title: 'Email de valeur' },
-      { subcategory: 'Email 3', title: 'Email témoignage' },
-      { subcategory: 'Email 4', title: 'Email urgence' },
-      { subcategory: 'Email 5', title: 'Email dernière chance' },
-      { subcategory: 'DM scripts', title: 'Scripts de prospection' },
-      { subcategory: 'Posts & Reels', title: 'Contenu réseaux sociaux' },
-      { subcategory: 'Angles marketing', title: 'Hooks et angles' },
+      { subcategory: 'Identifier le problème', title: 'Message 1 : Le Diagnostic' },
+      { subcategory: 'Créer la connexion', title: 'Message 2 : L\'Empathie' },
+      { subcategory: 'Présenter l\'offre', title: 'Message 3 : La Solution' },
+      { subcategory: 'Appel à l\'action', title: 'Message 4 : L\'Achat' },
+    ]
+  },
+  { 
+    id: 'emails', 
+    name: 'Emails Marketing', 
+    icon: Mail,
+    documents: [
+      { subcategory: 'Premier contact', title: 'Email 1 : Bienvenue' },
+      { subcategory: 'Contenu gratuit', title: 'Email 2 : Valeur' },
+      { subcategory: 'Témoignage/Résultat', title: 'Email 3 : Transformation' },
+      { subcategory: 'Présentation produit', title: 'Email 4 : Offre' },
+      { subcategory: 'Dernier appel', title: 'Email 5 : Urgence' },
     ]
   },
   { 

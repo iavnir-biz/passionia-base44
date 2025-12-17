@@ -31,12 +31,6 @@ export default function NovaChat() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      
-      // Load user profile to check payment status
-      const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
-      if (profiles.length > 0) {
-        setUser({ ...currentUser, has_paid: profiles[0].has_paid });
-      }
     } catch (error) {
       console.error('Error loading user:', error);
     }
@@ -78,7 +72,8 @@ export default function NovaChat() {
     );
   }
 
-  const showPaywall = user && !user.has_paid;
+  // Nova est réservé à l'abonnement ultime uniquement
+  const showPaywall = true;
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
@@ -218,20 +213,20 @@ export default function NovaChat() {
                   <Sparkles className="w-10 h-10 text-[#61f7a2]" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Débloque Nova IA
+                  Nova IA - Réservé à l'Abonnement Ultime
                 </h2>
                 <p className="text-gray-600 text-lg mb-8">
-                  Accède au coaching IA personnalisé illimité, à tous les templates, stratégies et outils pour transformer ton savoir-faire en business rentable.
+                  Le coaching IA personnalisé illimité avec Nova est exclusivement disponible dans l'abonnement premium ultime. Passe au niveau supérieur pour débloquer cette fonctionnalité.
                 </p>
                 <Button
                   onClick={() => window.location.href = '/plan-action'}
                   className="bg-[#61f7a2] hover:bg-[#4de88f] text-white text-lg font-semibold px-8 py-6 h-auto"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Débloquer maintenant
+                  Découvrir l'abonnement ultime
                 </Button>
                 <p className="text-gray-500 text-sm mt-4">
-                  Rejoins les créateurs qui transforment leur passion en revenus
+                  Réservé aux membres de l'abonnement premium
                 </p>
               </div>
             </motion.div>

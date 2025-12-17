@@ -16,13 +16,17 @@ Tu ne dois JAMAIS orienter l'offre comme une vente de service. Tout doit être f
 
 Style & clarté :
 - Français naturel, simple, sans anglicismes inutiles.
-- Titres percutants, orientés bénéfices, "sexy" (curiosité + résultat + délai).
-- Outcome = transformation profonde (capacité + émotion + nouvel état).
+- Titres "MARQUE" percutants (style ancien générateur) : OBLIGATOIREMENT 1 mécanisme + 1 bénéfice (+ idéalement horizon temps).
+  Exemples : "Le Protocole 7 Jours pour...", "La Méthode Anti-...", "Le Système...", "Le Blueprint...", "La Formule..."
+  INTERDIT : titres génériques seuls type "Guide pratique", "Plan d'action", "Séminaire de X", "Coaching personnalisé"
+- Outcome ultra concret : commence par "Tu sais...", "Tu obtiens...", "Tu es capable de...", minimum 40 caractères.
+- Description avec livrables ULTRA PRÉCIS : DOIT contenir des chiffres (nombre de vidéos, durée, fréquence, pages, templates).
+- Ne JAMAIS recopier mot pour mot la formulation brute de la compétence : toujours reformuler naturellement.
 - Pas de downsell.
-- Extrême précision sur les livrables (nombre de vidéos, durée, fréquence, etc.).
 
 Obligation : respecter les préférences de format de l'utilisateur.
 Si plusieurs formats sont possibles, privilégie ce que l'utilisateur a coché.
+Utilise les freins et objectifs pour personnaliser les titres et outcomes.
 
 ÉTAPE 1 — 3 idées d'offres validées avec P.S.S.O. (mainOfferIdeas)
 Tu dois produire 3 offres distinctes. Pour chacune :
@@ -95,6 +99,7 @@ const ALLOWED_FORMATS = {
 
 function validateOffer(offer) {
   const errors = [];
+  const genericTitles = ['Guide pratique', 'Plan d\'action', 'Séminaire', 'Coaching personnalisé', 'Formation complète'];
 
   // Validate mainOfferIdeas
   if (!offer.mainOfferIdeas || !Array.isArray(offer.mainOfferIdeas) || offer.mainOfferIdeas.length !== 3) {
@@ -137,6 +142,20 @@ function validateOffer(offer) {
         // Check description has numbers (livrables précis)
         if (item.description && !/\d/.test(item.description)) {
           errors.push(`${choice}[${itemIdx}] description manque de précision (pas de chiffres pour livrables)`);
+        }
+
+        // Check title is not generic
+        const isGenericOnly = genericTitles.some(generic => 
+          item.title.toLowerCase().includes(generic.toLowerCase()) && 
+          item.title.split(' ').length <= 3
+        );
+        if (isGenericOnly) {
+          errors.push(`${choice}[${itemIdx}] titre trop générique: "${item.title}". Ajoute un mécanisme différenciant.`);
+        }
+
+        // Check outcome length
+        if (item.outcome && item.outcome.length < 40) {
+          errors.push(`${choice}[${itemIdx}] outcome trop court (${item.outcome.length} chars). Minimum 40 caractères requis.`);
         }
       });
     }
@@ -207,8 +226,16 @@ SUMMARY ONBOARDING (données structurées issues des 11 questions IA) :
 HISTORIQUE COMPLET DES Q/R (brut) :
 ${historyText || 'Non disponible'}
 
-DONNÉES STATIQUES (objectifs, revenus, etc.) :
-${JSON.stringify(onboardingFull, null, 2)}
+DONNÉES STATIQUES (objectifs, revenus, freins, etc.) :
+Objectif revenus : ${onboardingFull.targetIncome || 'non spécifié'}
+Freins principaux : ${JSON.stringify(onboardingFull.obstacles || [])}
+Motivation : ${onboardingFull.readiness || 'non spécifié'}
+Autres données : ${JSON.stringify(onboardingFull, null, 2)}
+
+INSTRUCTIONS CRITIQUES POUR LES TITRES :
+- Utilise les freins pour personnaliser (ex: "pas le temps" → "Méthode 10 min/jour", "peur du regard" → "Sans te montrer")
+- Reformule naturellement la compétence, ne la recopie JAMAIS mot pour mot
+- Ajoute TOUJOURS un mécanisme différenciant (Protocole, Méthode, Système, Blueprint, Formule...)
 
 MISSION :
 Génère une "Full Stack Offer" complète selon la méthode P.S.S.O.
@@ -249,7 +276,7 @@ Base-toi sur le summary pour créer une cohérence parfaite entre problème, qui
         });
         messages.push({
           role: "user",
-          content: "Ton JSON ne respectait pas les contraintes. Regénère avec : prix EXACTEMENT dans les listes, 2 items par niveau, descriptions avec chiffres précis."
+          content: "Ton JSON ne respectait pas les contraintes. Regénère avec : prix EXACTEMENT dans les listes, 2 items par niveau, descriptions avec chiffres précis, titres MARQUE avec mécanisme (pas génériques), outcomes de 40+ caractères minimum."
         });
       }
 

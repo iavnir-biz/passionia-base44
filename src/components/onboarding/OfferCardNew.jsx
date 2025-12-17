@@ -153,7 +153,7 @@ export default function OfferCardNew({
         >
           <p className="text-xs text-gray-600 mb-2 uppercase tracking-wide font-semibold">Résultat attendu :</p>
           <p className="text-sm text-gray-700 leading-relaxed font-medium">
-            {offer.result}
+            {offer.outcome || offer.result || "Transformation garantie"}
           </p>
         </motion.div>
       </div>

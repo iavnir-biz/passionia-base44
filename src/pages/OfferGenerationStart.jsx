@@ -49,15 +49,40 @@ export default function OfferGenerationStart() {
       });
       
       if (!sessions || sessions.length === 0) {
-        throw new Error('Session not found');
+        console.error('Session not found, redirecting to onboarding');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
       }
       
-      const sessionId = sessions[0].id;
+      const session = sessions[0];
+      const sessionId = session.id;
+
+      // Vérifier que toutes les données nécessaires sont présentes
+      const missingData = [];
+      if (!user.firstName) missingData.push('firstName');
+      if (!session.skill && !session.onboarding_summary?.who_to_teach) missingData.push('skill');
+      if (!session.onboarding_history || session.onboarding_history.length < 11) {
+        missingData.push(`onboarding_history (${session.onboarding_history?.length || 0}/11 questions)`);
+      }
+      if (!session.onboarding_full || Object.keys(session.onboarding_full).length === 0) {
+        missingData.push('réponses statiques post-transition');
+      }
+
+      if (missingData.length > 0) {
+        console.error('Données manquantes pour générer l\'offre:', missingData);
+        // Rediriger vers l'onboarding dynamic pour compléter
+        navigate(createPageUrl('OnboardingDynamic'));
+        return;
+      }
       
       // Generate Full Stack Offer (P.S.S.O.)
-      await base44.functions.invoke('generateFullStackOffer', {
+      const response = await base44.functions.invoke('generateFullStackOffer', {
         sessionId
       });
+
+      if (response.data?.error) {
+        console.error('Erreur génération offre:', response.data.error);
+      }
       
       // Navigate to offer selection pages
       navigate(createPageUrl('OfferProductPrincipal'));

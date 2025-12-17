@@ -224,16 +224,10 @@ Sois concis mais complet. Format markdown.`,
   
   const offerCards = [
     {
-      id: 'high',
-      title: 'Offre premium',
-      subtitle: 'High ticket',
-      type: 'offre_premium'
-    },
-    {
-      id: 'mid',
-      title: 'Offre intermédiaire',
-      subtitle: 'Mid ticket',
-      type: 'offre_superieure'
+      id: 'low',
+      title: 'Produit d\'appel',
+      subtitle: 'Low ticket',
+      type: 'product_principal'
     },
     {
       id: 'bump',
@@ -242,16 +236,16 @@ Sois concis mais complet. Format markdown.`,
       type: 'petit_extra'
     },
     {
-      id: 'low',
-      title: 'Produit d\'appel',
-      subtitle: 'Low ticket',
-      type: 'product_principal'
+      id: 'mid',
+      title: 'Offre intermédiaire',
+      subtitle: 'Mid ticket',
+      type: 'offre_superieure'
     },
     {
-      id: 'complete',
-      title: 'Ton offre structurée',
-      subtitle: 'Offre complète',
-      type: 'complete'
+      id: 'high',
+      title: 'Offre premium',
+      subtitle: 'High ticket',
+      type: 'offre_premium'
     }
   ];
   
@@ -311,11 +305,11 @@ Sois concis mais complet. Format markdown.`,
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">Tes offres</h3>
                 <span className="text-gray-600 text-sm">
-                  {generatedOffersCount}/5 générées
+                  {generatedOffersCount}/4 générées
                 </span>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {offerCards.map((card, index) => (
                   <OfferGenerationCard
                     key={card.id}
@@ -348,7 +342,7 @@ Sois concis mais complet. Format markdown.`,
                       <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
                       {category.id === 'offre' ? (
                         <span className="text-gray-600 text-sm">
-                          {generatedOffersCount}/5 générées
+                          {generatedOffersCount}/4 générées
                         </span>
                       ) : (
                         <span className="text-gray-600 text-sm">
@@ -358,7 +352,7 @@ Sois concis mais complet. Format markdown.`,
                     </div>
                     
                     {category.id === 'offre' ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {offerCards.map((card, index) => (
                           <OfferGenerationCard
                             key={card.id}

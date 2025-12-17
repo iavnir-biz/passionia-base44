@@ -65,6 +65,8 @@ export default function EmailsMarketing() {
   const [previewEmail, setPreviewEmail] = useState(null);
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [hasPremium, setHasPremium] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -79,14 +81,27 @@ export default function EmailsMarketing() {
         base44.entities.Session.filter({ created_by: user.email })
       ]);
 
-      if (profileRes.length > 0) setProfile(profileRes[0]);
-      if (sessionRes.length > 0) setSession(sessionRes[0]);
+      if (profileRes.length > 0) {
+        setProfile(profileRes[0]);
+        setHasPremium(profileRes[0].has_paid === true);
+      }
+      if (sessionRes.length > 0) {
+        setSession(sessionRes[0]);
+        if (sessionRes[0].generated_marketing_emails) {
+          setGeneratedEmails(sessionRes[0].generated_marketing_emails);
+        }
+      }
     } catch (error) {
       console.error('Error loading user data:', error);
     }
   };
 
-  const handleGenerate = async (emailType) => {
+  const handleGenerate = async (emailType, isRegenerate = false) => {
+    if (isRegenerate && !hasPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     if (!profile || !session) {
       toast.error('Profil incomplet');
       return;
@@ -100,10 +115,16 @@ export default function EmailsMarketing() {
         session
       });
 
-      setGeneratedEmails(prev => ({
-        ...prev,
+      const updatedEmails = {
+        ...generatedEmails,
         [emailType]: response.data.email
-      }));
+      };
+      setGeneratedEmails(updatedEmails);
+
+      // Save to session
+      await base44.entities.Session.update(session.id, {
+        generated_marketing_emails: updatedEmails
+      });
 
       toast.success('Email généré avec succès !');
     } catch (error) {
@@ -228,13 +249,14 @@ export default function EmailsMarketing() {
                             </GlowButton>
                           </div>
                           <GlowButton
-                            onClick={() => handleGenerate(email.id)}
+                            onClick={() => handleGenerate(email.id, true)}
                             variant="secondary"
                             size="sm"
                             className="w-full"
                             disabled={isGenerating}
+                            icon={!hasPremium ? Lock : undefined}
                           >
-                            Régénérer
+                            {!hasPremium ? 'Premium' : 'Régénérer'}
                           </GlowButton>
                         </div>
                       ) : (

@@ -45,6 +45,7 @@ import OfferTaVieFuture from './pages/OfferTaVieFuture';
 import OfferConcretement from './pages/OfferConcretement';
 import OnboardingDynamic from './pages/OnboardingDynamic';
 import OnboardingTransition from './pages/OnboardingTransition';
+import NovaChat from './pages/NovaChat';
 
 
 export const PAGES = {
@@ -95,6 +96,7 @@ export const PAGES = {
     "OfferConcretement": OfferConcretement,
     "OnboardingDynamic": OnboardingDynamic,
     "OnboardingTransition": OnboardingTransition,
+    "NovaChat": NovaChat,
 }
 
 export const pagesConfig = {

@@ -241,14 +241,14 @@ export default function Dashboard() {
                     <Link
                       key={action.id}
                       to={createPageUrl(action.page)}
-                      className="block bg-[#1b1b33] border border-[#2a2a45] rounded-xl p-4 hover:border-[#61f7a2]/50 transition-all group"
+                      className="block bg-white border border-gray-200 rounded-xl p-4 hover:border-[#61f7a2]/50 transition-all group"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center">
                           <Icon className="w-5 h-5 text-[#61f7a2]" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-white font-medium">{action.title}</p>
+                          <p className="text-gray-900 font-medium">{action.title}</p>
                           {action.generated ? (
                             <div className="flex items-center gap-1 mt-1">
                               <CheckCircle className="w-3 h-3 text-[#61f7a2]" />

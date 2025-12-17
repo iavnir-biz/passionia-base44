@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
     // Récupérer l'URL de l'app depuis les headers
     const referer = req.headers.get('referer') || '';
-    const origin = referer ? new URL(referer).origin : 'https://passionprofit.base44.run';
+    const origin = referer ? new URL(referer).origin : 'https://6930250f9337193d59c1dcf5.base44.app';
     const successUrl = `${origin}/PlanAction?payment=success`;
     const cancelUrl = `${origin}/PlanAction`;
 

@@ -294,7 +294,7 @@ export default function Welcome() {
             </div>
 
             {/* Right - Legal Links */}
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-600">
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-600 whitespace-nowrap overflow-x-auto">
               <a href="#" className="hover:text-gray-900 transition-colors">Réglementation AI Act</a>
               <span className="text-gray-300">•</span>
               <a href="#" className="hover:text-gray-900 transition-colors">Protection des données</a>

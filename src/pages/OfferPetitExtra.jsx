@@ -31,11 +31,13 @@ export default function OfferPetitExtra() {
           const userSession = sessions[0];
           setSession(userSession);
           
-          // Récupérer les offres depuis offer_draft
-          if (userSession.offer_draft?.offerChoices?.orderBump1Choices) {
-            const choices = userSession.offer_draft.offerChoices.orderBump1Choices.map(choice => ({
+          // Récupérer les offres depuis offer_generation
+          if (userSession.offer_generation?.offerChoices?.orderBump1Choices) {
+            const choices = userSession.offer_generation.offerChoices.orderBump1Choices.map((choice, idx) => ({
               ...choice,
+              id: choice.id || `bump_${idx}`,
               icon: Layers,
+              badge: choice.productType || choice.badge || 'Bonus',
               result: choice.outcome
             }));
             setOffers(choices);

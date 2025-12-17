@@ -34,11 +34,13 @@ export default function OfferProductPrincipal() {
           const userSession = sessions[0];
           setSession(userSession);
           
-          // Récupérer les offres depuis offer_draft
-          if (userSession.offer_draft?.offerChoices?.mainProductChoices) {
-            const choices = userSession.offer_draft.offerChoices.mainProductChoices.map(choice => ({
+          // Récupérer les offres depuis offer_generation (Full Stack Offer)
+          if (userSession.offer_generation?.offerChoices?.mainProductChoices) {
+            const choices = userSession.offer_generation.offerChoices.mainProductChoices.map((choice, idx) => ({
               ...choice,
-              icon: Video
+              id: choice.id || `main_${idx}`,
+              icon: Video,
+              badge: choice.productType || choice.badge || 'Formation'
             }));
             setOffers(choices);
           }

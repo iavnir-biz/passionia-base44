@@ -31,11 +31,13 @@ export default function OfferPremium() {
           const userSession = sessions[0];
           setSession(userSession);
           
-          // Récupérer les offres depuis offer_draft
-          if (userSession.offer_draft?.offerChoices?.upsell3Choices) {
-            const choices = userSession.offer_draft.offerChoices.upsell3Choices.map(choice => ({
+          // Récupérer les offres depuis offer_generation
+          if (userSession.offer_generation?.offerChoices?.upsell3Choices) {
+            const choices = userSession.offer_generation.offerChoices.upsell3Choices.map((choice, idx) => ({
               ...choice,
+              id: choice.id || `premium_${idx}`,
               icon: Star,
+              badge: choice.productType || choice.badge || 'Premium',
               result: choice.outcome
             }));
             setOffers(choices);

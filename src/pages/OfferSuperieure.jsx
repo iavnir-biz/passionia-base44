@@ -31,11 +31,13 @@ export default function OfferSuperieure() {
           const userSession = sessions[0];
           setSession(userSession);
           
-          // Récupérer les offres depuis offer_draft
-          if (userSession.offer_draft?.offerChoices?.upsell1Choices) {
-            const choices = userSession.offer_draft.offerChoices.upsell1Choices.map(choice => ({
+          // Récupérer les offres depuis offer_generation
+          if (userSession.offer_generation?.offerChoices?.upsell1Choices) {
+            const choices = userSession.offer_generation.offerChoices.upsell1Choices.map((choice, idx) => ({
               ...choice,
+              id: choice.id || `upsell_${idx}`,
               icon: Presentation,
+              badge: choice.productType || choice.badge || 'Formation',
               result: choice.outcome
             }));
             setOffers(choices);

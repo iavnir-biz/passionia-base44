@@ -36,18 +36,10 @@ export default function OfferGenerationStart() {
       
       const sessionId = sessions[0].id;
       
-      // Sync User onboarding data to Session first
-      await base44.functions.invoke('syncOnboardingToSession', {
+      // Generate Full Stack Offer (P.S.S.O.)
+      await base44.functions.invoke('generateFullStackOffer', {
         sessionId
       });
-      
-      // Generate offer from onboarding data
-      await base44.functions.invoke('generateOfferFromOnboarding', {
-        sessionId
-      });
-      
-      // Mark onboarding as completed
-      await base44.auth.updateMe({ onboardingCompleted: true });
       
       // Navigate to offer selection pages
       navigate(createPageUrl('OfferProductPrincipal'));

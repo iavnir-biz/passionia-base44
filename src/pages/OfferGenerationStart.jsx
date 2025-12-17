@@ -8,6 +8,16 @@ import { Brain, Sparkles, Zap } from 'lucide-react';
 export default function OfferGenerationStart() {
   const navigate = useNavigate();
   const [dots, setDots] = useState(0);
+  const [currentMessage, setCurrentMessage] = useState(0);
+
+  const messages = [
+    "J'analyse ton marché",
+    "Je structure tes offres",
+    "Je fixe tes prix",
+    "Je valide la demande",
+    "Je projette ton potentiel de revenus",
+    "J'élabore ton plan d'action personnalisé"
+  ];
 
   useEffect(() => {
     const dotsInterval = setInterval(() => {
@@ -21,18 +31,7 @@ export default function OfferGenerationStart() {
     };
   }, []);
 
-  const messages = [
-    "J'analyse ton marché",
-    "Je structure tes offres",
-    "Je fixe tes prix",
-    "Je valide la demande",
-    "Je projette ton potentiel de revenus",
-    "J'élabore ton plan d'action personnalisé"
-  ];
-
-  const [currentMessage, setCurrentMessage] = React.useState(0);
-
-  React.useEffect(() => {
+  useEffect(() => {
     const messageInterval = setInterval(() => {
       setCurrentMessage(prev => (prev + 1) % messages.length);
     }, 2000);
@@ -67,25 +66,6 @@ export default function OfferGenerationStart() {
       navigate(createPageUrl('OfferProductPrincipal'));
     }
   };
-
-  const messages = [
-    "J'analyse ton marché",
-    "Je structure tes offres",
-    "Je fixe tes prix",
-    "Je valide la demande",
-    "Je projette ton potentiel de revenus",
-    "J'élabore ton plan d'action personnalisé"
-  ];
-
-  const [currentMessage, setCurrentMessage] = useState(0);
-
-  useEffect(() => {
-    const messageInterval = setInterval(() => {
-      setCurrentMessage(prev => (prev + 1) % messages.length);
-    }, 2000);
-
-    return () => clearInterval(messageInterval);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">

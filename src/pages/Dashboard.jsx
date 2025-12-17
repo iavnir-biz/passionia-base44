@@ -8,28 +8,30 @@ import {
   Target, 
   Calendar, 
   FileText, 
-  TrendingUp,
   Sparkles,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Lock,
+  User,
+  MessageCircle,
+  Send,
+  Package,
+  Users,
+  Video
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import ProgressBar from '@/components/ui/ProgressBar';
-import ActionOfTheDayCard from '@/components/dashboard/ActionOfTheDayCard';
-import PlanStepCard from '@/components/dashboard/PlanStepCard';
 import GlowButton from '@/components/ui/GlowButton';
-import ChatBubble from '@/components/chat/ChatBubble';
 
-const planSteps = [
-  { step_number: 1, title: "Trouver une idée", description: "Identifier ta passion rentable" },
-  { step_number: 2, title: "Clarifier l'idée", description: "Définir précisément ton offre" },
-  { step_number: 3, title: "Valider le marché", description: "Confirmer la demande" },
-  { step_number: 4, title: "Créer le produit", description: "Développer ton offre" },
-  { step_number: 5, title: "Créer l'offre + pricing", description: "Structurer et tarifer" },
-  { step_number: 6, title: "Direction artistique", description: "Identité visuelle" },
-  { step_number: 7, title: "Marketing + lancement", description: "Stratégie de lancement" },
-  { step_number: 8, title: "Premières ventes", description: "Obtenir tes premiers clients" },
+const planSteps7Days = [
+  { step_number: 1, title: "Clarifier ton offre", description: "Définir précisément ton produit", locked: false },
+  { step_number: 2, title: "Créer tes avatars clients", description: "Identifier tes cibles", locked: false },
+  { step_number: 3, title: "Messages de vente", description: "Rédiger tes accroches", locked: false },
+  { step_number: 4, title: "Emails marketing", description: "Préparer ta séquence", locked: false },
+  { step_number: 5, title: "Page de vente", description: "Construire ta landing", locked: false },
+  { step_number: 6, title: "Lancer la pub", description: "Démarrer tes campagnes", locked: true },
+  { step_number: 7, title: "Premières ventes", description: "Obtenir tes clients", locked: false },
 ];
 
 export default function Dashboard() {
@@ -37,8 +39,7 @@ export default function Dashboard() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [dailyActions, setDailyActions] = useState([]);
-  const [steps, setSteps] = useState([]);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -52,67 +53,15 @@ export default function Dashboard() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
-      // Check if purchased, redirect to PlanAction if not
-      if (!currentUser.has_purchased) {
-        navigate(createPageUrl('PlanAction'));
-        return;
-      }
-      
-      // Load profile
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
       }
-      
-      // Load or create plan steps
-      const existingSteps = await base44.entities.PlanStep.filter({ created_by: currentUser.email });
-      if (existingSteps.length === 0) {
-        // Create default steps
-        for (const step of planSteps) {
-          await base44.entities.PlanStep.create({
-            ...step,
-            checklist: [
-              { id: '1', text: 'Tâche à définir', completed: false }
-            ],
-            is_completed: false
-          });
-        }
-        const newSteps = await base44.entities.PlanStep.filter({ created_by: currentUser.email });
-        setSteps(newSteps.sort((a, b) => a.step_number - b.step_number));
-      } else {
-        setSteps(existingSteps.sort((a, b) => a.step_number - b.step_number));
+
+      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+      if (sessions.length > 0) {
+        setSession(sessions[0]);
       }
-      
-      // Load or create daily actions
-      const today = new Date().toISOString().split('T')[0];
-      let todayActions = await base44.entities.DailyAction.filter({ 
-        created_by: currentUser.email,
-        date: today 
-      });
-      
-      if (todayActions.length === 0) {
-        // Generate daily actions
-        const defaultActions = [
-          { title: "Clarifie ton problème-client", description: "Identifie le problème principal que tu résous", priority: 3 },
-          { title: "Écris un DM test", description: "Contacte une personne de ta cible", priority: 2 },
-          { title: "Valide ton idée auprès de 2 personnes", description: "Obtiens des retours concrets", priority: 1 }
-        ];
-        
-        for (const action of defaultActions) {
-          await base44.entities.DailyAction.create({
-            ...action,
-            date: today,
-            is_completed: false
-          });
-        }
-        
-        todayActions = await base44.entities.DailyAction.filter({ 
-          created_by: currentUser.email,
-          date: today 
-        });
-      }
-      
-      setDailyActions(todayActions.sort((a, b) => (b.priority || 1) - (a.priority || 1)));
       
     } catch (error) {
       console.error('Error loading data:', error);
@@ -121,30 +70,90 @@ export default function Dashboard() {
     }
   };
   
-  const toggleAction = async (actionId) => {
-    const action = dailyActions.find(a => a.id === actionId);
-    if (!action) return;
-    
-    await base44.entities.DailyAction.update(actionId, {
-      is_completed: !action.is_completed
-    });
-    
-    setDailyActions(dailyActions.map(a => 
-      a.id === actionId ? { ...a, is_completed: !a.is_completed } : a
-    ));
-  };
-  
   const calculateProgress = () => {
-    if (steps.length === 0) return 0;
-    const completed = steps.filter(s => s.is_completed).length;
-    return Math.round((completed / steps.length) * 100);
+    if (!session) return 0;
+    let completed = 0;
+    let total = 5;
+    
+    if (session.offer_generation) completed++;
+    if (session.generated_avatars) completed++;
+    if (session.generated_sales_messages) completed++;
+    if (session.generated_emails) completed++;
+    if (session.generated_sales_page) completed++;
+    
+    return Math.round((completed / total) * 100);
   };
   
-  const calculateDailyProgress = () => {
-    if (dailyActions.length === 0) return 0;
-    const completed = dailyActions.filter(a => a.is_completed).length;
-    return Math.round((completed / dailyActions.length) * 100);
+  const getCurrentStep = () => {
+    if (!session?.offer_generation) return 1;
+    if (!session?.generated_avatars) return 2;
+    if (!session?.generated_sales_messages) return 3;
+    if (!session?.generated_emails) return 4;
+    if (!session?.generated_sales_page) return 5;
+    return 6;
   };
+
+  const dailyActions = [
+    {
+      id: 1,
+      title: "Génère ton offre complète",
+      page: "MyOffers",
+      icon: Package,
+      generated: session?.offer_generation
+    },
+    {
+      id: 2,
+      title: "Crée tes 3 avatars clients",
+      page: "AvatarClients",
+      icon: User,
+      generated: session?.generated_avatars
+    },
+    {
+      id: 3,
+      title: "Rédige tes messages de vente",
+      page: "SalesMessages",
+      icon: MessageCircle,
+      generated: session?.generated_sales_messages
+    }
+  ];
+
+  const aiResources = [
+    {
+      title: "Offre complète",
+      page: "MyOffers",
+      icon: Package,
+      color: "from-blue-500 to-cyan-500",
+      generated: session?.offer_generation
+    },
+    {
+      title: "Avatars clients",
+      page: "AvatarClients",
+      icon: User,
+      color: "from-purple-500 to-pink-500",
+      generated: session?.generated_avatars
+    },
+    {
+      title: "Messages de vente",
+      page: "SalesMessages",
+      icon: MessageCircle,
+      color: "from-green-500 to-emerald-500",
+      generated: session?.generated_sales_messages
+    },
+    {
+      title: "Emails marketing",
+      page: "EmailsMarketing",
+      icon: Send,
+      color: "from-orange-500 to-red-500",
+      generated: session?.generated_emails
+    },
+    {
+      title: "Page de vente",
+      page: "SalesPage",
+      icon: FileText,
+      color: "from-amber-500 to-yellow-500",
+      generated: session?.generated_sales_page
+    }
+  ];
   
   if (authLoading || loading) {
     return (
@@ -160,173 +169,250 @@ export default function Dashboard() {
   }
   
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+    <div className="flex min-h-screen bg-[#11112b]">
       <Sidebar currentPage="Dashboard" progress={calculateProgress()} />
       
       <div className="flex-1 ml-72">
         <TopBar 
           title="Dashboard" 
-          subtitle="Bienvenue dans ton espace membre"
+          subtitle={`Bienvenue ${user?.full_name?.split(' ')[0] || ''} !`}
           user={user}
         />
         
         <main className="p-8">
-          {/* Welcome Card */}
+          {/* Bandeau supérieur - Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl p-8 mb-8 border border-green-200 shadow-sm"
+            className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 mb-8"
           >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#61f7a2] flex items-center justify-center shadow-sm">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Salut {user?.full_name?.split(' ')[0] || 'là'} ! 👋
-                </h2>
-                <p className="text-gray-600">Prêt à avancer sur ton projet ?</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 text-sm font-medium">Progression globale</span>
-                  <span className="text-[#61f7a2] font-bold">{calculateProgress()}%</span>
+                  <span className="text-gray-400 text-sm">Progression globale</span>
+                  <span className="text-[#61f7a2] font-bold text-lg">{calculateProgress()}%</span>
                 </div>
                 <ProgressBar value={calculateProgress()} max={100} size="sm" />
               </div>
               
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
+              <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 text-sm font-medium">Actions du jour</span>
-                  <span className="text-[#61f7a2] font-bold">{calculateDailyProgress()}%</span>
-                </div>
-                <ProgressBar value={calculateDailyProgress()} max={100} size="sm" />
-              </div>
-              
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 text-sm font-medium">Étape actuelle</span>
-                  <span className="text-[#61f7a2] font-bold">
-                    {steps.findIndex(s => !s.is_completed) + 1 || steps.length}/{steps.length}
+                  <span className="text-gray-400 text-sm">Actions du jour</span>
+                  <span className="text-[#61f7a2] font-bold text-lg">
+                    {dailyActions.filter(a => a.generated).length}/{dailyActions.length}
                   </span>
                 </div>
-                <p className="text-gray-900 text-sm font-semibold truncate">
-                  {steps.find(s => !s.is_completed)?.title || "Toutes complétées !"}
-                </p>
+                <ProgressBar 
+                  value={(dailyActions.filter(a => a.generated).length / dailyActions.length) * 100} 
+                  max={100} 
+                  size="sm" 
+                />
+              </div>
+              
+              <div>
+                <span className="text-gray-400 text-sm block mb-2">Étape actuelle</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[#61f7a2] font-bold text-lg">{getCurrentStep()}/7</span>
+                  <span className="text-white text-sm truncate">
+                    {planSteps7Days[getCurrentStep() - 1]?.title}
+                  </span>
+                </div>
               </div>
             </div>
           </motion.div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Actions du jour */}
+          {/* Section principale - 2 colonnes */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Colonne gauche - Actions du jour */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-[#61f7a2]" />
-                  Actions du jour
-                </h3>
-                <Link 
-                  to={createPageUrl('DailyActions')}
-                  className="text-[#61f7a2] text-sm hover:underline flex items-center gap-1"
-                >
-                  Voir tout <ArrowRight className="w-4 h-4" />
-                </Link>
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar className="w-5 h-5 text-[#61f7a2]" />
+                <h3 className="text-xl font-bold text-white">Actions du jour</h3>
               </div>
 
               <div className="space-y-3">
-                {dailyActions.slice(0, 3).map((action, index) => (
-                  <ActionOfTheDayCard
-                    key={action.id}
-                    action={action}
-                    onToggle={toggleAction}
-                    index={index}
-                  />
-                ))}
+                {dailyActions.map((action, index) => {
+                  const Icon = action.icon;
+                  return (
+                    <Link
+                      key={action.id}
+                      to={createPageUrl(action.page)}
+                      className="block bg-[#1b1b33] border border-[#2a2a45] rounded-xl p-4 hover:border-[#61f7a2]/50 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-[#61f7a2]" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-white font-medium">{action.title}</p>
+                          {action.generated ? (
+                            <div className="flex items-center gap-1 mt-1">
+                              <CheckCircle className="w-3 h-3 text-[#61f7a2]" />
+                              <span className="text-[#61f7a2] text-xs">Généré</span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-xs">À générer</span>
+                          )}
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-[#61f7a2] transition-colors" />
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </motion.div>
 
-            {/* Plan d'action */}
+            {/* Colonne droite - Plan 7 jours */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <Target className="w-5 h-5 text-[#61f7a2]" />
-                  Plan d'action IAVNIR
-                </h3>
-                <Link 
-                  to={createPageUrl('PlanAction')}
-                  className="text-[#61f7a2] text-sm hover:underline flex items-center gap-1"
-                >
-                  Voir tout <ArrowRight className="w-4 h-4" />
-                </Link>
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-[#61f7a2]" />
+                <h3 className="text-xl font-bold text-white">Plan d'action 7 jours</h3>
               </div>
 
               <div className="space-y-3">
-                {steps.slice(0, 4).map((step, index) => (
-                  <PlanStepCard
-                    key={step.id}
-                    step={step}
-                    index={index}
-                    isUnlocked={index === 0 || steps[index - 1]?.is_completed}
-                  />
-                ))}
+                {planSteps7Days.map((step, index) => {
+                  const isUnlocked = !step.locked;
+                  const isCurrent = index + 1 === getCurrentStep();
+                  const isCompleted = index + 1 < getCurrentStep();
+
+                  return (
+                    <div
+                      key={step.step_number}
+                      className={`bg-[#1b1b33] border rounded-xl p-4 transition-all ${
+                        isUnlocked 
+                          ? isCurrent 
+                            ? 'border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20' 
+                            : 'border-[#2a2a45]'
+                          : 'border-[#2a2a45] opacity-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${
+                          isCompleted 
+                            ? 'bg-[#61f7a2] text-[#11112b]' 
+                            : isCurrent 
+                              ? 'bg-[#61f7a2]/20 text-[#61f7a2] border border-[#61f7a2]' 
+                              : 'bg-[#2a2a45] text-gray-500'
+                        }`}>
+                          {isCompleted ? <CheckCircle className="w-4 h-4" /> : step.step_number}
+                        </div>
+                        <div className="flex-1">
+                          <p className={`font-medium ${isUnlocked ? 'text-white' : 'text-gray-500'}`}>
+                            {step.title}
+                          </p>
+                          <p className="text-gray-400 text-xs">{step.description}</p>
+                        </div>
+                        {!isUnlocked && <Lock className="w-4 h-4 text-gray-600" />}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </motion.div>
           </div>
-          
-          {/* Quick access documents */}
+
+          {/* Bandeau Ressources IA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mt-8"
+            className="mb-8"
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-[#61f7a2]" />
-                Documents IA
-              </h3>
-              <Link 
-                to={createPageUrl('Documents')}
-                className="text-[#61f7a2] text-sm hover:underline flex items-center gap-1"
-              >
-                Voir tout <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-[#61f7a2]" />
+              <h3 className="text-xl font-bold text-white">Ressources IA</h3>
             </div>
             
-            <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['Offre complète', 'Page de vente', 'Emails', 'Avatar client'].map((doc, index) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {aiResources.map((resource) => {
+                const Icon = resource.icon;
+                return (
                   <Link
-                    key={doc}
-                    to={createPageUrl('Documents')}
-                    className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 hover:shadow-md transition-all group border border-blue-100"
+                    key={resource.title}
+                    to={createPageUrl(resource.page)}
+                    className="bg-[#1b1b33] border border-[#2a2a45] rounded-xl p-4 hover:border-[#61f7a2]/50 transition-all group"
                   >
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center mb-3 group-hover:from-[#61f7a2]/30 group-hover:to-[#61f7a2]/20 transition-all">
-                      <FileText className="w-5 h-5 text-[#61f7a2]" />
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${resource.color} flex items-center justify-center mb-3`}>
+                      <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-gray-900 font-semibold text-sm">{doc}</p>
-                    <p className="text-gray-500 text-xs mt-1">Généré</p>
+                    <p className="text-white font-medium text-sm mb-1">{resource.title}</p>
+                    {resource.generated ? (
+                      <div className="flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3 text-[#61f7a2]" />
+                        <span className="text-[#61f7a2] text-xs">Généré</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-xs">À générer</span>
+                    )}
                   </Link>
-                ))}
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* Bandeau Coaching */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-gradient-to-br from-[#1b1b33] to-[#2a2a45] border border-[#61f7a2]/30 rounded-2xl p-8 mb-8"
+          >
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+                  <Video className="w-8 h-8 text-[#11112b]" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-1">Besoin d'accompagnement ?</h3>
+                  <p className="text-gray-400">Prends rendez-vous avec un expert pour accélérer</p>
+                </div>
               </div>
+              <GlowButton
+                onClick={() => window.open('https://calendly.com/votre-lien', '_blank')}
+                variant="primary"
+                size="lg"
+              >
+                Prendre un rendez-vous
+              </GlowButton>
+            </div>
+          </motion.div>
+
+          {/* Bandeau Communauté */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-8"
+          >
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-1">Rejoins la communauté</h3>
+                  <p className="text-gray-400">Partage avec d'autres créateurs et reçois du soutien</p>
+                </div>
+              </div>
+              <GlowButton
+                onClick={() => window.open('https://www.skool.com/votre-groupe', '_blank')}
+                variant="outline"
+                size="lg"
+              >
+                Accéder à Skool
+              </GlowButton>
             </div>
           </motion.div>
         </main>
-        </div>
-
-        {/* Chat Bubble */}
-        <ChatBubble />
-        </div>
-        );
-        }
+      </div>
+    </div>
+  );
+}

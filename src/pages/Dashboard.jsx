@@ -23,6 +23,7 @@ import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import ProgressBar from '@/components/ui/ProgressBar';
 import GlowButton from '@/components/ui/GlowButton';
+import ChatBubble from '@/components/chat/ChatBubble';
 
 const planSteps7Days = [
   { step_number: 1, title: "Clarifier ton offre", description: "Définir précisément ton produit", locked: false },
@@ -413,6 +414,9 @@ export default function Dashboard() {
           </motion.div>
         </main>
       </div>
+
+      {/* Chat Bubble */}
+      <ChatBubble />
     </div>
   );
 }

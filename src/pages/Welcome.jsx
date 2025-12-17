@@ -279,7 +279,7 @@ export default function Welcome() {
       {/* Footer - Institutional & Legal */}
       <footer className="w-full border-t border-gray-200 bg-gray-50/50 py-8">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-row justify-between items-center gap-6 overflow-x-auto">
             {/* Left - Brand & Technology */}
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">

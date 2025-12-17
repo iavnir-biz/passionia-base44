@@ -275,6 +275,41 @@ export default function Welcome() {
           </div>
         </div>
       </motion.div>
+
+      {/* Footer - Institutional & Legal */}
+      <footer className="w-full border-t border-gray-200 bg-gray-50/50 py-8">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            {/* Left - Brand & Technology */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-gray-900">PassionIA</p>
+                <p className="text-xs text-gray-600">
+                  Technologie d'intelligence artificielle développée par IAVNIR INC
+                </p>
+              </div>
+            </div>
+
+            {/* Right - Legal Links */}
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-gray-600">
+              <a href="#" className="hover:text-gray-900 transition-colors">Réglementation AI Act</a>
+              <span className="text-gray-300">•</span>
+              <a href="#" className="hover:text-gray-900 transition-colors">Protection des données</a>
+              <span className="text-gray-300">•</span>
+              <a href="#" className="hover:text-gray-900 transition-colors">RGPD</a>
+              <span className="text-gray-300">•</span>
+              <a href="#" className="hover:text-gray-900 transition-colors">Politique de confidentialité</a>
+              <span className="text-gray-300">•</span>
+              <a href="#" className="hover:text-gray-900 transition-colors">Mentions légales</a>
+              <span className="text-gray-300">•</span>
+              <a href="#" className="hover:text-gray-900 transition-colors">Contact</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

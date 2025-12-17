@@ -48,6 +48,7 @@ import OnboardingTransition from './pages/OnboardingTransition';
 import NovaChat from './pages/NovaChat';
 import SalesPage from './pages/SalesPage';
 import EmailsMarketing from './pages/EmailsMarketing';
+import SalesMessages from './pages/SalesMessages';
 
 
 export const PAGES = {
@@ -101,6 +102,7 @@ export const PAGES = {
     "NovaChat": NovaChat,
     "SalesPage": SalesPage,
     "EmailsMarketing": EmailsMarketing,
+    "SalesMessages": SalesMessages,
 }
 
 export const pagesConfig = {

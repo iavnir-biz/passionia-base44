@@ -21,6 +21,7 @@ const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Plan d\'action', icon: Target, page: 'PlanAction' },
   { name: 'Actions du jour', icon: Calendar, page: 'DailyActions' },
+  { name: 'Messages de vente', icon: MessageCircle, page: 'SalesMessages' },
   { name: 'Emails Marketing', icon: Send, page: 'EmailsMarketing' },
   { name: 'Page de vente', icon: FileText, page: 'SalesPage' },
   { name: 'Discuter avec Nova', icon: MessageCircle, page: 'NovaChat', locked: true },

@@ -29,13 +29,13 @@ const categories = [
   },
   { 
     id: 'messages', 
-    name: 'Le Diagnostic & angles marketing', 
+    name: 'Messages de vente', 
     icon: MessageSquare,
     documents: [
-      { subcategory: 'Message 1', title: 'Le Diagnostic' },
-      { subcategory: 'Message 2', title: 'L\'Empathie' },
-      { subcategory: 'Message 3', title: 'La Solution' },
-      { subcategory: 'Message 4', title: 'L\'Achat' },
+      { subcategory: 'Identifier le problème', title: 'Message 1 : Le Diagnostic' },
+      { subcategory: 'Créer la connexion', title: 'Message 2 : L\'empathie' },
+      { subcategory: 'Présenter l\'offre', title: 'Message 3 : La solution' },
+      { subcategory: 'Appel à l\'action', title: 'Message 4 : L\'achat' },
     ]
   },
   { 

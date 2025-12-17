@@ -3,8 +3,29 @@ import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Play } from "lucide-react";
+import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Play, Brain, Database, Cpu, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Floating AI Icons Component
+const FloatingIcon = ({ icon: Icon, delay = 0, className = "" }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ 
+      opacity: [0, 1, 1, 1],
+      y: [20, 0, -10, 0]
+    }}
+    transition={{
+      duration: 3,
+      delay,
+      repeat: Infinity,
+      repeatType: "reverse",
+      ease: "easeInOut"
+    }}
+    className={className}
+  >
+    <Icon className="w-8 h-8 md:w-12 md:h-12 text-[#61f7a2] opacity-20" />
+  </motion.div>
+);
 
 const features = [
   { 
@@ -57,7 +78,25 @@ export default function Welcome() {
       </header>
 
       {/* Hero Section with Floating Cards */}
-      <div className="relative flex items-center justify-center px-6 py-20 md:py-32">
+      <div className="relative flex items-center justify-center px-6 py-20 md:py-32 overflow-hidden">
+        {/* Desktop Floating AI Icons - Left Side */}
+        <FloatingIcon icon={Brain} delay={0} className="hidden md:block absolute left-8 top-20" />
+        <FloatingIcon icon={Zap} delay={0.3} className="hidden md:block absolute left-16 top-1/3" />
+        <FloatingIcon icon={Database} delay={0.6} className="hidden md:block absolute left-12 bottom-32" />
+        <FloatingIcon icon={Sparkles} delay={0.9} className="hidden md:block absolute left-20 bottom-1/4" />
+        
+        {/* Desktop Floating AI Icons - Right Side */}
+        <FloatingIcon icon={Cpu} delay={0.2} className="hidden md:block absolute right-12 top-24" />
+        <FloatingIcon icon={Network} delay={0.5} className="hidden md:block absolute right-20 top-1/3" />
+        <FloatingIcon icon={Sparkles} delay={0.8} className="hidden md:block absolute right-16 bottom-28" />
+        <FloatingIcon icon={Zap} delay={1.1} className="hidden md:block absolute right-24 bottom-1/4" />
+        
+        {/* Mobile Floating AI Icons - Around Title */}
+        <FloatingIcon icon={Brain} delay={0} className="md:hidden absolute left-4 top-32" />
+        <FloatingIcon icon={Sparkles} delay={0.3} className="md:hidden absolute right-4 top-28" />
+        <FloatingIcon icon={Cpu} delay={0.6} className="md:hidden absolute left-6 bottom-40" />
+        <FloatingIcon icon={Zap} delay={0.9} className="md:hidden absolute right-6 bottom-36" />
+
         <div className="max-w-4xl text-center relative z-10">
           {/* AI Badge */}
           <motion.div

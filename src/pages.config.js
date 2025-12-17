@@ -50,6 +50,7 @@ import SalesPage from './pages/SalesPage';
 import EmailsMarketing from './pages/EmailsMarketing';
 import SalesMessages from './pages/SalesMessages';
 import AdCopies from './pages/AdCopies';
+import SocialMedia from './pages/SocialMedia';
 
 
 export const PAGES = {
@@ -105,6 +106,7 @@ export const PAGES = {
     "EmailsMarketing": EmailsMarketing,
     "SalesMessages": SalesMessages,
     "AdCopies": AdCopies,
+    "SocialMedia": SocialMedia,
 }
 
 export const pagesConfig = {

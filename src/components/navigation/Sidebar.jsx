@@ -25,6 +25,7 @@ const menuItems = [
   { name: 'Emails Marketing', icon: Send, page: 'EmailsMarketing' },
   { name: 'Page de vente', icon: FileText, page: 'SalesPage' },
   { name: 'Vos publicités', icon: FileText, page: 'AdCopies', locked: true },
+  { name: 'Contenus réseaux sociaux', icon: MessageCircle, page: 'SocialMedia', locked: true },
   { name: 'Discuter avec Nova', icon: MessageCircle, page: 'NovaChat', locked: true },
   { name: 'Documents IA', icon: FileText, page: 'Documents' },
   { name: 'Paramètres', icon: Settings, page: 'Settings' },

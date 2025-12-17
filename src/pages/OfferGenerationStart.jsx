@@ -53,7 +53,7 @@ export default function OfferGenerationStart() {
       navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
       console.error('Error:', error);
-      navigate(createPageUrl('Results'));
+      navigate(createPageUrl('OfferProductPrincipal'));
     }
   };
 

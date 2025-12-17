@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
+import PayFallModal from '@/components/paywall/PayFallModal';
 import { 
   Loader2, 
   ArrowRight,
@@ -53,6 +54,7 @@ export default function PlanAction() {
   const [content, setContent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isPayFallOpen, setIsPayFallOpen] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -104,7 +106,15 @@ export default function PlanAction() {
   };
 
   const handleAccessDashboard = () => {
-    navigate(createPageUrl('Dashboard'));
+    setIsPayFallOpen(true);
+  };
+
+  const handleCheckout = async () => {
+    // TODO: Intégrer Stripe checkout
+    console.log('Checkout Stripe...');
+    // Après paiement réussi:
+    // await base44.auth.updateMe({ has_purchased: true });
+    // navigate(createPageUrl('Dashboard'));
   };
 
   if (isLoading || isGenerating) {
@@ -663,6 +673,13 @@ export default function PlanAction() {
           <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
         </div>
       </footer>
+
+      {/* PayFall Modal */}
+      <PayFallModal
+        isOpen={isPayFallOpen}
+        onClose={() => setIsPayFallOpen(false)}
+        onCheckout={handleCheckout}
+      />
     </div>
   );
 }

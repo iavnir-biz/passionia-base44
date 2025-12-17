@@ -38,9 +38,10 @@ Deno.serve(async (req) => {
     }
 
     // Récupérer l'URL de l'app depuis les headers
-    const origin = req.headers.get('origin') || req.headers.get('referer')?.replace(/\/$/, '') || '';
-    const successUrl = origin ? `${origin}/PlanAction?payment=success` : 'https://passionprofit.base44.run/PlanAction?payment=success';
-    const cancelUrl = origin ? `${origin}/PlanAction` : 'https://passionprofit.base44.run/PlanAction';
+    const referer = req.headers.get('referer') || '';
+    const origin = referer ? new URL(referer).origin : 'https://passionprofit.base44.run';
+    const successUrl = `${origin}/PlanAction?payment=success`;
+    const cancelUrl = `${origin}/PlanAction`;
 
     // Créer la session de paiement
     const session = await stripe.checkout.sessions.create({

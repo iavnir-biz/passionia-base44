@@ -151,7 +151,7 @@ ${offer.benefits.join('\n')}
       
       <div className="flex-1 ml-72">
         <TopBar 
-          title="Mes offres" 
+          title="Offres" 
           subtitle="Tes 4 offres complètes générées par l'IA"
           user={user}
         />
@@ -173,94 +173,100 @@ ${offer.benefits.join('\n')}
               </p>
             </div>
 
-            {/* Generate Button */}
-            {!generatedOffers ? (
-              <div className="flex justify-center">
-                <GlowButton
-                  onClick={() => handleGenerate()}
-                  variant="primary"
-                  size="lg"
-                  loading={loading}
-                  className="px-12"
-                >
-                  {loading ? 'Génération en cours...' : 'Générer mes offres'}
-                </GlowButton>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                
-                {/* Offer Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {offerTypes.map((offerType, index) => {
-                    const offer = generatedOffers[offerType.id];
-                    const Icon = offerType.icon;
-                    
-                    return (
-                      <div
-                        key={offerType.id}
-                        className={cn(
-                          "bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 hover:shadow-xl animate-fade-in"
-                        )}
-                        style={{ animationDelay: `${index * 0.1}s` }}
-                      >
-                        {/* Gradient Header */}
-                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${offerType.color} flex items-center justify-center mb-4`}>
-                          <Icon className="w-8 h-8 text-white" />
-                        </div>
-
-                        {/* Content */}
-                        <div className="mb-4">
-                          <p className="text-[#61f7a2] text-sm mb-1">{offerType.subtitle}</p>
-                          <h3 className="text-2xl font-bold text-white mb-2">
-                            {offer.title}
-                          </h3>
-                          <div className="text-3xl font-bold text-[#61f7a2] mb-3">
-                            {offer.price}
-                          </div>
-                          <p className="text-gray-300 text-sm mb-4">
-                            {offer.description}
-                          </p>
-                        </div>
-
-                        {/* Deliverables */}
-                        <div className="mb-4">
-                          <h4 className="text-white font-semibold text-sm mb-2">📦 Livrables</h4>
-                          <ul className="space-y-1">
-                            {offer.deliverables.slice(0, 3).map((item, i) => (
-                              <li key={i} className="text-gray-400 text-xs flex items-start gap-2">
-                                <span className="text-[#61f7a2] mt-0.5">•</span>
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-2">
-                          <GlowButton
-                            onClick={() => setShowPreview(offer)}
-                            variant="outline"
-                            size="sm"
-                            icon={Eye}
-                            className="flex-1"
-                          >
-                            Voir
-                          </GlowButton>
-                          <GlowButton
-                            onClick={() => handleCopy(offer)}
-                            variant="ghost"
-                            size="sm"
-                            icon={Copy}
-                          >
-                            Copier
-                          </GlowButton>
-                        </div>
+            {/* Offer Cards */}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {offerTypes.map((offerType, index) => {
+                  const offer = generatedOffers?.[offerType.id];
+                  const Icon = offerType.icon;
+                  
+                  return (
+                    <div
+                      key={offerType.id}
+                      className={cn(
+                        "bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 hover:shadow-xl animate-fade-in"
+                      )}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      {/* Gradient Header */}
+                      <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${offerType.color} flex items-center justify-center mb-4`}>
+                        <Icon className="w-8 h-8 text-white" />
                       </div>
-                    );
-                  })}
-                </div>
 
-                {/* Regenerate Button */}
+                      {/* Content */}
+                      <div className="mb-4">
+                        <p className="text-[#61f7a2] text-sm mb-1">{offerType.subtitle}</p>
+                        <h3 className="text-xl font-bold text-white mb-2">
+                          {offerType.title}
+                        </h3>
+                        <p className="text-gray-400 text-sm mb-4">
+                          {offerType.description}
+                        </p>
+                      </div>
+
+                      {/* Generated Content or Generate Button */}
+                      {offer ? (
+                        <>
+                          <div className="mb-4">
+                            <div className="text-2xl font-bold text-[#61f7a2] mb-2">
+                              {offer.price}
+                            </div>
+                            <p className="text-gray-300 text-sm mb-3">
+                              {offer.description}
+                            </p>
+                            
+                            <div>
+                              <h4 className="text-white font-semibold text-sm mb-2">📦 Livrables</h4>
+                              <ul className="space-y-1">
+                                {offer.deliverables.slice(0, 3).map((item, i) => (
+                                  <li key={i} className="text-gray-400 text-xs flex items-start gap-2">
+                                    <span className="text-[#61f7a2] mt-0.5">•</span>
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex gap-2">
+                            <GlowButton
+                              onClick={() => setShowPreview(offer)}
+                              variant="outline"
+                              size="sm"
+                              icon={Eye}
+                              className="flex-1"
+                            >
+                              Voir
+                            </GlowButton>
+                            <GlowButton
+                              onClick={() => handleCopy(offer)}
+                              variant="ghost"
+                              size="sm"
+                              icon={Copy}
+                            >
+                              Copier
+                            </GlowButton>
+                          </div>
+                        </>
+                      ) : (
+                        <GlowButton
+                          onClick={() => handleGenerate(false)}
+                          variant="primary"
+                          size="default"
+                          loading={loading}
+                          className="w-full"
+                        >
+                          {loading ? 'Génération...' : 'Générer'}
+                        </GlowButton>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Regenerate Button (only if offers are generated) */}
+              {generatedOffers && (
                 <div className="flex justify-center pt-4">
                   <GlowButton
                     onClick={() => handleGenerate(true)}
@@ -272,8 +278,8 @@ ${offer.benefits.join('\n')}
                     {!hasPremium ? 'Premium - Régénérer' : 'Régénérer'}
                   </GlowButton>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </main>
       </div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import { Sparkles, Loader2, Eye, Copy, Download, Lock, Package, ShoppingCart, TrendingUp, Crown } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -90,8 +91,7 @@ export default function SalesPage() {
     if (!page?.html) return;
     
     navigator.clipboard.writeText(page.html);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    toast.success('Copié dans le presse-papier !');
   };
 
   const handleDownload = (page, filename) => {
@@ -147,191 +147,171 @@ export default function SalesPage() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-        <Sidebar currentPage="SalesPage" progress={0} />
-        <div className="flex-1 ml-72">
-          <div className="flex items-center justify-center h-screen">
-            <div className="animate-spin w-8 h-8 border-2 border-[#61f7a2] border-t-transparent rounded-full" />
-          </div>
-        </div>
+      <div className="flex items-center justify-center h-screen bg-[#11112b]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+    <div className="flex min-h-screen bg-[#11112b]">
       <Sidebar currentPage="SalesPage" progress={0} />
       
       <div className="flex-1 ml-72">
         <TopBar 
           title="Page de vente" 
-          subtitle="Génère ta page de vente professionnelle avec l'IA"
+          subtitle="Génère ta page de vente avec l'IA"
           user={user}
         />
         
-        <main className="p-8 max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
-          >
-            {/* Hero section */}
-            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl p-8 border border-green-200">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-[#61f7a2] rounded-2xl flex items-center justify-center shadow-sm">
-                  <Sparkles className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    Tes pages de vente IA
-                  </h2>
-                  <p className="text-gray-600">
-                    L'IA génère des pages de vente complètes et optimisées pour chacune de tes offres : 
-                    structure professionnelle, images personnalisées, textes persuasifs et call-to-action.
-                  </p>
-                </div>
+        <main className="p-8">
+          <div className="max-w-6xl mx-auto space-y-6">
+            
+            {/* Header */}
+            <div className="text-center mb-12 animate-fade-in">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1b1b33] rounded-full mb-4">
+                <Sparkles className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-sm text-gray-300">Pages générées par IA</span>
               </div>
+              <h1 className="text-4xl font-bold text-white mb-3">
+                Tes Pages de Vente
+              </h1>
+              <p className="text-gray-400 text-lg">
+                Crée des pages de vente optimisées pour tes offres
+              </p>
             </div>
 
             {/* Offer type cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {offerTypes.map((offer, index) => {
                 const Icon = offer.icon;
                 const isGenerated = generatedPages[offer.id];
                 
                 return (
-                  <motion.div
+                  <div
                     key={offer.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`relative rounded-2xl border-2 overflow-hidden ${
-                      offer.locked 
-                        ? 'border-gray-300 bg-gray-50' 
-                        : 'border-green-200 bg-white hover:shadow-lg transition-shadow'
-                    }`}
+                    className="relative bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 hover:shadow-xl animate-fade-in"
+                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <div className="p-6">
-                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${offer.color} flex items-center justify-center mb-4 shadow-sm ${
-                        offer.locked ? 'opacity-50' : ''
-                      }`}>
-                        <Icon className="w-7 h-7 text-white" />
-                      </div>
-                      
-                      <h3 className="text-lg font-bold text-gray-900 mb-1">{offer.title}</h3>
-                      <p className="text-sm text-gray-600 mb-3">{offer.subtitle}</p>
-                      <p className="text-xs text-gray-500 mb-4">{offer.description}</p>
-                      
-                      {offer.locked ? (
-                        <div className="flex items-center gap-2 text-gray-500 text-sm">
-                          <Lock className="w-4 h-4" />
-                          <span>Abonnement premium</span>
-                        </div>
-                      ) : isGenerated ? (
-                        <div className="space-y-2">
-                          <GlowButton
-                            onClick={() => {
-                              setShowPreview(isGenerated);
-                            }}
-                            variant="secondary"
-                            size="sm"
-                            className="w-full"
-                            icon={Eye}
-                          >
-                            Voir
-                          </GlowButton>
+                    {/* Gradient Header */}
+                    <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${offer.color} flex items-center justify-center mb-4`}>
+                      <Icon className="w-8 h-8 text-white" />
+                    </div>
+
+                    {/* Content */}
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {offer.title}
+                    </h3>
+                    <p className="text-[#61f7a2] text-sm mb-1">{offer.subtitle}</p>
+                    <p className="text-gray-400 text-sm mb-6">{offer.description}</p>
+
+                    {/* Actions */}
+                    {!offer.locked ? (
+                      isGenerated ? (
+                        <div className="space-y-3">
                           <div className="flex gap-2">
                             <GlowButton
-                              onClick={() => handleCopy(isGenerated)}
+                              onClick={() => setShowPreview(isGenerated)}
                               variant="outline"
                               size="sm"
+                              icon={Eye}
                               className="flex-1"
                             >
-                              <Copy className="w-3 h-3" />
+                              Voir
+                            </GlowButton>
+                            <GlowButton
+                              onClick={() => handleCopy(isGenerated)}
+                              variant="ghost"
+                              size="sm"
+                              icon={Copy}
+                            >
+                              Copier
                             </GlowButton>
                             <GlowButton
                               onClick={() => handleDownload(isGenerated, `page-${offer.id}.html`)}
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
-                              className="flex-1"
+                              icon={Download}
                             >
-                              <Download className="w-3 h-3" />
+                              Télécharger
                             </GlowButton>
                           </div>
+                          <GlowButton
+                            onClick={() => handleGenerate(offer.id)}
+                            variant="secondary"
+                            size="sm"
+                            className="w-full"
+                          >
+                            Régénérer
+                          </GlowButton>
                         </div>
                       ) : (
                         <GlowButton
                           onClick={() => handleGenerate(offer.id)}
-                          icon={Sparkles}
-                          size="sm"
+                          variant="primary"
+                          size="default"
                           className="w-full"
                         >
                           Générer
                         </GlowButton>
-                      )}
-                    </div>
-                    
+                      )
+                    ) : null}
+
+                    {/* Lock Overlay */}
                     {offer.locked && (
-                      <div className="absolute inset-0 bg-white/40 backdrop-blur-md flex items-center justify-center">
+                      <div className="absolute inset-0 bg-white/40 backdrop-blur-md flex items-center justify-center rounded-2xl">
                         <div className="text-center">
                           <Lock className="w-10 h-10 text-gray-400 mx-auto mb-2" />
                           <p className="text-sm font-semibold text-gray-600">Premium</p>
                         </div>
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
 
-            {/* Generation in progress */}
-            <AnimatePresence>
-              {isGenerating && (
-                <SalesPageGenerator
-                  profile={profile}
-                  session={session}
-                  offerType={selectedType}
-                  onComplete={handleGenerationComplete}
-                  onCancel={() => {
-                    setIsGenerating(false);
-                    setSelectedType(null);
-                  }}
-                />
-              )}
-            </AnimatePresence>
-          </motion.div>
+          </div>
+
+          {/* Generation in progress */}
+          <AnimatePresence>
+            {isGenerating && (
+              <SalesPageGenerator
+                profile={profile}
+                session={session}
+                offerType={selectedType}
+                onComplete={handleGenerationComplete}
+                onCancel={() => {
+                  setIsGenerating(false);
+                  setSelectedType(null);
+                }}
+              />
+            )}
+          </AnimatePresence>
         </main>
       </div>
 
       {/* Preview Modal */}
       {showPreview && (
-        <div 
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowPreview(false)}
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl"
-          >
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-900">Prévisualisation complète</h3>
-              <button 
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1b1b33] rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden border border-[#2a2a45]">
+            <div className="p-6 border-b border-[#2a2a45] flex items-center justify-between">
+              <h3 className="text-xl font-bold text-white">Aperçu de la page</h3>
+              <button
                 onClick={() => setShowPreview(false)}
-                className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200"
+                className="text-gray-400 hover:text-white transition-colors"
               >
                 ✕
               </button>
             </div>
-            <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+            <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
               <iframe
                 srcDoc={showPreview.html}
-                className="w-full h-[800px] border-0"
+                className="w-full h-[800px] border-0 bg-white"
                 title="Sales Page Preview"
               />
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
     </div>

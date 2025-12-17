@@ -10,7 +10,8 @@ import {
   Settings, 
   LogOut,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  MessageCircle
 } from "lucide-react";
 import ProgressBar from '@/components/ui/ProgressBar';
 
@@ -18,6 +19,7 @@ const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Plan d\'action', icon: Target, page: 'PlanAction' },
   { name: 'Actions du jour', icon: Calendar, page: 'DailyActions' },
+  { name: 'Discuter avec Nova', icon: MessageCircle, page: 'NovaChat' },
   { name: 'Documents IA', icon: FileText, page: 'Documents' },
   { name: 'Paramètres', icon: Settings, page: 'Settings' },
 ];

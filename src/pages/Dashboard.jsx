@@ -20,7 +20,6 @@ import ActionOfTheDayCard from '@/components/dashboard/ActionOfTheDayCard';
 import PlanStepCard from '@/components/dashboard/PlanStepCard';
 import GlowButton from '@/components/ui/GlowButton';
 import ChatBubble from '@/components/chat/ChatBubble';
-import NovaSection from '@/components/chat/NovaSection';
 
 const planSteps = [
   { step_number: 1, title: "Trouver une idée", description: "Identifier ta passion rentable" },
@@ -241,7 +240,7 @@ export default function Dashboard() {
                 </Link>
               </div>
 
-              <div className="space-y-3 mb-8">
+              <div className="space-y-3">
                 {dailyActions.slice(0, 3).map((action, index) => (
                   <ActionOfTheDayCard
                     key={action.id}
@@ -251,9 +250,6 @@ export default function Dashboard() {
                   />
                 ))}
               </div>
-
-              {/* Nova Chat Section */}
-              <NovaSection />
             </motion.div>
 
             {/* Plan d'action */}

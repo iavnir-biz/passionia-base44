@@ -186,34 +186,43 @@ Position : ${generatedOffer.funnelPosition}`;
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 hover:border-[#61f7a2]/30 transition-all"
+        className={cn(
+          "rounded-2xl p-6 border shadow-sm hover:shadow-md transition-all",
+          scheme.cardBg,
+          scheme.border
+        )}
       >
         <div className="flex items-start gap-4 mb-6">
           <div className={cn(
-            "w-12 h-12 rounded-xl flex items-center justify-center",
-            generatedOffer ? "bg-[#61f7a2]" : "bg-[#2a2a45]"
+            "w-12 h-12 rounded-xl flex items-center justify-center shadow-sm",
+            generatedOffer ? scheme.badge : "bg-white"
           )}>
             {generatedOffer ? (
-              <Check className="w-6 h-6 text-[#11112b]" />
+              <Check className="w-6 h-6 text-white" />
             ) : (
-              <FileText className="w-6 h-6 text-gray-400" />
+              <FileText className={cn("w-6 h-6", scheme.text)} />
             )}
           </div>
           <div className="flex-1">
-            <h3 className="text-white font-bold text-lg mb-1">{offer.title}</h3>
-            <p className="text-gray-400 text-sm">{offer.subtitle}</p>
+            <h3 className="text-gray-900 font-bold text-lg mb-1">{offer.title}</h3>
+            <p className="text-gray-600 text-sm">{offer.subtitle}</p>
           </div>
         </div>
 
         <div className="mb-6">
-          <p className="text-gray-500 text-sm mb-2">Version {version}</p>
+          <p className="text-gray-600 text-sm mb-2">Version {version}</p>
         </div>
 
         {!generatedOffer ? (
           <Button
             onClick={handleGenerate}
             disabled={isGenerating}
-            className="w-full bg-transparent border border-[#61f7a2] text-[#61f7a2] hover:bg-[#61f7a2] hover:text-[#11112b] transition-all"
+            className={cn(
+              "w-full transition-all",
+              isGenerating 
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                : `bg-white border-2 ${scheme.text} hover:${scheme.badge} hover:text-white`
+            )}
           >
             {isGenerating ? (
               <>
@@ -231,7 +240,7 @@ Position : ${generatedOffer.funnelPosition}`;
           <div className="space-y-2">
             <Button
               onClick={() => setShowPreview(true)}
-              className="w-full bg-[#61f7a2] text-[#11112b] hover:bg-[#4de88f]"
+              className={cn("w-full text-white", `bg-${scheme.badge.split('-')[1]}-500 hover:bg-${scheme.badge.split('-')[1]}-600`)}
             >
               <Eye className="w-4 h-4 mr-2" />
               Voir
@@ -241,7 +250,7 @@ Position : ${generatedOffer.funnelPosition}`;
                 onClick={handleCopy}
                 variant="outline"
                 size="sm"
-                className="bg-[#2a2a45] border-[#2a2a45] text-gray-300 hover:bg-[#3a3a55] hover:text-white"
+                className="bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
               >
                 {copied ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
                 {copied ? 'Copié' : 'Copier'}
@@ -250,7 +259,7 @@ Position : ${generatedOffer.funnelPosition}`;
                 onClick={handleDownloadPDF}
                 variant="outline"
                 size="sm"
-                className="bg-[#2a2a45] border-[#2a2a45] text-gray-300 hover:bg-[#3a3a55] hover:text-white"
+                className="bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
               >
                 <Download className="w-3 h-3 mr-1" />
                 PDF
@@ -270,31 +279,31 @@ Position : ${generatedOffer.funnelPosition}`;
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            className="bg-white border border-gray-200 rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-2xl"
           >
             <div className="flex items-start justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">{generatedOffer.name || offer.title}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{generatedOffer.name || offer.title}</h2>
               <button 
                 onClick={() => setShowPreview(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-600 hover:text-gray-900"
               >
                 ✕
               </button>
             </div>
 
             {offer.type === 'complete' ? (
-              <div className="space-y-4 text-gray-300">
+              <div className="space-y-4 text-gray-700">
                 <p className="text-base leading-relaxed">{generatedOffer.description}</p>
                 
                 <div>
                   <h3 className="text-[#61f7a2] font-semibold mb-3">Offres incluses :</h3>
                   <div className="space-y-3">
                     {generatedOffer.offers?.map((o, i) => (
-                      <div key={i} className="bg-[#11112b] rounded-lg p-4">
+                      <div key={i} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h4 className="text-white font-semibold">{o.name}</h4>
-                            <p className="text-gray-400 text-sm mt-1">{o.description}</p>
+                            <h4 className="text-gray-900 font-semibold">{o.name}</h4>
+                            <p className="text-gray-600 text-sm mt-1">{o.description}</p>
                           </div>
                           <span className="text-[#61f7a2] font-bold">{o.price}</span>
                         </div>
@@ -304,42 +313,42 @@ Position : ${generatedOffer.funnelPosition}`;
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 text-gray-300">
+              <div className="space-y-4 text-gray-700">
                 <p className="text-base italic text-[#61f7a2]">{generatedOffer.promise}</p>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-gray-500 text-sm">Pour qui :</span>
-                    <p className="text-white">{generatedOffer.targetAudience}</p>
+                    <span className="text-gray-600 text-sm">Pour qui :</span>
+                    <p className="text-gray-900">{generatedOffer.targetAudience}</p>
                   </div>
                   <div>
-                    <span className="text-gray-500 text-sm">Format :</span>
-                    <p className="text-white">{generatedOffer.format}</p>
+                    <span className="text-gray-600 text-sm">Format :</span>
+                    <p className="text-gray-900">{generatedOffer.format}</p>
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-gray-500 text-sm">Problème résolu :</span>
-                  <p className="text-white">{generatedOffer.problemSolved}</p>
+                  <span className="text-gray-600 text-sm">Problème résolu :</span>
+                  <p className="text-gray-900">{generatedOffer.problemSolved}</p>
                 </div>
 
                 <div>
-                  <span className="text-gray-500 text-sm">Résultat concret :</span>
-                  <p className="text-white">{generatedOffer.concreteResult}</p>
+                  <span className="text-gray-600 text-sm">Résultat concret :</span>
+                  <p className="text-gray-900">{generatedOffer.concreteResult}</p>
                 </div>
 
                 <div>
-                  <span className="text-gray-500 text-sm">Contenu inclus :</span>
-                  <ul className="list-disc list-inside text-white mt-2 space-y-1">
+                  <span className="text-gray-600 text-sm">Contenu inclus :</span>
+                  <ul className="list-disc list-inside text-gray-900 mt-2 space-y-1">
                     {generatedOffer.includedContent?.map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-[#2a2a45]">
-                  <span className="text-gray-500">Prix conseillé :</span>
-                  <span className="text-2xl font-bold text-[#61f7a2]">{generatedOffer.recommendedPrice}</span>
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                  <span className="text-gray-600">Prix conseillé :</span>
+                  <span className={cn("text-2xl font-bold", scheme.text)}>{generatedOffer.recommendedPrice}</span>
                 </div>
               </div>
             )}

@@ -256,7 +256,7 @@ Sois concis mais complet. Format markdown.`,
   ];
   
   return (
-    <div className="flex min-h-screen bg-[#11112b]">
+    <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       <Sidebar currentPage="Documents" progress={progress} />
       
       <div className="flex-1 ml-72">
@@ -273,8 +273,8 @@ Sois concis mais complet. Format markdown.`,
               onClick={() => setActiveCategory('all')}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                 activeCategory === 'all'
-                  ? 'bg-[#61f7a2] text-[#11112b]'
-                  : 'bg-[#1b1b33] text-gray-400 hover:text-white'
+                  ? 'bg-[#61f7a2] text-white shadow-md'
+                  : 'bg-white text-gray-600 hover:text-gray-900 border border-gray-200'
               }`}
             >
               Tout
@@ -285,8 +285,8 @@ Sois concis mais complet. Format markdown.`,
                 onClick={() => setActiveCategory(cat.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   activeCategory === cat.id
-                    ? 'bg-[#61f7a2] text-[#11112b]'
-                    : 'bg-[#1b1b33] text-gray-400 hover:text-white'
+                    ? 'bg-[#61f7a2] text-white shadow-md'
+                    : 'bg-white text-gray-600 hover:text-gray-900 border border-gray-200'
                 }`}
               >
                 <cat.icon className="w-4 h-4" />
@@ -298,7 +298,7 @@ Sois concis mais complet. Format markdown.`,
           {loading || generating ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="animate-spin w-10 h-10 border-2 border-[#61f7a2] border-t-transparent rounded-full mb-4" />
-              <p className="text-gray-400">
+              <p className="text-gray-600">
                 {generating ? 'Génération de vos documents en cours...' : 'Chargement...'}
               </p>
             </div>
@@ -309,8 +309,8 @@ Sois concis mais complet. Format markdown.`,
                 <div className="w-10 h-10 rounded-xl bg-[#61f7a2]/10 flex items-center justify-center">
                   <Package className="w-5 h-5 text-[#61f7a2]" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Tes offres</h3>
-                <span className="text-gray-500 text-sm">
+                <h3 className="text-xl font-bold text-gray-900">Tes offres</h3>
+                <span className="text-gray-600 text-sm">
                   {generatedOffersCount}/5 générées
                 </span>
               </div>
@@ -345,13 +345,13 @@ Sois concis mais complet. Format markdown.`,
                       <div className="w-10 h-10 rounded-xl bg-[#61f7a2]/10 flex items-center justify-center">
                         <category.icon className="w-5 h-5 text-[#61f7a2]" />
                       </div>
-                      <h3 className="text-xl font-bold text-white">{category.name}</h3>
+                      <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
                       {category.id === 'offre' ? (
-                        <span className="text-gray-500 text-sm">
+                        <span className="text-gray-600 text-sm">
                           {generatedOffersCount}/5 générées
                         </span>
                       ) : (
-                        <span className="text-gray-500 text-sm">
+                        <span className="text-gray-600 text-sm">
                           {categoryDocs.filter(d => d.is_generated).length}/{categoryDocs.length} générés
                         </span>
                       )}
@@ -415,13 +415,13 @@ Sois concis mais complet. Format markdown.`,
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-3xl max-h-[80vh] bg-[#1b1b33] rounded-3xl border border-[#2a2a45] overflow-hidden"
+            className="w-full max-w-3xl max-h-[80vh] bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-[#2a2a45] flex items-center justify-between">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold text-white">{selectedDocument.title}</h3>
-                <p className="text-gray-400 text-sm">{selectedDocument.subcategory}</p>
+                <h3 className="text-xl font-bold text-gray-900">{selectedDocument.title}</h3>
+                <p className="text-gray-600 text-sm">{selectedDocument.subcategory}</p>
               </div>
               <div className="flex items-center gap-2">
                 <GlowButton
@@ -434,14 +434,14 @@ Sois concis mais complet. Format markdown.`,
                 </GlowButton>
                 <button
                   onClick={() => setSelectedDocument(null)}
-                  className="w-10 h-10 rounded-xl bg-[#2a2a45] flex items-center justify-center text-gray-400 hover:text-white"
+                  className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-200"
                 >
                   ✕
                 </button>
               </div>
             </div>
             <div className="p-6 overflow-y-auto max-h-[60vh]">
-              <div className="prose prose-invert max-w-none">
+              <div className="prose max-w-none">
                 {selectedDocument.content || (
                   <p className="text-gray-500">Ce document n'a pas encore été généré.</p>
                 )}

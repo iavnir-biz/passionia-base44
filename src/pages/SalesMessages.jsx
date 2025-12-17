@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
-import { Sparkles, Loader2, Eye, Copy, Download, MessageSquare, Heart, Lightbulb, ShoppingBag } from 'lucide-react';
+import { Sparkles, Loader2, Eye, Copy, Download, MessageSquare, Heart, Lightbulb, ShoppingBag, Lock } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
@@ -15,6 +15,7 @@ export default function SalesMessages() {
   const [loading, setLoading] = useState({});
   const [generatedMessages, setGeneratedMessages] = useState({});
   const [showPreview, setShowPreview] = useState(null);
+  const [hasPremium, setHasPremium] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,6 +33,7 @@ export default function SalesMessages() {
       });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
+        setHasPremium(profiles[0].has_paid === true);
       }
 
       const sessions = await base44.entities.Session.filter({ 
@@ -221,13 +223,20 @@ export default function SalesMessages() {
                           </GlowButton>
                         </div>
                         <GlowButton
-                          onClick={() => handleGenerate(msgType.id)}
+                          onClick={() => {
+                            if (!hasPremium) {
+                              toast.error('Fonctionnalité réservée aux abonnés Premium');
+                              return;
+                            }
+                            handleGenerate(msgType.id);
+                          }}
                           variant="secondary"
                           size="sm"
                           className="w-full"
                           loading={isLoading}
+                          icon={!hasPremium ? Lock : undefined}
                         >
-                          Régénérer
+                          {!hasPremium ? 'Premium' : 'Régénérer'}
                         </GlowButton>
                       </div>
                     ) : (

@@ -7,15 +7,16 @@ import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Play, Brain, D
 import { Button } from "@/components/ui/button";
 
 // Floating AI Icons Component
-const FloatingIcon = ({ icon: Icon, delay = 0, className = "" }) => (
+const FloatingIcon = ({ icon: Icon, delay = 0, className = "", mobile = false }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ 
-      opacity: [0, 1, 1, 1],
-      y: [20, 0, -10, 0]
+      opacity: mobile ? [0, 0.3, 0.25, 0.3] : [0, 0.4, 0.35, 0.4],
+      y: [20, 0, -10, 0],
+      rotate: [0, 5, -5, 0]
     }}
     transition={{
-      duration: 3,
+      duration: mobile ? 4 : 3,
       delay,
       repeat: Infinity,
       repeatType: "reverse",
@@ -23,7 +24,7 @@ const FloatingIcon = ({ icon: Icon, delay = 0, className = "" }) => (
     }}
     className={className}
   >
-    <Icon className="w-8 h-8 md:w-12 md:h-12 text-[#61f7a2] opacity-20" />
+    <Icon className={mobile ? "w-6 h-6 text-[#61f7a2]" : "w-10 h-10 md:w-12 md:h-12 text-[#61f7a2]"} />
   </motion.div>
 );
 
@@ -91,11 +92,15 @@ export default function Welcome() {
         <FloatingIcon icon={Sparkles} delay={0.8} className="hidden md:block absolute right-16 bottom-28" />
         <FloatingIcon icon={Zap} delay={1.1} className="hidden md:block absolute right-24 bottom-1/4" />
         
-        {/* Mobile Floating AI Icons - Around Title */}
-        <FloatingIcon icon={Brain} delay={0} className="md:hidden absolute left-4 top-32" />
-        <FloatingIcon icon={Sparkles} delay={0.3} className="md:hidden absolute right-4 top-28" />
-        <FloatingIcon icon={Cpu} delay={0.6} className="md:hidden absolute left-6 bottom-40" />
-        <FloatingIcon icon={Zap} delay={0.9} className="md:hidden absolute right-6 bottom-36" />
+        {/* Mobile Floating AI Icons - Around Title (plus visibles) */}
+        <FloatingIcon icon={Brain} delay={0} mobile={true} className="md:hidden absolute left-4 top-24" />
+        <FloatingIcon icon={Sparkles} delay={0.4} mobile={true} className="md:hidden absolute right-4 top-20" />
+        <FloatingIcon icon={Zap} delay={0.8} mobile={true} className="md:hidden absolute left-6 top-52" />
+        <FloatingIcon icon={Cpu} delay={1.2} mobile={true} className="md:hidden absolute right-6 top-56" />
+        <FloatingIcon icon={Network} delay={0.2} mobile={true} className="md:hidden absolute left-8 bottom-1/3" />
+        <FloatingIcon icon={Database} delay={0.6} mobile={true} className="md:hidden absolute right-8 bottom-1/3" />
+        <FloatingIcon icon={Sparkles} delay={1.0} mobile={true} className="md:hidden absolute left-4 bottom-1/4" />
+        <FloatingIcon icon={Zap} delay={1.4} mobile={true} className="md:hidden absolute right-4 bottom-1/4" />
 
         <div className="max-w-4xl text-center relative z-10">
           {/* AI Badge */}

@@ -3,9 +3,93 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Brain, Zap } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import { Input } from '@/components/ui/input';
+
+// Nova AI Avatar - Animated
+const NovaAvatar = () => (
+  <div className="relative flex items-center justify-center mb-8">
+    {/* Glow effect background */}
+    <motion.div
+      className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-[#61f7a2]/30 to-[#4de88f]/20 blur-2xl"
+      animate={{
+        scale: [1, 1.2, 1],
+        opacity: [0.5, 0.8, 0.5]
+      }}
+      transition={{
+        duration: 3,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    />
+    
+    {/* Main Nova Icon */}
+    <motion.div
+      className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-xl"
+      animate={{
+        y: [0, -8, 0],
+      }}
+      transition={{
+        duration: 4,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    >
+      <Brain className="w-12 h-12 text-white" />
+      
+      {/* Sparkle particles */}
+      <motion.div
+        className="absolute -top-2 -right-2"
+        animate={{
+          scale: [1, 1.3, 1],
+          rotate: [0, 180, 360]
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      >
+        <Sparkles className="w-6 h-6 text-[#61f7a2]" />
+      </motion.div>
+      
+      <motion.div
+        className="absolute -bottom-1 -left-1"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.5, 1, 0.5]
+        }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.5
+        }}
+      >
+        <Zap className="w-5 h-5 text-[#61f7a2]" />
+      </motion.div>
+    </motion.div>
+    
+    {/* Pulse rings */}
+    {[0, 0.5, 1].map((delay, i) => (
+      <motion.div
+        key={i}
+        className="absolute w-24 h-24 rounded-full border-2 border-[#61f7a2]/30"
+        animate={{
+          scale: [1, 1.5, 1.8],
+          opacity: [0.6, 0.3, 0]
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeOut",
+          delay: delay * 1.5
+        }}
+      />
+    ))}
+  </div>
+);
 
 export default function OnboardingFirstName() {
   const navigate = useNavigate();
@@ -67,21 +151,31 @@ export default function OnboardingFirstName() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg">
-            <Sparkles className="w-7 h-7 text-white" />
-          </div>
-        </div>
+        {/* Nova Avatar */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <NovaAvatar />
+        </motion.div>
 
         {/* Card */}
         <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
           <h1 className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed">
             Enchanté ! Commençons par faire connaissance 🙂
           </h1>
-          <p className="text-gray-700 mb-6 leading-relaxed">
-            Je suis Nova, l'IA de Passion IA, et je vais t'aider à monétiser ton savoir-faire.
+          <p className="text-gray-700 mb-4 leading-relaxed">
+            Je suis <span className="text-[#61f7a2] font-semibold">Nova</span>, l'IA de Passion IA, et je vais t'aider à monétiser ton savoir-faire.
           </p>
+          <motion.p 
+            className="text-sm text-gray-500 italic mb-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            Une technologie d'intelligence artificielle développée par IAvenir Corporation
+          </motion.p>
           <p className="text-gray-600 text-sm mb-6">
             Pour démarrer : quel est ton prénom ?
           </p>

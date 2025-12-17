@@ -103,32 +103,37 @@ export default function AdCopies() {
                     className="relative"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <div className={cn(
-                      "bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 animate-fade-in",
-                      showBlur && "blur-sm"
-                    )}>
+                    <div className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 animate-fade-in">
                       {/* Gradient Header */}
                       <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-4`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
 
                       {/* Content */}
-                      <h3 className="text-2xl font-bold text-white mb-2">
-                        {type.title}
-                      </h3>
-                      <p className="text-[#61f7a2] text-sm mb-1">{type.subtitle}</p>
-                      <p className="text-gray-400 text-sm mb-6">{type.description}</p>
+                      <div className={cn(
+                        "transition-all duration-700",
+                        showBlur && "blur-[2px]"
+                      )}>
+                        <h3 className="text-2xl font-bold text-white mb-2">
+                          {type.title}
+                        </h3>
+                        <p className="text-[#61f7a2] text-sm mb-1">{type.subtitle}</p>
+                        <p className="text-gray-400 text-sm mb-6">{type.description}</p>
 
-                      {/* Fake content */}
-                      <div className="space-y-3">
-                        <div className="h-16 bg-[#0f0f1f] rounded-xl" />
-                        <div className="h-16 bg-[#0f0f1f] rounded-xl" />
-                        <div className="h-16 bg-[#0f0f1f] rounded-xl" />
+                        {/* Fake content */}
+                        <div className="space-y-3">
+                          <div className="h-16 bg-[#0f0f1f] rounded-xl" />
+                          <div className="h-16 bg-[#0f0f1f] rounded-xl" />
+                          <div className="h-16 bg-[#0f0f1f] rounded-xl" />
+                        </div>
                       </div>
                     </div>
 
                     {/* Lock Overlay */}
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl">
+                    <div className={cn(
+                      "absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl transition-opacity duration-700",
+                      showBlur ? "opacity-100" : "opacity-0 pointer-events-none"
+                    )}>
                       <Lock className="w-12 h-12 text-[#61f7a2] mb-4" />
                       <h4 className="text-xl font-bold text-white mb-2">Premium</h4>
                       <p className="text-gray-400 text-sm mb-4 text-center px-6">

@@ -115,8 +115,9 @@ export default function OfferSuperieure() {
       <div className="max-w-3xl mx-auto px-4">
         {/* Step Title */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-[#61f7a2] mb-2">
-            Étape 3 sur 4 : Choisis ton Offre Supérieure
+          <h2 className="text-3xl font-bold mb-2">
+            <span className="text-[#61f7a2]">Étape 3 sur 4</span>
+            <span className="text-gray-900"> : Choisis ton Offre Supérieure</span>
           </h2>
           <p className="text-gray-500 text-sm max-w-lg mx-auto">
             Une solution plus complète pour tes élèves motivés.

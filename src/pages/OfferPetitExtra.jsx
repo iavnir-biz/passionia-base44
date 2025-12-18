@@ -115,8 +115,9 @@ export default function OfferPetitExtra() {
       <div className="max-w-3xl mx-auto px-4">
         {/* Step Title */}
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-[#61f7a2] mb-2">
-            Étape 2 sur 4 : Choisis ton Petit Extra
+          <h2 className="text-3xl font-bold mb-2">
+            <span className="text-[#61f7a2]">Étape 2 sur 4</span>
+            <span className="text-gray-900"> : Choisis ton Petit Extra</span>
           </h2>
           <p className="text-gray-500 text-sm max-w-lg mx-auto">
             Un bonus rapide et irrésistible qui renforce ton produit principal.

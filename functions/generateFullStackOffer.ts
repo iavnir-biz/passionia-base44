@@ -24,11 +24,13 @@ Tu ne dois JAMAIS orienter l'offre comme une vente de service. Tout doit être f
 STRUCTURE POUR CHAQUE OFFRE (Low / Order Bump / Mid / High) :
 
 1. NOM DU PRODUIT (title)
-   - Nom concret orienté problème ou micro-résultat
-   - Pas de "Mini-formation", "Programme", "Masterclass" seul
-   - Exemples : "Stopper la procrastination en 7 jours", "Ton premier produit vendable en 48h", "Méthode Clarté Offre"
-   - Structure brandée recommandée : [Nom unique] - [Durée/Format] pour [Résultat mesurable]
-   - Utilise les données de l'onboarding : méthode unique, expertise, angle différenciant
+   - OBLIGATOIRE : Structure [Nom Brandé Unique] : [Promise Détaillée et Spécifique]
+   - Exemples à suivre : "Le Déclic du Pianiste : Votre Plan en 21 Jours pour Jouer Vos Premières Mélodies"
+   - INTERDIT : titres courts type "Guide pratique : Démarrer le piano" ou "Mini-formation piano"
+   - Le nom complet doit faire entre 8 et 15 mots minimum
+   - Toujours utiliser ":" pour séparer le nom brandé de la promise
+   - Intégrer des chiffres et le vouvoiement dans la promise (Votre, Vos)
+   - Utilise les données de l'onboarding : méthode unique, expertise, angle différenciant, histoire personnelle
 
 2. SOUS-TITRE EXPLICATIF (outcome)
    - 1 phrase claire qui explique à quoi ça sert et pour qui
@@ -268,18 +270,64 @@ Freins principaux : ${JSON.stringify(onboardingFull.obstacles || [])}
 Motivation : ${onboardingFull.readiness || 'non spécifié'}
 Autres données : ${JSON.stringify(onboardingFull, null, 2)}
 
-INSTRUCTIONS CRITIQUES POUR LES TITRES - NOMS DE PRODUITS BRANDÉS :
-- CRÉE UN VRAI NOM DE PRODUIT qui donne l'impression d'un produit prêt à vendre
-- Structure : [Nom de marque unique] - [Durée/Format] pour [Résultat ultra précis]
-- Exemples pour piano : "Piano Mind - 7 jours pour maîtriser 3 gammes" (PAS "Mini formation piano" ou "Les premiers pas au piano")
-- Exemples pour marketing : "First Sale Sprint - 14 jours pour ton premier client" (PAS "Guide marketing débutant")
-- Utilise la méthode unique de l'expert (mentionnée dans l'onboarding)
-- Utilise son expertise spécifique et ce qui rend ses élèves uniques
-- Utilise son histoire personnelle et ce qu'il a traversé
-- Intègre les freins pour personnaliser (ex: "pas le temps" → "Express 15 min/jour", "peur du regard" → "Mode discret activé")
-- Le nom doit être MÉMORABLE, BRANDÉ, et donner envie immédiatement
-- Ne JAMAIS utiliser de titres génériques comme "Mini formation", "Guide pratique", "Démarrer en..."
-- OBLIGATOIRE : Chaque titre doit répondre à un QUICK WIN précis basé sur les réponses de l'onboarding
+INSTRUCTIONS CRITIQUES POUR LES TITRES - NOMS DE PRODUITS BRANDÉS ET ÉLABORÉS :
+
+🎯 STRUCTURE OBLIGATOIRE DES NOMS :
+[Nom brandé accrocheur] : [Promise détaillée et spécifique]
+
+📌 EXEMPLES DE RÉFÉRENCE (à respecter comme modèle) :
+- "Le Déclic du Dessinateur : Votre Kit de Démarrage pour Vaincre la Page Blanche"
+- "La Boîte à Outils Anti-Panne : 50 Modèles & Structures pour Pratiquer Sans Pression"
+- "Atelier 'Dessin Intuitif' : Libérez Votre Trait en Direct"
+- "Le Programme 'Artiste Émergent' : Votre Accompagnement de 3 Mois pour Développer Votre Style"
+
+⚡ RÈGLES ABSOLUES :
+1. TOUJOURS créer un nom brandé unique et mémorable (ex: "Le Déclic du...", "La Boîte à...", "Programme...", "Atelier...", "La Méthode...")
+2. TOUJOURS ajouter après le nom brandé un ":" suivi d'une promise ultra détaillée
+3. La promise doit être SPÉCIFIQUE avec des mots d'action forts (Vaincre, Libérer, Maîtriser, Développer, Transformer...)
+4. Intégrer des NOMBRES quand possible (50 Modèles, 3 Mois, 7 Jours, etc.)
+5. Utiliser le VOUVOIEMENT dans la promise (Votre, Vos) pour créer un lien direct
+6. Le nom complet doit faire entre 8 et 15 mots minimum
+
+🚫 INTERDICTIONS STRICTES :
+- PAS de titres courts type "Guide pratique : Démarrer le piano"
+- PAS de noms génériques sans brandage
+- PAS de promises vagues
+- PAS de structures plates sans ":" pour séparer nom brandé et promise
+
+✨ FORMULES À UTILISER :
+Pour Low-Ticket (17-47€) :
+- "Le Déclic de [Compétence] : Votre Kit de Démarrage pour [Transformation Précise]"
+- "La Boîte à Outils [Adjectif] : [Nombre] [Livrables] pour [Bénéfice Sans Pression]"
+- "Starter Pack '[Nom Unique]' : Vos Premiers Pas pour [Quick Win Mesurable]"
+
+Pour Order Bump (14-37€) :
+- "La Boîte à Outils [Anti-Problème] : [Nombre] [Type Ressources] pour [Action Sans Friction]"
+- "Pack Boost '[Nom]' : [Nombre] [Ressources] Prêts à Utiliser pour [Accélération]"
+- "Kit Express '[Nom]' : Tous les [Outils] pour [Complément du Principal]"
+
+Pour Upsell Mid (67-297€) :
+- "Atelier '[Nom Évocateur]' : [Libérez/Maîtrisez/Développez] [Compétence Clé] en [Format Précis]"
+- "Formation '[Nom Unique]' : Le Programme Complet pour [Transformation Intermédiaire]"
+- "Masterclass '[Thème]' : [Durée] pour [Résultat Avancé Mesurable]"
+
+Pour Premium High (1000-5000€) :
+- "Le Programme '[Nom Ambitieux]' : Votre Accompagnement de [Durée] pour [Grande Transformation]"
+- "Coaching '[Nom Premium]' : [Durée] de Suivi Personnalisé pour [Objectif Élevé]"
+- "Retraite '[Nom Inspirant]' : [Durée] d'Immersion pour [Transformation Profonde]"
+
+💡 PERSONNALISATION OBLIGATOIRE :
+- Utilise la MÉTHODE UNIQUE de l'expert
+- Intègre son HISTOIRE et son ANGLE DIFFÉRENCIANT
+- Référence le PROBLÈME PRINCIPAL et la TRANSFORMATION visés
+- Adapte le VOCABULAIRE au niveau de l'audience cible
+- Incorpore les FREINS pour rassurer (ex: "Sans Pression", "À Votre Rythme", "Sans Risque")
+
+🎯 EXEMPLES ADAPTÉS PAR DOMAINE :
+Piano: "Le Déclic du Pianiste : Votre Plan en 21 Jours pour Jouer Vos Premières Mélodies"
+Marketing: "La Formule Premier Client : Votre Système en 14 Jours pour Vendre Sans Être Vendeur"  
+Dessin: "L'Atelier Trait Libre : 4 Sessions pour Dessiner Sans Blocage Mental"
+Cuisine: "Les Secrets du Chef à Domicile : 30 Recettes Pro pour Impressionner en Toute Simplicité"
 
 MISSION :
 Génère une "Full Stack Offer" complète selon la méthode P.S.S.O.

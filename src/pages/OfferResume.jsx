@@ -139,7 +139,24 @@ export default function OfferResume() {
           </p>
         </motion.div>
 
-        {/* Products Detail Cards */}
+        {/* CTA Button Top */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="flex justify-center mb-12">
+
+          <GlowButton
+            onClick={handleContinue}
+            size="lg"
+            className="px-12">
+
+            Découvrir si mon marché est validé
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </GlowButton>
+        </motion.div>
+
+        {/* Products Summary - Vertical */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -151,16 +168,55 @@ export default function OfferResume() {
             Tes 4 offres complètes
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {products.map((product) => (
-              <OfferDetailCard
-                key={product.key}
-                offerType={product.offerType}
-                offerTitle={product.label}
-                baseOffer={product.data}
-                sessionId={sessionId}
-              />
-            ))}
+          <div className="space-y-4">
+            {products.map((product, index) => {
+              const Icon = iconMap[product.data?.productType] || Video;
+              const colorSchemes = {
+                0: 'bg-blue-50 border-blue-200',
+                1: 'bg-green-50 border-green-200',
+                2: 'bg-purple-50 border-purple-200',
+                3: 'bg-amber-50 border-amber-200'
+              };
+              
+              return (
+                <div
+                  key={product.key}
+                  className={`${colorSchemes[index]} border rounded-2xl p-5 flex items-center gap-4`}
+                >
+                  {/* Icon */}
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                      <Icon className="w-6 h-6 text-gray-700" />
+                    </div>
+                  </div>
+                  
+                  {/* Title & Subtitle */}
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-900 mb-1">{product.label}</h3>
+                    <p className="text-sm text-gray-600">{product.data?.title || 'Non défini'}</p>
+                  </div>
+                  
+                  {/* Price */}
+                  <div className="flex-shrink-0">
+                    <span className="text-2xl font-bold text-gray-900">{product.data?.price || '—'}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Blur Effect - Detail disponible à la fin */}
+          <div className="mt-6 relative">
+            <div className="blur-sm opacity-40 pointer-events-none bg-white border border-gray-200 rounded-2xl p-6">
+              <p className="text-gray-600 text-sm">
+                Contenu détaillé de chaque offre avec descriptions complètes, livrables, et bénéfices...
+              </p>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-gray-700 font-semibold text-lg px-6 py-3 bg-white/90 rounded-xl shadow-lg">
+                Le détail de vos offres sera disponible à la fin
+              </p>
+            </div>
           </div>
         </motion.div>
 
@@ -251,7 +307,7 @@ export default function OfferResume() {
           }
         </motion.div>
 
-        {/* CTA Button */}
+        {/* CTA Button Bottom */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -263,7 +319,7 @@ export default function OfferResume() {
             size="lg"
             className="px-12">
 
-            Continuer
+            Voir si mon marché est validé
             <ArrowRight className="w-5 h-5 ml-2" />
           </GlowButton>
         </motion.div>

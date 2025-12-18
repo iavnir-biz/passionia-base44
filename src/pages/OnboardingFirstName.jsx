@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
@@ -6,25 +6,6 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Brain, Zap } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import { Input } from '@/components/ui/input';
-
-// Typing effect component
-const TypingText = ({ text, className = "", delay = 0 }) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timeout = setTimeout(() => {
-        setDisplayedText(prev => prev + text[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
-      }, delay + 30 + Math.random() * 30);
-      
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndex, text, delay]);
-
-  return <span className={className}>{displayedText}</span>;
-};
 
 // Nova AI Avatar - Animated
 const NovaAvatar = () => (
@@ -182,37 +163,21 @@ export default function OnboardingFirstName() {
         {/* Card */}
         <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
           <h1 className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed">
-            <TypingText text="Enchanté ! Commençons par faire connaissance 🙂" delay={0} />
+            Enchanté ! Commençons par faire connaissance 🙂
           </h1>
           <p className="text-gray-700 mb-4 leading-relaxed">
-            <TypingText 
-              text="Je suis " 
-              delay={1300}
-            />
-            <span className="text-[#61f7a2] font-semibold">
-              <TypingText text="Nova" delay={1600} />
-            </span>
-            <TypingText 
-              text=", l'IA de Passion IA, et je vais t'aider à monétiser ton savoir-faire." 
-              delay={1900}
-            />
+            Je suis <span className="text-[#61f7a2] font-semibold">Nova</span>, l'IA de Passion IA, et je vais t'aider à monétiser ton savoir-faire.
           </p>
           <motion.p 
             className="text-sm text-gray-500 italic mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 5 }}
+            transition={{ delay: 0.8 }}
           >
-            <TypingText 
-              text="Une technologie d'intelligence artificielle développée par IAvenir Corporation"
-              delay={5000}
-            />
+            Une technologie d'intelligence artificielle développée par IAvenir Corporation
           </motion.p>
           <p className="text-gray-600 text-sm mb-6">
-            <TypingText 
-              text="Pour démarrer : quel est ton prénom ?"
-              delay={7500}
-            />
+            Pour démarrer : quel est ton prénom ?
           </p>
 
           <Input

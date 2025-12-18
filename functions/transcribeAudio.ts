@@ -14,15 +14,18 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const formData = await req.formData();
-    const audioFile = formData.get('audio');
+    const { audioUrl } = await req.json();
 
-    if (!audioFile) {
-      return Response.json({ error: 'No audio file provided' }, { status: 400 });
+    if (!audioUrl) {
+      return Response.json({ error: 'No audio URL provided' }, { status: 400 });
     }
 
+    // Télécharger le fichier audio
+    const audioResponse = await fetch(audioUrl);
+    const audioBlob = await audioResponse.blob();
+    
     // Convertir en File pour OpenAI
-    const file = new File([audioFile], 'audio.webm', { type: 'audio/webm' });
+    const file = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
 
     const transcription = await openai.audio.transcriptions.create({
       file: file,

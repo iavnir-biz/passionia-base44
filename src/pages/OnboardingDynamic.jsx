@@ -180,10 +180,14 @@ export default function OnboardingDynamic() {
         // Transcrire l'audio
         setIsTranscribing(true);
         try {
-          const formData = new FormData();
-          formData.append('audio', audioBlob, 'voice-note.webm');
-
-          const { data } = await base44.functions.invoke('transcribeAudio', formData);
+          // Upload l'audio d'abord
+          const file = new File([audioBlob], 'voice-note.webm', { type: 'audio/webm' });
+          const uploadResult = await base44.integrations.Core.UploadFile({ file });
+          
+          // Puis transcrire
+          const { data } = await base44.functions.invoke('transcribeAudio', {
+            audioUrl: uploadResult.file_url
+          });
           
           // Ajouter le texte transcrit à la réponse existante
           setValue(prev => prev ? `${prev}\n${data.text}` : data.text);

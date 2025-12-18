@@ -32,22 +32,22 @@ const features = [
   { 
     icon: Zap, 
     title: "Analyse IA instantanée", 
-    description: "Validation de ton marché, de ta cible, de ton positionnement et de ton avatar." 
+    description: "Transforme ta passion en business validé en quelques minutes." 
   },
   { 
     icon: Target, 
     title: "Plan d'action personnalisé", 
-    description: "Un roadmap sur-mesure pour atteindre tes premiers revenus en 7 jours." 
+    description: "Un roadmap sur-mesure pour atteindre tes premiers revenus." 
   },
   { 
     icon: FileText, 
-    title: "Documents IA générés", 
-    description: "Page de vente, emails marketing, messages de vente, avatar complet, toutes tes offres et prix, prêts à l'emploi." 
+    title: "Documents générés", 
+    description: "Page de vente, emails, scripts DM... tout prêt à l'emploi." 
   },
   { 
     icon: TrendingUp, 
-    title: "Plan d'action", 
-    description: "Suivi de ton avancement avec tâches à faire tous les jours." 
+    title: "Suivi progression", 
+    description: "Suis ton avancement et reste motivé chaque jour." 
   },
 ];
 
@@ -152,7 +152,7 @@ export default function Welcome() {
           </motion.div>
           
           <p className="text-gray-500 text-sm">
-            5 minutes pour accéder à ton dashboard personnalisé
+            Gratuit • 5 minutes
           </p>
         </div>
 
@@ -262,7 +262,7 @@ export default function Welcome() {
             Prêt à transformer ta passion en business ?
           </h2>
           <p className="text-gray-600 text-lg mb-10 leading-relaxed">
-            Construis ton premier produit digital en 7 jours : la première marche pour transformer ton savoir-faire en activité rentable.
+            Découvre comment ton savoir-faire peut devenir une source de revenus grâce à l'IA.
           </p>
           <div className="flex justify-center">
             <Button

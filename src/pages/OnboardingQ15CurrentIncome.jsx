@@ -12,7 +12,8 @@ export default function OnboardingQ15CurrentIncome() {
         "1500€ - 2500€",
         "2500€ - 3500€",
         "3500€ - 4500€",
-        "Plus de 4500€"
+        "Plus de 4500€",
+        "Je ne préfère pas le dire"
       ]}
       fieldName="currentIncome"
       nextPage="OnboardingQ16TargetIncome"

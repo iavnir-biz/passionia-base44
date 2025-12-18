@@ -112,33 +112,29 @@ export default function OfferTaVieFuture() {
 
   const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
   
-  // Calculate sales needed to reach goal - with smart distribution
+  // Calculate sales needed to reach goal using same proportions as revenue potential
   const revenueGoal = parseInt(user?.targetIncome) || 500;
   
-  // Sort by price descending to prioritize higher ticket items
-  const sortedRevenues = [...revenues].sort((a, b) => b.price - a.price);
+  // Calculate the multiplier to reach the goal from current potential
+  const multiplier = totalMonthly > 0 ? revenueGoal / totalMonthly : 1;
   
-  const salesNeeded = sortedRevenues.map((r, idx) => {
-    if (r.price === 0) return { ...r, salesNeeded: 0 };
+  // Apply the multiplier to each product's sales count to maintain proportions
+  const salesNeeded = revenues.map(r => {
+    if (r.price === 0) return { ...r, salesNeeded: 0, projectedRevenue: 0 };
     
-    // Distribution strategy: focus more on main product, less on premium
-    let salesCount = 0;
-    if (idx === 0) { // Premium - 1-2 sales
-      salesCount = Math.min(2, Math.ceil(revenueGoal / r.price / 10));
-    } else if (idx === 1) { // Upsell - 3-5 sales
-      salesCount = Math.min(5, Math.ceil(revenueGoal / r.price / 6));
-    } else if (idx === 2) { // Order Bump - 8-10 sales
-      salesCount = Math.min(10, Math.ceil(revenueGoal / r.price / 4));
-    } else { // Main Product - 15-20 sales
-      salesCount = Math.min(20, Math.ceil(revenueGoal / r.price / 2));
-    }
+    // Scale up the current multiplier by the goal ratio
+    const targetSales = Math.ceil(r.multiplier * multiplier);
+    const projectedRevenue = targetSales * r.price;
     
-    return { ...r, salesNeeded: Math.max(1, salesCount) };
-  }).sort((a, b) => {
-    // Re-sort to original order (main, bump, upsell, premium)
-    const order = ['product_principal', 'petit_extra', 'offre_superieure', 'offre_premium'];
-    return order.indexOf(a.key) - order.indexOf(b.key);
+    return { 
+      ...r, 
+      salesNeeded: targetSales,
+      projectedRevenue 
+    };
   });
+  
+  // Calculate total projected revenue to verify
+  const totalProjected = salesNeeded.reduce((sum, item) => sum + item.projectedRevenue, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
@@ -348,6 +344,11 @@ export default function OfferTaVieFuture() {
                 </h2>
                 <p className="text-gray-600 text-sm">
                   Nombre de ventes nécessaires par mois pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
+                  {totalProjected > 0 && (
+                    <span className="block mt-1 text-[#61f7a2] font-semibold">
+                      → Projection totale : {totalProjected.toLocaleString('fr-FR')}€/mois
+                    </span>
+                  )}
                 </p>
               </div>
             </div>

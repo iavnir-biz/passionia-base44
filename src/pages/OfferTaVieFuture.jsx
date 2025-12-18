@@ -90,7 +90,7 @@ export default function OfferTaVieFuture() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
@@ -121,9 +121,9 @@ export default function OfferTaVieFuture() {
   });
 
   return (
-    <div className="min-h-screen bg-[#11112b]">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Main Navigation Bar */}
-      <div className="bg-[#1b1b33] border-b border-[#2a2a45] py-4">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 py-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
             {mainSteps.map((step, index) => (
@@ -131,17 +131,17 @@ export default function OfferTaVieFuture() {
                 <div className={cn(
                   "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
                   step.id === 3 
-                    ? "bg-[#61f7a2] text-[#11112b]" 
+                    ? "bg-[#61f7a2] text-white shadow-md" 
                     : step.id < 3
-                      ? "text-[#61f7a2]"
-                      : "text-gray-500"
+                      ? "text-[#61f7a2] bg-[#61f7a2]/10"
+                      : "text-gray-400 bg-gray-100"
                 )}>
                   {step.id}. {step.label}
                 </div>
                 {index < mainSteps.length - 1 && (
                   <div className={cn(
                     "w-4 md:w-8 h-[2px]",
-                    step.id < 3 ? "bg-[#61f7a2]" : "bg-[#2a2a45]"
+                    step.id < 3 ? "bg-[#61f7a2]" : "bg-gray-200"
                   )} />
                 )}
               </React.Fragment>
@@ -151,15 +151,15 @@ export default function OfferTaVieFuture() {
       </div>
 
       {/* Content */}
-      <div className="py-8">
+      <div className="py-12">
         <div className="max-w-3xl mx-auto px-4">
           {/* Title */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-6"
+            className="text-center mb-8"
           >
-            <h1 className="text-3xl font-bold text-white mb-3">
+            <h1 className="text-4xl font-bold text-gray-900 mb-3">
               ✨ Voici ce que ta vie future te réserve…
             </h1>
           </motion.div>
@@ -182,17 +182,21 @@ export default function OfferTaVieFuture() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-8 mb-6"
+            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6"
           >
-            <div className="flex items-start gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-5 h-5 text-[#61f7a2]" />
-              </div>
+            <div className="flex items-start gap-4 mb-6">
+              <motion.div 
+                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-lg"
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles className="w-6 h-6 text-white" />
+              </motion.div>
               <div>
-                <h2 className="text-lg font-bold text-white mb-1">
+                <h2 className="text-xl font-bold text-gray-900 mb-1">
                   Ta vision personnalisée
                 </h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Une projection inspirante basée sur ton parcours
                 </p>
               </div>
@@ -201,14 +205,20 @@ export default function OfferTaVieFuture() {
             {isGenerating ? (
               <div className="flex items-center gap-3 py-8">
                 <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                <span className="text-gray-400">Génération de ta vision en cours...</span>
+                <span className="text-gray-600">Génération de ta vision en cours...</span>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {futureVision?.narrativeText.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx} className="text-gray-300 leading-relaxed">
+                  <motion.p 
+                    key={idx} 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="text-gray-700 leading-relaxed text-base"
+                  >
                     {paragraph}
-                  </p>
+                  </motion.p>
                 ))}
               </div>
             )}
@@ -219,34 +229,43 @@ export default function OfferTaVieFuture() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-[#61f7a2]/10 to-[#1b1b33] rounded-2xl border border-[#61f7a2]/30 p-6 mb-6"
+            className="bg-gradient-to-br from-[#61f7a2]/10 via-white to-[#4de88f]/5 rounded-3xl border-2 border-[#61f7a2]/30 p-8 mb-6 shadow-lg"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-[#61f7a2] flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-[#11112b]" />
-              </div>
+            <div className="flex items-center gap-4 mb-6">
+              <motion.div 
+                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <TrendingUp className="w-6 h-6 text-white" />
+              </motion.div>
               <div>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-xl font-bold text-gray-900">
                   Ton Potentiel de Revenus Mensuels
                 </h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Basé sur les produits sélectionnés et une hypothèse d'une vente par jour
                 </p>
               </div>
             </div>
 
             {/* Big Number */}
-            <div className="text-center py-6">
-              <span className="text-5xl md:text-6xl font-bold text-[#61f7a2]">
+            <motion.div 
+              className="text-center py-8"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <span className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">
                 {totalMonthly.toLocaleString('fr-FR')} €
               </span>
-              <p className="text-gray-400 mt-2">par mois</p>
-            </div>
+              <p className="text-gray-600 mt-3 text-lg font-medium">par mois</p>
+            </motion.div>
 
             {/* Toggle Detail */}
             <button
               onClick={() => setShowDetail(!showDetail)}
-              className="w-full flex items-center justify-center gap-2 py-3 text-[#61f7a2] hover:text-white transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[#61f7a2] hover:bg-[#61f7a2]/5 transition-all font-medium"
             >
               {showDetail ? (
                 <>
@@ -264,15 +283,15 @@ export default function OfferTaVieFuture() {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="border-t border-[#2a2a45] pt-4 mt-2 space-y-3"
+                className="border-t border-gray-200 pt-4 mt-2 space-y-3"
               >
                 {revenues.map((rev) => (
                   <div 
                     key={rev.key}
-                    className="flex items-center justify-between py-2 px-3 bg-[#11112b]/50 rounded-lg"
+                    className="flex items-center justify-between py-3 px-4 bg-white rounded-2xl border border-gray-200"
                   >
                     <div>
-                      <span className="text-white text-sm font-medium">{rev.label}</span>
+                      <span className="text-gray-900 text-sm font-semibold">{rev.label}</span>
                       <p className="text-gray-500 text-xs">×{rev.multiplier} ventes/mois</p>
                     </div>
                     <div className="text-right">
@@ -282,8 +301,8 @@ export default function OfferTaVieFuture() {
                   </div>
                 ))}
                 
-                <div className="flex items-center justify-between py-3 px-3 bg-[#61f7a2]/10 rounded-lg border border-[#61f7a2]/30">
-                  <span className="text-white font-bold">Total Mensuel</span>
+                <div className="flex items-center justify-between py-4 px-4 bg-gradient-to-r from-[#61f7a2]/10 to-[#4de88f]/10 rounded-2xl border-2 border-[#61f7a2]/30">
+                  <span className="text-gray-900 font-bold">Total Mensuel</span>
                   <span className="text-[#61f7a2] font-bold text-xl">
                     {totalMonthly.toLocaleString('fr-FR')} €
                   </span>
@@ -296,48 +315,56 @@ export default function OfferTaVieFuture() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-yellow-500/10 to-[#1b1b33] rounded-2xl border border-yellow-500/30 p-6 mb-8"
+            transition={{ delay: 0.5 }}
+            className="bg-gradient-to-br from-yellow-50 to-white rounded-3xl border-2 border-yellow-300/50 p-8 mb-8 shadow-lg"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                <Target className="w-5 h-5 text-yellow-500" />
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg">
+                <Target className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-xl font-bold text-gray-900">
                   Ton Plan de Route pour Atteindre ton Objectif
                 </h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Nombre de ventes nécessaires par mois pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
                 </p>
               </div>
             </div>
 
-            <div className="space-y-4">
-              {salesNeeded.map((item) => (
-                <div 
+            <div className="space-y-3">
+              {salesNeeded.map((item, idx) => (
+                <motion.div 
                   key={item.key}
-                  className="flex items-center justify-between py-3 px-4 bg-[#11112b] rounded-xl border border-[#2a2a45]"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6 + idx * 0.1 }}
+                  className="flex items-center justify-between py-4 px-5 bg-white rounded-2xl border border-gray-200 shadow-sm"
                 >
                   <div>
-                    <span className="text-white text-sm font-medium">{item.label}</span>
+                    <span className="text-gray-900 text-sm font-semibold">{item.label}</span>
                     <p className="text-gray-500 text-xs">{item.price} € par vente</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-yellow-500" />
-                    <span className="text-yellow-500 font-bold text-lg">
+                    <CheckCircle className="w-5 h-5 text-yellow-500" />
+                    <span className="text-yellow-600 font-bold text-lg">
                       {item.salesNeeded} ventes
                     </span>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
-            <div className="mt-6 p-4 bg-yellow-500/5 rounded-xl border border-yellow-500/20">
-              <p className="text-gray-300 text-sm text-center">
-                💡 <strong className="text-white">Astuce :</strong> Commence par te concentrer sur ton Produit Principal pour valider le marché, puis ajoute progressivement les autres offres.
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1 }}
+              className="mt-6 p-5 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border border-yellow-200"
+            >
+              <p className="text-gray-700 text-sm text-center leading-relaxed">
+                💡 <strong className="text-gray-900">Astuce :</strong> Commence par te concentrer sur ton Produit Principal pour valider le marché, puis ajoute progressivement les autres offres.
               </p>
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Bottom CTA */}
@@ -356,10 +383,14 @@ export default function OfferTaVieFuture() {
       </div>
 
       {/* Footer */}
-      <footer className="py-6 text-center border-t border-[#2a2a45] bg-[#1b1b33]">
+      <footer className="py-8 text-center border-t border-gray-200 bg-white">
         <p className="text-gray-500 text-sm">Copyright Passion IA</p>
         <div className="flex items-center justify-center gap-2 mt-2">
-          <div className="w-2 h-2 rounded-full bg-[#61f7a2] animate-pulse" />
+          <motion.div 
+            className="w-2 h-2 rounded-full bg-[#61f7a2]"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
           <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
         </div>
       </footer>

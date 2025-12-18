@@ -39,21 +39,23 @@ function ProgressBarItem({ label, value, icon: Icon, delay = 0 }) {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay }}
-      className="space-y-2"
+      className="space-y-3"
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-[#61f7a2]" />
-          <span className="text-sm text-gray-300">{label}</span>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center">
+            <Icon className="w-4 h-4 text-[#61f7a2]" />
+          </div>
+          <span className="text-sm font-medium text-gray-700">{label}</span>
         </div>
         <span className="text-sm font-bold text-[#61f7a2]">{value}%</span>
       </div>
-      <div className="h-3 bg-[#2a2a45] rounded-full overflow-hidden">
+      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
           transition={{ delay: delay + 0.2, duration: 0.8, ease: "easeOut" }}
-          className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-full"
+          className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-full shadow-sm"
         />
       </div>
     </motion.div>
@@ -134,7 +136,7 @@ export default function BonneNouvelle() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
@@ -158,9 +160,9 @@ export default function BonneNouvelle() {
   const scores = marketAnalysis?.marketScores || {};
 
   return (
-    <div className="min-h-screen bg-[#11112b]">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Main Navigation Bar */}
-      <div className="bg-[#1b1b33] border-b border-[#2a2a45] py-4">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 py-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
             {mainSteps.map((step, index) => (
@@ -168,17 +170,17 @@ export default function BonneNouvelle() {
                 <div className={cn(
                   "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
                   step.id === 2 
-                    ? "bg-[#61f7a2] text-[#11112b]" 
+                    ? "bg-[#61f7a2] text-white shadow-md" 
                     : step.id < 2
-                      ? "text-[#61f7a2]"
-                      : "text-gray-500"
+                      ? "text-[#61f7a2] bg-[#61f7a2]/10"
+                      : "text-gray-400 bg-gray-100"
                 )}>
                   {step.id}. {step.label}
                 </div>
                 {index < mainSteps.length - 1 && (
                   <div className={cn(
                     "w-4 md:w-8 h-[2px]",
-                    step.id < 2 ? "bg-[#61f7a2]" : "bg-[#2a2a45]"
+                    step.id < 2 ? "bg-[#61f7a2]" : "bg-gray-200"
                   )} />
                 )}
               </React.Fragment>
@@ -188,15 +190,15 @@ export default function BonneNouvelle() {
       </div>
 
       {/* Content */}
-      <div className="py-8">
+      <div className="py-12">
         <div className="max-w-3xl mx-auto px-4">
           {/* Title */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-6"
+            className="text-center mb-8"
           >
-            <h1 className="text-3xl font-bold text-white mb-3">
+            <h1 className="text-4xl font-bold text-gray-900 mb-3">
               🎉 Étape 2 : Bonne nouvelle !
             </h1>
           </motion.div>
@@ -219,17 +221,21 @@ export default function BonneNouvelle() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-6"
+            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6"
           >
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-5 h-5 text-[#61f7a2]" />
-              </div>
+            <div className="flex items-start gap-4 mb-4">
+              <motion.div 
+                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-lg"
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles className="w-6 h-6 text-white" />
+              </motion.div>
               <div>
-                <h2 className="text-lg font-bold text-white mb-1">
+                <h2 className="text-xl font-bold text-gray-900 mb-1">
                   Ton marché est validé
                 </h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Analyse personnalisée pour {user?.coreSkill || 'ta compétence'}
                 </p>
               </div>
@@ -238,10 +244,10 @@ export default function BonneNouvelle() {
             {isGenerating ? (
               <div className="flex items-center gap-3 py-4">
                 <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                <span className="text-gray-400">Analyse en cours...</span>
+                <span className="text-gray-600">Analyse en cours...</span>
               </div>
             ) : (
-              <p className="text-gray-300 leading-relaxed">
+              <p className="text-gray-700 leading-relaxed text-base">
                 {marketAnalysis?.validationText}
               </p>
             )}
@@ -252,14 +258,14 @@ export default function BonneNouvelle() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-6"
+            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-[#61f7a2]" />
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg">
+                <BarChart3 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-xl font-bold text-gray-900">
                   Potentiel du marché pour enseigner {user?.coreSkill || 'ta compétence'} en ligne
                 </h2>
               </div>
@@ -310,34 +316,43 @@ export default function BonneNouvelle() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-[#61f7a2]/10 to-[#1b1b33] rounded-2xl border border-[#61f7a2]/30 p-6 mb-8"
+            className="bg-gradient-to-br from-[#61f7a2]/10 via-white to-[#4de88f]/5 rounded-3xl border-2 border-[#61f7a2]/30 p-8 mb-8 shadow-lg"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-[#61f7a2] flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-[#11112b]" />
-              </div>
+            <div className="flex items-center gap-4 mb-6">
+              <motion.div 
+                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <TrendingUp className="w-6 h-6 text-white" />
+              </motion.div>
               <div>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-xl font-bold text-gray-900">
                   Ton Potentiel de Revenus Mensuels
                 </h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-600 text-sm">
                   Basé sur les produits sélectionnés et une hypothèse d'une vente par jour
                 </p>
               </div>
             </div>
 
             {/* Big Number */}
-            <div className="text-center py-6">
-              <span className="text-5xl md:text-6xl font-bold text-[#61f7a2]">
+            <motion.div 
+              className="text-center py-8"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <span className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">
                 {totalMonthly.toLocaleString('fr-FR')} €
               </span>
-              <p className="text-gray-400 mt-2">par mois</p>
-            </div>
+              <p className="text-gray-600 mt-3 text-lg font-medium">par mois</p>
+            </motion.div>
 
             {/* Toggle Detail */}
             <button
               onClick={() => setShowDetail(!showDetail)}
-              className="w-full flex items-center justify-center gap-2 py-3 text-[#61f7a2] hover:text-white transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[#61f7a2] hover:bg-[#61f7a2]/5 transition-all font-medium"
             >
               {showDetail ? (
                 <>
@@ -355,15 +370,15 @@ export default function BonneNouvelle() {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="border-t border-[#2a2a45] pt-4 mt-2 space-y-3"
+                className="border-t border-gray-200 pt-4 mt-2 space-y-3"
               >
                 {revenues.map((rev) => (
                   <div 
                     key={rev.key}
-                    className="flex items-center justify-between py-2 px-3 bg-[#11112b]/50 rounded-lg"
+                    className="flex items-center justify-between py-3 px-4 bg-white rounded-2xl border border-gray-200"
                   >
                     <div>
-                      <span className="text-white text-sm font-medium">{rev.label}</span>
+                      <span className="text-gray-900 text-sm font-semibold">{rev.label}</span>
                       <p className="text-gray-500 text-xs">×{rev.multiplier} ventes/mois</p>
                     </div>
                     <div className="text-right">
@@ -373,8 +388,8 @@ export default function BonneNouvelle() {
                   </div>
                 ))}
                 
-                <div className="flex items-center justify-between py-3 px-3 bg-[#61f7a2]/10 rounded-lg border border-[#61f7a2]/30">
-                  <span className="text-white font-bold">Total Mensuel</span>
+                <div className="flex items-center justify-between py-4 px-4 bg-gradient-to-r from-[#61f7a2]/10 to-[#4de88f]/10 rounded-2xl border-2 border-[#61f7a2]/30">
+                  <span className="text-gray-900 font-bold">Total Mensuel</span>
                   <span className="text-[#61f7a2] font-bold text-xl">
                     {totalMonthly.toLocaleString('fr-FR')} €
                   </span>
@@ -399,10 +414,14 @@ export default function BonneNouvelle() {
       </div>
 
       {/* Footer */}
-      <footer className="py-6 text-center border-t border-[#2a2a45] bg-[#1b1b33]">
+      <footer className="py-8 text-center border-t border-gray-200 bg-white">
         <p className="text-gray-500 text-sm">Copyright Passion IA</p>
         <div className="flex items-center justify-center gap-2 mt-2">
-          <div className="w-2 h-2 rounded-full bg-[#61f7a2] animate-pulse" />
+          <motion.div 
+            className="w-2 h-2 rounded-full bg-[#61f7a2]"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
           <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
         </div>
       </footer>

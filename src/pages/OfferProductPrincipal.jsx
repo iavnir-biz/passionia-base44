@@ -155,7 +155,7 @@ export default function OfferProductPrincipal() {
 
         {/* Step Title */}
         <div className="text-center mb-8">
-          <h2 className="text-xl font-bold text-[#61f7a2] mb-2">
+          <h2 className="text-3xl font-bold text-[#61f7a2] mb-2">
             Étape 1 sur 4 : Choisis ton Produit Principal
           </h2>
           <p className="text-gray-700 mx-auto text-sm max-w-lg">C'est ton offre d'entrée. Choisis l'option la plus simple pour commencer.

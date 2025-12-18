@@ -17,21 +17,94 @@ import {
   ChevronDown,
   ChevronUp,
   TrendingUp,
-  ArrowRight } from
+  ArrowRight,
+  BookOpen,
+  Zap,
+  Award,
+  Crown,
+  Gift,
+  Target,
+  Lightbulb,
+  MessageSquare,
+  Calendar,
+  Package } from
 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import GlowButton from '@/components/ui/GlowButton';
 import OfferDetailCard from '@/components/offer/OfferDetailCard';
 
-const iconMap = {
-  'mini-formation': Video,
-  'ebook': FileText,
-  'modeles': Layers,
-  'checklist': CheckSquare,
-  'atelier': Presentation,
-  'formation-complete': GraduationCap,
-  'coaching': Star,
-  'mentorat': Users
+// Function to get icon based on offer content
+const getProductIcon = (offer) => {
+  if (!offer) return Package;
+  
+  const titleLower = (offer.title || '').toLowerCase();
+  const descLower = (offer.description || '').toLowerCase();
+  const typeLower = (offer.productType || '').toLowerCase();
+  
+  // Coaching / Mentorat
+  if (titleLower.includes('coaching') || descLower.includes('coaching') || 
+      titleLower.includes('mentorat') || descLower.includes('accompagnement personnel') ||
+      typeLower.includes('coaching') || typeLower.includes('mentorat')) {
+    return Star;
+  }
+  
+  // VIP / Premium
+  if (titleLower.includes('vip') || titleLower.includes('premium') || 
+      titleLower.includes('masterclass') || typeLower.includes('vip')) {
+    return Crown;
+  }
+  
+  // Formation complète
+  if (titleLower.includes('formation complète') || titleLower.includes('programme complet') ||
+      descLower.includes('formation complète') || typeLower.includes('formation-complete')) {
+    return GraduationCap;
+  }
+  
+  // Mini-formation / Cours
+  if (titleLower.includes('mini-formation') || titleLower.includes('mini formation') ||
+      titleLower.includes('cours') || typeLower.includes('mini-formation')) {
+    return Video;
+  }
+  
+  // Ebook / Guide
+  if (titleLower.includes('ebook') || titleLower.includes('e-book') || 
+      titleLower.includes('guide') || titleLower.includes('pdf') ||
+      typeLower.includes('ebook')) {
+    return BookOpen;
+  }
+  
+  // Checklist / Template
+  if (titleLower.includes('checklist') || titleLower.includes('check-list') ||
+      titleLower.includes('template') || titleLower.includes('modèle') ||
+      typeLower.includes('checklist') || typeLower.includes('modeles')) {
+    return CheckSquare;
+  }
+  
+  // Atelier / Workshop
+  if (titleLower.includes('atelier') || titleLower.includes('workshop') ||
+      titleLower.includes('masterclass') || typeLower.includes('atelier')) {
+    return Presentation;
+  }
+  
+  // Consultation / Appel
+  if (titleLower.includes('consultation') || titleLower.includes('appel') ||
+      titleLower.includes('session') || descLower.includes('consultation')) {
+    return MessageSquare;
+  }
+  
+  // Communauté / Groupe
+  if (titleLower.includes('communauté') || titleLower.includes('groupe') ||
+      titleLower.includes('accès groupe')) {
+    return Users;
+  }
+  
+  // Bonus / Cadeau
+  if (titleLower.includes('bonus') || titleLower.includes('cadeau') ||
+      titleLower.includes('offert')) {
+    return Gift;
+  }
+  
+  return Package;
 };
 
 function parsePrice(priceStr) {
@@ -172,7 +245,7 @@ export default function OfferResume() {
             {products.map((product, index) => {
               if (!product.data) return null;
               
-              const Icon = iconMap[product.data?.productType] || Video;
+              const Icon = getProductIcon(product.data);
               
               // Couleurs flash par type d'offre
               const colorSchemes = {

@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, Video, FileText, Headphones, CheckSquare, BookOpen, GraduationCap, Play } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
+import OfferTransition from '@/components/offer/OfferTransition';
 
 // Fonction pour déterminer l'icône selon le type de produit
 const getProductIcon = (offer) => {
@@ -42,6 +43,7 @@ export default function OfferProductPrincipal() {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -123,9 +125,8 @@ export default function OfferProductPrincipal() {
         offer: { ...currentOffer, product_principal: offer }
       });
       
-      setTimeout(() => {
-        navigate(createPageUrl('OfferPetitExtra'));
-      }, 500);
+      setIsSaving(false);
+      setShowTransition(true);
     } catch (error) {
       console.error('Error saving:', error);
       setIsSaving(false);
@@ -136,8 +137,17 @@ export default function OfferProductPrincipal() {
     return (
       <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-      </div>);
+      </div>
+    );
+  }
 
+  if (showTransition) {
+    return (
+      <OfferTransition 
+        message="Noah prépare ton Petit Extra..." 
+        onComplete={() => navigate(createPageUrl('OfferPetitExtra'))}
+      />
+    );
   }
 
   return (

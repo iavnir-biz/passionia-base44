@@ -40,7 +40,7 @@ export default function OnboardingTransition() {
     if (visibleItems < items.length) {
       const timer = setTimeout(() => {
         setVisibleItems(prev => prev + 1);
-      }, 500);
+      }, 400);
       return () => clearTimeout(timer);
     }
   }, [visibleItems, items.length]);
@@ -52,7 +52,7 @@ export default function OnboardingTransition() {
         if (prev >= 92) return 92;
         return prev + 2;
       });
-    }, 800);
+    }, 600);
     return () => clearInterval(progressTimer);
   }, []);
 
@@ -62,9 +62,17 @@ export default function OnboardingTransition() {
     const statusTimer = setInterval(() => {
       index = (index + 1) % statusTexts.length;
       setStatusText(statusTexts[index]);
-    }, 1800);
+    }, 1500);
     return () => clearInterval(statusTimer);
   }, []);
+
+  useEffect(() => {
+    // Redirection automatique après 8 secondes
+    const redirectTimer = setTimeout(() => {
+      navigate(createPageUrl('OnboardingQ12AgeRange'));
+    }, 8000);
+    return () => clearTimeout(redirectTimer);
+  }, [navigate]);
 
   const loadUser = async () => {
     try {
@@ -212,48 +220,7 @@ export default function OnboardingTransition() {
             </div>
           </motion.div>
 
-          {/* Micro-feedback personnalisé */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.5 }}
-            className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-200"
-          >
-            <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#61f7a2]" />
-              💬 Ce que j'ai déjà compris de toi
-            </h3>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-start gap-2">
-                <span className="text-[#61f7a2] font-bold">–</span>
-                <span>Tu veux transmettre ton savoir, pas vendre un service</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#61f7a2] font-bold">–</span>
-                <span>Tu cherches quelque chose de simple mais structuré</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[#61f7a2] font-bold">–</span>
-                <span>Ton objectif est réaliste et atteignable</span>
-              </li>
-            </ul>
-          </motion.div>
 
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 2 }}
-          >
-            <GlowButton
-              onClick={handleNext}
-              className="w-full"
-              size="lg"
-            >
-              Découvrir ce que l'IA a préparé pour moi
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
-          </motion.div>
         </div>
       </motion.div>
     </div>

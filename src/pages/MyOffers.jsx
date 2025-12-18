@@ -299,17 +299,52 @@ ${offer.benefits.join('\n')}
             </div>
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
               <div className="space-y-6">
+                {/* Titre et sous-titre */}
                 <div>
                   <h2 className="text-2xl font-bold text-white mb-2">{showPreview.title}</h2>
-                  <div className="text-3xl font-bold text-[#61f7a2] mb-4">{showPreview.price}</div>
-                  <p className="text-gray-300">{showPreview.description}</p>
+                  {showPreview.subtitle && (
+                    <p className="text-gray-400 text-sm mb-3">{showPreview.subtitle}</p>
+                  )}
                 </div>
 
+                {/* Prix et Valeur */}
+                <div className="flex items-center gap-4">
+                  {showPreview.original_value && (
+                    <div className="text-xl text-gray-500 line-through">{showPreview.original_value}</div>
+                  )}
+                  <div className="text-3xl font-bold text-[#61f7a2]">{showPreview.price}</div>
+                </div>
+
+                {/* La Douleur Actuelle */}
+                {showPreview.pain_before && (
+                  <div className="bg-[#2a2a45]/50 border border-red-500/20 rounded-xl p-4">
+                    <h3 className="text-base font-semibold text-red-400 mb-2">😔 Ta situation actuelle</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.pain_before}</p>
+                  </div>
+                )}
+
+                {/* La Transformation */}
+                {showPreview.transformation_after && (
+                  <div className="bg-[#2a2a45]/50 border border-[#61f7a2]/20 rounded-xl p-4">
+                    <h3 className="text-base font-semibold text-[#61f7a2] mb-2">✨ Ce qui t'attend</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.transformation_after}</p>
+                  </div>
+                )}
+
+                {/* La Solution */}
+                {showPreview.solution && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2">💡 La Solution</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.solution}</p>
+                  </div>
+                )}
+
+                {/* Livrables */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">📦 Livrables</h3>
+                  <h3 className="text-lg font-semibold text-white mb-3">📦 Ce que tu reçois concrètement</h3>
                   <ul className="space-y-2">
-                    {showPreview.deliverables.map((item, i) => (
-                      <li key={i} className="text-gray-300 flex items-start gap-2">
+                    {showPreview.deliverables?.map((item, i) => (
+                      <li key={i} className="text-gray-300 text-sm flex items-start gap-2">
                         <span className="text-[#61f7a2] mt-1">✓</span>
                         <span>{item}</span>
                       </li>
@@ -317,17 +352,52 @@ ${offer.benefits.join('\n')}
                   </ul>
                 </div>
 
+                {/* Bénéfices */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">🎯 Bénéfices</h3>
+                  <h3 className="text-lg font-semibold text-white mb-3">🎯 Les bénéfices pour toi</h3>
                   <ul className="space-y-2">
-                    {showPreview.benefits.map((item, i) => (
-                      <li key={i} className="text-gray-300 flex items-start gap-2">
+                    {showPreview.benefits?.map((item, i) => (
+                      <li key={i} className="text-gray-300 text-sm flex items-start gap-2">
                         <span className="text-[#61f7a2] mt-1">→</span>
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
+
+                {/* Pour Qui / Pas Pour Qui */}
+                {(showPreview.for_who || showPreview.not_for_who) && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {showPreview.for_who && (
+                      <div className="bg-[#2a2a45]/50 rounded-xl p-4">
+                        <h3 className="text-sm font-semibold text-[#61f7a2] mb-2">✅ Pour toi si...</h3>
+                        <ul className="space-y-1">
+                          {showPreview.for_who.map((item, i) => (
+                            <li key={i} className="text-gray-400 text-xs">{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {showPreview.not_for_who && (
+                      <div className="bg-[#2a2a45]/50 rounded-xl p-4">
+                        <h3 className="text-sm font-semibold text-red-400 mb-2">❌ Pas pour toi si...</h3>
+                        <ul className="space-y-1">
+                          {showPreview.not_for_who.map((item, i) => (
+                            <li key={i} className="text-gray-400 text-xs">{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Pourquoi Maintenant */}
+                {showPreview.why_now && (
+                  <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#61f7a2]/5 border border-[#61f7a2]/30 rounded-xl p-4">
+                    <h3 className="text-base font-semibold text-[#61f7a2] mb-2">⚡ Pourquoi acheter maintenant</h3>
+                    <p className="text-gray-300 text-sm">{showPreview.why_now}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

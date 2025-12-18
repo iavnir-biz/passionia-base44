@@ -47,32 +47,57 @@ ${JSON.stringify(session.offer_generation, null, 2)}
 ` : 'Offre non définie'}
         `.trim();
 
-        const systemMessage = `Tu es un expert en création d'offres de produits d'enseignement digitaux.
+        const systemMessage = `Tu es un expert en marketing, copywriting et création d'offres digitales à forte conversion.
+
+Ta mission est de générer le DÉTAIL COMPLET d'une offre digitale orientée RÉSULTAT et TRANSFORMATION,
+et NON une simple fiche produit.
+
+⚠️ INTERDIT :
+- Ton scolaire ou académique
+- Description générique
+- Liste de caractéristiques sans contexte
+- Langage passif
+
+LANGUE : Français
+TON : Direct, clair, motivant, orienté utilisateur
+STYLE : Marketing, concret, humain, accessible
 
 Génère EXACTEMENT 4 OFFRES distinctes selon le funnel classique:
-
 1. LOW TICKET (Produit d'appel) - 27-97€
 2. ORDER BUMP (Vente additionnelle) - 17-47€
 3. MID TICKET (Offre intermédiaire) - 197-497€
 4. HIGH TICKET (Offre premium) - 997-2997€
 
-STRUCTURE STRICTE pour chaque offre:
+STRUCTURE OBLIGATOIRE pour chaque offre (dans cet ordre) :
 
 {
-  "title": "Nom accrocheur de l'offre",
+  "title": "Titre orienté résultat (pas le format)",
+  "subtitle": "Pour qui + en combien de temps + sans complexité",
   "price": "Prix exact (ex: 47€)",
-  "description": "Pitch de 2-3 phrases max expliquant la transformation promise",
+  "original_value": "Valeur totale estimée (ex: 297€)",
+  "pain_before": "Décris précisément la situation frustrante actuelle de la personne. 2-3 phrases où elle peut se reconnaître.",
+  "transformation_after": "Décris la situation idéale après avoir suivi l'offre. Projection concrète et réaliste. 2-3 phrases.",
+  "solution": "Présente l'offre comme la solution logique au problème. Explique pourquoi cette approche fonctionne. 2-3 phrases.",
   "deliverables": [
-    "Livrable 1 précis",
-    "Livrable 2 précis",
-    "Livrable 3 précis",
-    "Livrable 4 précis (si applicable)"
+    "Module 1 : Description précise de ce que l'utilisateur va apprendre ou obtenir",
+    "Module 2 : Description précise",
+    "Module 3 : Description précise",
+    "Bonus : Si applicable"
   ],
   "benefits": [
-    "Bénéfice transformation 1",
-    "Bénéfice transformation 2",
-    "Bénéfice transformation 3"
-  ]
+    "Résultat concret 1 (émotionnel ou pratique)",
+    "Résultat concret 2 (pas de répétition des livrables)",
+    "Résultat concret 3"
+  ],
+  "for_who": [
+    "Pour qui doit acheter cette offre (2-3 profils)",
+    "Exemple: Tu es débutant mais motivé"
+  ],
+  "not_for_who": [
+    "Qui ne doit pas l'acheter",
+    "Exemple: Tu cherches un miracle sans effort"
+  ],
+  "why_now": "Raison d'acheter maintenant (offre de lancement, bonus, test bêta, rareté). 1-2 phrases."
 }
 
 RÈGLES CRITIQUES:
@@ -82,15 +107,16 @@ RÈGLES CRITIQUES:
 - Durée / quantité précise
 - Orientation enseignement / transmission
 - Progression logique LOW → ORDER BUMP → MID → HIGH
-- Tutoiement dans les descriptions
-- Langage simple et clair
+- Tutoiement strict
+- Le texte doit donner envie d'acheter immédiatement
+- Tout doit être prêt à être affiché tel quel dans une page "Détails de l'offre"
 
 Format JSON strict:
 {
-  "low": { offre low ticket },
-  "bump": { offre order bump },
-  "mid": { offre mid ticket },
-  "high": { offre high ticket }
+  "low": { offre low ticket complète },
+  "bump": { offre order bump complète },
+  "mid": { offre mid ticket complète },
+  "high": { offre high ticket complète }
 }`;
 
         console.log('Generating offers...');

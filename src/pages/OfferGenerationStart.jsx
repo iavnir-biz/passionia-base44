@@ -146,7 +146,7 @@ export default function OfferGenerationStart() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="text-3xl font-bold text-gray-900 mb-4"
         >
-          Nova analyse ton projet…
+          Noah analyse ton projet…
         </motion.h1>
 
         <motion.p
@@ -158,17 +158,39 @@ export default function OfferGenerationStart() {
           Encore un instant, je prépare ton plan personnalisé.
         </motion.p>
 
-        {/* Animated Messages */}
-        <motion.div
-          key={currentMessage}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.5 }}
-          className="text-[#61f7a2] text-base font-medium mb-8"
-        >
-          {messages[currentMessage]}
-        </motion.div>
+        {/* Animated Messages avec effet gamifié */}
+        <div className="relative h-16 mb-8">
+          <motion.div
+            key={currentMessage}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <div className="bg-gradient-to-r from-[#61f7a2]/10 via-[#61f7a2]/20 to-[#61f7a2]/10 px-8 py-4 rounded-2xl border-2 border-[#61f7a2]/30 shadow-lg">
+              <motion.div
+                animate={{ scale: [1, 1.02, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+                className="text-gray-900 text-xl font-bold flex items-center gap-3"
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                >
+                  <Sparkles className="w-5 h-5 text-[#61f7a2]" />
+                </motion.div>
+                {messages[currentMessage]}
+                <motion.span
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  {".".repeat((dots % 3) + 1)}
+                </motion.span>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
 
         {/* Progress Dots */}
         <motion.div

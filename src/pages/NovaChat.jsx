@@ -9,7 +9,7 @@ import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import ChatBubble from '@/components/chat/ChatBubble';
 
-export default function NovaChat() {
+export default function NoahChat() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
   const [messages, setMessages] = useState([

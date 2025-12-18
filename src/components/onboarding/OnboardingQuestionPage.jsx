@@ -417,7 +417,11 @@ export default function OnboardingQuestionPage({
               )}
 
               {inputType === 'radio' && (
-                <RadioGroup value={value} onValueChange={setValue} className="space-y-3">
+                <RadioGroup value={value} onValueChange={(val) => {
+                  setValue(val);
+                  // Auto-submit après sélection
+                  setTimeout(() => handleNext(), 300);
+                }} className="space-y-3">
                   {options.map((option, idx) => (
                     <motion.div
                       key={idx}
@@ -429,7 +433,10 @@ export default function OnboardingQuestionPage({
                           ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
                           : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}
-                      onClick={() => setValue(option)}
+                      onClick={() => {
+                        setValue(option);
+                        setTimeout(() => handleNext(), 300);
+                      }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >

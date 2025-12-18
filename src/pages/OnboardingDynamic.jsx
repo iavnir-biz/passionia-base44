@@ -379,7 +379,11 @@ export default function OnboardingDynamic() {
               )}
 
               {currentQuestion.type === 'single_choice' && (
-                <RadioGroup value={value} onValueChange={setValue} className="space-y-3">
+                <RadioGroup value={value} onValueChange={(val) => {
+                  setValue(val);
+                  // Auto-submit après sélection
+                  setTimeout(() => handleNext(), 300);
+                }} className="space-y-3">
                   {(currentQuestion.options || []).map((option, idx) => (
                     <motion.div
                       key={idx}
@@ -391,7 +395,10 @@ export default function OnboardingDynamic() {
                           ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
                           : 'bg-white border-gray-200 hover:border-gray-300'
                       }`}
-                      onClick={() => setValue(option)}
+                      onClick={() => {
+                        setValue(option);
+                        setTimeout(() => handleNext(), 300);
+                      }}
                     >
                       <RadioGroupItem value={option} id={`option-${idx}`} />
                       <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">

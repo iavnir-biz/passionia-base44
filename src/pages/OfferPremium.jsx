@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, Star, Users, Crown, Award, Sparkles } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
+import OfferTransition from '@/components/offer/OfferTransition';
 
 // Fonction pour déterminer l'icône selon le type de produit
 const getProductIcon = (offer) => {
@@ -33,6 +34,7 @@ export default function OfferPremium() {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -114,9 +116,9 @@ export default function OfferPremium() {
       await base44.auth.updateMe({ 
         offer: { ...currentOffer, offre_premium: offer }
       });
-      setTimeout(() => {
-        navigate(createPageUrl('OfferResume'));
-      }, 500);
+      
+      setIsSaving(false);
+      setShowTransition(true);
     } catch (error) {
       console.error('Error saving:', error);
       setIsSaving(false);
@@ -128,6 +130,15 @@ export default function OfferPremium() {
       <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
+    );
+  }
+
+  if (showTransition) {
+    return (
+      <OfferTransition 
+        message="Noah compile ton offre complète..." 
+        onComplete={() => navigate(createPageUrl('OfferResume'))}
+      />
     );
   }
 

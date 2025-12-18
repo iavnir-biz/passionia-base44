@@ -299,103 +299,118 @@ ${offer.benefits.join('\n')}
             </div>
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
               <div className="space-y-6">
-                {/* Titre et sous-titre */}
-                <div>
+                {/* 1. L'IDENTITÉ DE L'OFFRE */}
+                <div className="bg-[#2a2a45]/30 rounded-xl p-5 border border-[#2a2a45]">
+                  <h3 className="text-xs font-semibold text-[#61f7a2] mb-3">🧩 L'IDENTITÉ DE L'OFFRE</h3>
                   <h2 className="text-2xl font-bold text-white mb-2">{showPreview.title}</h2>
                   {showPreview.subtitle && (
-                    <p className="text-gray-400 text-sm mb-3">{showPreview.subtitle}</p>
+                    <p className="text-gray-400 text-sm mb-4">{showPreview.subtitle}</p>
                   )}
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    {showPreview.product_type && (
+                      <div><span className="text-gray-500">Type:</span> <span className="text-white">{showPreview.product_type}</span></div>
+                    )}
+                    {showPreview.level && (
+                      <div><span className="text-gray-500">Niveau:</span> <span className="text-white">{showPreview.level}</span></div>
+                    )}
+                    {showPreview.duration && (
+                      <div><span className="text-gray-500">Durée:</span> <span className="text-white">{showPreview.duration}</span></div>
+                    )}
+                    <div className="flex items-center gap-3">
+                      {showPreview.original_value && (
+                        <span className="text-gray-500 line-through">{showPreview.original_value}</span>
+                      )}
+                      <span className="text-2xl font-bold text-[#61f7a2]">{showPreview.price}</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Prix et Valeur */}
-                <div className="flex items-center gap-4">
-                  {showPreview.original_value && (
-                    <div className="text-xl text-gray-500 line-through">{showPreview.original_value}</div>
-                  )}
-                  <div className="text-3xl font-bold text-[#61f7a2]">{showPreview.price}</div>
-                </div>
-
-                {/* La Douleur Actuelle */}
-                {showPreview.pain_before && (
-                  <div className="bg-[#2a2a45]/50 border border-red-500/20 rounded-xl p-4">
-                    <h3 className="text-base font-semibold text-red-400 mb-2">😔 Ta situation actuelle</h3>
-                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.pain_before}</p>
-                  </div>
-                )}
-
-                {/* La Transformation */}
-                {showPreview.transformation_after && (
-                  <div className="bg-[#2a2a45]/50 border border-[#61f7a2]/20 rounded-xl p-4">
-                    <h3 className="text-base font-semibold text-[#61f7a2] mb-2">✨ Ce qui t'attend</h3>
-                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.transformation_after}</p>
-                  </div>
-                )}
-
-                {/* La Solution */}
-                {showPreview.solution && (
+                {/* 2. À QUEL PROBLÈME CETTE OFFRE RÉPOND */}
+                {showPreview.problem && (
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">💡 La Solution</h3>
-                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.solution}</p>
+                    <h3 className="text-sm font-semibold text-white mb-2">🎯 À QUEL PROBLÈME CETTE OFFRE RÉPOND</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.problem}</p>
                   </div>
                 )}
 
-                {/* Livrables */}
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">📦 Ce que tu reçois concrètement</h3>
-                  <ul className="space-y-2">
-                    {showPreview.deliverables?.map((item, i) => (
-                      <li key={i} className="text-gray-300 text-sm flex items-start gap-2">
-                        <span className="text-[#61f7a2] mt-1">✓</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Bénéfices */}
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">🎯 Les bénéfices pour toi</h3>
-                  <ul className="space-y-2">
-                    {showPreview.benefits?.map((item, i) => (
-                      <li key={i} className="text-gray-300 text-sm flex items-start gap-2">
-                        <span className="text-[#61f7a2] mt-1">→</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Pour Qui / Pas Pour Qui */}
-                {(showPreview.for_who || showPreview.not_for_who) && (
-                  <div className="grid grid-cols-2 gap-4">
-                    {showPreview.for_who && (
-                      <div className="bg-[#2a2a45]/50 rounded-xl p-4">
-                        <h3 className="text-sm font-semibold text-[#61f7a2] mb-2">✅ Pour toi si...</h3>
-                        <ul className="space-y-1">
-                          {showPreview.for_who.map((item, i) => (
-                            <li key={i} className="text-gray-400 text-xs">{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {showPreview.not_for_who && (
-                      <div className="bg-[#2a2a45]/50 rounded-xl p-4">
-                        <h3 className="text-sm font-semibold text-red-400 mb-2">❌ Pas pour toi si...</h3>
-                        <ul className="space-y-1">
-                          {showPreview.not_for_who.map((item, i) => (
-                            <li key={i} className="text-gray-400 text-xs">{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                {/* 3. AVANT / APRÈS (TRANSFORMATION) */}
+                {(showPreview.before || showPreview.after) && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-white mb-3">🔄 AVANT / APRÈS</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {showPreview.before && (
+                        <div className="bg-[#2a2a45]/50 border border-red-500/20 rounded-xl p-4">
+                          <p className="text-xs font-semibold text-red-400 mb-2">Avant</p>
+                          <p className="text-gray-300 text-sm leading-relaxed">{showPreview.before}</p>
+                        </div>
+                      )}
+                      {showPreview.after && (
+                        <div className="bg-[#2a2a45]/50 border border-[#61f7a2]/20 rounded-xl p-4">
+                          <p className="text-xs font-semibold text-[#61f7a2] mb-2">Après</p>
+                          <p className="text-gray-300 text-sm leading-relaxed">{showPreview.after}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
-                {/* Pourquoi Maintenant */}
-                {showPreview.why_now && (
+                {/* 4. CE QUE CONTIENT EXACTEMENT L'OFFRE */}
+                {showPreview.deliverables && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-white mb-3">📦 CE QUE CONTIENT EXACTEMENT L'OFFRE</h3>
+                    <ul className="space-y-2">
+                      {showPreview.deliverables.map((item, i) => (
+                        <li key={i} className="text-gray-300 text-sm flex items-start gap-2 bg-[#2a2a45]/30 p-3 rounded-lg">
+                          <span className="text-[#61f7a2] mt-0.5">✓</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 5. COMMENT UTILISER CETTE OFFRE */}
+                {showPreview.how_to_use && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-white mb-2">🛠 COMMENT UTILISER CETTE OFFRE</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.how_to_use}</p>
+                  </div>
+                )}
+
+                {/* 6 & 7. POUR QUI / PAS POUR QUI */}
+                {(showPreview.ideal_for || showPreview.not_for) && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-white mb-3">👤 CIBLAGE STRATÉGIQUE</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {showPreview.ideal_for && (
+                        <div className="bg-[#2a2a45]/50 border border-[#61f7a2]/20 rounded-xl p-4">
+                          <p className="text-xs font-semibold text-[#61f7a2] mb-2">✅ Idéal pour</p>
+                          <ul className="space-y-1">
+                            {showPreview.ideal_for.map((item, i) => (
+                              <li key={i} className="text-gray-300 text-xs">• {item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {showPreview.not_for && (
+                        <div className="bg-[#2a2a45]/50 border border-red-500/20 rounded-xl p-4">
+                          <p className="text-xs font-semibold text-red-400 mb-2">❌ Pas adapté si</p>
+                          <ul className="space-y-1">
+                            {showPreview.not_for.map((item, i) => (
+                              <li key={i} className="text-gray-300 text-xs">• {item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 8. RÔLE DANS L'ÉCOSYSTÈME GLOBAL */}
+                {showPreview.ecosystem_role && (
                   <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#61f7a2]/5 border border-[#61f7a2]/30 rounded-xl p-4">
-                    <h3 className="text-base font-semibold text-[#61f7a2] mb-2">⚡ Pourquoi acheter maintenant</h3>
-                    <p className="text-gray-300 text-sm">{showPreview.why_now}</p>
+                    <h3 className="text-sm font-semibold text-[#61f7a2] mb-2">🔗 RÔLE DANS L'ÉCOSYSTÈME GLOBAL</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{showPreview.ecosystem_role}</p>
                   </div>
                 )}
               </div>

@@ -134,11 +134,7 @@ export default function OfferProductPrincipal() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-      </div>
-    );
+    return null;
   }
 
   if (showTransition) {

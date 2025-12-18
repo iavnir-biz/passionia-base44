@@ -16,12 +16,15 @@ Tu ne dois JAMAIS orienter l'offre comme une vente de service. Tout doit être f
 
 Style & clarté :
 - Français naturel, simple, sans anglicismes inutiles.
-- Titres "MARQUE" percutants (style ancien générateur) : OBLIGATOIREMENT 1 mécanisme + 1 bénéfice (+ idéalement horizon temps).
-  Exemples : "Le Protocole 7 Jours pour...", "La Méthode Anti-...", "Le Système...", "Le Blueprint...", "La Formule..."
-  INTERDIT : titres génériques seuls type "Guide pratique", "Plan d'action", "Séminaire de X", "Coaching personnalisé"
+- Titres "PRODUIT" percutants et brandés : OBLIGATOIREMENT [Nom de marque/concept unique] + [Bénéfice précis/Quick Win] (+ idéalement horizon temps).
+  Exemples : "Piano Mind - 7 jours pour maîtriser 3 gammes", "Le Plan Anti-Procrastination SLR", "Yoga Flow Reset - 21 jours pour retrouver ta souplesse", "Marketing Momentum - 30 jours pour tes 5 premiers clients"
+  Structure recommandée : [Nom brandé] - [Durée/Format] pour [Résultat mesurable]
+  INTERDIT : titres génériques type "Mini formation", "Guide pratique", "Les premiers pas en...", "Démarrer le..."
+  LE TITRE DOIT DONNER L'IMPRESSION D'UN VRAI PRODUIT PRÊT À VENDRE, PAS D'UN COURS GÉNÉRIQUE
 - Outcome ultra concret : commence par "Tu sais...", "Tu obtiens...", "Tu es capable de...", minimum 40 caractères.
 - Description avec livrables ULTRA PRÉCIS : DOIT contenir des chiffres (nombre de vidéos, durée, fréquence, pages, templates).
-- Ne JAMAIS recopier mot pour mot la formulation brute de la compétence : toujours reformuler naturellement.
+- Utilise TOUTES les données de l'onboarding dynamique : méthode unique, expertise, réseau des utilisateurs, ce que l'expert a traversé, son angle différenciant
+- Ne JAMAIS recopier mot pour mot la formulation brute de la compétence : toujours reformuler naturellement en produit brandé.
 - Pas de downsell.
 
 Obligation : respecter les préférences de format de l'utilisateur.
@@ -232,10 +235,18 @@ Freins principaux : ${JSON.stringify(onboardingFull.obstacles || [])}
 Motivation : ${onboardingFull.readiness || 'non spécifié'}
 Autres données : ${JSON.stringify(onboardingFull, null, 2)}
 
-INSTRUCTIONS CRITIQUES POUR LES TITRES :
-- Utilise les freins pour personnaliser (ex: "pas le temps" → "Méthode 10 min/jour", "peur du regard" → "Sans te montrer")
-- Reformule naturellement la compétence, ne la recopie JAMAIS mot pour mot
-- Ajoute TOUJOURS un mécanisme différenciant (Protocole, Méthode, Système, Blueprint, Formule...)
+INSTRUCTIONS CRITIQUES POUR LES TITRES - NOMS DE PRODUITS BRANDÉS :
+- CRÉE UN VRAI NOM DE PRODUIT qui donne l'impression d'un produit prêt à vendre
+- Structure : [Nom de marque unique] - [Durée/Format] pour [Résultat ultra précis]
+- Exemples pour piano : "Piano Mind - 7 jours pour maîtriser 3 gammes" (PAS "Mini formation piano" ou "Les premiers pas au piano")
+- Exemples pour marketing : "First Sale Sprint - 14 jours pour ton premier client" (PAS "Guide marketing débutant")
+- Utilise la méthode unique de l'expert (mentionnée dans l'onboarding)
+- Utilise son expertise spécifique et ce qui rend ses élèves uniques
+- Utilise son histoire personnelle et ce qu'il a traversé
+- Intègre les freins pour personnaliser (ex: "pas le temps" → "Express 15 min/jour", "peur du regard" → "Mode discret activé")
+- Le nom doit être MÉMORABLE, BRANDÉ, et donner envie immédiatement
+- Ne JAMAIS utiliser de titres génériques comme "Mini formation", "Guide pratique", "Démarrer en..."
+- OBLIGATOIRE : Chaque titre doit répondre à un QUICK WIN précis basé sur les réponses de l'onboarding
 
 MISSION :
 Génère une "Full Stack Offer" complète selon la méthode P.S.S.O.

@@ -444,7 +444,7 @@ export default function OnboardingDynamic() {
                     transition={{ duration: 0.2 }}
                   >
                     <span className="text-5xl font-bold text-[#61f7a2]">
-                      {value}
+                      {value >= (currentQuestion.max || 10) ? `${value}+` : value} {value === 1 ? 'AN' : 'ANS'}
                     </span>
                   </motion.div>
                   <Slider
@@ -456,8 +456,8 @@ export default function OnboardingDynamic() {
                     className="w-full"
                   />
                   <div className="flex justify-between text-sm text-gray-600 font-medium">
-                    <span>{currentQuestion.min || 0}</span>
-                    <span>{currentQuestion.max || 10}</span>
+                    <span>{currentQuestion.min || 0} {(currentQuestion.min || 0) === 1 ? 'AN' : 'ANS'}</span>
+                    <span>{currentQuestion.max || 10}+ ANS</span>
                   </div>
                 </div>
               )}

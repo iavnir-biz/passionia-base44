@@ -170,23 +170,29 @@ export default function OfferResume() {
           
           <div className="space-y-4">
             {products.map((product, index) => {
+              if (!product.data) return null;
+              
               const Icon = iconMap[product.data?.productType] || Video;
+              
+              // Couleurs flash par type d'offre
               const colorSchemes = {
-                0: 'bg-blue-50 border-blue-200',
-                1: 'bg-green-50 border-green-200',
-                2: 'bg-purple-50 border-purple-200',
-                3: 'bg-amber-50 border-amber-200'
+                0: { bg: 'bg-blue-50', border: 'border-blue-200', iconBg: 'bg-blue-500', iconColor: 'text-white' },
+                1: { bg: 'bg-green-50', border: 'border-green-200', iconBg: 'bg-green-500', iconColor: 'text-white' },
+                2: { bg: 'bg-purple-50', border: 'border-purple-200', iconBg: 'bg-purple-500', iconColor: 'text-white' },
+                3: { bg: 'bg-amber-50', border: 'border-amber-200', iconBg: 'bg-amber-500', iconColor: 'text-white' }
               };
+              
+              const scheme = colorSchemes[index];
               
               return (
                 <div
                   key={product.key}
-                  className={`${colorSchemes[index]} border rounded-2xl p-5 flex items-center gap-4`}
+                  className={`${scheme.bg} ${scheme.border} border rounded-2xl p-5 flex items-center gap-4 transition-all hover:shadow-md`}
                 >
-                  {/* Icon */}
+                  {/* Icon avec couleur flash */}
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                      <Icon className="w-6 h-6 text-gray-700" />
+                    <div className={`w-14 h-14 rounded-2xl ${scheme.iconBg} shadow-lg flex items-center justify-center`}>
+                      <Icon className={`w-7 h-7 ${scheme.iconColor}`} />
                     </div>
                   </div>
                   

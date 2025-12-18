@@ -6,25 +6,30 @@ const openai = new OpenAI({
 });
 
 const EMAIL_PROMPTS = {
-    welcome: {
-        title: "Email de Bienvenue",
-        instruction: "Crée un email de bienvenue chaleureux et engageant pour quelqu'un qui vient de s'inscrire. L'email doit créer un lien émotionnel fort, présenter la valeur qu'ils vont recevoir, et donner envie de passer à l'action."
+    contraste: {
+        title: "Email 1 : Le Contraste (Aujourd'hui vs Demain)",
+        subject: "Une décision pour tes {incomeGoal}€ par mois...",
+        instruction: "Rappelle la douleur {painPoints}. Compare la situation actuelle avec le rêve {lifeChanges}. Présente le produit {mainProductTitle} comme le pont pour traverser. Ton : Empathique, direct."
     },
-    nurture: {
-        title: "Email de Nurturing",
-        instruction: "Crée un email de nurturing qui apporte de la valeur éducative, renforce la relation, et positionne l'expéditeur comme expert. L'email doit être informatif sans être vendeur."
+    validation: {
+        title: "Email 2 : La Validation Sociale (Le Regard des autres)",
+        subject: "Ce que tes proches vont enfin dire de toi.",
+        instruction: "Utilise la donnée {socialValidation}. Décris la scène où l'expert est enfin reconnu pour son succès. C'est l'email 'Émotionnel'. Lien : Présente l'offre comme le moyen d'obtenir cette reconnaissance."
     },
-    promo: {
-        title: "Email Promotionnel",
-        instruction: "Crée un email promotionnel persuasif qui présente l'offre, ses bénéfices, crée l'urgence, et pousse à l'action. Utilise des techniques de copywriting avancées."
+    calcul: {
+        title: "Email 3 : Le Calcul de Faisabilité (La Logique)",
+        subject: "Juste 1 vente par jour...",
+        instruction: "Décompose mathématiquement comment atteindre {incomeGoal}€ en vendant {mainProductTitle}. Montre que c'est simple et accessible. Ton : Rationnel, rassurant."
     },
-    story: {
-        title: "Email Storytelling",
-        instruction: "Crée un email basé sur le storytelling et le parcours personnel. Raconte une histoire authentique qui crée de l'identification, inspire et connecte émotionnellement avec le lecteur."
+    impact: {
+        title: "Email 4 : L'Impact et la Fierté (Le Sens)",
+        subject: "Imaginer les visages de ceux que tu vas aider.",
+        instruction: "Utilise {impact} et {pride}. Parle de la sensation d'être utile. Mentionne l'Offre Premium {premiumTitle} comme l'expérience ultime de transformation. Ton : Inspirant."
     },
-    reengagement: {
-        title: "Email de Réengagement",
-        instruction: "Crée un email de réengagement pour réactiver des abonnés inactifs. L'email doit être empathique, créer la curiosité, et donner une raison forte de revenir."
+    urgence: {
+        title: "Email 5 : L'Urgence de l'Inaction (Le Regret)",
+        subject: "Où seras-tu dans 6 mois si rien ne change ?",
+        instruction: "Rappelle le coût émotionnel de ne pas se lancer. Reprends le rêve {lifeChanges} et montre qu'il s'éloigne si l'action n'est pas prise maintenant."
     }
 };
 
@@ -52,42 +57,65 @@ Deno.serve(async (req) => {
             }, { status: 400 });
         }
 
+        // Extraire les données pour personnalisation
+        const skill = profile.passion || 'ta compétence';
+        const name = user.full_name || 'l\'expert';
+        const incomeGoal = session.onboarding_full?.target_income || 5000;
+        const lifeChanges = session.onboarding_full?.life_change || 'vivre de ta passion';
+        const impact = session.onboarding_full?.impact || 'aider les autres';
+        const pride = session.onboarding_full?.emotions || 'fierté';
+        const socialValidation = session.onboarding_full?.relatives || 'reconnaissance de tes proches';
+        const painPoints = profile.main_problem || 'tes blocages actuels';
+        
+        const mainProductTitle = session.offer_generation?.offerChoices?.product_principal?.title || 'ton produit';
+        const mainProductPrice = session.offer_generation?.offerChoices?.product_principal?.price || 97;
+        const premiumTitle = session.offer_generation?.offerChoices?.offre_premium?.title || 'ton offre premium';
+        const premiumPrice = session.offer_generation?.offerChoices?.offre_premium?.price || 997;
+
         // Construire le contexte utilisateur
         const userContext = `
-**Informations de l'utilisateur:**
-- Prénom: ${user.full_name || 'l\'utilisateur'}
-- Passion/Compétence: ${profile.passion || 'sa compétence'}
-- Public cible: ${profile.target_audience || 'son audience'}
-- Problème principal: ${profile.main_problem || 'les défis de son audience'}
-- Transformation promise: ${profile.transformation || 'la transformation qu\'il apporte'}
-
-**Contexte de l'offre:**
-${session.offer_generation ? `
-- Produit Principal: ${session.offer_generation.offerChoices?.product_principal?.title || 'Non défini'}
-- Prix: ${session.offer_generation.offerChoices?.product_principal?.price || 'Non défini'}€
-` : ''}
-
-**Style de communication souhaité:**
-Utilise un ton ${session.onboarding_summary?.format_preferences?.includes('Présentiel') ? 'premium et professionnel' : 'accessible et bienveillant'}.
-Tutoie le lecteur et crée une connexion authentique.
+DONNÉES À UTILISER POUR PERSONNALISATION :
+- Savoir-faire : ${skill}
+- Prénom de l'expert : ${name}
+- Objectif de revenu : ${incomeGoal}€
+- Ce que l'argent va changer (Rêve) : ${lifeChanges}
+- Impact désiré : ${impact}
+- Fierté ressentie : ${pride}
+- Validation des proches attendue : ${socialValidation}
+- Frein principal actuel (Douleur) : ${painPoints}
+- Nom du Produit Principal : ${mainProductTitle} (Prix : ${mainProductPrice}€)
+- Nom de l'Offre Premium : ${premiumTitle} (Prix : ${premiumPrice}€)
 `;
 
-        // Générer l'email avec OpenAI
+        // Générer l'email avec OpenAI - Méthode PASSION IA
         const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 {
                     role: "system",
-                    content: `Tu es un expert en email marketing et copywriting. ${emailConfig.instruction}
+                    content: `Tu es un expert en Copywriting Émotionnel et en Storytelling de Transformation. Ta mission est de rédiger un email de séquence marketing pour un expert qui vend son savoir-faire.
 
-Structure de l'email:
-- Objet captivant (commence par "📧 Objet: ")
-- Corps de l'email avec storytelling et émotion
+${emailConfig.title}
+
+Sujet suggéré : ${emailConfig.subject}
+
+Angle et ton : ${emailConfig.instruction}
+
+RÈGLES DE STYLE STRICTES :
+- Utilise exclusivement le 'Tu'
+- Paragraphes courts (2 lignes max)
+- Langage "Terre-à-terre", pas de jargon marketing
+- Intègre les variables naturellement dans le texte
+- Émojis utilisés avec parcimonie
+- Entre 200 et 400 mots maximum
+
+Structure de l'email :
+- Objet : ${emailConfig.subject} (commence par "📧 Objet: ")
+- Corps de l'email avec storytelling émotionnel
 - Call-to-action clair et motivant
 - Signature personnalisée
 
-Utilise des émojis avec parcimonie, des paragraphes courts, et un ton conversationnel.
-L'email doit faire entre 200 et 400 mots maximum.`
+Remplace les variables entre accolades par les données réelles du client fournies ci-dessous.`
                 },
                 {
                     role: "user",

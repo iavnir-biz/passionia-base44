@@ -119,6 +119,7 @@ export default function OnboardingDynamic() {
     if (!canProceed()) return;
     
     setIsSaving(true);
+    setIsLoading(true); // Afficher l'animation de chargement
     await fetchNextQuestion(session.id, value);
     setValue('');
     setIsSaving(false);
@@ -196,8 +197,98 @@ export default function OnboardingDynamic() {
 
   if (isLoading || !currentQuestion) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          {/* Cerveau animé */}
+          <div className="relative w-32 h-32 mx-auto mb-6">
+            {/* Cerveau principal */}
+            <motion.div
+              animate={{
+                scale: [1, 1.05, 1],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="absolute inset-0 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
+              style={{
+                boxShadow: '0 0 40px rgba(97, 247, 162, 0.4)'
+              }}
+            >
+              <Sparkles className="w-16 h-16 text-white" />
+            </motion.div>
+
+            {/* Particules orbitales */}
+            {[0, 1, 2, 3].map((i) => (
+              <motion.div
+                key={i}
+                animate={{
+                  rotate: 360,
+                }}
+                transition={{
+                  duration: 3 + i,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                className="absolute inset-0"
+              >
+                <div
+                  className="absolute w-3 h-3 rounded-full bg-[#61f7a2]"
+                  style={{
+                    top: '50%',
+                    left: '100%',
+                    transform: 'translate(-50%, -50%)',
+                    boxShadow: '0 0 10px rgba(97, 247, 162, 0.6)'
+                  }}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Texte animé */}
+          <motion.div
+            animate={{
+              opacity: [0.5, 1, 0.5],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Noah réfléchit à ta prochaine question...
+            </h3>
+            <p className="text-gray-600 text-sm">
+              Analyse de tes réponses en cours
+            </p>
+          </motion.div>
+
+          {/* Points de chargement */}
+          <div className="flex justify-center gap-2 mt-6">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                animate={{
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  duration: 0.6,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: "easeInOut"
+                }}
+                className="w-2 h-2 rounded-full bg-[#61f7a2]"
+              />
+            ))}
+          </div>
+        </motion.div>
       </div>
     );
   }

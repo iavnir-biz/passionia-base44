@@ -42,12 +42,12 @@ const features = [
   { 
     icon: FileText, 
     title: "Documents IA générés", 
-    description: "Page de vente, messages de vente, avatar complet, email marketing, script DM... tout est prêt à l'emploi pour te lancer." 
+    description: "Page de vente, messages de vente, avatar complet, email marketing, script DM." 
   },
   { 
     icon: TrendingUp, 
     title: "Suivi de progression avancé", 
-    description: "Suis ton avancement et reste motivé chaque jour avec des tâches prêtes à l'emploi tous les jours." 
+    description: "Suis ton avancement et reste motivé chaque jour avec des tâches prêtes à l'emploi." 
   },
 ];
 

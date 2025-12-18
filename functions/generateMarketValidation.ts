@@ -18,7 +18,8 @@ TON & STYLE
 - Tutoiement obligatoire
 - Adresse-toi à l'utilisateur par son prénom
 - Texte fluide, pas de formatage Markdown (pas d'astérisques, pas de listes, pas de gras)
-- Paragraphes courts et aérés
+- Paragraphes courts et aérés (3 sections distinctes séparées par des sauts de ligne)
+- Ajoute 2-3 émojis pertinents pour dynamiser le texte (🎯, 💡, 🚀, 📈, ✨, 💰, etc.)
 
 TEXTE TRANSFORMATIONNEL PRINCIPAL (OBLIGATOIRE)
 Rédige un texte fluide et humain qui :
@@ -54,7 +55,9 @@ INTERDICTIONS ABSOLUES
 
 FORMAT DE SORTIE
 - Texte brut uniquement
-- 4 à 6 paragraphes courts
+- EXACTEMENT 3 sections distinctes séparées par "\n\n" (double saut de ligne)
+- Chaque section : 2-3 phrases maximum
+- Intègre 2-3 émojis pertinents dans le texte pour le rendre vivant
 - Pas de titres ni de sous-titres`;
 
 Deno.serve(async (req) => {
@@ -121,8 +124,8 @@ Produit Principal : "${mainProductTitle}" (${mainProductDescription})
 Upsell : "${upsell1Title}"
 Offre Premium : "${premiumTitle}"
 
-Ta tâche : Rédige une analyse courte, aérée et encourageante (3-5 paragraphes courts) du potentiel de marché pour cette offre.
-Rappelle-toi : 2 statistiques minimum, 1-2 douleurs, 1 audience cible spécifique, et une conclusion motivante.`;
+Ta tâche : Rédige une analyse courte, aérée et encourageante en EXACTEMENT 3 sections distinctes séparées par un double saut de ligne (\n\n).
+Rappelle-toi : 2 statistiques minimum, 1-2 douleurs, 1 audience cible spécifique, une conclusion motivante, et 2-3 émojis bien placés pour dynamiser le texte (🎯, 💡, 🚀, 📈, ✨, 💰, etc.).`;
 
     console.log('OPENAI_CALL start', { 
       fn: 'generateMarketValidation',

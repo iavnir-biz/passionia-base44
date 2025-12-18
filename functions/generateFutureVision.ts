@@ -92,6 +92,7 @@ Deno.serve(async (req) => {
     const potentialRevenue = session.potential_revenue || 0;
     
     const name = user.firstName || onboardingFull.firstName || 'l\'entrepreneur';
+    const gender = user.gender || onboardingFull.gender || '';
     const skill = onboardingSummary.who_to_teach || onboardingFull.coreSkill || onboardingFull.skill || 'cette compétence';
     
     // Personal answers (effet miroir + nouvelle réalité)
@@ -113,7 +114,19 @@ Deno.serve(async (req) => {
     const upsell1Title = finalizedOffer.upsell1?.title || '';
     const premiumTitle = finalizedOffer.upsell3?.title || '';
 
-    const userPrompt = `DONNÉES OBLIGATOIRES À UTILISER
+    // Déterminer les accords grammaticaux selon le genre
+    let genderAgreement = '';
+    if (gender === 'Femme') {
+      genderAgreement = 'CRITIQUE: L\'utilisateur est une FEMME. Tu DOIS utiliser les accords féminins dans TOUT le récit (elle, alignée, motivée, prête, lancée, devenue, accomplie, inspirée, etc.). Vérifie CHAQUE adjectif et participe passé.';
+    } else if (gender === 'Homme') {
+      genderAgreement = 'CRITIQUE: L\'utilisateur est un HOMME. Tu DOIS utiliser les accords masculins dans TOUT le récit (il, aligné, motivé, prêt, lancé, devenu, accompli, inspiré, etc.). Vérifie CHAQUE adjectif et participe passé.';
+    } else {
+      genderAgreement = 'CRITIQUE: Genre non spécifié. Utilise "il/elle" ou des formulations neutres. Évite les accords de genre quand possible, sinon utilise la forme "aligné(e)", "motivé(e)", etc.';
+    }
+
+    const userPrompt = `${genderAgreement}
+
+DONNÉES OBLIGATOIRES À UTILISER
 
 Prénom : ${name}
 Compétence : ${skill}

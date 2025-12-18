@@ -95,13 +95,26 @@ Deno.serve(async (req) => {
     const onboardingFull = session.onboarding_full || {};
     
     const name = user.firstName || onboardingFull.firstName || 'l\'entrepreneur';
+    const gender = user.gender || onboardingFull.gender || '';
     const skill = onboardingSummary.who_to_teach || onboardingFull.coreSkill || onboardingFull.skill || 'cette compétence';
     const mainProductTitle = finalizedOffer.mainProduct?.title || 'ton produit principal';
     const mainProductDescription = finalizedOffer.mainProduct?.description || '';
     const upsell1Title = finalizedOffer.upsell1?.title || '';
     const premiumTitle = finalizedOffer.upsell3?.title || '';
 
-    const userPrompt = `L'utilisateur, ${name}, veut lancer une offre pour ENSEIGNER sa compétence : "${skill}".
+    // Déterminer les accords grammaticaux selon le genre
+    let genderAgreement = '';
+    if (gender === 'Femme') {
+      genderAgreement = 'IMPORTANT: L\'utilisateur est une femme. Utilise les accords féminins (elle, alignée, motivée, prête, etc.) dans tout le texte.';
+    } else if (gender === 'Homme') {
+      genderAgreement = 'IMPORTANT: L\'utilisateur est un homme. Utilise les accords masculins (il, aligné, motivé, prêt, etc.) dans tout le texte.';
+    } else {
+      genderAgreement = 'IMPORTANT: Genre non spécifié. Utilise "il/elle" ou reformule pour éviter les accords de genre quand possible.';
+    }
+
+    const userPrompt = `${genderAgreement}
+
+L'utilisateur, ${name}, veut lancer une offre pour ENSEIGNER sa compétence : "${skill}".
 
 Voici les produits qu'il a sélectionnés :
 Produit Principal : "${mainProductTitle}" (${mainProductDescription})

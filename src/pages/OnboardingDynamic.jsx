@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, Mic, StopCircle, Brain } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -221,7 +221,7 @@ export default function OnboardingDynamic() {
                 boxShadow: '0 0 40px rgba(97, 247, 162, 0.4)'
               }}
             >
-              <Sparkles className="w-16 h-16 text-white" />
+              <Brain className="w-16 h-16 text-white" />
             </motion.div>
 
             {/* Particules orbitales */}

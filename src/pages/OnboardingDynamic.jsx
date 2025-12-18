@@ -24,6 +24,7 @@ export default function OnboardingDynamic() {
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [audioURL, setAudioURL] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -176,16 +177,20 @@ export default function OnboardingDynamic() {
         const url = URL.createObjectURL(audioBlob);
         setAudioURL(url);
 
-        // Upload audio
-        setIsUploading(true);
+        // Transcrire l'audio
+        setIsTranscribing(true);
         try {
-          const file = new File([audioBlob], 'voice-note.webm', { type: 'audio/webm' });
-          const { data } = await base44.integrations.Core.UploadFile({ file });
-          setAttachedFiles([...attachedFiles, { name: 'Note vocale', url: data.file_url, isAudio: true }]);
+          const formData = new FormData();
+          formData.append('audio', audioBlob, 'voice-note.webm');
+
+          const { data } = await base44.functions.invoke('transcribeAudio', formData);
+          
+          // Ajouter le texte transcrit à la réponse existante
+          setValue(prev => prev ? `${prev}\n${data.text}` : data.text);
         } catch (error) {
-          console.error('Error uploading audio:', error);
+          console.error('Error transcribing audio:', error);
         } finally {
-          setIsUploading(false);
+          setIsTranscribing(false);
         }
 
         stream.getTracks().forEach(track => track.stop());
@@ -301,10 +306,13 @@ export default function OnboardingDynamic() {
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className={`h-8 w-8 hover:bg-gray-100 ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`h-8 w-8 hover:bg-gray-100 ${isRecording ? 'text-red-500 animate-pulse' : isTranscribing ? 'text-[#61f7a2]' : 'text-gray-500 hover:text-gray-700'}`}
                         onClick={isRecording ? stopRecording : startRecording}
+                        disabled={isTranscribing}
                       >
-                        {isRecording ? (
+                        {isTranscribing ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : isRecording ? (
                           <StopCircle className="w-4 h-4" />
                         ) : (
                           <Mic className="w-4 h-4" />

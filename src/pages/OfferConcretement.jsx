@@ -186,28 +186,33 @@ export default function OfferConcretement() {
       <div className="bg-[#1b1b33] border-b border-[#2a2a45] py-4">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
-            {mainSteps.map((step, index) => (
-              <React.Fragment key={step.id}>
-                <button
-                  onClick={() => handleStepClick(step)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap cursor-pointer hover:opacity-80",
-                    step.id === 4 
-                      ? "bg-[#61f7a2] text-[#11112b]" 
-                      : step.id < 4
-                        ? "text-[#61f7a2] hover:text-[#4de88f]"
-                        : "text-gray-500 hover:text-gray-400"
-                  )}>
-                  {step.id}. {step.label}
-                </button>
-                {index < mainSteps.length - 1 && (
-                  <div className={cn(
-                    "w-4 md:w-8 h-[2px]",
-                    step.id < 4 ? "bg-[#61f7a2]" : "bg-[#2a2a45]"
-                  )} />
-                )}
-              </React.Fragment>
-            ))}
+            {mainSteps.map((step, index) => {
+              const isActive = step.id === 4;
+              const isPrevious = step.id < 4;
+              const isClickable = isPrevious;
+
+              return (
+                <React.Fragment key={step.id}>
+                  <button
+                    onClick={() => isClickable && step.page && navigate(createPageUrl(step.page))}
+                    disabled={!isClickable}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
+                      isActive && "bg-[#61f7a2] text-[#11112b]",
+                      isPrevious && "text-[#61f7a2] hover:text-[#4de88f] cursor-pointer",
+                      !isActive && !isPrevious && "text-gray-500 cursor-not-allowed opacity-50"
+                    )}>
+                    {step.id}. {step.label}
+                  </button>
+                  {index < mainSteps.length - 1 && (
+                    <div className={cn(
+                      "w-4 md:w-8 h-[2px]",
+                      step.id < 4 ? "bg-[#61f7a2]" : "bg-[#2a2a45]"
+                    )} />
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -349,14 +354,7 @@ export default function OfferConcretement() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="py-6 text-center border-t border-[#2a2a45] bg-[#1b1b33] mt-12">
-        <p className="text-gray-500 text-sm">Copyright Passion IA</p>
-        <div className="flex items-center justify-center gap-2 mt-2">
-          <div className="w-2 h-2 rounded-full bg-[#61f7a2] animate-pulse" />
-          <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
-        </div>
-      </footer>
+
     </div>
   );
 }

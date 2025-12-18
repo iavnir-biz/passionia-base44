@@ -235,28 +235,33 @@ export default function PlanAction() {
       <div className="bg-white border-b border-gray-200 py-4 shadow-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
-            {mainSteps.map((step, index) => (
-              <React.Fragment key={step.id}>
-                <button
-                  onClick={() => handleStepClick(step)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap cursor-pointer hover:opacity-80",
-                    step.id === 5 
-                      ? "bg-[#61f7a2] text-white shadow-sm" 
-                      : step.id < 5
-                        ? "text-[#61f7a2] hover:text-[#4de88f]"
-                        : "text-gray-400 hover:text-gray-500"
-                  )}>
-                  {step.id}. {step.label}
-                </button>
-                {index < mainSteps.length - 1 && (
-                  <div className={cn(
-                    "w-4 md:w-8 h-[2px]",
-                    step.id < 5 ? "bg-[#61f7a2]" : "bg-gray-200"
-                  )} />
-                )}
-              </React.Fragment>
-            ))}
+            {mainSteps.map((step, index) => {
+              const isActive = step.id === 5;
+              const isPrevious = step.id < 5;
+              const isClickable = isPrevious;
+
+              return (
+                <React.Fragment key={step.id}>
+                  <button
+                    onClick={() => isClickable && step.page && navigate(createPageUrl(step.page))}
+                    disabled={!isClickable}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
+                      isActive && "bg-[#61f7a2] text-white shadow-sm",
+                      isPrevious && "text-[#61f7a2] hover:text-[#4de88f] cursor-pointer",
+                      !isActive && !isPrevious && "text-gray-400 cursor-not-allowed opacity-50"
+                    )}>
+                    {step.id}. {step.label}
+                  </button>
+                  {index < mainSteps.length - 1 && (
+                    <div className={cn(
+                      "w-4 md:w-8 h-[2px]",
+                      step.id < 5 ? "bg-[#61f7a2]" : "bg-gray-200"
+                    )} />
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -684,14 +689,7 @@ export default function PlanAction() {
         </motion.div>
       </div>
 
-      {/* Footer */}
-      <footer className="py-8 text-center border-t border-gray-200 bg-white mt-12">
-        <p className="text-gray-500 text-sm">Copyright Passion IA</p>
-        <div className="flex items-center justify-center gap-2 mt-2">
-          <div className="w-2 h-2 rounded-full bg-[#61f7a2] animate-pulse" />
-          <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
-        </div>
-      </footer>
+
 
       {/* PayFall Modal */}
       <PayFallModal

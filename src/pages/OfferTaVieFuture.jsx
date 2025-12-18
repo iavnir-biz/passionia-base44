@@ -142,26 +142,34 @@ export default function OfferTaVieFuture() {
       <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 py-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
-            {mainSteps.map((step, index) => (
-              <React.Fragment key={step.id}>
-                <div className={cn(
-                  "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
-                  step.id === 3 
-                    ? "bg-[#61f7a2] text-white shadow-md" 
-                    : step.id < 3
-                      ? "text-[#61f7a2] bg-[#61f7a2]/10"
-                      : "text-gray-400 bg-gray-100"
-                )}>
-                  {step.id}. {step.label}
-                </div>
-                {index < mainSteps.length - 1 && (
-                  <div className={cn(
-                    "w-4 md:w-8 h-[2px]",
-                    step.id < 3 ? "bg-[#61f7a2]" : "bg-gray-200"
-                  )} />
-                )}
-              </React.Fragment>
-            ))}
+            {mainSteps.map((step, index) => {
+              const isActive = step.id === 3;
+              const isPrevious = step.id < 3;
+              const isClickable = isPrevious;
+              const pageMap = { 1: 'OfferResume', 2: 'BonneNouvelle' };
+
+              return (
+                <React.Fragment key={step.id}>
+                  <button
+                    onClick={() => isClickable && navigate(createPageUrl(pageMap[step.id]))}
+                    disabled={!isClickable}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
+                      isActive && "bg-[#61f7a2] text-white shadow-md",
+                      isPrevious && "text-[#61f7a2] bg-[#61f7a2]/10 cursor-pointer hover:opacity-80",
+                      !isActive && !isPrevious && "text-gray-400 bg-gray-100 cursor-not-allowed"
+                    )}>
+                    {step.id}. {step.label}
+                  </button>
+                  {index < mainSteps.length - 1 && (
+                    <div className={cn(
+                      "w-4 md:w-8 h-[2px]",
+                      step.id < 3 ? "bg-[#61f7a2]" : "bg-gray-200"
+                    )} />
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -403,18 +411,7 @@ export default function OfferTaVieFuture() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="py-8 text-center border-t border-gray-200 bg-white">
-        <p className="text-gray-500 text-sm">Copyright Passion IA</p>
-        <div className="flex items-center justify-center gap-2 mt-2">
-          <motion.div 
-            className="w-2 h-2 rounded-full bg-[#61f7a2]"
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
-        </div>
-      </footer>
+
     </div>
   );
 }

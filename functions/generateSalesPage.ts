@@ -29,66 +29,99 @@ Deno.serve(async (req) => {
 
     const heroImageUrl = imageResponse.data[0].url;
 
-    // Generate sales page content with GPT-4
-    const contentPrompt = `Tu es un expert en copywriting et pages de vente.
+    // Extract product data from session
+    const mainProduct = session.offer_generation?.offerChoices?.product_principal || {};
+    const mainProductTitle = mainProduct.title || profile.passion;
+    const mainProductPrice = mainProduct.price || 'Prix à définir';
+    const mainProductType = mainProduct.delivery_type || 'Formation digitale';
+    const mainProductDescription = mainProduct.description || mainProduct.full_description || '';
+    const mainProductOutcome = profile.transformation || profile.quick_win || '';
+    
+    const painPoints = profile.main_problem || '';
+    const lifeChanges = session.onboarding_full?.life_change || '';
+    const inactionCost = session.onboarding_full?.if_nothing_changes || '';
+    const skill = profile.passion || '';
 
-Crée une page de vente complète et persuasive en HTML pour :
+    // Generate sales page content with GPT-4 - Structure 12 étapes
+    const contentPrompt = `Tu es un expert en Copywriting de Réponse Directe et en Marketing Digital. Ta mission est de rédiger une page de vente complète pour un produit digital en suivant une structure psychologique précise de 12 étapes.
 
-PROFIL:
-- Compétence: ${profile.passion}
-- Public cible: ${profile.target_audience}
-- Problème principal: ${profile.main_problem}
-- Transformation: ${profile.transformation}
-- Quick win: ${profile.quick_win}
-- Méthode unique: ${profile.unique_method || 'Non défini'}
+OBJECTIF : Transformer les visiteurs en acheteurs du 'Produit Principal'.
 
-OFFRE:
-${session.finalized_offer ? JSON.stringify(session.finalized_offer, null, 2) : 'Offre en cours de finalisation'}
+DONNÉES CLIENT À UTILISER :
+- Expert : ${user.full_name}
+- Compétence / Niche : ${skill}
+- Nom du Produit : ${mainProductTitle}
+- Prix : ${mainProductPrice}€
+- Format du Produit : ${mainProductType}
+- Description du Produit : ${mainProductDescription}
+- Résultat concret (Transformation) : ${mainProductOutcome}
+- Douleurs identifiées : ${painPoints}
+- Rêves / Changement de vie : ${lifeChanges}
+- Coût de l'inaction : ${inactionCost}
 
-STRUCTURE REQUISE (en HTML avec Tailwind CSS inline):
+STRUCTURE DE LA PAGE (À respecter impérativement) :
 
-1. **Hero Section** (avec l'image fournie)
-   - Titre percutant (H1) qui parle de la transformation
-   - Sous-titre qui identifie le problème
-   - CTA principal clair et visible
-   - Image hero (URL fournie séparément)
+1. **Bandeau d'Urgence** :
+   Rédige une ligne courte d'urgence (ex: Offre de lancement, Bonus inclus pour une durée limitée).
 
-2. **Section Problème**
-   - 3-4 points de douleur identifiés
-   - Empathie et connexion
+2. **En-tête (The Hero Section)** :
+   - Titre accrocheur : Une promesse forte incluant ${skill} et le résultat ${mainProductOutcome}.
+   - Sous-titre : Une phrase claire qui explique comment le produit ${mainProductTitle} comble le fossé entre ${painPoints} et ${lifeChanges}.
+   - CTA : Un bouton d'action puissant : 'Je veux accéder maintenant / Je démarre aujourd'hui'.
+   - Image hero (sera injectée)
 
-3. **Section Solution**
-   - Présentation de l'offre
-   - Bénéfices clairs (pas features)
-   - Transformation promise
+3. **Identifier le problème** :
+   - Utilise la formule : 'Tu en as marre de... ${painPoints} ?'
+   - Décris l'émotion de frustration liée à ${skill}. 
+   - Ajoute 3 bullet points sur les blocages typiques rencontrés par le prospect.
 
-4. **Section Comment ça marche**
-   - 3-4 étapes simples
-   - Rassurer sur la facilité
+4. **Casser les objections** :
+   - Phrase : 'Et le meilleur dans tout ça ? Tu n'as PAS besoin de...'
+   - Liste 3 à 5 éléments que le client pense nécessaires (ex: technique, gros budget, diplômes) mais qui ne le sont pas avec ta méthode.
 
-5. **Section Témoignages/Preuves**
-   - 2-3 témoignages fictifs mais réalistes
-   - Résultats concrets
+5. **Présenter la solution** :
+   - Introduis ${mainProductTitle}.
+   - Une phrase décrivant pourquoi c'est LA solution idéale. 
+   - Insiste sur la simplicité et la rapidité.
 
-6. **Section Prix & Offre**
-   - Valeur perçue
-   - Prix avec justification
-   - Garantie
+6. **Comment ça marche (3 étapes)** :
+   - Étape 1 : Action simple (ex: Commande).
+   - Étape 2 : Transformation (ex: Suis le plan).
+   - Étape 3 : Résultat final (ex: Obtiens ${mainProductOutcome}).
 
-7. **Section FAQ**
-   - 5-6 questions fréquentes
+7. **Pour qui c'est fait ?** :
+   - 'Ce programme est fait pour toi si...' (Lister 3 à 5 profils basés sur ${skill}).
+   - (Optionnel) : 'Ce n'est pas pour toi si...' (Cible les touristes ou ceux qui ne veulent pas agir).
 
-8. **CTA Final**
-   - Urgence/rareté
-   - Dernier call to action
+8. **Ce que tu vas obtenir** :
+   - Détaille le contenu de ${mainProductTitle} (modules, ressources).
+   - Liste les bonus offerts.
+   - Réitère la transformation : 'À la fin, tu seras capable de ${mainProductOutcome}'.
 
-IMPORTANT:
-- Utilise Tailwind CSS pour le styling (inline dans le HTML)
-- Design moderne, épuré, professionnel
-- Responsive mobile-first
-- Couleurs principales: #61f7a2 (vert accent), #11112b (sombre), blanc
-- Ton: Tu, proche, bienveillant mais professionnel
-- Retourne UNIQUEMENT le HTML complet (pas de markdown, pas d'explication)`;
+9. **Preuves sociales** :
+   - Rédige des exemples de résultats concrets que les gens peuvent attendre (témoignages réalistes et crédibles).
+
+10. **L'offre et le prix** :
+    - Affiche le prix ${mainProductPrice}€ (fais un ancrage de valeur : 'Valeur réelle XXX€, aujourd'hui seulement ${mainProductPrice}€').
+    - Mentionne la garantie 'Satisfait ou Remboursé 30 jours'.
+
+11. **FAQ** :
+    - Rédige 5 questions fréquentes avec des réponses rassurantes et simples.
+
+12. **Appel à l'action final** :
+    - Rappel de la promesse principale.
+    - Mention d'urgence (Offre limitée).
+    - CTA Final : 'Je lance mon business ${skill} maintenant'.
+
+CONSIGNES DE RÉDACTION :
+- Utilise exclusivement le 'Tu'.
+- Style fluide, aéré, facile à lire sur mobile.
+- Sois persuasif mais reste authentique et bienveillant.
+- Utilise Tailwind CSS pour le styling (inline dans le HTML).
+- Design moderne, épuré, professionnel.
+- Responsive mobile-first.
+- Couleurs principales: #61f7a2 (vert accent), #11112b (sombre), blanc.
+- Retourne UNIQUEMENT le HTML complet (pas de markdown, pas d'explication).`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",

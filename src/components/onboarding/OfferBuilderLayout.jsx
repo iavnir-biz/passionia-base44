@@ -109,15 +109,6 @@ export default function OfferBuilderLayout({
       <div className="py-12">
         {children}
       </div>
-
-      {/* Footer */}
-      <footer className="py-8 text-center border-t border-gray-200 bg-white mt-12">
-        <p className="text-gray-500 text-sm">Copyright Passion IA</p>
-        <div className="flex items-center justify-center gap-2 mt-2">
-          <div className="w-2 h-2 rounded-full bg-[#61f7a2] animate-pulse" />
-          <span className="text-[#61f7a2] text-xs font-medium">SYSTÈME CONNECTÉ</span>
-        </div>
-      </footer>
     </div>);
 
 }

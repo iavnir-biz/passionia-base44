@@ -112,12 +112,32 @@ export default function OfferTaVieFuture() {
 
   const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
   
-  // Calculate sales needed to reach goal
+  // Calculate sales needed to reach goal - with smart distribution
   const revenueGoal = parseInt(user?.targetIncome) || 500;
-  const salesNeeded = revenues.map(r => {
+  
+  // Sort by price descending to prioritize higher ticket items
+  const sortedRevenues = [...revenues].sort((a, b) => b.price - a.price);
+  
+  const salesNeeded = sortedRevenues.map((r, idx) => {
     if (r.price === 0) return { ...r, salesNeeded: 0 };
-    const needed = Math.ceil(revenueGoal / r.price);
-    return { ...r, salesNeeded: needed };
+    
+    // Distribution strategy: focus more on main product, less on premium
+    let salesCount = 0;
+    if (idx === 0) { // Premium - 1-2 sales
+      salesCount = Math.min(2, Math.ceil(revenueGoal / r.price / 10));
+    } else if (idx === 1) { // Upsell - 3-5 sales
+      salesCount = Math.min(5, Math.ceil(revenueGoal / r.price / 6));
+    } else if (idx === 2) { // Order Bump - 8-10 sales
+      salesCount = Math.min(10, Math.ceil(revenueGoal / r.price / 4));
+    } else { // Main Product - 15-20 sales
+      salesCount = Math.min(20, Math.ceil(revenueGoal / r.price / 2));
+    }
+    
+    return { ...r, salesNeeded: Math.max(1, salesCount) };
+  }).sort((a, b) => {
+    // Re-sort to original order (main, bump, upsell, premium)
+    const order = ['product_principal', 'petit_extra', 'offre_superieure', 'offre_premium'];
+    return order.indexOf(a.key) - order.indexOf(b.key);
   });
 
   return (
@@ -229,7 +249,7 @@ export default function OfferTaVieFuture() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-[#61f7a2]/10 via-white to-[#4de88f]/5 rounded-3xl border-2 border-[#61f7a2]/30 p-8 mb-6 shadow-lg"
+            className="bg-[#1b1b33] rounded-3xl border border-[#2a2a45] p-8 mb-6 shadow-lg"
           >
             <div className="flex items-center gap-4 mb-6">
               <motion.div 
@@ -240,10 +260,10 @@ export default function OfferTaVieFuture() {
                 <TrendingUp className="w-6 h-6 text-white" />
               </motion.div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-white">
                   Ton Potentiel de Revenus Mensuels
                 </h2>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-400 text-sm">
                   Basé sur les produits sélectionnés et une hypothèse d'une vente par jour
                 </p>
               </div>
@@ -256,16 +276,16 @@ export default function OfferTaVieFuture() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <span className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">
+              <span className="text-5xl md:text-7xl font-bold text-[#61f7a2]">
                 {totalMonthly.toLocaleString('fr-FR')} €
               </span>
-              <p className="text-gray-600 mt-3 text-lg font-medium">par mois</p>
+              <p className="text-gray-400 mt-3 text-lg font-medium">par mois</p>
             </motion.div>
 
             {/* Toggle Detail */}
             <button
               onClick={() => setShowDetail(!showDetail)}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[#61f7a2] hover:bg-[#61f7a2]/5 transition-all font-medium"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[#61f7a2] hover:bg-[#2a2a45] transition-all font-medium"
             >
               {showDetail ? (
                 <>
@@ -283,26 +303,26 @@ export default function OfferTaVieFuture() {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="border-t border-gray-200 pt-4 mt-2 space-y-3"
+                className="border-t border-[#2a2a45] pt-4 mt-2 space-y-3"
               >
                 {revenues.map((rev) => (
                   <div 
                     key={rev.key}
-                    className="flex items-center justify-between py-3 px-4 bg-white rounded-2xl border border-gray-200"
+                    className="flex items-center justify-between py-3 px-4 bg-[#11112b] rounded-2xl border border-[#2a2a45]"
                   >
                     <div>
-                      <span className="text-gray-900 text-sm font-semibold">{rev.label}</span>
-                      <p className="text-gray-500 text-xs">×{rev.multiplier} ventes/mois</p>
+                      <span className="text-white text-sm font-semibold">{rev.label}</span>
+                      <p className="text-gray-400 text-xs">×{rev.multiplier} ventes/mois</p>
                     </div>
                     <div className="text-right">
                       <span className="text-[#61f7a2] font-bold">{rev.total.toLocaleString('fr-FR')} €</span>
-                      <p className="text-gray-500 text-xs">{rev.price} € × {rev.multiplier}</p>
+                      <p className="text-gray-400 text-xs">{rev.price} € × {rev.multiplier}</p>
                     </div>
                   </div>
                 ))}
                 
-                <div className="flex items-center justify-between py-4 px-4 bg-gradient-to-r from-[#61f7a2]/10 to-[#4de88f]/10 rounded-2xl border-2 border-[#61f7a2]/30">
-                  <span className="text-gray-900 font-bold">Total Mensuel</span>
+                <div className="flex items-center justify-between py-4 px-4 bg-[#2a2a45] rounded-2xl border-2 border-[#61f7a2]/30">
+                  <span className="text-white font-bold">Total Mensuel</span>
                   <span className="text-[#61f7a2] font-bold text-xl">
                     {totalMonthly.toLocaleString('fr-FR')} €
                   </span>

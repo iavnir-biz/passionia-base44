@@ -39,71 +39,103 @@ const getProductIcon = (offer) => {
   
   const titleLower = (offer.title || '').toLowerCase();
   const descLower = (offer.description || '').toLowerCase();
-  const typeLower = (offer.productType || '').toLowerCase();
+  const badgeLower = (offer.badge || '').toLowerCase();
+  const resultLower = (offer.result || offer.outcome || '').toLowerCase();
   
-  // Coaching / Mentorat
-  if (titleLower.includes('coaching') || descLower.includes('coaching') || 
-      titleLower.includes('mentorat') || descLower.includes('accompagnement personnel') ||
-      typeLower.includes('coaching') || typeLower.includes('mentorat')) {
+  // Combine all text for better detection
+  const allText = `${titleLower} ${descLower} ${badgeLower} ${resultLower}`.toLowerCase();
+  
+  // Retraite / Séjour / Présentiel
+  if (allText.includes('retraite') || allText.includes('séjour') || 
+      allText.includes('présentiel') || allText.includes('weekend') ||
+      allText.includes('immersion')) {
     return Star;
   }
   
-  // VIP / Premium
-  if (titleLower.includes('vip') || titleLower.includes('premium') || 
-      titleLower.includes('masterclass') || typeLower.includes('vip')) {
+  // Coaching / Mentorat / Accompagnement
+  if (allText.includes('coaching') || allText.includes('mentorat') || 
+      allText.includes('accompagnement') || allText.includes('suivi personnalisé') ||
+      allText.includes('appels privés')) {
+    return Star;
+  }
+  
+  // VIP / Premium / Masterclass
+  if (allText.includes('vip') || allText.includes('premium') || 
+      allText.includes('masterclass') || allText.includes('élite')) {
     return Crown;
   }
   
-  // Formation complète
-  if (titleLower.includes('formation complète') || titleLower.includes('programme complet') ||
-      descLower.includes('formation complète') || typeLower.includes('formation-complete')) {
+  // Programme / Formation complète
+  if (allText.includes('programme') || allText.includes('formation complète') ||
+      allText.includes('parcours complet') || allText.includes('cursus')) {
     return GraduationCap;
   }
   
-  // Mini-formation / Cours
-  if (titleLower.includes('mini-formation') || titleLower.includes('mini formation') ||
-      titleLower.includes('cours') || typeLower.includes('mini-formation')) {
+  // Mini-formation / Cours vidéo
+  if (allText.includes('mini-formation') || allText.includes('mini formation') ||
+      allText.includes('cours vidéo') || allText.includes('modules vidéo') ||
+      allText.includes('vidéos')) {
     return Video;
   }
   
-  // Ebook / Guide
-  if (titleLower.includes('ebook') || titleLower.includes('e-book') || 
-      titleLower.includes('guide') || titleLower.includes('pdf') ||
-      typeLower.includes('ebook')) {
+  // Ebook / Guide / PDF
+  if (allText.includes('ebook') || allText.includes('e-book') || 
+      allText.includes('guide') || allText.includes('pdf') ||
+      allText.includes('livre')) {
     return BookOpen;
   }
   
-  // Checklist / Template
-  if (titleLower.includes('checklist') || titleLower.includes('check-list') ||
-      titleLower.includes('template') || titleLower.includes('modèle') ||
-      typeLower.includes('checklist') || typeLower.includes('modeles')) {
+  // Checklist / Template / Modèles
+  if (allText.includes('checklist') || allText.includes('check-list') ||
+      allText.includes('template') || allText.includes('modèle') ||
+      allText.includes('kit') || allText.includes('ressource')) {
     return CheckSquare;
   }
   
-  // Atelier / Workshop
-  if (titleLower.includes('atelier') || titleLower.includes('workshop') ||
-      titleLower.includes('masterclass') || typeLower.includes('atelier')) {
+  // Atelier / Workshop / Live
+  if (allText.includes('atelier') || allText.includes('workshop') ||
+      allText.includes('live') || allText.includes('webinaire') ||
+      allText.includes('session live')) {
     return Presentation;
   }
   
-  // Consultation / Appel
-  if (titleLower.includes('consultation') || titleLower.includes('appel') ||
-      titleLower.includes('session') || descLower.includes('consultation')) {
+  // Consultation / Appel stratégique
+  if (allText.includes('consultation') || allText.includes('appel') ||
+      allText.includes('session') || allText.includes('diagnostic')) {
     return MessageSquare;
   }
   
-  // Communauté / Groupe
-  if (titleLower.includes('communauté') || titleLower.includes('groupe') ||
-      titleLower.includes('accès groupe')) {
+  // Communauté / Groupe / Accès
+  if (allText.includes('communauté') || allText.includes('groupe') ||
+      allText.includes('réseau') || allText.includes('club')) {
     return Users;
   }
   
   // Bonus / Cadeau
-  if (titleLower.includes('bonus') || titleLower.includes('cadeau') ||
-      titleLower.includes('offert')) {
+  if (allText.includes('bonus') || allText.includes('cadeau') ||
+      allText.includes('offert') || allText.includes('gratuit')) {
     return Gift;
   }
   
+  // Calendrier / Planning
+  if (allText.includes('calendrier') || allText.includes('planning') ||
+      allText.includes('suivi') || allText.includes('rendez-vous')) {
+    return Calendar;
+  }
+  
+  // Idée / Conseil / Tips
+  if (allText.includes('idée') || allText.includes('astuce') ||
+      allText.includes('conseil') || allText.includes('tips')) {
+    return Lightbulb;
+  }
+  
+  // Challenge / Action
+  if (allText.includes('challenge') || allText.includes('défi') ||
+      allText.includes('action') || allText.includes('exercice')) {
+    return Target;
+  }
+  
+  // Default
   return Package;
 };
 

@@ -41,13 +41,13 @@ const features = [
   },
   { 
     icon: FileText, 
-    title: "Documents générés", 
-    description: "Page de vente, emails, scripts DM... tout prêt à l'emploi." 
+    title: "Documents IA générés", 
+    description: "Page de vente, messages de vente, avatar complet, email marketing, script DM... tout est prêt à l'emploi pour te lancer." 
   },
   { 
     icon: TrendingUp, 
-    title: "Suivi progression", 
-    description: "Suis ton avancement et reste motivé chaque jour." 
+    title: "Suivi de progression avancé", 
+    description: "Suis ton avancement et reste motivé chaque jour avec des tâches prêtes à l'emploi tous les jours." 
   },
 ];
 
@@ -152,7 +152,7 @@ export default function Welcome() {
           </motion.div>
           
           <p className="text-gray-500 text-sm">
-            Gratuit • 5 minutes
+            5 minutes avant d'avoir ton plan sur mesure
           </p>
         </div>
 

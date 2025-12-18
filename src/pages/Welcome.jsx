@@ -32,12 +32,12 @@ const features = [
   { 
     icon: Zap, 
     title: "Analyse IA instantanée", 
-    description: "Transformez votre passion en business validé en quelques minutes." 
+    description: "Transforme ta passion en business validé en quelques minutes." 
   },
   { 
     icon: Target, 
     title: "Plan d'action personnalisé", 
-    description: "Un roadmap sur-mesure pour atteindre vos premiers revenus." 
+    description: "Un roadmap sur-mesure pour atteindre tes premiers revenus." 
   },
   { 
     icon: FileText, 
@@ -47,7 +47,7 @@ const features = [
   { 
     icon: TrendingUp, 
     title: "Suivi progression", 
-    description: "Suivez votre avancement et restez motivé chaque jour." 
+    description: "Suis ton avancement et reste motivé chaque jour." 
   },
 ];
 
@@ -152,7 +152,7 @@ export default function Welcome() {
           </motion.div>
           
           <p className="text-gray-500 text-sm">
-            Gratuit • Aucune carte requise • 5 minutes
+            Gratuit • 5 minutes
           </p>
         </div>
 
@@ -262,7 +262,7 @@ export default function Welcome() {
             Prêt à transformer ta passion en business ?
           </h2>
           <p className="text-gray-600 text-lg mb-10 leading-relaxed">
-            Rejoins des centaines d'entrepreneurs qui ont déjà lancé leur activité grâce à PASSION IA.
+            Découvre comment ton savoir-faire peut devenir une source de revenus grâce à l'IA.
           </p>
           <div className="flex justify-center">
             <Button

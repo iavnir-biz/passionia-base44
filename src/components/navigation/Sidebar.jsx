@@ -40,7 +40,7 @@ const menuStructure = [
       { name: 'Réseaux sociaux', icon: Share2, page: 'SocialMedia', locked: true },
     ]
   },
-  { name: 'Discuter avec Nova', icon: MessageCircle, page: 'NovaChat', locked: true },
+  { name: 'Discuter avec Noah', icon: MessageCircle, page: 'NovaChat', locked: true },
   { name: 'Paramètres', icon: Settings, page: 'Settings' },
 ];
 

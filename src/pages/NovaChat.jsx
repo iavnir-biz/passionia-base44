@@ -15,7 +15,7 @@ export default function NovaChat() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Salut ! Je suis Nova, ton coach IA personnalisé 🚀\n\nJe suis là pour t'accompagner à chaque étape de ton parcours vers la liberté financière.\n\nPose-moi toutes tes questions : stratégie, marketing, création de produit, pricing... Je suis là pour toi !"
+      content: "Salut ! Je suis Noah, ton coach IA personnalisé 🚀\n\nJe suis là pour t'accompagner à chaque étape de ton parcours vers la liberté financière.\n\nPose-moi toutes tes questions : stratégie, marketing, création de produit, pricing... Je suis là pour toi !"
     }
   ]);
   const [input, setInput] = useState('');
@@ -88,7 +88,7 @@ export default function NovaChat() {
       
       <div className="flex-1 ml-72">
         <TopBar 
-          title="Discuter avec Nova" 
+          title="Discuter avec Noah" 
           subtitle="Ton coach IA disponible 24/7"
           user={user}
         />
@@ -106,9 +106,9 @@ export default function NovaChat() {
                   <Sparkles className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Nova, ton coach IA</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Noah, ton coach IA</h2>
                   <p className="text-gray-600">
-                    Nova est ton coach IA qui t'accompagne pour transformer ton savoir-faire en business rentable.
+                    Noah est ton coach IA qui t'accompagne pour transformer ton savoir-faire en business rentable.
                     Pose-lui toutes tes questions sur la création de produits, le marketing, le pricing, ou tout autre aspect de ton projet !
                   </p>
                 </div>
@@ -191,7 +191,7 @@ export default function NovaChat() {
                         sendMessage();
                       }
                     }}
-                    placeholder="Pose ta question à Nova..."
+                    placeholder="Pose ta question à Noah..."
                     className="flex-1 min-h-[80px] max-h-[150px] resize-none bg-white text-base"
                     disabled={isLoading}
                   />
@@ -220,10 +220,10 @@ export default function NovaChat() {
                   <Sparkles className="w-10 h-10 text-[#61f7a2]" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Nova IA - Réservé à l'Abonnement Ultime
+                  Noah IA - Réservé à l'Abonnement Ultime
                 </h2>
                 <p className="text-gray-600 text-lg mb-8">
-                  Le coaching IA personnalisé illimité avec Nova est exclusivement disponible dans l'abonnement premium ultime. Passe au niveau supérieur pour débloquer cette fonctionnalité.
+                  Le coaching IA personnalisé illimité avec Noah est exclusivement disponible dans l'abonnement premium ultime. Passe au niveau supérieur pour débloquer cette fonctionnalité.
                 </p>
                 <Button
                   onClick={() => window.location.href = '/plan-action'}

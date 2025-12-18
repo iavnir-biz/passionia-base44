@@ -8,7 +8,7 @@ export default function NovaSection() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Salut ! Je suis Nova, ton coach IA personnalisé 🚀\n\nJe suis là pour t'accompagner à chaque étape de ton parcours vers la liberté financière."
+      content: "Salut ! Je suis Noah, ton coach IA personnalisé 🚀\n\nJe suis là pour t'accompagner à chaque étape de ton parcours vers la liberté financière."
     }
   ]);
   const [input, setInput] = useState('');
@@ -51,9 +51,9 @@ export default function NovaSection() {
             <Sparkles className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Discuter avec Nova</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Discuter avec Noah</h3>
             <p className="text-gray-600 text-sm">
-              Nova est ton coach IA qui t'accompagne pour transformer ton savoir-faire en business rentable.
+              Noah est ton coach IA qui t'accompagne pour transformer ton savoir-faire en business rentable.
               Pose-lui toutes tes questions !
             </p>
           </div>
@@ -121,7 +121,7 @@ export default function NovaSection() {
                   sendMessage();
                 }
               }}
-              placeholder="Pose ta question à Nova..."
+              placeholder="Pose ta question à Noah..."
               className="flex-1 min-h-[60px] max-h-[120px] resize-none bg-white"
               disabled={isLoading}
             />

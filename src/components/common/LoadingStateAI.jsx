@@ -62,7 +62,7 @@ export default function LoadingStateAI({ message, step = 0 }) {
         </motion.h2>
         
         <p className="text-gray-400 text-sm mb-6">
-          L'IA analyse vos réponses pour créer votre plan personnalisé
+          Noah analyse tes réponses pour créer ton plan personnalisé
         </p>
         
         {/* Progress dots */}

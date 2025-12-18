@@ -13,46 +13,46 @@ import ChatBubble from '@/components/chat/ChatBubble';
 
 const emailTypes = [
   {
-    id: 'welcome',
-    title: 'Email de Bienvenue',
-    subtitle: 'Premier contact avec ton audience',
-    description: 'Crée un lien fort dès le début',
+    id: 'contraste',
+    title: 'Email 1 : Le Contraste',
+    subtitle: 'Aujourd\'hui vs Demain',
+    description: 'Rappelle la douleur et le rêve',
     icon: Send,
     color: 'from-blue-500 to-cyan-500',
     locked: false
   },
   {
-    id: 'nurture',
-    title: 'Email de Nurturing',
-    subtitle: 'Entretiens la relation',
-    description: 'Apporte de la valeur régulièrement',
+    id: 'validation',
+    title: 'Email 2 : La Validation Sociale',
+    subtitle: 'Le Regard des autres',
+    description: 'Reconnaissance et succès',
     icon: Send,
     color: 'from-purple-500 to-pink-500',
     locked: false
   },
   {
-    id: 'promo',
-    title: 'Email Promotionnel',
-    subtitle: 'Vends ton offre',
-    description: 'Transforme tes prospects en clients',
+    id: 'calcul',
+    title: 'Email 3 : Le Calcul de Faisabilité',
+    subtitle: 'La Logique',
+    description: 'Montre que c\'est accessible',
     icon: Send,
     color: 'from-orange-500 to-red-500',
     locked: false
   },
   {
-    id: 'story',
-    title: 'Email Storytelling',
-    subtitle: 'Raconte ton histoire',
-    description: 'Crée une connexion authentique',
+    id: 'impact',
+    title: 'Email 4 : L\'Impact et la Fierté',
+    subtitle: 'Le Sens',
+    description: 'Inspire à aider les autres',
     icon: Send,
     color: 'from-amber-500 to-yellow-500',
     locked: false
   },
   {
-    id: 'reengagement',
-    title: 'Email de Réengagement',
-    subtitle: 'Réactive tes inactifs',
-    description: 'Récupère ton audience dormante',
+    id: 'urgence',
+    title: 'Email 5 : L\'Urgence de l\'Inaction',
+    subtitle: 'Le Regret',
+    description: 'Coût émotionnel de ne rien faire',
     icon: Send,
     color: 'from-green-500 to-emerald-500',
     locked: false

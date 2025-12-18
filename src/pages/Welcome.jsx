@@ -287,23 +287,25 @@ export default function Welcome() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-gray-900">PassionIA</p>
-                <p className="text-xs text-gray-600">
-                  Technologie d'intelligence artificielle développée par IAVNIR INC
-                </p>
               </div>
             </div>
 
             {/* Right - Legal Links */}
-            <div className="flex items-center justify-center gap-4 text-xs text-gray-600 whitespace-nowrap overflow-x-auto">
-              <a href="#" className="hover:text-gray-900 transition-colors">Réglementation AI Act</a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">Protection des données</a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">RGPD</a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">Politique de confidentialité</a>
-              <span className="text-gray-300">•</span>
-              <a href="#" className="hover:text-gray-900 transition-colors">Mentions légales</a>
+            <div className="flex flex-col items-end justify-center gap-2 text-xs text-gray-600 whitespace-nowrap overflow-x-auto">
+              <div className="flex items-center gap-4">
+                <a href="#" className="hover:text-gray-900 transition-colors">Réglementation AI Act</a>
+                <span className="text-gray-300">•</span>
+                <a href="#" className="hover:text-gray-900 transition-colors">Protection des données</a>
+                <span className="text-gray-300">•</span>
+                <a href="#" className="hover:text-gray-900 transition-colors">RGPD</a>
+                <span className="text-gray-300">•</span>
+                <a href="#" className="hover:text-gray-900 transition-colors">Politique de confidentialité</a>
+                <span className="text-gray-300">•</span>
+                <a href="#" className="hover:text-gray-900 transition-colors">Mentions légales</a>
+              </div>
+              <p className="text-gray-500">
+                Technologie d'intelligence artificielle développée par IAVNIR INC
+              </p>
             </div>
           </div>
         </div>

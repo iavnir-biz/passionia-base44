@@ -247,11 +247,9 @@ export default function BonneNouvelle() {
                 <span className="text-gray-600">Analyse en cours...</span>
               </div>
             ) : (
-              <div className="space-y-4 text-gray-700 leading-relaxed text-base">
-                {marketAnalysis?.validationText?.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx}>{paragraph}</p>
-                )) || <p>{marketAnalysis?.validationText}</p>}
-              </div>
+              <p className="text-gray-700 leading-relaxed text-base">
+                {marketAnalysis?.validationText}
+              </p>
             )}
           </motion.div>
 
@@ -318,21 +316,21 @@ export default function BonneNouvelle() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 rounded-3xl border-2 border-yellow-600 p-8 mb-8 shadow-2xl"
+            className="bg-[#1b1b33] rounded-3xl border border-[#2a2a45] p-8 mb-8 shadow-lg"
           >
             <div className="flex items-center gap-4 mb-6">
               <motion.div 
-                className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg"
+                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
                 <TrendingUp className="w-6 h-6 text-white" />
               </motion.div>
               <div>
-                <h2 className="text-xl font-bold text-white drop-shadow-sm">
-                  🎯 Ton Objectif de Revenus Mensuels
+                <h2 className="text-xl font-bold text-white">
+                  Ton Potentiel de Revenus Mensuels
                 </h2>
-                <p className="text-white/80 text-sm drop-shadow-sm">
+                <p className="text-gray-400 text-sm">
                   Basé sur les produits sélectionnés et une hypothèse d'une vente par jour
                 </p>
               </div>
@@ -340,21 +338,21 @@ export default function BonneNouvelle() {
 
             {/* Big Number */}
             <motion.div 
-              className="text-center py-8 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20"
+              className="text-center py-8"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <span className="text-6xl md:text-8xl font-black text-white drop-shadow-xl">
+              <span className="text-5xl md:text-7xl font-bold text-[#61f7a2]">
                 {totalMonthly.toLocaleString('fr-FR')} €
               </span>
-              <p className="text-white/90 mt-4 text-xl font-bold drop-shadow-sm">💰 par mois</p>
+              <p className="text-gray-400 mt-3 text-lg font-medium">par mois</p>
             </motion.div>
 
             {/* Toggle Detail */}
             <button
               onClick={() => setShowDetail(!showDetail)}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-white hover:bg-white/10 transition-all font-medium mt-4"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[#61f7a2] hover:bg-[#2a2a45] transition-all font-medium"
             >
               {showDetail ? (
                 <>
@@ -372,27 +370,27 @@ export default function BonneNouvelle() {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="border-t border-white/20 pt-4 mt-2 space-y-3"
+                className="border-t border-[#2a2a45] pt-4 mt-2 space-y-3"
               >
                 {revenues.map((rev) => (
                   <div 
                     key={rev.key}
-                    className="flex items-center justify-between py-3 px-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20"
+                    className="flex items-center justify-between py-3 px-4 bg-[#11112b] rounded-2xl border border-[#2a2a45]"
                   >
                     <div>
                       <span className="text-white text-sm font-semibold">{rev.label}</span>
-                      <p className="text-white/70 text-xs">×{rev.multiplier} ventes/mois</p>
+                      <p className="text-gray-400 text-xs">×{rev.multiplier} ventes/mois</p>
                     </div>
                     <div className="text-right">
-                      <span className="text-white font-bold">{rev.total.toLocaleString('fr-FR')} €</span>
-                      <p className="text-white/70 text-xs">{rev.price} € × {rev.multiplier}</p>
+                      <span className="text-[#61f7a2] font-bold">{rev.total.toLocaleString('fr-FR')} €</span>
+                      <p className="text-gray-400 text-xs">{rev.price} € × {rev.multiplier}</p>
                     </div>
                   </div>
                 ))}
                 
-                <div className="flex items-center justify-between py-4 px-4 bg-white/20 backdrop-blur-sm rounded-2xl border-2 border-white/40">
+                <div className="flex items-center justify-between py-4 px-4 bg-[#2a2a45] rounded-2xl border-2 border-[#61f7a2]/30">
                   <span className="text-white font-bold">Total Mensuel</span>
-                  <span className="text-white font-bold text-xl">
+                  <span className="text-[#61f7a2] font-bold text-xl">
                     {totalMonthly.toLocaleString('fr-FR')} €
                   </span>
                 </div>

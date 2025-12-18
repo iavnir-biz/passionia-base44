@@ -7,8 +7,8 @@ import { ArrowRight, Sparkles, Brain, Zap } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import { Input } from '@/components/ui/input';
 
-// Nova AI Avatar - Animated
-const NovaAvatar = () => (
+// Noah AI Avatar - Animated
+const NoahAvatar = () => (
   <div className="relative flex items-center justify-center mb-8">
     {/* Glow effect background */}
     <motion.div
@@ -24,7 +24,7 @@ const NovaAvatar = () => (
       }}
     />
     
-    {/* Main Nova Icon */}
+    {/* Main Noah Icon */}
     <motion.div
       className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-xl"
       animate={{
@@ -151,13 +151,13 @@ export default function OnboardingFirstName() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        {/* Nova Avatar */}
+        {/* Noah Avatar */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <NovaAvatar />
+          <NoahAvatar />
         </motion.div>
 
         {/* Card */}
@@ -166,7 +166,7 @@ export default function OnboardingFirstName() {
             Enchanté ! Commençons par faire connaissance 🙂
           </h1>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            Je suis <span className="text-[#61f7a2] font-semibold">Nova</span>, l'IA de Passion IA, et je vais t'aider aujourd'hui à créer tes premières offres et à vendre ton premier produit en ligne.
+            Je suis <span className="text-[#61f7a2] font-semibold">Noah</span>, l'IA de Passion IA, et je vais t'aider aujourd'hui à créer tes premières offres et à vendre ton premier produit en ligne.
           </p>
           <p className="text-gray-600 text-sm mb-6">
             Pour démarrer : quel est ton prénom ?

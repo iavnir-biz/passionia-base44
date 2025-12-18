@@ -165,17 +165,9 @@ export default function OnboardingFirstName() {
           <h1 className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed">
             Enchanté ! Commençons par faire connaissance 🙂
           </h1>
-          <p className="text-gray-700 mb-4 leading-relaxed">
+          <p className="text-gray-700 mb-6 leading-relaxed">
             Je suis <span className="text-[#61f7a2] font-semibold">Nova</span>, l'IA de Passion IA, et je vais t'aider à monétiser ton savoir-faire.
           </p>
-          <motion.p 
-            className="text-sm text-gray-500 italic mb-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            Une technologie d'intelligence artificielle développée par IAvenir Corporation
-          </motion.p>
           <p className="text-gray-600 text-sm mb-6">
             Pour démarrer : quel est ton prénom ?
           </p>

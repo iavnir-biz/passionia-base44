@@ -2,9 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Loader2, Layers, CheckSquare } from 'lucide-react';
+import { Loader2, Layers, CheckSquare, FileText, Headphones, Gift, Package } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
+
+// Fonction pour déterminer l'icône selon le type de produit
+const getProductIcon = (offer) => {
+  const title = (offer?.title || '').toLowerCase();
+  const description = (offer?.description || '').toLowerCase();
+  const productType = (offer?.productType || '').toLowerCase();
+  
+  if (title.includes('pdf') || title.includes('ebook') || description.includes('pdf') || productType.includes('pdf') || productType.includes('ebook')) {
+    return FileText;
+  }
+  if (title.includes('checklist') || title.includes('check-list') || description.includes('checklist') || productType.includes('checklist')) {
+    return CheckSquare;
+  }
+  if (title.includes('audio') || title.includes('podcast') || description.includes('audio') || productType.includes('audio')) {
+    return Headphones;
+  }
+  if (title.includes('template') || title.includes('modèle') || description.includes('template')) {
+    return Layers;
+  }
+  // Par défaut, bonus/gift
+  return Gift;
+};
 
 export default function OfferPetitExtra() {
   const navigate = useNavigate();
@@ -36,7 +58,7 @@ export default function OfferPetitExtra() {
             const choices = userSession.offer_generation.offerChoices.orderBump1Choices.map((choice, idx) => ({
               ...choice,
               id: choice.id || `bump_${idx}`,
-              icon: Layers,
+              icon: getProductIcon(choice),
               badge: choice.productType || choice.badge || 'Bonus',
               result: choice.outcome
             }));

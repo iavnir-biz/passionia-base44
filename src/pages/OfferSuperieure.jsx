@@ -2,9 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Loader2, Presentation, GraduationCap } from 'lucide-react';
+import { Loader2, Presentation, GraduationCap, Video, BookOpen, Users } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
+
+// Fonction pour déterminer l'icône selon le type de produit
+const getProductIcon = (offer) => {
+  const title = (offer?.title || '').toLowerCase();
+  const description = (offer?.description || '').toLowerCase();
+  const productType = (offer?.productType || '').toLowerCase();
+  
+  if (title.includes('formation complète') || title.includes('masterclass') || description.includes('formation complète') || productType.includes('formation')) {
+    return GraduationCap;
+  }
+  if (title.includes('atelier') || title.includes('workshop') || description.includes('atelier') || productType.includes('atelier')) {
+    return Presentation;
+  }
+  if (title.includes('coaching') || title.includes('accompagnement') || description.includes('coaching') || productType.includes('coaching')) {
+    return Users;
+  }
+  if (title.includes('vidéo') || title.includes('video') || description.includes('vidéo')) {
+    return Video;
+  }
+  // Par défaut, atelier
+  return BookOpen;
+};
 
 export default function OfferSuperieure() {
   const navigate = useNavigate();
@@ -36,7 +58,7 @@ export default function OfferSuperieure() {
             const choices = userSession.offer_generation.offerChoices.upsell1Choices.map((choice, idx) => ({
               ...choice,
               id: choice.id || `upsell_${idx}`,
-              icon: Presentation,
+              icon: getProductIcon(choice),
               badge: choice.productType || choice.badge || 'Formation',
               result: choice.outcome
             }));

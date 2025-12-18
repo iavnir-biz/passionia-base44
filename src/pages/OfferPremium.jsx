@@ -2,9 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Loader2, Star, Users } from 'lucide-react';
+import { Loader2, Star, Users, Crown, Award, Sparkles } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
+
+// Fonction pour déterminer l'icône selon le type de produit
+const getProductIcon = (offer) => {
+  const title = (offer?.title || '').toLowerCase();
+  const description = (offer?.description || '').toLowerCase();
+  const productType = (offer?.productType || '').toLowerCase();
+  
+  if (title.includes('coaching') || title.includes('mentorat') || description.includes('coaching') || description.includes('mentorat') || productType.includes('coaching')) {
+    return Users;
+  }
+  if (title.includes('vip') || title.includes('premium') || title.includes('exclusif') || description.includes('vip')) {
+    return Crown;
+  }
+  if (title.includes('masterclass') || title.includes('élite') || description.includes('masterclass')) {
+    return Award;
+  }
+  // Par défaut, étoile premium
+  return Star;
+};
 
 export default function OfferPremium() {
   const navigate = useNavigate();
@@ -36,7 +55,7 @@ export default function OfferPremium() {
             const choices = userSession.offer_generation.offerChoices.upsell3Choices.map((choice, idx) => ({
               ...choice,
               id: choice.id || `premium_${idx}`,
-              icon: Star,
+              icon: getProductIcon(choice),
               badge: choice.productType || choice.badge || 'Premium',
               result: choice.outcome
             }));

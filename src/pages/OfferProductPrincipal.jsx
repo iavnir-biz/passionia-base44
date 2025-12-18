@@ -2,9 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Loader2, Video, FileText } from 'lucide-react';
+import { Loader2, Video, FileText, Headphones, CheckSquare, BookOpen, GraduationCap, Play } from 'lucide-react';
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
+
+// Fonction pour déterminer l'icône selon le type de produit
+const getProductIcon = (offer) => {
+  const title = (offer?.title || '').toLowerCase();
+  const description = (offer?.description || '').toLowerCase();
+  const productType = (offer?.productType || '').toLowerCase();
+  
+  if (title.includes('pdf') || title.includes('ebook') || description.includes('pdf') || productType.includes('pdf') || productType.includes('ebook')) {
+    return FileText;
+  }
+  if (title.includes('checklist') || title.includes('check-list') || description.includes('checklist') || productType.includes('checklist')) {
+    return CheckSquare;
+  }
+  if (title.includes('audio') || title.includes('podcast') || description.includes('audio') || productType.includes('audio')) {
+    return Headphones;
+  }
+  if (title.includes('formation complète') || title.includes('masterclass') || description.includes('formation complète')) {
+    return GraduationCap;
+  }
+  if (title.includes('atelier') || title.includes('workshop') || description.includes('atelier')) {
+    return BookOpen;
+  }
+  // Par défaut, vidéo/mini-formation
+  return Video;
+};
 
 
 
@@ -54,7 +79,7 @@ export default function OfferProductPrincipal() {
             const choices = userSession.offer_generation.offerChoices.mainProductChoices.map((choice, idx) => ({
               ...choice,
               id: choice.id || `main_${idx}`,
-              icon: Video,
+              icon: getProductIcon(choice),
               badge: choice.productType || choice.badge || 'Formation'
             }));
             console.log('OfferProductPrincipal: Offers loaded', { count: choices.length });

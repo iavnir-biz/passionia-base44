@@ -166,7 +166,7 @@ export default function OnboardingFirstName() {
             Enchanté ! Commençons par faire connaissance 🙂
           </h1>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            Je suis <span className="text-[#61f7a2] font-semibold">Nova</span>, l'IA de Passion IA, et je vais t'aider à monétiser ton savoir-faire.
+            Je suis <span className="text-[#61f7a2] font-semibold">Nova</span>, l'IA de Passion IA, et je vais t'aider aujourd'hui à créer tes premières offres et à vendre ton premier produit en ligne.
           </p>
           <p className="text-gray-600 text-sm mb-6">
             Pour démarrer : quel est ton prénom ?

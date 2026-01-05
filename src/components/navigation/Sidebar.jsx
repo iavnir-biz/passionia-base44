@@ -37,8 +37,6 @@ const menuStructure = [
       { name: 'Page de vente', icon: FileText, page: 'SalesPage' },
       { name: 'Messages de vente', icon: MessageCircle, page: 'SalesMessages' },
       { name: 'Emails Marketing', icon: Send, page: 'EmailsMarketing' },
-      { name: 'Publicité ADS', icon: Magnet, page: 'AdCopies', locked: true },
-      { name: 'Réseaux sociaux', icon: Share2, page: 'SocialMedia', locked: true },
     ]
   },
   { name: 'Discuter avec Noah', icon: MessageCircle, page: 'NovaChat', locked: true },

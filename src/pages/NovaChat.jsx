@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from 'framer-motion';
-import { Sparkles, Send, Zap, Target, TrendingUp, Lightbulb } from 'lucide-react';
+import { Sparkles, Send, Zap, Target, TrendingUp, Lightbulb, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import Sidebar from '@/components/navigation/Sidebar';
@@ -29,10 +29,10 @@ export default function NoahChat() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    // Afficher le paywall après 3 secondes
+    // Afficher le paywall après 20 secondes
     const timer = setTimeout(() => {
       setShowPaywall(true);
-    }, 3000);
+    }, 20000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -47,26 +47,8 @@ export default function NoahChat() {
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
-
-    const userMessage = { role: 'user', content: input };
-    setMessages([...messages, userMessage]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      // TODO: Appeler l'API Nova ici avec le contexte utilisateur
-      setTimeout(() => {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: "Je suis là pour t'aider ! Cette fonctionnalité arrive très bientôt 🎯\n\nEn attendant, continue d'avancer sur ton plan d'action et tes objectifs du jour."
-        }]);
-        setIsLoading(false);
-      }, 1500);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setIsLoading(false);
-    }
+    // Afficher le paywall immédiatement si on tente d'envoyer un message
+    setShowPaywall(true);
   };
 
   if (authLoading) {
@@ -89,7 +71,7 @@ export default function NoahChat() {
       <div className="flex-1 ml-72">
         <TopBar 
           title="Discuter avec Noah" 
-          subtitle="Ton coach IA disponible 24/7"
+          subtitle=""
           user={user}
         />
         
@@ -106,10 +88,10 @@ export default function NoahChat() {
                   <Sparkles className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Noah, ton coach IA</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Noah, ton coach IA 24/7</h2>
                   <p className="text-gray-600">
-                    Noah est ton coach IA qui t'accompagne pour transformer ton savoir-faire en business rentable.
-                    Pose-lui toutes tes questions sur la création de produits, le marketing, le pricing, ou tout autre aspect de ton projet !
+                    Noah est ton coach IA qui t'accompagne à chaque étape pour transformer ton savoir-faire en business rentable.
+                    Il t'aide à créer tes produits, définir ta stratégie marketing, optimiser ton pricing et réaliser l'entièreté de ton projet !
                   </p>
                 </div>
               </div>
@@ -197,11 +179,10 @@ export default function NoahChat() {
                   />
                   <Button
                     onClick={sendMessage}
-                    disabled={!input.trim() || isLoading}
-                    className="bg-[#61f7a2] hover:bg-[#4de88f] text-white h-[80px] px-8 text-base font-semibold"
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 h-[80px] px-8 text-base font-semibold cursor-pointer"
                   >
-                    <Send className="w-5 h-5 mr-2" />
-                    Envoyer
+                    <Lock className="w-5 h-5 mr-2" />
+                    Premium
                   </Button>
                 </div>
               </div>
@@ -220,10 +201,10 @@ export default function NoahChat() {
                   <Sparkles className="w-10 h-10 text-[#61f7a2]" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Noah IA - Réservé à l'Abonnement Ultime
+                  Coaching IA personnalisé illimité avec Noah
                 </h2>
                 <p className="text-gray-600 text-lg mb-8">
-                  Le coaching IA personnalisé illimité avec Noah est exclusivement disponible dans l'abonnement premium ultime. Passe au niveau supérieur pour débloquer cette fonctionnalité.
+                  Le coaching IA personnalisé illimité avec Noah est accessible dans l'abonnement premium ultime. Passez au niveau supérieur pour débloquer cette fonctionnalité et bénéficier d'un accompagnement complet pour réaliser l'entièreté de votre projet.
                 </p>
                 <Button
                   onClick={() => window.location.href = '/plan-action'}

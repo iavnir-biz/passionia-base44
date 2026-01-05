@@ -324,10 +324,19 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // Utiliser les données passées en paramètre (localStorage)
+    // Utiliser les données passées en paramètre
     const workingHistory = history || [];
     const workingSummary = summary || {};
-    const firstName = localStorage?.getItem?.('onboarding_firstName') || '';
+    
+    // Récupérer le prénom depuis l'utilisateur Base44
+    let firstName = '';
+    try {
+      const user = await base44.auth.me();
+      firstName = user?.full_name || '';
+    } catch (e) {
+      console.log('User not authenticated, using default');
+    }
+    
     const skill = workingSummary.who_to_teach || '';
 
     // Si userAnswer fourni, l'ajouter à l'historique de travail

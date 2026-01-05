@@ -17,6 +17,7 @@ import {
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
+import HelpFooter from '@/components/common/HelpFooter';
 
 export default function MarketAnalysis() {
   const [user, setUser] = useState(null);

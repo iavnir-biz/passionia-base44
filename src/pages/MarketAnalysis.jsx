@@ -157,12 +157,12 @@ export default function MarketAnalysis() {
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-12"
+                className="mb-12 text-left"
               >
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
                   Analyse de marché
                 </h1>
-                <p className="text-gray-600 text-lg">
+                <p className="text-gray-600 text-lg max-w-3xl">
                   Comprendre qui a besoin de ton savoir, pourquoi, et comment ces personnes achètent aujourd'hui
                 </p>
               </motion.div>

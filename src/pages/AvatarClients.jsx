@@ -174,7 +174,7 @@ export default function AvatarClients() {
       <div className="flex-1 ml-72">
         <TopBar 
           title="Avatars clients" 
-          subtitle="Comprends tes clients idéaux"
+          subtitle=""
           user={user}
         />
         
@@ -256,8 +256,12 @@ export default function AvatarClients() {
                     >
                       {/* Avatar Header */}
                       <div className="flex items-start gap-4 mb-6">
-                        <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                          <User className="w-7 h-7 text-gray-600" />
+                        <div className={cn(
+                          "w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0",
+                          avatarColors[index].bg,
+                          `border-2 ${avatarColors[index].border}`
+                        )}>
+                          <User className={cn("w-7 h-7", `bg-gradient-to-br ${avatarColors[index].gradient} bg-clip-text text-transparent`)} />
                         </div>
                         <div className="flex-1">
                           <h3 className="text-xl font-bold text-gray-900 mb-1">

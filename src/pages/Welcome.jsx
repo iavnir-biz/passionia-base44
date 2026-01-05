@@ -108,27 +108,6 @@ export default function Welcome() {
 
       {/* Hero Section with Floating Cards */}
       <div className="relative flex items-center justify-center px-6 py-20 md:py-32 overflow-hidden">
-        {/* Desktop Floating AI Icons - Left Side */}
-        <FloatingIcon icon={Brain} delay={0} className="hidden md:block absolute left-8 top-20" />
-        <FloatingIcon icon={Zap} delay={0.3} className="hidden md:block absolute left-16 top-1/3" />
-        <FloatingIcon icon={Database} delay={0.6} className="hidden md:block absolute left-12 bottom-32" />
-        <FloatingIcon icon={Sparkles} delay={0.9} className="hidden md:block absolute left-20 bottom-1/4" />
-        
-        {/* Desktop Floating AI Icons - Right Side */}
-        <FloatingIcon icon={Cpu} delay={0.2} className="hidden md:block absolute right-12 top-24" />
-        <FloatingIcon icon={Network} delay={0.5} className="hidden md:block absolute right-20 top-1/3" />
-        <FloatingIcon icon={Sparkles} delay={0.8} className="hidden md:block absolute right-16 bottom-28" />
-        <FloatingIcon icon={Zap} delay={1.1} className="hidden md:block absolute right-24 bottom-1/4" />
-        
-        {/* Mobile Floating AI Icons - Around Title (plus visibles) */}
-        <FloatingIcon icon={Brain} delay={0} mobile={true} className="md:hidden absolute left-4 top-24" />
-        <FloatingIcon icon={Sparkles} delay={0.4} mobile={true} className="md:hidden absolute right-4 top-20" />
-        <FloatingIcon icon={Zap} delay={0.8} mobile={true} className="md:hidden absolute left-6 top-52" />
-        <FloatingIcon icon={Cpu} delay={1.2} mobile={true} className="md:hidden absolute right-6 top-56" />
-        <FloatingIcon icon={Network} delay={0.2} mobile={true} className="md:hidden absolute left-8 bottom-1/3" />
-        <FloatingIcon icon={Database} delay={0.6} mobile={true} className="md:hidden absolute right-8 bottom-1/3" />
-        <FloatingIcon icon={Sparkles} delay={1.0} mobile={true} className="md:hidden absolute left-4 bottom-1/4" />
-        <FloatingIcon icon={Zap} delay={1.4} mobile={true} className="md:hidden absolute right-4 bottom-1/4" />
 
         <div className="max-w-4xl text-center relative z-10">
           {/* AI Badge */}
@@ -210,70 +189,124 @@ export default function Welcome() {
           </p>
         </div>
 
-        {/* Floating Cards around Hero */}
+        {/* Floating Cards around Hero - Smaller */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="hidden lg:block absolute top-10 left-20 w-32 h-32 bg-white rounded-3xl shadow-xl p-4">
-
-          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl flex items-center justify-center">
-            <Target className="w-12 h-12 text-blue-600" />
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            y: [20, 0, -10, 0],
+            rotate: [0, 5, -5, 0]
+          }}
+          transition={{
+            duration: 4,
+            delay: 0.4,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut"
+          }}
+          className="hidden lg:block absolute top-16 left-8 w-16 h-16 bg-white rounded-2xl shadow-lg p-2">
+          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl flex items-center justify-center">
+            <Target className="w-7 h-7 text-blue-600" />
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          className="hidden lg:block absolute top-32 right-24 w-40 h-40 bg-white rounded-3xl shadow-xl p-4">
-
-          <div className="w-full h-full bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl flex items-center justify-center">
-            <Zap className="w-14 h-14 text-purple-600" />
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            y: [20, 0, -10, 0],
+            rotate: [0, -5, 5, 0]
+          }}
+          transition={{
+            duration: 4,
+            delay: 0.5,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut"
+          }}
+          className="hidden lg:block absolute top-24 right-8 w-16 h-16 bg-white rounded-2xl shadow-lg p-2">
+          <div className="w-full h-full bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center">
+            <Zap className="w-7 h-7 text-purple-600" />
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 }}
-          className="hidden lg:block absolute bottom-20 left-32 w-36 h-36 bg-white rounded-3xl shadow-xl p-4">
-
-          <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center">
-            <TrendingUp className="w-12 h-12 text-green-600" />
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            y: [20, 0, -10, 0],
+            rotate: [0, 5, -5, 0]
+          }}
+          transition={{
+            duration: 4,
+            delay: 0.6,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut"
+          }}
+          className="hidden lg:block absolute bottom-32 left-12 w-16 h-16 bg-white rounded-2xl shadow-lg p-2">
+          <div className="w-full h-full bg-gradient-to-br from-green-100 to-green-50 rounded-xl flex items-center justify-center">
+            <TrendingUp className="w-7 h-7 text-green-600" />
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.7 }}
-          className="hidden lg:block absolute bottom-32 right-20 w-32 h-32 bg-white rounded-3xl shadow-xl p-4">
-
-          <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl flex items-center justify-center">
-            <FileText className="w-12 h-12 text-amber-600" />
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            y: [20, 0, -10, 0],
+            rotate: [0, -5, 5, 0]
+          }}
+          transition={{
+            duration: 4,
+            delay: 0.7,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut"
+          }}
+          className="hidden lg:block absolute bottom-24 right-12 w-16 h-16 bg-white rounded-2xl shadow-lg p-2">
+          <div className="w-full h-full bg-gradient-to-br from-amber-100 to-amber-50 rounded-xl flex items-center justify-center">
+            <FileText className="w-7 h-7 text-amber-600" />
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.8 }}
-          className="hidden lg:block absolute top-1/2 left-10 w-28 h-28 bg-white rounded-3xl shadow-xl p-3">
-
-          <div className="w-full h-full bg-gradient-to-br from-pink-100 to-pink-50 rounded-2xl flex items-center justify-center">
-            <Sparkles className="w-10 h-10 text-pink-600" />
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            y: [20, 0, -10, 0],
+            rotate: [0, 5, -5, 0]
+          }}
+          transition={{
+            duration: 4,
+            delay: 0.8,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut"
+          }}
+          className="hidden lg:block absolute top-1/2 left-4 w-16 h-16 bg-white rounded-2xl shadow-lg p-2">
+          <div className="w-full h-full bg-gradient-to-br from-rose-100 to-rose-50 rounded-xl flex items-center justify-center">
+            <Sparkles className="w-7 h-7 text-rose-600" />
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.9 }}
-          className="hidden lg:block absolute top-1/2 right-16 w-28 h-28 bg-white rounded-3xl shadow-xl p-3">
-
-          <div className="w-full h-full bg-gradient-to-br from-cyan-100 to-cyan-50 rounded-2xl flex items-center justify-center">
-            <ArrowRight className="w-10 h-10 text-cyan-600" />
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            y: [20, 0, -10, 0],
+            rotate: [0, -5, 5, 0]
+          }}
+          transition={{
+            duration: 4,
+            delay: 0.9,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut"
+          }}
+          className="hidden lg:block absolute top-1/2 right-4 w-16 h-16 bg-white rounded-2xl shadow-lg p-2">
+          <div className="w-full h-full bg-gradient-to-br from-cyan-100 to-cyan-50 rounded-xl flex items-center justify-center">
+            <ArrowRight className="w-7 h-7 text-cyan-600" />
           </div>
         </motion.div>
       </div>

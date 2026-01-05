@@ -643,6 +643,95 @@ export default function PlanAction() {
           </div>
         </motion.div>
 
+        {/* 6️⃣-B CE QUI EST INCLUS DANS LE PACK */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.9 }}
+          className="mb-16"
+        >
+          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 rounded-3xl border-2 border-blue-300 p-8 shadow-lg">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              Ce qui est inclus dans le pack
+            </h3>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              {[
+                { icon: Sparkles, text: "Offre complète générée par IA" },
+                { icon: Target, text: "Validation de marché, de cible et de positionnement" },
+                { icon: FileText, text: "Page de vente personnalisée" },
+                { icon: Mail, text: "5 emails de vente automatiques" },
+                { icon: MessageSquare, text: "Tous les messages de vente inclus" },
+                { icon: Zap, text: "Plan d'action 7 jours pour ta première vente" },
+                { icon: Calendar, text: "Plan d'action 30 jours complet" },
+                { icon: FileText, text: "Tous les documents IA personnalisés" }
+              ].map((item, idx) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 2 + idx * 0.05 }}
+                    className="flex items-center gap-3 bg-white rounded-xl p-4 border border-blue-200 shadow-sm"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <span className="text-gray-800 font-medium text-sm">{item.text}</span>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-blue-200">
+              <p className="text-center text-gray-700 text-lg font-medium">
+                Tout est prêt. Tu passes simplement à l'étape suivante.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* 6️⃣-C RENTABILISE TON INVESTISSEMENT */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.1 }}
+          className="mb-16"
+        >
+          <div className="bg-white rounded-3xl border-2 border-gray-200 p-8 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-[#61f7a2] flex items-center justify-center flex-shrink-0">
+                <BarChart className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                Rentabilise ton investissement dès la première vente
+              </h3>
+            </div>
+
+            <div className="bg-gradient-to-br from-[#61f7a2]/10 to-green-50 rounded-2xl border border-[#61f7a2]/30 p-6 mb-6">
+              <p className="text-gray-800 text-lg mb-4">
+                Le pack est à <span className="font-bold text-[#61f7a2]">67€</span>. 
+                Ton produit principal est à <span className="font-bold text-[#61f7a2]">{products[0]?.data?.price || '—'}</span>.
+              </p>
+              <p className="text-gray-900 text-xl font-bold">
+                Il te suffira de faire <span className="text-[#61f7a2]">2 ventes</span> pour que ce soit 
+                <span className="text-[#61f7a2]"> 100% remboursé</span>. 
+              </p>
+              <p className="text-gray-700 text-lg mt-2">
+                Tout le reste, c'est 100% de bénéfice pour toi. 💰
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center gap-3 bg-gray-50 rounded-xl p-4">
+              <Clock className="w-6 h-6 text-[#61f7a2]" />
+              <p className="text-gray-700 font-medium">
+                L'objectif : ta première vente dans les 24 heures après avoir lancé
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* 7️⃣ CTA FINAL */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

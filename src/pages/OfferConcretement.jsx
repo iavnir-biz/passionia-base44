@@ -40,13 +40,13 @@ function PhaseCard({ number, title, objective, plan, result, delay = 0 }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 hover:border-[#3a3a55] transition-all"
+      className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-all"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-xl bg-[#61f7a2] flex items-center justify-center">
-          <span className="text-xl font-bold text-[#11112b]">{number}</span>
+        <div className="w-12 h-12 rounded-xl bg-[#61f7a2] flex items-center justify-center shadow-sm">
+          <span className="text-xl font-bold text-white">{number}</span>
         </div>
-        <h3 className="text-xl font-bold text-white">{title}</h3>
+        <h3 className="text-xl font-bold text-gray-900">{title}</h3>
       </div>
 
       <div className="space-y-4">
@@ -57,27 +57,27 @@ function PhaseCard({ number, title, objective, plan, result, delay = 0 }) {
               Ton Objectif
             </span>
           </div>
-          <p className="text-gray-300 leading-relaxed">{objective}</p>
+          <p className="text-gray-700 leading-relaxed">{objective}</p>
         </div>
 
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm font-semibold text-yellow-500 uppercase tracking-wide">
+            <Zap className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
               Notre Plan d'Action
             </span>
           </div>
-          <p className="text-gray-300 leading-relaxed">{plan}</p>
+          <p className="text-gray-700 leading-relaxed">{plan}</p>
         </div>
 
-        <div className="bg-[#61f7a2]/5 rounded-xl p-4 border border-[#61f7a2]/20">
+        <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-4 border border-green-200">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
             <span className="text-sm font-semibold text-[#61f7a2] uppercase tracking-wide">
               Le Résultat
             </span>
           </div>
-          <p className="text-white font-medium">{result}</p>
+          <p className="text-gray-900 font-medium">{result}</p>
         </div>
       </div>
     </motion.div>
@@ -147,18 +147,18 @@ export default function OfferConcretement() {
 
   if (isLoading || isGenerating) {
     return (
-      <div className="min-h-screen bg-[#11112b] flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex flex-col items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mb-4" />
-        <p className="text-gray-400">{isGenerating ? 'Nova prépare ton plan personnalisé...' : 'Chargement...'}</p>
+        <p className="text-gray-600">{isGenerating ? 'Nova prépare ton plan personnalisé...' : 'Chargement...'}</p>
       </div>
     );
   }
 
   if (!planDeRoute) {
     return (
-      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-400 mb-4">Impossible de charger le plan de route</p>
+          <p className="text-gray-600 mb-4">Impossible de charger le plan de route</p>
           <GlowButton onClick={() => window.location.reload()}>
             Réessayer
           </GlowButton>
@@ -181,9 +181,9 @@ export default function OfferConcretement() {
   }));
 
   return (
-    <div className="min-h-screen bg-[#11112b]">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Main Navigation Bar */}
-      <div className="bg-[#1b1b33] border-b border-[#2a2a45] py-4">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 py-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
             {mainSteps.map((step, index) => {
@@ -198,16 +198,16 @@ export default function OfferConcretement() {
                     disabled={!isClickable}
                     className={cn(
                       "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
-                      isActive && "bg-[#61f7a2] text-[#11112b]",
-                      isPrevious && "text-[#61f7a2] hover:text-[#4de88f] cursor-pointer",
-                      !isActive && !isPrevious && "text-gray-500 cursor-not-allowed opacity-50"
+                      isActive && "bg-[#61f7a2] text-white shadow-md",
+                      isPrevious && "text-[#61f7a2] bg-[#61f7a2]/10 cursor-pointer hover:opacity-80",
+                      !isActive && !isPrevious && "text-gray-400 bg-gray-100 cursor-not-allowed"
                     )}>
                     {step.id}. {step.label}
                   </button>
                   {index < mainSteps.length - 1 && (
                     <div className={cn(
                       "w-4 md:w-8 h-[2px]",
-                      step.id < 4 ? "bg-[#61f7a2]" : "bg-[#2a2a45]"
+                      step.id < 4 ? "bg-[#61f7a2]" : "bg-gray-200"
                     )} />
                   )}
                 </React.Fragment>
@@ -218,33 +218,33 @@ export default function OfferConcretement() {
       </div>
 
       {/* Content */}
-      <div className="py-8">
+      <div className="py-12">
         <div className="max-w-4xl mx-auto px-4">
-          {/* Top CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex justify-center mb-8"
-          >
-            <GlowButton onClick={handleContinue} size="lg" className="px-10">
-              🚀 Voir mon Pack Clé en Main
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
-          </motion.div>
-
           {/* Title */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-center mb-6"
+            className="text-center mb-8"
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+            <h1 className="text-4xl font-bold text-gray-900 mb-3">
               Ton Plan de Route en 4 Phases
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-gray-600 text-lg">
               Oublie la pression des délais. Avance à ton rythme, étape par étape, vers ton objectif.
             </p>
+          </motion.div>
+
+          {/* Top CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex justify-center mb-8"
+          >
+            <GlowButton onClick={handleContinue} size="lg" className="px-10">
+              Voir mon Pack Clé en Main
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </GlowButton>
           </motion.div>
 
           {/* Intro Box */}
@@ -252,9 +252,9 @@ export default function OfferConcretement() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6 mb-8"
+            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
           >
-            <p className="text-gray-300 leading-relaxed text-center">
+            <p className="text-gray-700 leading-relaxed text-center text-base">
               {planDeRoute.introduction}
             </p>
           </motion.div>
@@ -266,10 +266,10 @@ export default function OfferConcretement() {
             transition={{ delay: 0.3 }}
             className="mb-6"
           >
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
               🗺️ Ton Parcours Guidé
             </h2>
-            <p className="text-gray-400">
+            <p className="text-gray-600">
               {planDeRoute.parcoursGuide}
             </p>
           </motion.div>
@@ -292,7 +292,7 @@ export default function OfferConcretement() {
             transition={{ delay: 0.8 }}
             className="mb-8"
           >
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               🧩 Pourquoi ce plan est efficace ?
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
@@ -304,15 +304,15 @@ export default function OfferConcretement() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.9 + index * 0.05 }}
-                    className="bg-[#1b1b33] rounded-xl border border-[#2a2a45] p-5 hover:border-[#61f7a2]/30 transition-all"
+                    className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5 text-[#61f7a2]" />
+                      <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <h3 className="text-white font-semibold mb-1">{advantage.title}</h3>
-                        <p className="text-gray-400 text-sm">{advantage.description}</p>
+                        <h3 className="text-gray-900 font-semibold mb-1">{advantage.title}</h3>
+                        <p className="text-gray-600 text-sm">{advantage.description}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -326,12 +326,12 @@ export default function OfferConcretement() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.1 }}
-            className="bg-gradient-to-br from-[#61f7a2]/10 to-[#1b1b33] rounded-2xl border border-[#61f7a2]/30 p-8 mb-8 text-center"
+            className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl border border-green-200 p-8 mb-8 text-center shadow-sm"
           >
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               💡 Tu comprends maintenant ?
             </h2>
-            <p className="text-gray-300 leading-relaxed text-lg">
+            <p className="text-gray-700 leading-relaxed text-lg">
               {planDeRoute.conclusion}
             </p>
           </motion.div>
@@ -343,11 +343,11 @@ export default function OfferConcretement() {
             transition={{ delay: 1.2 }}
             className="flex flex-col items-center"
           >
-            <p className="text-gray-400 mb-4 text-lg">
+            <p className="text-gray-600 mb-4 text-lg">
               Prêt(e) à commencer le voyage ?
             </p>
             <GlowButton onClick={handleContinue} size="lg" className="px-12">
-              ✨ Voir Mon Pack Clé en Main
+              Voir Mon Pack Clé en Main
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
           </motion.div>

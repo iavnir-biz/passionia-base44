@@ -1,22 +1,25 @@
-import Welcome from './pages/Welcome';
-import Onboarding from './pages/Onboarding';
-import Results from './pages/Results';
-import Dashboard from './pages/Dashboard';
-import PlanAction from './pages/PlanAction';
-import PlanStepDetail from './pages/PlanStepDetail';
+import AdCopies from './pages/AdCopies';
+import AvatarClients from './pages/AvatarClients';
+import BonneNouvelle from './pages/BonneNouvelle';
+import Booking from './pages/Booking';
 import DailyActions from './pages/DailyActions';
+import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
-import Settings from './pages/Settings';
+import EmailsMarketing from './pages/EmailsMarketing';
+import Home from './pages/Home';
+import MyOffers from './pages/MyOffers';
+import NovaChat from './pages/NovaChat';
+import OfferConcretement from './pages/OfferConcretement';
+import OfferGenerationStart from './pages/OfferGenerationStart';
+import OfferPetitExtra from './pages/OfferPetitExtra';
+import OfferPremium from './pages/OfferPremium';
+import OfferProductPrincipal from './pages/OfferProductPrincipal';
+import OfferResume from './pages/OfferResume';
+import OfferSuperieure from './pages/OfferSuperieure';
+import OfferTaVieFuture from './pages/OfferTaVieFuture';
+import Onboarding from './pages/Onboarding';
+import OnboardingDynamic from './pages/OnboardingDynamic';
 import OnboardingFirstName from './pages/OnboardingFirstName';
-import OnboardingQ1CoreSkill from './pages/OnboardingQ1CoreSkill';
-import OnboardingQ2ExperienceLevel from './pages/OnboardingQ2ExperienceLevel';
-import OnboardingQ3Years from './pages/OnboardingQ3Years';
-import OnboardingQ4TargetAudience from './pages/OnboardingQ4TargetAudience';
-import OnboardingQ5MainProblem from './pages/OnboardingQ5MainProblem';
-import OnboardingQ6FirstResult from './pages/OnboardingQ6FirstResult';
-import OnboardingQ7FinalTransformation from './pages/OnboardingQ7FinalTransformation';
-import OnboardingQ8MainTeaching from './pages/OnboardingQ8MainTeaching';
-import OnboardingQ9Method from './pages/OnboardingQ9Method';
 import OnboardingQ10TypicalMistake from './pages/OnboardingQ10TypicalMistake';
 import OnboardingQ11ExtraDetail from './pages/OnboardingQ11ExtraDetail';
 import OnboardingQ12AgeRange from './pages/OnboardingQ12AgeRange';
@@ -27,6 +30,7 @@ import OnboardingQ16TargetIncome from './pages/OnboardingQ16TargetIncome';
 import OnboardingQ17TargetDelay from './pages/OnboardingQ17TargetDelay';
 import OnboardingQ18LifeChange from './pages/OnboardingQ18LifeChange';
 import OnboardingQ19Impact from './pages/OnboardingQ19Impact';
+import OnboardingQ1CoreSkill from './pages/OnboardingQ1CoreSkill';
 import OnboardingQ20Emotions from './pages/OnboardingQ20Emotions';
 import OnboardingQ21Relatives from './pages/OnboardingQ21Relatives';
 import OnboardingQ22Lifestyle from './pages/OnboardingQ22Lifestyle';
@@ -34,48 +38,48 @@ import OnboardingQ23Obstacles from './pages/OnboardingQ23Obstacles';
 import OnboardingQ24IfNothingChanges from './pages/OnboardingQ24IfNothingChanges';
 import OnboardingQ25Readiness from './pages/OnboardingQ25Readiness';
 import OnboardingQ26DeliveryPreferences from './pages/OnboardingQ26DeliveryPreferences';
-import OfferGenerationStart from './pages/OfferGenerationStart';
-import OfferProductPrincipal from './pages/OfferProductPrincipal';
-import OfferPetitExtra from './pages/OfferPetitExtra';
-import OfferSuperieure from './pages/OfferSuperieure';
-import OfferPremium from './pages/OfferPremium';
-import OfferResume from './pages/OfferResume';
-import BonneNouvelle from './pages/BonneNouvelle';
-import OfferTaVieFuture from './pages/OfferTaVieFuture';
-import OfferConcretement from './pages/OfferConcretement';
-import OnboardingDynamic from './pages/OnboardingDynamic';
+import OnboardingQ2ExperienceLevel from './pages/OnboardingQ2ExperienceLevel';
+import OnboardingQ3Years from './pages/OnboardingQ3Years';
+import OnboardingQ4TargetAudience from './pages/OnboardingQ4TargetAudience';
+import OnboardingQ5MainProblem from './pages/OnboardingQ5MainProblem';
+import OnboardingQ6FirstResult from './pages/OnboardingQ6FirstResult';
+import OnboardingQ7FinalTransformation from './pages/OnboardingQ7FinalTransformation';
+import OnboardingQ8MainTeaching from './pages/OnboardingQ8MainTeaching';
+import OnboardingQ9Method from './pages/OnboardingQ9Method';
 import OnboardingTransition from './pages/OnboardingTransition';
-import NovaChat from './pages/NovaChat';
-import SalesPage from './pages/SalesPage';
-import EmailsMarketing from './pages/EmailsMarketing';
+import PlanAction from './pages/PlanAction';
+import PlanStepDetail from './pages/PlanStepDetail';
+import Results from './pages/Results';
 import SalesMessages from './pages/SalesMessages';
-import AdCopies from './pages/AdCopies';
+import SalesPage from './pages/SalesPage';
+import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
-import AvatarClients from './pages/AvatarClients';
-import MyOffers from './pages/MyOffers';
-import Booking from './pages/Booking';
+import Welcome from './pages/Welcome';
 
 
 export const PAGES = {
-    "Welcome": Welcome,
-    "Onboarding": Onboarding,
-    "Results": Results,
-    "Dashboard": Dashboard,
-    "PlanAction": PlanAction,
-    "PlanStepDetail": PlanStepDetail,
+    "AdCopies": AdCopies,
+    "AvatarClients": AvatarClients,
+    "BonneNouvelle": BonneNouvelle,
+    "Booking": Booking,
     "DailyActions": DailyActions,
+    "Dashboard": Dashboard,
     "Documents": Documents,
-    "Settings": Settings,
+    "EmailsMarketing": EmailsMarketing,
+    "Home": Home,
+    "MyOffers": MyOffers,
+    "NovaChat": NovaChat,
+    "OfferConcretement": OfferConcretement,
+    "OfferGenerationStart": OfferGenerationStart,
+    "OfferPetitExtra": OfferPetitExtra,
+    "OfferPremium": OfferPremium,
+    "OfferProductPrincipal": OfferProductPrincipal,
+    "OfferResume": OfferResume,
+    "OfferSuperieure": OfferSuperieure,
+    "OfferTaVieFuture": OfferTaVieFuture,
+    "Onboarding": Onboarding,
+    "OnboardingDynamic": OnboardingDynamic,
     "OnboardingFirstName": OnboardingFirstName,
-    "OnboardingQ1CoreSkill": OnboardingQ1CoreSkill,
-    "OnboardingQ2ExperienceLevel": OnboardingQ2ExperienceLevel,
-    "OnboardingQ3Years": OnboardingQ3Years,
-    "OnboardingQ4TargetAudience": OnboardingQ4TargetAudience,
-    "OnboardingQ5MainProblem": OnboardingQ5MainProblem,
-    "OnboardingQ6FirstResult": OnboardingQ6FirstResult,
-    "OnboardingQ7FinalTransformation": OnboardingQ7FinalTransformation,
-    "OnboardingQ8MainTeaching": OnboardingQ8MainTeaching,
-    "OnboardingQ9Method": OnboardingQ9Method,
     "OnboardingQ10TypicalMistake": OnboardingQ10TypicalMistake,
     "OnboardingQ11ExtraDetail": OnboardingQ11ExtraDetail,
     "OnboardingQ12AgeRange": OnboardingQ12AgeRange,
@@ -86,6 +90,7 @@ export const PAGES = {
     "OnboardingQ17TargetDelay": OnboardingQ17TargetDelay,
     "OnboardingQ18LifeChange": OnboardingQ18LifeChange,
     "OnboardingQ19Impact": OnboardingQ19Impact,
+    "OnboardingQ1CoreSkill": OnboardingQ1CoreSkill,
     "OnboardingQ20Emotions": OnboardingQ20Emotions,
     "OnboardingQ21Relatives": OnboardingQ21Relatives,
     "OnboardingQ22Lifestyle": OnboardingQ22Lifestyle,
@@ -93,26 +98,23 @@ export const PAGES = {
     "OnboardingQ24IfNothingChanges": OnboardingQ24IfNothingChanges,
     "OnboardingQ25Readiness": OnboardingQ25Readiness,
     "OnboardingQ26DeliveryPreferences": OnboardingQ26DeliveryPreferences,
-    "OfferGenerationStart": OfferGenerationStart,
-    "OfferProductPrincipal": OfferProductPrincipal,
-    "OfferPetitExtra": OfferPetitExtra,
-    "OfferSuperieure": OfferSuperieure,
-    "OfferPremium": OfferPremium,
-    "OfferResume": OfferResume,
-    "BonneNouvelle": BonneNouvelle,
-    "OfferTaVieFuture": OfferTaVieFuture,
-    "OfferConcretement": OfferConcretement,
-    "OnboardingDynamic": OnboardingDynamic,
+    "OnboardingQ2ExperienceLevel": OnboardingQ2ExperienceLevel,
+    "OnboardingQ3Years": OnboardingQ3Years,
+    "OnboardingQ4TargetAudience": OnboardingQ4TargetAudience,
+    "OnboardingQ5MainProblem": OnboardingQ5MainProblem,
+    "OnboardingQ6FirstResult": OnboardingQ6FirstResult,
+    "OnboardingQ7FinalTransformation": OnboardingQ7FinalTransformation,
+    "OnboardingQ8MainTeaching": OnboardingQ8MainTeaching,
+    "OnboardingQ9Method": OnboardingQ9Method,
     "OnboardingTransition": OnboardingTransition,
-    "NovaChat": NovaChat,
-    "SalesPage": SalesPage,
-    "EmailsMarketing": EmailsMarketing,
+    "PlanAction": PlanAction,
+    "PlanStepDetail": PlanStepDetail,
+    "Results": Results,
     "SalesMessages": SalesMessages,
-    "AdCopies": AdCopies,
+    "SalesPage": SalesPage,
+    "Settings": Settings,
     "SocialMedia": SocialMedia,
-    "AvatarClients": AvatarClients,
-    "MyOffers": MyOffers,
-    "Booking": Booking,
+    "Welcome": Welcome,
 }
 
 export const pagesConfig = {

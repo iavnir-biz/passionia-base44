@@ -5,7 +5,6 @@ export default function TopBar({ title, subtitle, user }) {
   return (
     <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-40">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
         {subtitle && <p className="text-gray-600 text-sm mt-0.5">{subtitle}</p>}
       </div>
       

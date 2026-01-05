@@ -25,79 +25,93 @@ const STEPS = [
     id: 'market',
     icon: Search,
     label: 'Analyser ton marché',
-    title: 'Étape 1 — Comprendre ton marché',
-    description: 'On commence par une chose essentielle : vérifier si ton savoir-faire répond à une vraie demande aujourd\'hui.',
-    buttonText: 'Lancer l\'analyse de marché',
+    title: 'Étape 1 — Vérifier la demande',
+    description: 'On commence par valider que ton savoir-faire répond à un vrai besoin aujourd\'hui.',
+    buttonText: 'Lancer l\'analyse',
     duration: '1 à 2 minutes',
+    subtext: 'Nova analyse les tendances et la demande réelle',
     functionName: 'generateMarketValidation',
-    successMessage: 'Analyse terminée — ton marché est validé'
+    successMessage: '✓ Demande validée — ton marché existe et cherche des solutions',
+    transitionMessage: 'Maintenant qu\'on sait que la demande existe, on va définir qui sont exactement tes futurs clients.'
   },
   {
     id: 'avatars',
     icon: Users,
     label: 'Créer tes avatars clients',
     title: 'Étape 2 — Définir tes clients idéaux',
-    description: 'Noah va maintenant créer 3 profils détaillés de tes futurs élèves. Tu sauras exactement à qui t\'adresser.',
-    buttonText: 'Générer les avatars',
+    description: 'Nova va créer 3 profils détaillés de tes futurs élèves pour que tu saches exactement à qui t\'adresser.',
+    buttonText: 'Créer les avatars',
     duration: '2 à 3 minutes',
+    subtext: 'Profils complets avec besoins, freins et motivations',
     functionName: 'generateAvatars',
-    successMessage: 'Avatars créés — tu sais maintenant qui sont tes clients'
+    successMessage: '✓ Avatars créés — tu sais maintenant qui sont tes clients et comment leur parler',
+    transitionMessage: 'Tes clients idéaux sont définis. On passe à la construction de ta gamme d\'offres.'
   },
   {
     id: 'offers',
     icon: Package,
     label: 'Structurer tes offres',
-    title: 'Étape 3 — Valider ta gamme d\'offres',
-    description: 'Tes offres ont déjà été définies pendant l\'onboarding. On valide juste qu\'elles sont bien enregistrées.',
-    buttonText: 'Valider mes offres',
+    title: 'Étape 3 — Valider ta gamme complète',
+    description: 'Tes 4 offres ont été définies pendant l\'onboarding, on vérifie juste qu\'elles sont bien enregistrées.',
+    buttonText: 'Valider la gamme',
     duration: 'Instantané',
+    subtext: 'Low ticket → Premium, tout est déjà structuré',
     skip: true,
-    successMessage: 'Offres validées — ta gamme est prête'
+    successMessage: '✓ Gamme validée — du produit d\'entrée à l\'offre premium, tout est prêt',
+    transitionMessage: 'Ta gamme est structurée. Place à la page qui va convertir tes visiteurs en clients.'
   },
   {
     id: 'salespage',
     icon: FileText,
     label: 'Générer ta page de vente',
     title: 'Étape 4 — Créer ta page de vente',
-    description: 'Nova va rédiger une page de vente complète, optimisée pour transformer tes visiteurs en clients.',
-    buttonText: 'Générer la page de vente',
+    description: 'Nova rédige une page de vente complète, structurée pour transformer tes visiteurs en clients.',
+    buttonText: 'Générer la page',
     duration: '2 à 3 minutes',
+    subtext: 'Copywriting optimisé, structure éprouvée',
     functionName: 'generateSalesPage',
-    successMessage: 'Page de vente créée — prête à convertir'
+    successMessage: '✓ Page créée — prête à convaincre et convertir dès aujourd\'hui',
+    transitionMessage: 'Ta page de vente est prête. Maintenant, préparons tes messages pour promouvoir ton offre.'
   },
   {
     id: 'messages',
     icon: MessageSquare,
     label: 'Rédiger tes messages de vente',
-    title: 'Étape 5 — Préparer tes messages',
-    description: 'Des messages persuasifs pour promouvoir ton offre sur les réseaux sociaux, adaptés à ton style.',
+    title: 'Étape 5 — Rédiger tes messages',
+    description: 'Des messages persuasifs pour promouvoir ton offre sur les réseaux, adaptés à ton style et ton audience.',
     buttonText: 'Générer les messages',
     duration: '1 à 2 minutes',
+    subtext: 'Ton naturel, accrocheur, authentique',
     functionName: 'generateSalesMessage',
-    successMessage: 'Messages créés — prêts à publier'
+    successMessage: '✓ Messages créés — prêts à copier-coller et publier',
+    transitionMessage: 'Tes messages sont prêts. Passons maintenant à ta séquence email pour nourrir la relation avec tes prospects.'
   },
   {
     id: 'emails',
     icon: Mail,
     label: 'Créer tes emails marketing',
     title: 'Étape 6 — Construire ta séquence email',
-    description: 'Une séquence email complète pour nourrir ta relation avec tes prospects et convertir.',
+    description: 'Une séquence complète pour éduquer, convaincre et transformer tes prospects en clients fidèles.',
     buttonText: 'Générer les emails',
     duration: '2 à 3 minutes',
+    subtext: 'Séquence structurée, prête à envoyer',
     functionName: 'generateMarketingEmail',
-    successMessage: 'Emails créés — séquence prête'
+    successMessage: '✓ Séquence créée — tes prospects vont recevoir exactement ce qu\'il faut',
+    transitionMessage: 'Ta séquence email est prête. Avant de démarrer, rejoins la communauté pour ne jamais avancer seul.'
   },
   {
     id: 'community',
     icon: Globe,
     label: 'Rejoindre la communauté privée',
     title: 'Étape 7 — Rejoindre la communauté',
-    description: 'Accède au groupe School privé pour échanger, poser tes questions et avancer plus vite.',
-    buttonText: 'Rejoindre la communauté',
+    description: 'Accède au groupe School privé pour échanger, poser tes questions et avancer plus vite avec d\'autres créateurs.',
+    buttonText: 'Rejoindre maintenant',
     duration: 'Accès instantané',
+    subtext: 'Entraide, ressources bonus, expertise partagée',
     external: true,
     externalUrl: 'https://www.skool.com/passion-ia',
-    successMessage: 'Bienvenue dans la communauté !'
+    successMessage: '✓ Bienvenue dans la communauté — tu n\'es plus seul dans cette aventure',
+    transitionMessage: 'Tu fais maintenant partie de la communauté. Tout est en place : accède à ton dashboard.'
   }
 ];
 
@@ -367,7 +381,7 @@ export default function Activation() {
                         <ArrowRight className="w-5 h-5 ml-2" />
                       </GlowButton>
                       <p className="text-sm text-gray-500 text-center">
-                        ⏱️ {currentStep.duration} · Aucune action technique requise
+                        ⏱️ {currentStep.duration} · {currentStep.subtext || 'Aucune action technique requise'}
                       </p>
                     </motion.div>
                   )}
@@ -385,11 +399,15 @@ export default function Activation() {
                 </div>
                 
                 <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                  Tout est prêt 🚀
+                  Tout est prêt.
                 </h2>
                 
-                <p className="text-gray-600 text-lg mb-8 max-w-xl mx-auto">
-                  Ton espace complet est maintenant disponible. Tu pourras modifier, affiner et optimiser chaque élément à ton rythme.
+                <p className="text-gray-600 text-lg mb-2 max-w-xl mx-auto">
+                  Ton espace complet est maintenant disponible. Tu pourras affiner, modifier et lancer chaque élément à ton rythme.
+                </p>
+                
+                <p className="text-sm text-gray-500 mb-8">
+                  Chaque contenu généré t'attend dans ton dashboard. Tu contrôles la suite.
                 </p>
                 
                 <GlowButton
@@ -397,7 +415,7 @@ export default function Activation() {
                   size="lg"
                   className="px-12"
                 >
-                  Accéder à mon dashboard
+                  Accéder à mon espace
                   <Rocket className="w-5 h-5 ml-2" />
                 </GlowButton>
               </motion.div>

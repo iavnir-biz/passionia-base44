@@ -34,16 +34,49 @@ function parsePrice(priceStr) {
   return parseInt(cleaned, 10) || 0;
 }
 
-function PhaseCard({ number, title, objective, plan, result, delay = 0 }) {
+function PhaseCard({ number, title, objective, plan, result, delay = 0, color = 'green' }) {
+  const colorSchemes = {
+    green: {
+      bg: 'from-green-500',
+      border: 'border-green-200',
+      text: 'text-green-600',
+      resultBg: 'from-green-50 to-green-100',
+      resultBorder: 'border-green-200'
+    },
+    blue: {
+      bg: 'from-blue-500',
+      border: 'border-blue-200',
+      text: 'text-blue-600',
+      resultBg: 'from-blue-50 to-blue-100',
+      resultBorder: 'border-blue-200'
+    },
+    purple: {
+      bg: 'from-purple-500',
+      border: 'border-purple-200',
+      text: 'text-purple-600',
+      resultBg: 'from-purple-50 to-purple-100',
+      resultBorder: 'border-purple-200'
+    },
+    orange: {
+      bg: 'from-orange-500',
+      border: 'border-orange-200',
+      text: 'text-orange-600',
+      resultBg: 'from-orange-50 to-orange-100',
+      resultBorder: 'border-orange-200'
+    }
+  };
+
+  const scheme = colorSchemes[color];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-all"
+      className={cn("bg-white rounded-2xl border p-6 shadow-sm hover:shadow-md transition-all", scheme.border)}
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-xl bg-[#61f7a2] flex items-center justify-center shadow-sm">
+        <div className={cn("w-12 h-12 rounded-xl bg-gradient-to-br to-white flex items-center justify-center shadow-sm", scheme.bg)}>
           <span className="text-xl font-bold text-white">{number}</span>
         </div>
         <h3 className="text-xl font-bold text-gray-900">{title}</h3>
@@ -52,8 +85,8 @@ function PhaseCard({ number, title, objective, plan, result, delay = 0 }) {
       <div className="space-y-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Target className="w-4 h-4 text-[#61f7a2]" />
-            <span className="text-sm font-semibold text-[#61f7a2] uppercase tracking-wide">
+            <Target className={cn("w-4 h-4", scheme.text)} />
+            <span className={cn("text-sm font-semibold uppercase tracking-wide", scheme.text)}>
               Ton Objectif
             </span>
           </div>
@@ -62,18 +95,18 @@ function PhaseCard({ number, title, objective, plan, result, delay = 0 }) {
 
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+            <Zap className={cn("w-4 h-4", scheme.text)} />
+            <span className={cn("text-sm font-semibold uppercase tracking-wide", scheme.text)}>
               Notre Plan d'Action
             </span>
           </div>
           <p className="text-gray-700 leading-relaxed">{plan}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-4 border border-green-200">
+        <div className={cn("bg-gradient-to-br rounded-xl p-4 border", scheme.resultBg, scheme.resultBorder)}>
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-            <span className="text-sm font-semibold text-[#61f7a2] uppercase tracking-wide">
+            <CheckCircle className={cn("w-4 h-4", scheme.text)} />
+            <span className={cn("text-sm font-semibold uppercase tracking-wide", scheme.text)}>
               Le Résultat
             </span>
           </div>
@@ -168,10 +201,10 @@ export default function OfferConcretement() {
   }
 
   const phases = [
-    { number: 1, ...planDeRoute.phase1 },
-    { number: 2, ...planDeRoute.phase2 },
-    { number: 3, ...planDeRoute.phase3 },
-    { number: 4, ...planDeRoute.phase4 }
+    { number: 1, ...planDeRoute.phase1, color: 'green' },
+    { number: 2, ...planDeRoute.phase2, color: 'blue' },
+    { number: 3, ...planDeRoute.phase3, color: 'purple' },
+    { number: 4, ...planDeRoute.phase4, color: 'orange' }
   ];
 
   const advantageIcons = [Rocket, DollarSign, Shield, Sparkles];

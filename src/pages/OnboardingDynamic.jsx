@@ -296,19 +296,74 @@ export default function OnboardingDynamic() {
   const progress = Math.min((questionCount / 11) * 100, 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex flex-col">
-      {/* Progress bar */}
-      <div className="w-full bg-gray-100 h-2">
-        <div 
-          className="h-full bg-[#61f7a2] transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      <div className="text-center py-2 text-sm text-gray-600 font-medium">
-        Question {questionCount}
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
+      {/* Sidebar gauche */}
+      <div className="w-80 bg-white border-r border-gray-200 flex flex-col items-center py-12 px-6">
+        {/* Noah Avatar */}
+        <div className="relative mb-8">
+          <motion.div
+            className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
+            animate={{
+              y: [0, -5, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <Brain className="w-10 h-10 text-white" />
+          </motion.div>
+          <motion.div
+            className="absolute -top-1 -right-1"
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 180, 360]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          >
+            <Sparkles className="w-5 h-5 text-[#61f7a2]" />
+          </motion.div>
+        </div>
+
+        {/* Étape */}
+        <div className="text-center mb-8">
+          <h3 className="text-lg font-bold text-gray-900 mb-1">Étape 1</h3>
+          <p className="text-sm text-gray-600">Découverte</p>
+        </div>
+
+        {/* Progress vertical */}
+        <div className="flex-1 flex flex-col items-center w-full max-w-[200px]">
+          <div className="relative w-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
+            <motion.div 
+              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#61f7a2] to-[#4de88f]"
+              initial={{ height: '0%' }}
+              animate={{ height: `${progress}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          <div className="mt-4 text-center">
+            <p className="text-xs text-gray-500 font-medium">Question {questionCount}/11</p>
+            <p className="text-2xl font-bold text-[#61f7a2] mt-1">{Math.round(progress)}%</p>
+          </div>
+        </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-6">
+      {/* Main content */}
+      <div className="flex-1 flex flex-col">
+        {/* Progress bar horizontal (mobile) */}
+        <div className="w-full bg-gray-100 h-2 md:hidden">
+          <div 
+            className="h-full bg-[#61f7a2] transition-all duration-500"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <div className="flex-1 flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -482,6 +537,7 @@ export default function OnboardingDynamic() {
             </motion.div>
           </motion.div>
         </motion.div>
+        </div>
       </div>
     </div>
   );

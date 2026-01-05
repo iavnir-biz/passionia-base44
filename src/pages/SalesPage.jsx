@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import UpgradeModal from '@/components/paywall/UpgradeModal';
-import { Sparkles, Loader2, Eye, Copy, Download, Lock, Package, ShoppingCart, TrendingUp, Crown } from 'lucide-react';
+import { Sparkles, Loader2, Eye, Copy, Download, Lock, Package, ShoppingCart, TrendingUp, Crown, Brain } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
-import SalesPageGenerator from '@/components/salespage/SalesPageGenerator';
+import ChatBubble from '@/components/chat/ChatBubble';
+import { cn } from "@/lib/utils";
 
 export default function SalesPage() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
@@ -26,6 +27,11 @@ export default function SalesPage() {
   const [showPreview, setShowPreview] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [hasPremium, setHasPremium] = useState(false);
+  const [showCustomization, setShowCustomization] = useState(false);
+  const [selectedColor, setSelectedColor] = useState('#61f7a2');
+  const [selectedTone, setSelectedTone] = useState('inspirant');
+  const [generationStep, setGenerationStep] = useState(0);
+  const [previewHtml, setPreviewHtml] = useState('');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -61,37 +67,68 @@ export default function SalesPage() {
     }
   };
 
-  const handleGenerate = async (type, isRegenerate = false) => {
+  const handleGenerate = async (type) => {
     if (type !== 'low' && !hasPremium) {
       setShowUpgradeModal(true);
       return;
     }
-    
-    if (isRegenerate && !hasPremium) {
-      setShowUpgradeModal(true);
+
+    // Check if already generated
+    if (generatedPages[type]) {
       return;
     }
     
     setSelectedType(type);
-    setIsGenerating(true);
+    setShowCustomization(true);
   };
 
-  const handleGenerationComplete = async (salesPage) => {
+  const startGeneration = async () => {
+    setShowCustomization(false);
+    setIsGenerating(true);
+    setGenerationStep(0);
+    setPreviewHtml('');
+
+    const steps = [
+      { label: 'Analyse du profil', duration: 2000 },
+      { label: 'Création de l\'image hero', duration: 15000 },
+      { label: 'Rédaction du contenu', duration: 20000 },
+      { label: 'Construction de la page', duration: 3000 },
+      { label: 'Design & couleurs', duration: 2000 },
+      { label: 'Finalisation', duration: 2000 }
+    ];
+
+    // Start step progression
+    for (let i = 0; i < steps.length; i++) {
+      setGenerationStep(i);
+      await new Promise(resolve => setTimeout(resolve, steps[i].duration));
+    }
+
     try {
+      const response = await base44.functions.invoke('generateSalesPage', {
+        profile,
+        session,
+        offerType: selectedType,
+        color: selectedColor,
+        tone: selectedTone
+      });
+
+      const salesPage = response.data.salesPage;
+
       const updatedPages = { ...generatedPages, [selectedType]: salesPage };
       setGeneratedPages(updatedPages);
       
-      // Save to session
       await base44.entities.Session.update(session.id, {
         generated_sales_pages: updatedPages
       });
-      
-      setIsGenerating(false);
-      setSelectedType(null);
+
+      toast.success('Page de vente générée !');
     } catch (error) {
-      console.error('Error saving sales page:', error);
+      console.error('Error generating sales page:', error);
+      toast.error('Erreur lors de la génération');
+    } finally {
       setIsGenerating(false);
       setSelectedType(null);
+      setGenerationStep(0);
     }
   };
 
@@ -153,41 +190,68 @@ export default function SalesPage() {
     }
   ];
 
+  const colorOptions = [
+    { name: 'Vert Passion', value: '#61f7a2' },
+    { name: 'Bleu', value: '#3b82f6' },
+    { name: 'Violet', value: '#a855f7' },
+    { name: 'Orange', value: '#f97316' },
+  ];
+
+  const toneOptions = [
+    { name: 'Inspirant', value: 'inspirant' },
+    { name: 'Direct', value: 'direct' },
+    { name: 'Premium', value: 'premium' },
+    { name: 'Bienveillant', value: 'bienveillant' },
+  ];
+
+  const generationSteps = [
+    'Analyse du profil',
+    'Création de l\'image hero',
+    'Rédaction du contenu',
+    'Construction de la page',
+    'Design & couleurs',
+    'Finalisation'
+  ];
+
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#11112b]">
+      <div className="flex items-center justify-center h-screen bg-white">
         <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#11112b]">
+    <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="SalesPage" progress={0} />
       
       <div className="flex-1 ml-72">
         <TopBar 
-          title="Page de vente" 
-          subtitle="Génère ta page de vente avec l'IA"
+          title="Pages de vente" 
+          subtitle=""
           user={user}
         />
         
         <main className="p-8">
-          <div className="max-w-6xl mx-auto space-y-6">
+          <div className="max-w-6xl mx-auto space-y-8">
             
             {/* Header */}
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1b1b33] rounded-full mb-4">
-                <Sparkles className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm text-gray-300">Pages générées par IA</span>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-left"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
+                <Brain className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-xs font-medium text-gray-700">Pages générées par IA</span>
               </div>
-              <h1 className="text-4xl font-bold text-white mb-3">
-                Tes Pages de Vente
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                Tes pages de vente
               </h1>
-              <p className="text-gray-400 text-lg">
+              <p className="text-gray-600 text-lg">
                 Crée des pages de vente optimisées pour tes offres
               </p>
-            </div>
+            </motion.div>
 
             {/* Offer type cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -196,62 +260,62 @@ export default function SalesPage() {
                 const isGenerated = generatedPages[offer.id];
                 
                 return (
-                  <div
+                  <motion.div
                     key={offer.id}
-                    className="relative bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 hover:shadow-xl animate-fade-in"
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    className={cn(
+                      "relative bg-gray-50 border border-gray-200 rounded-2xl p-6 transition-all",
+                      !offer.locked && "hover:shadow-md"
+                    )}
                   >
-                    {/* Gradient Header */}
-                    <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${offer.color} flex items-center justify-center mb-4`}>
-                      <Icon className="w-8 h-8 text-white" />
+                    {/* Icon Header */}
+                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${offer.color} flex items-center justify-center mb-4`}>
+                      <Icon className="w-7 h-7 text-white" />
                     </div>
 
                     {/* Content */}
-                    <h3 className="text-xl font-bold text-white mb-2">
-                      {offer.title}
-                    </h3>
-                    <p className="text-[#61f7a2] text-sm mb-1">{offer.subtitle}</p>
-                    <p className="text-gray-400 text-sm mb-6">{offer.description}</p>
+                    <div className={cn(offer.locked && "filter blur-sm select-none")}>
+                      <p className="text-[#61f7a2] text-xs font-semibold uppercase tracking-wide mb-1">
+                        {offer.subtitle}
+                      </p>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">
+                        {offer.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-6">
+                        {offer.description}
+                      </p>
+                    </div>
 
                     {/* Actions */}
-                    {!offer.locked ? (
+                    {!offer.locked && (
                       isGenerated ? (
-                        <div className="space-y-3">
-                          <div className="flex gap-2">
-                            <GlowButton
-                              onClick={() => setShowPreview(isGenerated)}
-                              variant="outline"
-                              size="sm"
-                              icon={Eye}
-                              className="flex-1"
-                            >
-                              Voir
-                            </GlowButton>
-                            <GlowButton
-                              onClick={() => handleCopy(isGenerated)}
-                              variant="ghost"
-                              size="sm"
-                              icon={Copy}
-                            >
-                              Copier
-                            </GlowButton>
-                            <GlowButton
-                              onClick={() => handleDownload(isGenerated, `page-${offer.id}.html`)}
-                              variant="ghost"
-                              size="sm"
-                              icon={Download}
-                            >
-                              Télécharger
-                            </GlowButton>
-                          </div>
+                        <div className="flex gap-2">
                           <GlowButton
-                            onClick={() => handleGenerate(offer.id, true)}
+                            onClick={() => setShowPreview(isGenerated)}
                             variant="secondary"
                             size="sm"
-                            className="w-full"
-                            icon={!hasPremium ? Lock : undefined}
+                            icon={Eye}
+                            className="flex-1"
                           >
-                            {!hasPremium ? 'Premium' : 'Régénérer'}
+                            Voir
+                          </GlowButton>
+                          <GlowButton
+                            onClick={() => handleCopy(isGenerated)}
+                            variant="ghost"
+                            size="sm"
+                            icon={Copy}
+                          >
+                            Copier
+                          </GlowButton>
+                          <GlowButton
+                            onClick={() => handleDownload(isGenerated, `page-${offer.id}.html`)}
+                            variant="ghost"
+                            size="sm"
+                            icon={Download}
+                          >
+                            Télécharger
                           </GlowButton>
                         </div>
                       ) : (
@@ -259,72 +323,218 @@ export default function SalesPage() {
                           onClick={() => handleGenerate(offer.id)}
                           variant="primary"
                           size="default"
+                          icon={Sparkles}
                           className="w-full"
                         >
-                          Générer
+                          Générer avec l'IA
                         </GlowButton>
                       )
-                    ) : null}
+                    )}
 
                     {/* Lock Overlay */}
                     {offer.locked && (
-                      <div className="absolute inset-0 bg-white/40 backdrop-blur-md flex items-center justify-center rounded-2xl">
+                      <div className="absolute inset-0 flex items-center justify-center rounded-2xl">
                         <div className="text-center">
                           <Lock className="w-10 h-10 text-gray-400 mx-auto mb-2" />
                           <p className="text-sm font-semibold text-gray-600">Premium</p>
                         </div>
                       </div>
                     )}
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
 
           </div>
-
-          {/* Generation in progress */}
-          <AnimatePresence>
-            {isGenerating && (
-              <SalesPageGenerator
-                profile={profile}
-                session={session}
-                offerType={selectedType}
-                onComplete={handleGenerationComplete}
-                onCancel={() => {
-                  setIsGenerating(false);
-                  setSelectedType(null);
-                }}
-              />
-            )}
-          </AnimatePresence>
         </main>
       </div>
 
+      {/* Customization Modal */}
+      <AnimatePresence>
+        {showCustomization && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-xl"
+            >
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Personnalise ta page</h3>
+              <p className="text-gray-600 mb-6">Choisis la couleur et le ton de ta page de vente</p>
+
+              {/* Color Selection */}
+              <div className="mb-6">
+                <label className="text-sm font-semibold text-gray-900 mb-3 block">Couleur principale</label>
+                <div className="grid grid-cols-4 gap-3">
+                  {colorOptions.map((color) => (
+                    <button
+                      key={color.value}
+                      onClick={() => setSelectedColor(color.value)}
+                      className={cn(
+                        "h-16 rounded-xl transition-all border-2",
+                        selectedColor === color.value ? "border-gray-900 scale-105" : "border-gray-200"
+                      )}
+                      style={{ backgroundColor: color.value }}
+                    >
+                      <span className="sr-only">{color.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tone Selection */}
+              <div className="mb-8">
+                <label className="text-sm font-semibold text-gray-900 mb-3 block">Ton de communication</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {toneOptions.map((tone) => (
+                    <button
+                      key={tone.value}
+                      onClick={() => setSelectedTone(tone.value)}
+                      className={cn(
+                        "px-4 py-3 rounded-xl text-sm font-medium transition-all border",
+                        selectedTone === tone.value
+                          ? "bg-gray-900 text-white border-gray-900"
+                          : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
+                      )}
+                    >
+                      {tone.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <GlowButton
+                  onClick={() => setShowCustomization(false)}
+                  variant="secondary"
+                  className="flex-1"
+                >
+                  Annuler
+                </GlowButton>
+                <GlowButton
+                  onClick={startGeneration}
+                  variant="primary"
+                  icon={Sparkles}
+                  className="flex-1"
+                >
+                  Générer
+                </GlowButton>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Generation Modal */}
+      <AnimatePresence>
+        {isGenerating && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white rounded-2xl max-w-6xl w-full h-[85vh] overflow-hidden shadow-2xl"
+            >
+              <div className="h-full flex">
+                {/* Left: Steps */}
+                <div className="w-80 bg-gray-50 p-6 border-r border-gray-200">
+                  <h3 className="text-lg font-bold text-gray-900 mb-6">Génération en cours</h3>
+                  <div className="space-y-4">
+                    {generationSteps.map((step, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-lg transition-all",
+                          index === generationStep && "bg-white shadow-sm",
+                          index < generationStep && "opacity-50"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold",
+                          index < generationStep && "bg-[#61f7a2] text-white",
+                          index === generationStep && "bg-[#61f7a2] text-white animate-pulse",
+                          index > generationStep && "bg-gray-200 text-gray-400"
+                        )}>
+                          {index < generationStep ? '✓' : index + 1}
+                        </div>
+                        <span className={cn(
+                          "text-sm font-medium",
+                          index === generationStep && "text-gray-900",
+                          index !== generationStep && "text-gray-600"
+                        )}>
+                          {step}
+                        </span>
+                        {index === generationStep && (
+                          <Loader2 className="w-4 h-4 animate-spin text-[#61f7a2] ml-auto" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right: Preview */}
+                <div className="flex-1 p-6 overflow-hidden">
+                  <div className="h-full bg-gray-100 rounded-xl flex items-center justify-center">
+                    <div className="text-center">
+                      <Loader2 className="w-12 h-12 animate-spin text-[#61f7a2] mx-auto mb-4" />
+                      <p className="text-gray-600">Création de ta page de vente...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Preview Modal */}
-      {showPreview && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1b1b33] rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden border border-[#2a2a45]">
-            <div className="p-6 border-b border-[#2a2a45] flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">Aperçu de la page</h3>
-              <button
-                onClick={() => setShowPreview(false)}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
-              <iframe
-                srcDoc={showPreview.html}
-                className="w-full h-[800px] border-0 bg-white"
-                title="Sales Page Preview"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showPreview && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900">Aperçu de la page</h3>
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="text-gray-400 hover:text-gray-900 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
+                <iframe
+                  srcDoc={showPreview.html}
+                  className="w-full h-[800px] border-0 bg-white"
+                  title="Sales Page Preview"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+      <ChatBubble />
     </div>
   );
 }

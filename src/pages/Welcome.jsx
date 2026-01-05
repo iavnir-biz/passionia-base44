@@ -170,7 +170,7 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="flex flex-wrap justify-center gap-3 mb-6 max-w-4xl mx-auto">
+            className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
             {categories.map((category, index) => (
               <button
                 key={index}
@@ -182,10 +182,6 @@ export default function Welcome() {
               </button>
             ))}
           </motion.div>
-          
-          <p className="text-gray-500 text-sm">
-            5 minutes avant d'avoir ton plan sur mesure
-          </p>
         </div>
 
         {/* Floating Cards around Hero - Smaller */}
@@ -415,13 +411,10 @@ export default function Welcome() {
           <div className="bg-white rounded-3xl shadow-xl p-12">
             <div className="text-center">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
-                Prêt à transformer tes <span className="text-[#61f7a2]">compétences</span> en véritable activité en ligne
+                Prêt à transformer tes <span className="text-[#61f7a2]">compétences</span> en véritable activité en ligne ?
               </h2>
-              <p className="text-lg text-gray-600 mb-2">
-                Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA.
-              </p>
-              <p className="text-lg text-gray-900 font-semibold mb-8">
-                Commence dès maintenant !
+              <p className="text-lg text-gray-600 mb-8">
+                Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA. <span className="text-gray-900 font-semibold">Commence dès maintenant !</span>
               </p>
 
               {/* Three badges */}

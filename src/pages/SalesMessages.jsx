@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
-import { Sparkles, Loader2, Eye, Copy, Download, MessageSquare, Heart, Lightbulb, ShoppingBag, Lock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Sparkles, Loader2, Eye, Copy, Download, MessageSquare, Heart, Lightbulb, ShoppingBag, Lock, Brain } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
 import { toast } from 'sonner';
+import { cn } from "@/lib/utils";
 import UpgradeModal from '@/components/paywall/UpgradeModal';
 import ChatBubble from '@/components/chat/ChatBubble';
 
@@ -141,39 +143,43 @@ export default function SalesMessages() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#11112b]">
+      <div className="flex items-center justify-center h-screen bg-white">
         <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#11112b]">
+    <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="SalesMessages" progress={0} />
       
       <div className="flex-1 ml-72">
         <TopBar 
           title="Messages de vente" 
-          subtitle="Crée tes messages de vente avec l'IA"
+          subtitle=""
           user={user}
         />
         
         <main className="p-8">
-          <div className="max-w-6xl mx-auto space-y-6">
+          <div className="max-w-6xl mx-auto space-y-8">
             
             {/* Header */}
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1b1b33] rounded-full mb-4">
-                <Sparkles className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm text-gray-300">Messages générés par IA</span>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-left"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
+                <Brain className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-xs font-medium text-gray-700">Messages générés par IA</span>
               </div>
-              <h1 className="text-4xl font-bold text-white mb-3">
-                Tes Messages de Vente
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                Tes messages de vente
               </h1>
-              <p className="text-gray-400 text-lg">
+              <p className="text-gray-600 text-lg">
                 Génère une séquence complète de 4 messages pour convertir tes prospects
               </p>
-            </div>
+            </motion.div>
 
             {/* Message Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -183,69 +189,73 @@ export default function SalesMessages() {
                 const isLoading = loading[msgType.id];
                 
                 return (
-                  <div
+                  <motion.div
                     key={msgType.id}
-                    className="relative bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 hover:shadow-xl animate-fade-in"
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    className="bg-gray-50 border border-gray-200 rounded-2xl p-6 hover:border-gray-300 transition-all"
                   >
-                    {/* Gradient Header */}
-                    <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${msgType.color} flex items-center justify-center mb-4`}>
-                      <Icon className="w-8 h-8 text-white" />
+                    {/* Icon Header */}
+                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${msgType.color} flex items-center justify-center mb-4`}>
+                      <Icon className="w-7 h-7 text-white" />
                     </div>
 
                     {/* Content */}
-                    <h3 className="text-xl font-bold text-white mb-2">
+                    <p className="text-[#61f7a2] text-xs font-semibold uppercase tracking-wide mb-1">
+                      {msgType.subtitle}
+                    </p>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">
                       {msgType.title}
                     </h3>
-                    <p className="text-[#61f7a2] text-sm mb-1">{msgType.subtitle}</p>
-                    <p className="text-gray-400 text-sm mb-6">{msgType.description}</p>
+                    <p className="text-gray-600 text-sm mb-6">{msgType.description}</p>
 
                     {/* Actions */}
                     {isGenerated ? (
                       <div className="space-y-3">
                         <div className="flex gap-2">
-                          <GlowButton
+                          <button
                             onClick={() => setShowPreview(isGenerated)}
-                            variant="outline"
-                            size="sm"
-                            icon={Eye}
-                            className="flex-1"
+                            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
                           >
-                            Voir
-                          </GlowButton>
-                          <GlowButton
+                            <Eye className="w-4 h-4" />
+                            <span className="text-sm font-medium">Voir</span>
+                          </button>
+                          <button
                             onClick={() => handleCopy(isGenerated)}
-                            variant="ghost"
-                            size="sm"
-                            icon={Copy}
+                            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
                           >
-                            Copier
-                          </GlowButton>
-                          <GlowButton
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button
                             onClick={() => handleDownload(isGenerated, `message-${msgType.id}.txt`)}
-                            variant="ghost"
-                            size="sm"
-                            icon={Download}
+                            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
                           >
-                            Télécharger
-                          </GlowButton>
+                            <Download className="w-4 h-4" />
+                          </button>
                         </div>
-                        <GlowButton
+                        <button
                           onClick={() => {
                             if (!hasPremium) {
-                              toast.error('Fonctionnalité réservée aux abonnés Premium');
+                              setShowUpgradeModal(true);
                               return;
                             }
                             handleGenerate(msgType.id);
                           }}
-                          variant="secondary"
-                          size="sm"
-                          className="w-full"
-                          loading={isLoading}
-                          icon={!hasPremium ? Lock : undefined}
+                          disabled={isLoading}
+                          className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-700 disabled:opacity-50"
                         >
-                          {!hasPremium ? 'Premium' : 'Régénérer'}
-                        </GlowButton>
+                          {isLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <Lock className="w-4 h-4" />
+                              <span className="text-sm font-medium">
+                                {hasPremium ? 'Régénérer' : 'Régénérer (Premium)'}
+                              </span>
+                            </>
+                          )}
+                        </button>
                       </div>
                     ) : (
                       <GlowButton
@@ -254,11 +264,12 @@ export default function SalesMessages() {
                         size="default"
                         className="w-full"
                         loading={isLoading}
+                        icon={Sparkles}
                       >
                         {isLoading ? 'Génération...' : 'Générer'}
                       </GlowButton>
                     )}
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -268,25 +279,39 @@ export default function SalesMessages() {
 
       {/* Preview Modal */}
       {showPreview && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1b1b33] rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden border border-[#2a2a45]">
-            <div className="p-6 border-b border-[#2a2a45] flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">{showPreview.title}</h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden border border-gray-200 shadow-2xl"
+          >
+            <div className="bg-gray-100 p-6 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {messageTypes.find(m => showPreview.messageType === m.id) && (
+                  <>
+                    {React.createElement(
+                      messageTypes.find(m => showPreview.messageType === m.id).icon,
+                      { className: 'w-5 h-5 text-gray-700' }
+                    )}
+                    <h3 className="text-lg font-bold text-gray-900">{showPreview.title}</h3>
+                  </>
+                )}
+              </div>
               <button
                 onClick={() => setShowPreview(null)}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-gray-500 hover:text-gray-900 transition-colors text-xl"
               >
                 ✕
               </button>
             </div>
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
-              <div className="prose prose-invert max-w-none">
-                <pre className="whitespace-pre-wrap text-gray-300 font-sans">
+            <div className="p-8 overflow-y-auto max-h-[calc(90vh-100px)] bg-white">
+              <div className="prose prose-lg max-w-none text-gray-800">
+                <pre className="whitespace-pre-wrap font-sans leading-relaxed">
                   {showPreview.content}
                 </pre>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
 

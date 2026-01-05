@@ -16,7 +16,7 @@ export default function OnboardingQ24IfNothingChanges() {
       fieldName="ifNothingChanges"
       nextPage="OnboardingQ25Readiness"
       prevPage="OnboardingQ23Obstacles"
-      progress={96}
+      progress={92}
     />
   );
 }

@@ -18,7 +18,7 @@ export default function OnboardingQ22Lifestyle() {
       fieldName="lifestyleGoals"
       nextPage="OnboardingQ23Obstacles"
       prevPage="OnboardingQ21Relatives"
-      progress={88}
+      progress={78}
     />
   );
 }

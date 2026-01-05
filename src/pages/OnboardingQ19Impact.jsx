@@ -18,7 +18,7 @@ export default function OnboardingQ19Impact() {
       fieldName="impactGoals"
       nextPage="OnboardingQ20Emotions"
       prevPage="OnboardingQ18LifeChange"
-      progress={77}
+      progress={57}
     />
   );
 }

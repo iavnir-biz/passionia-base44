@@ -317,72 +317,53 @@ Tu renvoies UNIQUEMENT : { "isDone": true, "summary": {...} }`;
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    
-    const user = await base44.auth.me();
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
-    const { sessionId, userAnswer } = await req.json();
+    const { sessionId, userAnswer, history, summary } = await req.json();
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // Récupérer la session
-    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
-    if (!sessions || sessions.length === 0) {
-      return Response.json({ error: 'Session not found' }, { status: 404 });
-    }
+    // Utiliser les données passées en paramètre (localStorage)
+    const workingHistory = history || [];
+    const workingSummary = summary || {};
+    const firstName = localStorage?.getItem?.('onboarding_firstName') || '';
+    const skill = workingSummary.who_to_teach || '';
 
-    let session = sessions[0];
-    const history = session.onboarding_history || [];
-    const summary = session.onboarding_summary || {};
-    const skill = session.skill || user.coreSkill || '';
-
-    // Si userAnswer fourni, l'ajouter à l'historique
-    if (userAnswer !== undefined && userAnswer !== null) {
-      const currentQuestion = session.current_question;
+    // Si userAnswer fourni, l'ajouter à l'historique de travail
+    if (userAnswer !== undefined && userAnswer !== null && workingHistory.length > 0) {
+      const lastQuestion = workingHistory[workingHistory.length - 1]?.question || '';
       
-      if (currentQuestion) {
-        // Convertir answer en string pour éviter erreurs de validation
-        let answerValue = userAnswer;
-        if (typeof answerValue === 'number') {
-          answerValue = String(answerValue);
-        } else if (Array.isArray(answerValue)) {
-          answerValue = answerValue.join(', ');
-        }
-        
-        history.push({
-          question: currentQuestion.text,
-          type: currentQuestion.type,
-          answer: answerValue,
-          at: new Date().toISOString()
-        });
+      // Convertir answer en string pour éviter erreurs de validation
+      let answerValue = userAnswer;
+      if (typeof answerValue === 'number') {
+        answerValue = String(answerValue);
+      } else if (Array.isArray(answerValue)) {
+        answerValue = answerValue.join(', ');
       }
     }
 
     // Construire le contexte pour le LLM
-    const name = user.firstName || user.full_name || '';
+    const name = firstName;
     
-    const historyText = history
+    const historyText = workingHistory
       .map((h, idx) => `Q${idx + 1}: ${h.question}\nR${idx + 1}: ${JSON.stringify(h.answer)}`)
       .join('\n\n');
 
     // Dernière question/réponse pour relance naturelle
-    const lastEntry = history.length > 0 ? history[history.length - 1] : null;
+    const lastEntry = workingHistory.length > 0 ? workingHistory[workingHistory.length - 1] : null;
     const lastQA = lastEntry 
       ? `\n\nDERNIÈRE INTERACTION (utilise-la pour faire une relance naturelle) :\nQuestion précédente : ${lastEntry.question}\nRéponse de l'utilisateur : ${JSON.stringify(lastEntry.answer)}`
       : '';
 
     // Anti-répétition : 3 dernières questions
-    const recentQuestions = history
+    const recentQuestions = workingHistory
       .slice(-3)
       .map(h => h.question)
       .filter(q => q);
 
     // Déterminer quelle question poser (basé sur l'index)
-    const nextQuestionIndex = history.length; // 0-based
+    const nextQuestionIndex = workingHistory.length; // 0-based
     const nextQuestionConfig = nextQuestionIndex < QUESTION_STRUCTURE.length 
       ? QUESTION_STRUCTURE[nextQuestionIndex] 
       : null;
@@ -403,7 +384,7 @@ ${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
 ` : ''}
 
 ÉTAT :
-- Nombre de questions posées : ${history.length}/11
+- Nombre de questions posées : ${workingHistory.length}/11
 - Prochaine question à poser : ${nextQuestionConfig ? `#${nextQuestionConfig.id} - ${nextQuestionConfig.theme}` : 'TERMINÉ'}
 - Clés remplies dans summary : ${Object.keys(summary).filter(k => summary[k] && (typeof summary[k] === 'string' ? summary[k].trim() : true)).join(', ') || 'aucune'}
 
@@ -506,20 +487,7 @@ MISSION :
 
     const result = JSON.parse(completion.choices[0].message.content);
 
-    // Extraire le skill depuis summary.who_to_teach pour le sauvegarder dans session.skill
-    const updatedSkill = result.summary?.who_to_teach || session.skill || '';
-    
-    // Mettre à jour la session avec le summary complet
-    const updateData = {
-      onboarding_history: history,
-      onboarding_summary: result.summary, // Summary complet du LLM
-      is_onboarding_done: result.isDone,
-      current_question: result.isDone ? null : result.question,
-      skill: updatedSkill
-    };
-
-    await base44.asServiceRole.entities.Session.update(sessionId, updateData);
-
+    // Retourner les données sans sauvegarder en DB (c'est géré côté front en localStorage)
     return Response.json({
       isDone: result.isDone,
       question: result.isDone ? null : result.question,

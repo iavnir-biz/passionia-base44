@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Play, Brain, Database, Cpu, Network } from "lucide-react";
+import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Play, Brain, Database, Cpu, Network, Search, Music, Code, Languages, Dumbbell, ChefHat, Camera, Sword, Sparkle, Video, Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 // Floating AI Icons Component
 const FloatingIcon = ({ icon: Icon, delay = 0, className = "", mobile = false }) =>
@@ -51,8 +52,23 @@ const features = [
 }];
 
 
+const categories = [
+  { icon: Music, label: "Musique", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
+  { icon: Code, label: "Code", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
+  { icon: Languages, label: "Langues", color: "bg-green-100 text-green-700 hover:bg-green-200" },
+  { icon: Dumbbell, label: "Sport", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
+  { icon: ChefHat, label: "Cuisine", color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" },
+  { icon: Camera, label: "Photo", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
+  { icon: Sword, label: "Jujitsu", color: "bg-red-100 text-red-700 hover:bg-red-200" },
+  { icon: Sparkle, label: "Intelligence artificielle", color: "bg-indigo-100 text-indigo-700 hover:bg-indigo-200" },
+  { icon: Video, label: "Montage vidéo", color: "bg-cyan-100 text-cyan-700 hover:bg-cyan-200" },
+  { icon: Heart, label: "Yoga", color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
+  { icon: User, label: "Mannequin", color: "bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200" },
+];
+
 export default function Welcome() {
   const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState('');
 
   const handleStart = () => {
     navigate(createPageUrl('OnboardingFirstName'));
@@ -60,6 +76,10 @@ export default function Welcome() {
 
   const handleLogin = () => {
     base44.auth.redirectToLogin(createPageUrl('Dashboard'));
+  };
+
+  const handleCategoryClick = (category) => {
+    setSearchValue(category);
   };
 
   return (
@@ -143,20 +163,46 @@ export default function Welcome() {
             Transforme ta passion en business rentable avec l'aide de l'intelligence artificielle
           </motion.p>
           
-          {/* CTA Buttons */}
+          {/* Search Bar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="flex justify-center mb-6">
+            className="mb-6 max-w-2xl mx-auto">
+            
+            <div className="relative backdrop-blur-sm bg-white/95 rounded-2xl shadow-xl p-2 flex items-center gap-3 border border-gray-200">
+              <Search className="w-5 h-5 text-gray-400 ml-3" />
+              <Input
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                placeholder="Quelle compétence veux-tu transmettre !"
+                className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base"
+              />
+              <Button
+                onClick={handleStart}
+                className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all">
+                Démarrer
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </motion.div>
 
-            <Button
-              onClick={handleStart}
-              className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-8 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
-
-              Commencer maintenant
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+          {/* Category Tags */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="flex flex-wrap justify-center gap-3 mb-6 max-w-4xl mx-auto">
+            {categories.map((category, index) => (
+              <button
+                key={index}
+                onClick={() => handleCategoryClick(category.label)}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all hover:scale-105 ${category.color}`}
+              >
+                <category.icon className="w-4 h-4" />
+                {category.label}
+              </button>
+            ))}
           </motion.div>
           
           <p className="text-gray-500 text-sm">

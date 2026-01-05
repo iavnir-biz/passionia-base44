@@ -54,8 +54,8 @@ import SalesMessages from './pages/SalesMessages';
 import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
-import Welcome from './pages/Welcome';
 import Home from './pages/Home';
+import Welcome from './pages/Welcome';
 
 
 export const PAGES = {
@@ -115,8 +115,8 @@ export const PAGES = {
     "SalesPage": SalesPage,
     "Settings": Settings,
     "SocialMedia": SocialMedia,
-    "Welcome": Welcome,
     "Home": Home,
+    "Welcome": Welcome,
 }
 
 export const pagesConfig = {

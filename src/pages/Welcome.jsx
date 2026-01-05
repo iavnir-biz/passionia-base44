@@ -140,18 +140,18 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
             className="mb-6 max-w-2xl mx-auto">
-            
-            <div className="relative backdrop-blur-sm bg-white/95 rounded-2xl shadow-xl p-2 flex items-center gap-3 border border-gray-200">
+
+            <div className="relative backdrop-blur-sm bg-white/95 rounded-2xl shadow-xl p-3 flex items-center gap-3 border border-gray-200">
               <Search className="w-5 h-5 text-gray-400 ml-3" />
               <Input
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Quelle compétence veux-tu transmettre !"
-                className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base"
+                className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base h-12"
               />
               <Button
                 onClick={handleStart}
-                className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all">
+                className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-6 h-12 rounded-xl font-semibold shadow-md transition-all">
                 Démarrer
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -163,14 +163,14 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
+            className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
             {categories.map((category, index) => (
               <button
                 key={index}
                 onClick={() => handleCategoryClick(category.label)}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all hover:scale-105 ${category.color}`}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105 ${category.color}`}
               >
-                <category.icon className="w-4 h-4" />
+                <category.icon className="w-3.5 h-3.5" />
                 {category.label}
               </button>
             ))}

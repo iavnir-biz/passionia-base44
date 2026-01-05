@@ -545,9 +545,10 @@ export default function PlanAction() {
         {activeTab === 'actions' ? (
           <DailyActionsContent user={user} />
         ) : (
+          <div>
         
-        {/* 1️⃣ HERO SECTION - Vision & Clarté */}
-        <motion.div
+          {/* 1️⃣ HERO SECTION - Vision & Clarté */}
+          <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-16"
@@ -1068,9 +1069,10 @@ export default function PlanAction() {
               </motion.div>
             </div>
           </div>
-        </motion.div>
+          </motion.div>
+          </div>
         )}
-        </div>
+      </div>
 
 
 

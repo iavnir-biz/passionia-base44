@@ -105,30 +105,52 @@ export default function AvatarClients() {
   };
 
   const handleCopyAvatar = (avatar) => {
-    const text = `
-${avatar.name} - ${avatar.tagline}
-
-🎯 PROFIL
-${avatar.profile}
-
-💭 FRUSTRATIONS
-${avatar.frustrations}
-
-🎯 OBJECTIFS
-${avatar.goals}
-
-❤️ DÉSIRS PROFONDS
-${avatar.desires}
-
-⚠️ PEURS & FREINS
-${avatar.fears}
-
-📈 COMMENT LES ATTEINDRE
-${avatar.how_to_reach}
-    `.trim();
+    let text = `${avatar.name}\n\n`;
     
-    navigator.clipboard.writeText(text);
-    toast.success('Avatar copié dans le presse-papier !');
+    if (avatar.identity) {
+      text += `🎯 IDENTITÉ\n`;
+      text += `Âge : ${avatar.identity.age_range}\n`;
+      text += `Situation : ${avatar.identity.life_situation}\n`;
+      text += `Métier : ${avatar.identity.job_context}\n`;
+      text += `Niveau : ${avatar.identity.experience_level}\n\n`;
+    }
+    
+    if (avatar.factual_analysis) {
+      text += `📊 ANALYSE FACTUELLE\n`;
+      text += `${avatar.factual_analysis.current_situation}\n`;
+      text += `Budget : ${avatar.factual_analysis.budget}\n`;
+      text += `Temps disponible : ${avatar.factual_analysis.available_time}\n`;
+      text += `Canaux : ${avatar.factual_analysis.channels}\n`;
+      text += `Formats : ${avatar.factual_analysis.preferred_formats}\n\n`;
+    }
+    
+    if (avatar.behavior_alternatives) {
+      text += `🔄 COMPORTEMENTS\n`;
+      text += `Déjà essayé : ${avatar.behavior_alternatives.already_tried}\n`;
+      text += `Déceptions : ${avatar.behavior_alternatives.disappointments}\n\n`;
+    }
+    
+    if (avatar.in_his_head) {
+      text += `🧠 DANS SA TÊTE\n`;
+      text += `"${avatar.in_his_head.inner_phrase}"\n`;
+      text += `Déclencheur : ${avatar.in_his_head.trigger_to_action}\n\n`;
+    }
+    
+    if (avatar.purchase_motivations) {
+      text += `💰 MOTIVATIONS D'ACHAT\n`;
+      text += `Formation : ${avatar.purchase_motivations.why_training}\n`;
+      text += `Coaching : ${avatar.purchase_motivations.why_coaching}\n\n`;
+    }
+    
+    if (avatar.what_he_expects_from_expert) {
+      text += `👤 CE QU'IL ATTEND DE TOI\n`;
+      text += `Type d'expert : ${avatar.what_he_expects_from_expert.expert_type}\n`;
+      text += `Ton : ${avatar.what_he_expects_from_expert.tone}\n`;
+      text += `Confiance : ${avatar.what_he_expects_from_expert.trust_builders}\n`;
+    }
+    
+    navigator.clipboard.writeText(text.trim());
+    toast.success('Avatar copié !');
   };
 
   const avatarColors = [
@@ -450,44 +472,44 @@ ${avatar.how_to_reach}
                       </div>
                     </motion.div>
                   ) : (
-                    <div
+                    <motion.div
                       key={index}
-                      className={cn(
-                        "bg-[#1b1b33] border rounded-2xl p-6 transition-all duration-300 animate-fade-in",
-                        colors.border
-                      )}
-                      style={{ animationDelay: `${index * 0.1}s` }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + index * 0.1 }}
+                      className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-gray-400 transition-all"
                     >
-                      {/* Empty Avatar Card */}
                       <div className="flex items-start gap-4 mb-4">
-                        <div className={cn(
-                          "w-16 h-16 rounded-2xl bg-gradient-to-br flex items-center justify-center flex-shrink-0",
-                          colors.gradient
-                        )}>
-                          <User className="w-8 h-8 text-white" />
+                        <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <User className="w-7 h-7 text-gray-400" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-2xl font-bold text-white mb-1">
+                          <h3 className="text-lg font-bold text-gray-900 mb-1">
                             Avatar {index + 1}
                           </h3>
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-gray-500 text-sm">
                             En attente de génération
                           </p>
                         </div>
                       </div>
 
-                      <div className={cn("p-4 rounded-xl mb-4 border-2 border-dashed", colors.border)}>
-                        <p className="text-gray-500 text-sm text-center py-8">
-                          Clique sur "Générer" pour créer cet avatar
+                      <div className="py-8 text-center">
+                        <p className="text-gray-400 text-sm">
+                          Clique sur "Générer mes avatars" ci-dessous
                         </p>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
 
               {/* Generate/Regenerate Button */}
-              <div className="flex justify-center pt-4">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex justify-center pt-4"
+              >
                 {avatars.length === 0 ? (
                   <GlowButton
                     onClick={() => handleGenerate()}
@@ -496,7 +518,7 @@ ${avatar.how_to_reach}
                     loading={loading}
                     className="px-12"
                   >
-                    {loading ? 'Génération en cours...' : 'Générer mes avatars'}
+                    {loading ? 'Nova génère tes avatars...' : 'Générer mes avatars'}
                   </GlowButton>
                 ) : (
                   <GlowButton
@@ -506,17 +528,49 @@ ${avatar.how_to_reach}
                     loading={loading}
                     icon={!hasPremium ? Lock : undefined}
                   >
-                    {!hasPremium ? 'Premium - Régénérer' : 'Régénérer'}
+                    {!hasPremium ? '🔒 Régénérer (Premium)' : 'Régénérer les avatars'}
                   </GlowButton>
                 )}
-              </div>
+              </motion.div>
             </div>
+
+            {/* Help Section */}
+            {avatars.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="bg-gradient-to-br from-gray-50 to-blue-50 border border-gray-200 rounded-2xl p-6"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#61f7a2] flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      💡 Comment utiliser ces avatars ?
+                    </h3>
+                    <p className="text-gray-700 text-sm mb-3">
+                      Ces profils sont maintenant la base de toute ta communication. Quand tu écris un message, un email, ou que tu crées du contenu, réfère-toi à ces avatars pour :
+                    </p>
+                    <ul className="space-y-1.5 text-sm text-gray-700">
+                      <li>✓ Utiliser les mots qu'ils utilisent (vocabulaire, expressions)</li>
+                      <li>✓ Parler de leurs frustrations exactes</li>
+                      <li>✓ Montrer que tu comprends leur quotidien</li>
+                      <li>✓ Adresser leurs peurs et objections</li>
+                      <li>✓ Choisir les bons canaux et formats</li>
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
           </div>
         </main>
       </div>
 
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+      <ChatBubble />
     </div>
   );
 }

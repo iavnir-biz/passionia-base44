@@ -334,6 +334,7 @@ export default function OnboardingDynamic() {
         <div className="text-center mb-8">
           <h3 className="text-lg font-bold text-[#61f7a2] mb-1">Étape 1</h3>
           <p className="text-sm text-gray-600">Découverte</p>
+          <p className="text-xs text-gray-500 mt-2">{Math.min(session?.onboarding_history?.length || 0, 11)}/11 questions</p>
         </div>
 
         {/* Progress vertical - barre complète pour étape 1 */}
@@ -349,6 +350,7 @@ export default function OnboardingDynamic() {
 
           <div className="mt-4 text-center">
             <p className="text-2xl font-bold text-[#61f7a2]">{Math.round(progress)}%</p>
+            <p className="text-xs text-gray-500 mt-1">Question {Math.min(questionCount, 11)}/11</p>
           </div>
         </div>
       </div>

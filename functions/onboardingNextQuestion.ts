@@ -12,7 +12,7 @@ const QUESTION_STRUCTURE = [
     field: "coreSkill", 
     theme: "Compétence à monétiser", 
     type: "text",
-    titleTemplate: "Salut {{firstName}} ! Pour commencer, quelle est la compétence, la passion, le savoir-faire (ou même le talent) que tu aimerais transformer en revenu et enseigner ?",
+    titleTemplate: "Salut {{firstName}} ! Quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu et enseigner ?",
     subtitleTemplate: "Sois précis. Ex : peindre des aquarelles, conseiller en décoration intérieure, consulting RH, créer un programme de fitness maison."
   },
   { 
@@ -185,10 +185,7 @@ Q1 : Première question (pas d'accusé réception)
 Q2 : "Super, tu veux enseigner {{coreSkill_résumé}}. Dis-moi : quel est ton niveau d'expérience actuel ?"
      Options FIGÉES (ne pas modifier)
 
-Q3 : "Super, merci pour ta réponse. Quel est ton niveau d'expérience actuel ?"
-     Même si déjà posée en Q2, garde cette formulation EXACTE
-
-Q4 (Années de pratique - SLIDER) :
+Q3 (Années de pratique - SLIDER) :
      - Question COURTE, humaine
      - NE PAS répéter la compétence complète
      - Slider : min=0, max=15, step=1

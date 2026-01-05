@@ -1,13 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
-import { Sparkles, Loader2, Copy, User, Target, Heart, AlertCircle, TrendingUp, Lock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { 
+  Sparkles, 
+  Loader2, 
+  Copy, 
+  User, 
+  Target, 
+  Heart, 
+  AlertCircle, 
+  TrendingUp, 
+  Lock,
+  Users,
+  Clock,
+  DollarSign,
+  Calendar,
+  MessageSquare,
+  Lightbulb,
+  CheckCircle,
+  Brain
+} from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 import UpgradeModal from '@/components/paywall/UpgradeModal';
+import ChatBubble from '@/components/chat/ChatBubble';
 
 export default function AvatarClients() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
@@ -119,14 +139,14 @@ ${avatar.how_to_reach}
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#11112b]">
+      <div className="flex items-center justify-center h-screen bg-white">
         <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#11112b]">
+    <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="AvatarClients" progress={0} />
       
       <div className="flex-1 ml-72">
@@ -137,21 +157,62 @@ ${avatar.how_to_reach}
         />
         
         <main className="p-8">
-          <div className="max-w-6xl mx-auto space-y-6">
+          <div className="max-w-7xl mx-auto space-y-8">
             
-            {/* Header */}
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1b1b33] rounded-full mb-4">
-                <Sparkles className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm text-gray-300">Avatars générés par IA</span>
+            {/* Header Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-left"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
+                <Brain className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-xs font-medium text-gray-700">Psychologie client</span>
               </div>
-              <h1 className="text-4xl font-bold text-white mb-3">
-                Tes Avatars Clients
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                Tes avatars clients
               </h1>
-              <p className="text-gray-400 text-lg">
-                3 profils clients ultra-détaillés adaptés à ton offre
+              <p className="text-gray-600 text-lg max-w-3xl">
+                3 profils ultra-détaillés pour comprendre précisément qui sont tes clients, comment leur parler, et comment créer des offres qui convertissent.
               </p>
-            </div>
+            </motion.div>
+
+            {/* Purpose Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Target className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    📌 À quoi servent ces avatars ?
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-3 text-sm text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#61f7a2] flex-shrink-0" />
+                      <span>Créer tes messages de vente</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#61f7a2] flex-shrink-0" />
+                      <span>Écrire tes emails marketing</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#61f7a2] flex-shrink-0" />
+                      <span>Concevoir tes pages de vente</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#61f7a2] flex-shrink-0" />
+                      <span>Produire tes contenus</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
 
             {/* Avatar Cards - Always visible */}
             <div className="space-y-6">

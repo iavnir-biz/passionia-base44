@@ -6,7 +6,7 @@ export default function OnboardingQ16TargetIncome() {
     <OnboardingQuestionPage
       questionId="targetIncome"
       title="Combien aimerais-tu gagner par mois en transmettant ton savoir-faire ?"
-      subtitle="Exemples : voyager au Japon, manger dans de bons restaurants, investir, offrir une maison à ma famille."
+      subtitle="Pense à un montant qui changerait vraiment ta vie. Ose viser grand, c'est le moment de rêver !"
       inputType="slider"
       sliderConfig={{ min: 500, max: 50000, step: 500, suffix: ' €' }}
       fieldName="targetIncome"

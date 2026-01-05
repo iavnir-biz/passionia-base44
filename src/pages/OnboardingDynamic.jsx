@@ -292,7 +292,7 @@ export default function OnboardingDynamic() {
     );
   }
 
-  const progress = Math.min((questionCount / 11) * 100, 100);
+  const progress = Math.min((session?.onboarding_history?.length || 0) * 9, 100);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
@@ -346,8 +346,7 @@ export default function OnboardingDynamic() {
             />
           </div>
           <div className="mt-4 text-center">
-            <p className="text-xs text-gray-500 font-medium">Question {questionCount}/11</p>
-            <p className="text-2xl font-bold text-[#61f7a2] mt-1">{Math.round(progress)}%</p>
+            <p className="text-2xl font-bold text-[#61f7a2]">{Math.round(progress)}%</p>
           </div>
         </div>
       </div>

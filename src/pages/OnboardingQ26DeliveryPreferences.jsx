@@ -19,7 +19,7 @@ export default function OnboardingQ26DeliveryPreferences() {
       fieldName="deliveryPreferences"
       nextPage="OfferGenerationStart"
       prevPage="OnboardingQ25Readiness"
-      progress={100}
+      progress={93}
       buttonText="Générer mon offre sur-mesure"
     />
   );

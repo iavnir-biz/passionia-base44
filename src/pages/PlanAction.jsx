@@ -4,6 +4,8 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import PayFallModal from '@/components/paywall/PayFallModal';
+import ActionOfTheDayCard from '@/components/dashboard/ActionOfTheDayCard';
+import ProgressBar from '@/components/ui/ProgressBar';
 import { 
   Loader2, 
   ArrowRight,
@@ -28,7 +30,9 @@ import {
   Lightbulb,
   Calendar,
   MessageSquare,
-  BarChart
+  BarChart,
+  Trophy,
+  RefreshCw
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import { cn } from "@/lib/utils";
@@ -48,6 +52,226 @@ function parsePrice(priceStr) {
   return parseInt(cleaned, 10) || 0;
 }
 
+// Composant Actions du jour intégré
+function DailyActionsContent({ user }) {
+  const [actions, setActions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  
+  const today = new Date().toLocaleDateString('fr-FR', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long' 
+  });
+
+  useEffect(() => {
+    if (user) {
+      loadActions();
+    }
+  }, [user]);
+
+  const loadActions = async () => {
+    try {
+      const steps = await base44.entities.PlanStep.filter({ created_by: user.email });
+      const completed = steps.filter(s => s.is_completed).length;
+      setProgress(steps.length > 0 ? Math.round((completed / steps.length) * 100) : 0);
+      
+      const todayDate = new Date().toISOString().split('T')[0];
+      const todayActions = await base44.entities.DailyAction.filter({ 
+        created_by: user.email,
+        date: todayDate 
+      });
+      
+      setActions(todayActions.sort((a, b) => (b.priority || 1) - (a.priority || 1)));
+    } catch (error) {
+      console.error('Error loading actions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleAction = async (actionId) => {
+    const action = actions.find(a => a.id === actionId);
+    if (!action) return;
+    
+    await base44.entities.DailyAction.update(actionId, {
+      is_completed: !action.is_completed
+    });
+    
+    setActions(actions.map(a => 
+      a.id === actionId ? { ...a, is_completed: !a.is_completed } : a
+    ));
+  };
+
+  const regenerateActions = async () => {
+    setGenerating(true);
+    
+    try {
+      for (const action of actions) {
+        await base44.entities.DailyAction.delete(action.id);
+      }
+      
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      const profile = profiles[0];
+      
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Tu es Nova, coach d'affaires. Génère 3 actions quotidiennes concrètes pour quelqu'un qui:
+- Compétence: ${profile?.passion || 'un savoir-faire'}
+- Cible: ${profile?.target_audience || 'des apprenants'}
+
+Actions: concrètes, réalisables en 30 min max, progressives, orientées validation/ventes.
+Réponds en JSON.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            actions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  description: { type: "string" }
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      const todayDate = new Date().toISOString().split('T')[0];
+      const newActions = [];
+      
+      for (let i = 0; i < result.actions.length; i++) {
+        const action = result.actions[i];
+        const created = await base44.entities.DailyAction.create({
+          title: action.title,
+          description: action.description,
+          date: todayDate,
+          priority: 3 - i,
+          is_completed: false
+        });
+        newActions.push(created);
+      }
+      
+      setActions(newActions.sort((a, b) => (b.priority || 1) - (a.priority || 1)));
+    } catch (error) {
+      console.error('Error regenerating actions:', error);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const calculateDailyProgress = () => {
+    if (actions.length === 0) return 0;
+    const completed = actions.filter(a => a.is_completed).length;
+    return Math.round((completed / actions.length) * 100);
+  };
+
+  const allCompleted = actions.length > 0 && actions.every(a => a.is_completed);
+
+  return (
+    <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`rounded-2xl border p-8 ${
+          allCompleted 
+            ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200'
+            : 'bg-white border-gray-200'
+        }`}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+              allCompleted ? 'bg-[#61f7a2]' : 'bg-[#61f7a2]/10'
+            }`}>
+              {allCompleted ? (
+                <Trophy className="w-7 h-7 text-white" />
+              ) : (
+                <Calendar className="w-7 h-7 text-[#61f7a2]" />
+              )}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {allCompleted ? 'Bravo ! Journée complétée ! 🎉' : 'Tes actions du jour'}
+              </h2>
+              <p className="text-gray-600">
+                {allCompleted 
+                  ? 'Tu as accompli toutes tes actions. Reviens demain !'
+                  : `${actions.filter(a => a.is_completed).length} sur ${actions.length} actions complétées`
+                }
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-right mr-4">
+              <p className="text-4xl font-bold text-[#61f7a2]">{calculateDailyProgress()}%</p>
+              <p className="text-gray-600 text-sm">aujourd'hui</p>
+            </div>
+            
+            <GlowButton
+              variant="secondary"
+              onClick={regenerateActions}
+              loading={generating}
+              icon={RefreshCw}
+            >
+              Régénérer
+            </GlowButton>
+          </div>
+        </div>
+        
+        <ProgressBar value={calculateDailyProgress()} max={100} size="lg" />
+      </motion.div>
+      
+      <div className="space-y-4">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+          </div>
+        ) : actions.length > 0 ? (
+          actions.map((action, index) => (
+            <ActionOfTheDayCard
+              key={action.id}
+              action={action}
+              onToggle={toggleAction}
+              index={index}
+            />
+          ))
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-gray-100 mx-auto mb-4 flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-gray-600 mb-4">Aucune action pour aujourd'hui</p>
+            <GlowButton onClick={regenerateActions} loading={generating}>
+              Générer mes actions
+            </GlowButton>
+          </motion.div>
+        )}
+      </div>
+      
+      {!allCompleted && actions.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center"
+        >
+          <p className="text-gray-700">
+            💡 <span className="font-medium">Conseil :</span> Commence par l'action la plus importante. 
+            Les petites victoires quotidiennes construisent les grands succès.
+          </p>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
 export default function PlanAction() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -56,6 +280,7 @@ export default function PlanAction() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPayFallOpen, setIsPayFallOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('plan');
 
   useEffect(() => {
     loadUser();
@@ -278,6 +503,48 @@ export default function PlanAction() {
 
       {/* Content */}
       <div className="max-w-5xl mx-auto px-4 py-12">
+
+        {/* Tabs navigation */}
+        <div className="flex gap-2 mb-8 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('plan')}
+            className={cn(
+              "px-6 py-3 font-medium transition-all relative",
+              activeTab === 'plan'
+                ? "text-[#61f7a2]"
+                : "text-gray-600 hover:text-gray-900"
+            )}
+          >
+            Plan d'action
+            {activeTab === 'plan' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#61f7a2]"
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('actions')}
+            className={cn(
+              "px-6 py-3 font-medium transition-all relative",
+              activeTab === 'actions'
+                ? "text-[#61f7a2]"
+                : "text-gray-600 hover:text-gray-900"
+            )}
+          >
+            Actions du jour
+            {activeTab === 'actions' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#61f7a2]"
+              />
+            )}
+          </button>
+        </div>
+
+        {activeTab === 'actions' ? (
+          <DailyActionsContent user={user} />
+        ) : (
         
         {/* 1️⃣ HERO SECTION - Vision & Clarté */}
         <motion.div
@@ -802,11 +1069,12 @@ export default function PlanAction() {
             </div>
           </div>
         </motion.div>
-      </div>
+        )}
+        </div>
 
 
 
-      {/* PayFall Modal */}
+        {/* PayFall Modal */}
       <PayFallModal
         isOpen={isPayFallOpen}
         onClose={() => setIsPayFallOpen(false)}

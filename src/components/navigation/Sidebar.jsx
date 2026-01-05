@@ -26,7 +26,6 @@ import ProgressBar from '@/components/ui/ProgressBar';
 const menuStructure = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Plan d\'action', icon: Target, page: 'PlanAction' },
-  { name: 'Actions du jour', icon: Calendar, page: 'DailyActions' },
   {
     name: 'Ressources IA',
     icon: Sparkles,

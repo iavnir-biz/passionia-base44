@@ -93,14 +93,7 @@ export default function Welcome() {
             onClick={handleStart}
             className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-8 py-2 rounded-xl font-medium shadow-sm">
 
-            S'inscrire
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleLogin}
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-2 rounded-xl font-medium">
-
-            Connexion
+            Démarrer gratuitement
           </Button>
         </div>
       </header>
@@ -440,16 +433,7 @@ export default function Welcome() {
                 </Button>
               </div>
 
-              {/* Login link */}
-              <p className="text-gray-700 text-sm">
-                Déjà membre ?{' '}
-                <button
-                  onClick={handleLogin}
-                  className="font-bold underline hover:text-gray-900 transition-colors"
-                >
-                  Connecte-toi
-                </button>
-              </p>
+
             </div>
           </div>
         </div>

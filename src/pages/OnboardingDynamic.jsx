@@ -33,38 +33,22 @@ export default function OnboardingDynamic() {
 
   const initializeOnboarding = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      // Chercher ou créer une session
-      const sessions = await base44.entities.Session.filter({ 
-        created_by: currentUser.email 
-      });
+      // Récupérer les données du localStorage
+      const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
+      const firstName = localStorage.getItem('onboarding_firstName');
       
-      let activeSession;
-      if (sessions.length > 0) {
-        activeSession = sessions[0];
-      } else {
-        activeSession = await base44.entities.Session.create({
-          onboarding_history: [],
-          onboarding_summary: {},
-          current_question: null,
-          is_onboarding_done: false
-        });
-      }
-
-      setSession(activeSession);
-      const history = activeSession.onboarding_history || [];
+      setUser({ full_name: firstName });
+      setSession({ id: 'local', onboarding_history: onboardingData.history || [] });
       
-      // Calculer le vrai nombre de questions basé sur les 11 questions actuelles
+      const history = onboardingData.history || [];
       setQuestionCount(Math.min(history.length, 11) + 1);
 
       // Si pas de question courante, demander la première
-      if (!activeSession.current_question) {
-        await fetchNextQuestion(activeSession.id);
+      if (!onboardingData.current_question) {
+        await fetchNextQuestion('local', null, onboardingData);
       } else {
-        setCurrentQuestion(activeSession.current_question);
-        initializeValue(activeSession.current_question.type, activeSession.current_question);
+        setCurrentQuestion(onboardingData.current_question);
+        initializeValue(onboardingData.current_question.type, onboardingData.current_question);
         setIsLoading(false);
       }
     } catch (error) {
@@ -73,29 +57,39 @@ export default function OnboardingDynamic() {
     }
   };
 
-  const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
+  const fetchNextQuestion = async (sessionId, lastAnswer = null, currentData = null) => {
     try {
+      // Récupérer les données actuelles
+      const onboardingData = currentData || JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
+      
       const { data } = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId,
-        userAnswer: lastAnswer
+        userAnswer: lastAnswer,
+        history: onboardingData.history || [],
+        summary: onboardingData.summary || {}
       });
 
       if (data.isDone) {
-        // Sauvegarder coreSkill sur le user avant de passer aux questions statiques
-        const sessions = await base44.entities.Session.filter({ id: sessionId });
-        if (sessions.length > 0) {
-          const finalSession = sessions[0];
-          const summary = finalSession.onboarding_summary || {};
-          await base44.auth.updateMe({ 
-            coreSkill: summary.who_to_teach || finalSession.skill || ''
-          });
-        }
-        // Passer à l'écran de transition
+        // Sauvegarder en localStorage et passer à la transition
+        onboardingData.is_onboarding_done = true;
+        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
         navigate(createPageUrl('OnboardingTransition'));
       } else {
+        // Sauvegarder la nouvelle question
+        if (lastAnswer) {
+          onboardingData.history = onboardingData.history || [];
+          onboardingData.history.push({
+            question: currentQuestion?.text || currentQuestion?.title,
+            answer: lastAnswer,
+            at: new Date().toISOString()
+          });
+        }
+        onboardingData.current_question = data.question;
+        onboardingData.summary = data.summary || onboardingData.summary;
+        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+        
         setCurrentQuestion(data.question);
         initializeValue(data.question.type, data.question);
-        // Incrémenter seulement si on n'a pas dépassé 11
         setQuestionCount(prev => Math.min(prev + 1, 11));
       }
     } catch (error) {

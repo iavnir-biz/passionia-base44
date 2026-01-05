@@ -338,7 +338,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    const { sessionId, userAnswer, history, summary } = await req.json();
+    const { sessionId, userAnswer, history, summary, firstName } = await req.json();
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
@@ -359,21 +359,7 @@ Deno.serve(async (req) => {
     
     const skill = workingSummary.who_to_teach || '';
 
-    // Si userAnswer fourni, l'ajouter à l'historique de travail
-    if (userAnswer !== undefined && userAnswer !== null && workingHistory.length > 0) {
-      const lastQuestion = workingHistory[workingHistory.length - 1]?.question || '';
-      
-      // Convertir answer en string pour éviter erreurs de validation
-      let answerValue = userAnswer;
-      if (typeof answerValue === 'number') {
-        answerValue = String(answerValue);
-      } else if (Array.isArray(answerValue)) {
-        answerValue = answerValue.join(', ');
-      }
-    }
-
-    // Construire le contexte pour le LLM
-    const name = firstName;
+    // Note: l'ajout de l'answer à l'historique est géré côté frontend
     
     const historyText = workingHistory
       .map((h, idx) => `Q${idx + 1}: ${h.question}\nR${idx + 1}: ${JSON.stringify(h.answer)}`)

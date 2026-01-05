@@ -35,10 +35,13 @@ export default function OnboardingDynamic() {
     try {
       // Récupérer les données du localStorage
       const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
-      const firstName = localStorage.getItem('onboarding_firstName');
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
       
-      setUser({ full_name: firstName });
-      setSession({ id: 'local', onboarding_history: onboardingData.history || [] });
+      // Sauvegarder le prénom dans onboardingData pour le passer à l'API
+      onboardingData.firstName = firstName;
+      
+      setUser({ full_name: firstName, firstName: firstName });
+      setSession({ id: 'local', onboarding_history: onboardingData.history || [], firstName: firstName });
       
       const history = onboardingData.history || [];
       setQuestionCount(Math.min(history.length, 11) + 1);
@@ -61,12 +64,14 @@ export default function OnboardingDynamic() {
     try {
       // Récupérer les données actuelles
       const onboardingData = currentData || JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
       
       const { data } = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId,
         userAnswer: lastAnswer,
         history: onboardingData.history || [],
-        summary: onboardingData.summary || {}
+        summary: onboardingData.summary || {},
+        firstName: firstName
       });
 
       if (data.isDone) {

@@ -126,10 +126,10 @@ export default function OnboardingFirstName() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Typing effects for each text block
-  const text1 = "Enchanté ! Commençons par faire connaissance";
+  const text1 = "Enchanté ! Commençons par faire connaissance 🙂";
   const text2 = "Je suis Noah, l'IA de Passion IA.\nJe vais t'aider à transformer ce que tu sais déjà — ta passion, ton expérience ou ton savoir-faire — en une activité en ligne claire et monétisable.";
   const text3 = "Pas besoin d'avoir une idée parfaite.\nEn quelques minutes, on va poser les bases de ton projet et construire un plan d'action adapté à toi.";
-  const text4 = "On commence simplement, quel est ton prénom ?";
+  const text4 = "On commence simplement, quel est ton prénom ? 👇";
 
   const typing1 = useTypingEffect(text1, 30, 500);
   const typing2 = useTypingEffect(text2, 20, 2000);
@@ -224,7 +224,7 @@ export default function OnboardingFirstName() {
           )}
 
           {typing3.isComplete && (
-            <div className="text-gray-600 text-sm mb-6 min-h-[2rem]">
+            <div className="text-gray-700 mb-6 leading-relaxed min-h-[2rem]">
               {typing4.displayedText}
               {!typing4.isComplete && <span className="animate-pulse">|</span>}
             </div>

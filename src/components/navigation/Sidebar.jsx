@@ -31,10 +31,10 @@ const menuStructure = [
     icon: Sparkles,
     isFolder: true,
     items: [
-      { name: 'Offres', icon: Package, page: 'MyOffers' },
       { name: 'Analyse de marché', icon: BarChart3, page: 'MarketAnalysis' },
-      { name: 'Page de vente', icon: FileText, page: 'SalesPage' },
       { name: 'Avatars clients', icon: User, page: 'AvatarClients' },
+      { name: 'Offres', icon: Package, page: 'MyOffers' },
+      { name: 'Page de vente', icon: FileText, page: 'SalesPage' },
       { name: 'Messages de vente', icon: MessageCircle, page: 'SalesMessages' },
       { name: 'Emails Marketing', icon: Send, page: 'EmailsMarketing' },
       { name: 'Publicité ADS', icon: Magnet, page: 'AdCopies', locked: true },
@@ -85,7 +85,7 @@ export default function Sidebar({ currentPage, progress = 0 }) {
               <div key={item.name}>
                 <button
                   onClick={() => toggleFolder(item.name)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-50 w-full transition-all"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-blue-900/10 w-full transition-all"
                 >
                   <item.icon className="w-5 h-5" />
                   <span className="flex-1 font-medium text-left">{item.name}</span>
@@ -103,7 +103,7 @@ export default function Sidebar({ currentPage, progress = 0 }) {
                             "flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm",
                             isActive 
                               ? "bg-[#61f7a2]/10 text-[#61f7a2] border border-[#61f7a2]/20" 
-                              : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                              : "text-gray-600 hover:text-gray-900 hover:bg-blue-900/10"
                           )}
                         >
                           <subItem.icon className="w-4 h-4" />
@@ -128,7 +128,7 @@ export default function Sidebar({ currentPage, progress = 0 }) {
                 "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                 isActive 
                   ? "bg-[#61f7a2]/10 text-[#61f7a2] border border-[#61f7a2]/20" 
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-blue-900/10"
               )}
             >
               <item.icon className="w-5 h-5" />
@@ -143,7 +143,7 @@ export default function Sidebar({ currentPage, progress = 0 }) {
       {/* Logout */}
       <div className="p-4 border-t border-gray-200">
         <button 
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-gray-50 w-full transition-all"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-blue-900/10 w-full transition-all"
         >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Déconnexion</span>

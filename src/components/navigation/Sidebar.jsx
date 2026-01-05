@@ -62,7 +62,7 @@ export default function Sidebar({ currentPage, progress = 0 }) {
           </div>
           <div>
             <h1 className="text-lg font-bold text-gray-900">PASSION IA</h1>
-            <p className="text-xs text-gray-600">Générateur d'activité</p>
+            <p className="text-xs text-gray-600">Transformer son savoir-faire en activité de formation en ligne</p>
           </div>
         </div>
       </div>

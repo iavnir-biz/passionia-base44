@@ -1,3 +1,4 @@
+import Activation from './pages/Activation';
 import AdCopies from './pages/AdCopies';
 import AvatarClients from './pages/AvatarClients';
 import BonneNouvelle from './pages/BonneNouvelle';
@@ -56,10 +57,10 @@ import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
-import Activation from './pages/Activation';
 
 
 export const PAGES = {
+    "Activation": Activation,
     "AdCopies": AdCopies,
     "AvatarClients": AvatarClients,
     "BonneNouvelle": BonneNouvelle,
@@ -118,7 +119,6 @@ export const PAGES = {
     "Settings": Settings,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
-    "Activation": Activation,
 }
 
 export const pagesConfig = {

@@ -25,6 +25,8 @@ RÈGLES D'OR NOVA :
 - Chaque phrase doit donner envie d'agir MAINTENANT
 - Utilise les VRAIS noms de produits et VRAIS prix
 - Reformule tout pour qu'il soit spécifique à SA passion et SES offres
+- CRITIQUE : L'utilisateur n'est PAS un apprenant, c'est un CRÉATEUR qui va MONÉTISER son savoir
+- Le finalCTA doit parler de "transformer son savoir/expertise en revenus", JAMAIS "transformer sa passion en aventure"
 
 INTERDICTIONS ABSOLUES :
 - Ne JAMAIS répéter mot pour mot des formulations précédentes
@@ -91,8 +93,8 @@ Structure JSON STRICTE à respecter :
     }
   ],
   "finalCTA": {
-    "title": "titre final motivant et personnalisé",
-    "subtitle": "sous-titre rassurant"
+    "title": "titre final motivant orienté MONÉTISATION et REVENUS (jamais 'aventure')",
+    "subtitle": "sous-titre rassurant orienté transformation du savoir en source de revenus"
   }
 }`;
 

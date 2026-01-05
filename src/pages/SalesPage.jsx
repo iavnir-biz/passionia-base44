@@ -301,22 +301,20 @@ export default function SalesPage() {
                           >
                             Voir
                           </GlowButton>
-                          <GlowButton
+                          <button
                             onClick={() => handleCopy(isGenerated)}
-                            variant="ghost"
-                            size="sm"
-                            icon={Copy}
+                            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
                           >
-                            Copier
-                          </GlowButton>
-                          <GlowButton
+                            <Copy className="w-4 h-4" />
+                            <span className="text-sm font-medium">Copier</span>
+                          </button>
+                          <button
                             onClick={() => handleDownload(isGenerated, `page-${offer.id}.html`)}
-                            variant="ghost"
-                            size="sm"
-                            icon={Download}
+                            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
                           >
-                            Télécharger
-                          </GlowButton>
+                            <Download className="w-4 h-4" />
+                            <span className="text-sm font-medium">Télécharger</span>
+                          </button>
                         </div>
                       ) : (
                         <GlowButton

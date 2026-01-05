@@ -42,86 +42,97 @@ Deno.serve(async (req) => {
     const inactionCost = session.onboarding_full?.if_nothing_changes || '';
     const skill = profile.passion || '';
 
-    // Generate sales page content with GPT-4 - Structure 12 étapes
-    const contentPrompt = `Tu es un expert en Copywriting de Réponse Directe et en Marketing Digital. Ta mission est de rédiger une page de vente complète pour un produit digital en suivant une structure psychologique précise de 12 étapes.
+    // Generate sales page content with GPT-4 - Structure complète et visuelle
+    const contentPrompt = `Tu es un expert en Copywriting et Web Design. Tu dois créer une PAGE DE VENTE HTML COMPLÈTE, VISUELLE et PRÊTE À L'EMPLOI.
 
-OBJECTIF : Transformer les visiteurs en acheteurs du 'Produit Principal'.
-
-DONNÉES CLIENT À UTILISER :
+DONNÉES CLIENT :
 - Expert : ${user.full_name}
-- Compétence / Niche : ${skill}
-- Nom du Produit : ${mainProductTitle}
+- Compétence : ${skill}
+- Produit : ${mainProductTitle}
 - Prix : ${mainProductPrice}€
-- Format du Produit : ${mainProductType}
-- Description du Produit : ${mainProductDescription}
-- Résultat concret (Transformation) : ${mainProductOutcome}
-- Douleurs identifiées : ${painPoints}
-- Rêves / Changement de vie : ${lifeChanges}
-- Coût de l'inaction : ${inactionCost}
+- Format : ${mainProductType}
+- Description : ${mainProductDescription}
+- Transformation : ${mainProductOutcome}
+- Douleurs : ${painPoints}
+- Rêves : ${lifeChanges}
+- Coût inaction : ${inactionCost}
 
-STRUCTURE DE LA PAGE (À respecter impérativement) :
+STRUCTURE OBLIGATOIRE (HTML complet) :
 
-1. **Bandeau d'Urgence** :
-   Rédige une ligne courte d'urgence (ex: Offre de lancement, Bonus inclus pour une durée limitée).
+1. **Bandeau urgence** (sticky top, fond vert #61f7a2)
+   "🔥 Offre de lancement - Accès anticipé avec bonus inclus"
 
-2. **En-tête (The Hero Section)** :
-   - Titre accrocheur : Une promesse forte incluant ${skill} et le résultat ${mainProductOutcome}.
-   - Sous-titre : Une phrase claire qui explique comment le produit ${mainProductTitle} comble le fossé entre ${painPoints} et ${lifeChanges}.
-   - CTA : Un bouton d'action puissant : 'Je veux accéder maintenant / Je démarre aujourd'hui'.
-   - Image hero (sera injectée)
+2. **Hero Section** (bg-gradient, padding généreux)
+   - Titre H1 GRAND et accrocheur avec ${skill} + ${mainProductOutcome}
+   - Sous-titre H2 clair (problème → solution)
+   - CTA bouton XXL vert #61f7a2 "Je veux accéder maintenant"
+   - Image hero (placeholder "HERO_IMAGE_PLACEHOLDER")
 
-3. **Identifier le problème** :
-   - Utilise la formule : 'Tu en as marre de... ${painPoints} ?'
-   - Décris l'émotion de frustration liée à ${skill}. 
-   - Ajoute 3 bullet points sur les blocages typiques rencontrés par le prospect.
+3. **Section Frustrations** (fond blanc, 3 colonnes)
+   "Tu en as marre de..."
+   - 3-5 frustrations en cards avec icônes 😤
 
-4. **Casser les objections** :
-   - Phrase : 'Et le meilleur dans tout ça ? Tu n'as PAS besoin de...'
-   - Liste 3 à 5 éléments que le client pense nécessaires (ex: technique, gros budget, diplômes) mais qui ne le sont pas avec ta méthode.
+4. **Section Pas besoin** (fond gris très clair)
+   "Le meilleur ? Tu n'as PAS besoin de..."
+   - 3 éléments avec croix rouge ❌
 
-5. **Présenter la solution** :
-   - Introduis ${mainProductTitle}.
-   - Une phrase décrivant pourquoi c'est LA solution idéale. 
-   - Insiste sur la simplicité et la rapidité.
+5. **Solution** (fond blanc, centré)
+   Présenter ${mainProductTitle} avec conviction
+   - Box centrale avec ombre
+   - Liste bénéfices avec checkmarks verts ✓
 
-6. **Comment ça marche (3 étapes)** :
-   - Étape 1 : Action simple (ex: Commande).
-   - Étape 2 : Transformation (ex: Suis le plan).
-   - Étape 3 : Résultat final (ex: Obtiens ${mainProductOutcome}).
+6. **Comment ça marche** (3 étapes visuelles)
+   - 3 cards numérotées (1, 2, 3)
+   - Icônes illustratives
+   - Texte court et clair
 
-7. **Pour qui c'est fait ?** :
-   - 'Ce programme est fait pour toi si...' (Lister 3 à 5 profils basés sur ${skill}).
-   - (Optionnel) : 'Ce n'est pas pour toi si...' (Cible les touristes ou ceux qui ne veulent pas agir).
+7. **Pour qui** (2 colonnes)
+   - Colonne verte : "✅ C'est pour toi si..."
+   - Colonne rouge (optionnelle) : "❌ Pas pour toi si..."
 
-8. **Ce que tu vas obtenir** :
-   - Détaille le contenu de ${mainProductTitle} (modules, ressources).
-   - Liste les bonus offerts.
-   - Réitère la transformation : 'À la fin, tu seras capable de ${mainProductOutcome}'.
+8. **Contenu détaillé** (liste enrichie)
+   "Ce que tu vas obtenir :"
+   - Modules/ressources détaillés
+   - Bonus visuels
+   - Transformation finale en gras
 
-9. **Preuves sociales** :
-   - Rédige des exemples de résultats concrets que les gens peuvent attendre (témoignages réalistes et crédibles).
+9. **Témoignages** (cards avec photos placeholder)
+   - 3 témoignages réalistes
+   - Avatars ronds
+   - Résultats concrets
 
-10. **L'offre et le prix** :
-    - Affiche le prix ${mainProductPrice}€ (fais un ancrage de valeur : 'Valeur réelle XXX€, aujourd'hui seulement ${mainProductPrice}€').
-    - Mentionne la garantie 'Satisfait ou Remboursé 30 jours'.
+10. **Prix & Offre** (section centrale, fond clair)
+    - Ancien prix barré
+    - Prix actuel GRAND ${mainProductPrice}€
+    - Garantie 30 jours avec badge
+    - CTA bouton XXL
 
-11. **FAQ** :
-    - Rédige 5 questions fréquentes avec des réponses rassurantes et simples.
+11. **FAQ** (accordéon visuel)
+    - 5-6 questions pertinentes
+    - Réponses rassurantes
 
-12. **Appel à l'action final** :
-    - Rappel de la promesse principale.
-    - Mention d'urgence (Offre limitée).
-    - CTA Final : 'Je lance mon business ${skill} maintenant'.
+12. **CTA Final** (section sombre, contraste fort)
+    - Rappel promesse
+    - Urgence
+    - Bouton CTA final ÉNORME
 
-CONSIGNES DE RÉDACTION :
-- Utilise exclusivement le 'Tu'.
-- Style fluide, aéré, facile à lire sur mobile.
-- Sois persuasif mais reste authentique et bienveillant.
-- Utilise Tailwind CSS pour le styling (inline dans le HTML).
-- Design moderne, épuré, professionnel.
-- Responsive mobile-first.
-- Couleurs principales: #61f7a2 (vert accent), #11112b (sombre), blanc.
-- Retourne UNIQUEMENT le HTML complet (pas de markdown, pas d'explication).`;
+DESIGN OBLIGATOIRE :
+- HTML5 complet avec <!DOCTYPE html>
+- Tailwind CDN dans <head>
+- Sections bien espacées (py-16, py-20)
+- Typographie hiérarchisée (text-5xl, text-3xl, text-xl...)
+- Couleurs : #61f7a2 (CTA), #f3f4f6 (backgrounds), #111827 (textes)
+- Boutons avec hover et ombres
+- Responsive mobile-first
+- Icônes émojis pour illustrations
+- Espacements généreux entre sections
+
+CRITÈRE DE QUALITÉ :
+La page DOIT ressembler à une vraie landing page professionnelle.
+Chaque section doit avoir du contenu riche et personnalisé.
+Le HTML doit être COMPLET et directement utilisable.
+
+Retourne UNIQUEMENT le code HTML complet (pas de \`\`\`html, pas d'explication).`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -144,6 +155,10 @@ CONSIGNES DE RÉDACTION :
     htmlContent = htmlContent.replace(/```html\n?/g, '').replace(/```\n?/g, '');
 
     // Inject the hero image URL into the HTML
+    htmlContent = htmlContent.replace(
+      /HERO_IMAGE_PLACEHOLDER/g, 
+      heroImageUrl
+    );
     htmlContent = htmlContent.replace(
       /src="[^"]*hero[^"]*"/gi, 
       `src="${heroImageUrl}"`

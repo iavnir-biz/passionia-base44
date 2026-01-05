@@ -258,11 +258,110 @@ export default function Welcome() {
         </div>
       </motion.div>
 
+      {/* 4 Steps Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.4 }}
+        className="w-full max-w-6xl mx-auto px-6 py-20"
+      >
+        {/* Badge */}
+        <div className="flex justify-center mb-4">
+          <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 rounded-full px-4 py-2">
+            <span className="text-gray-700 text-sm font-medium">Simple & efficace</span>
+          </div>
+        </div>
+
+        {/* Title */}
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
+          <span className="font-extrabold">4 étapes</span> pour lancer ton activité en ligne
+        </h2>
+
+        {/* Steps Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Step 01 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.5 }}
+            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/50 flex items-center justify-center">
+                <Target className="w-7 h-7 text-blue-600" />
+              </div>
+              <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">01</span>
+            </div>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Crée ton profil</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Présente ta passion, ton expérience ou ton savoir-faire. L'IA s'adapte à ton parcours.
+            </p>
+          </motion.div>
+
+          {/* Step 02 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.6 }}
+            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-[#61f7a2]" />
+              </div>
+              <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">02</span>
+            </div>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Discute avec l'IA</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Notre IA t'aide à transformer ta passion en activité viable en quelques minutes.
+            </p>
+          </motion.div>
+
+          {/* Step 03 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.7 }}
+            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/50 flex items-center justify-center">
+                <FileText className="w-7 h-7 text-amber-600" />
+              </div>
+              <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">03</span>
+            </div>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Récupère tes documents IA</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Offre, avatars, messages de vente, emails et page de vente prêts à l'emploi.
+            </p>
+          </motion.div>
+
+          {/* Step 04 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8 }}
+            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group"
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-50 to-green-100/50 flex items-center justify-center">
+                <TrendingUp className="w-7 h-7 text-green-600" />
+              </div>
+              <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">04</span>
+            </div>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Passe à l'action</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Un plan d'action personnalisé pour avancer concrètement, jour après jour.
+            </p>
+          </motion.div>
+        </div>
+      </motion.div>
+
       {/* Bottom CTA Section */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5 }}
+        transition={{ delay: 1.9 }}
         className="w-full bg-gradient-to-br from-gray-50 to-white py-24"
       >
         <div className="max-w-2xl mx-auto text-center px-6">

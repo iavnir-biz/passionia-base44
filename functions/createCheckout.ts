@@ -16,9 +16,12 @@ Deno.serve(async (req) => {
     try {
       user = await base44.auth.me();
       
-      // Vérifier qu'il n'a pas déjà acheté
-      if (user?.has_purchased) {
-        return Response.json({ error: 'Already purchased' }, { status: 400 });
+      // Vérifier qu'il n'a pas déjà acheté (sauf en mode test)
+      if (user?.has_purchased && !user?.is_test_mode) {
+        return Response.json({ 
+          error: 'Already purchased',
+          message: 'Vous avez déjà acheté ce pack. Rendez-vous sur votre Dashboard.'
+        }, { status: 400 });
       }
       
       // Créer ou récupérer le client Stripe pour utilisateur authentifié

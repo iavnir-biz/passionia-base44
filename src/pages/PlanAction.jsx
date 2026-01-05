@@ -126,12 +126,23 @@ export default function PlanAction() {
       if (data.success && data.url) {
         window.location.href = data.url;
       } else {
-        console.error('Checkout failed:', data.error);
-        alert('Erreur lors de la création du paiement. Veuillez réessayer.');
+        console.error('Checkout failed:', data);
+        const errorMessage = data.message || data.error || 'Erreur lors de la création du paiement.';
+        
+        // Si déjà acheté, rediriger vers Dashboard
+        if (data.error === 'Already purchased') {
+          alert('Vous avez déjà acheté ce pack ! Redirection vers votre Dashboard...');
+          setTimeout(() => {
+            navigate(createPageUrl('Dashboard'));
+          }, 1000);
+        } else {
+          alert(errorMessage + ' Veuillez réessayer.');
+        }
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      alert('Erreur lors de la création du paiement. Veuillez réessayer.');
+      const errorMsg = error.response?.data?.message || error.message || 'Erreur lors de la création du paiement.';
+      alert(errorMsg);
     }
   };
 

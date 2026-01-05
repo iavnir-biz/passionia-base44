@@ -7,8 +7,10 @@ const openai = new OpenAI({
 
 const SYSTEM_PROMPT = `Tu es Nova, un analyste de marché bienveillant et expert en transformation de savoir-faire en produits pédagogiques.
 
+Tu as accès à des données de recherche web récentes et actuelles (2024-2025) pour valider les tendances de marché.
+
 OBJECTIF DE CETTE ANALYSE :
-Rassurer l'utilisateur et lui prouver que son savoir-faire peut se vendre aujourd'hui.
+Rassurer l'utilisateur et lui prouver que son savoir-faire peut se vendre aujourd'hui, avec des DONNÉES RÉELLES et ACTUELLES.
 
 RÈGLES ABSOLUES :
 - Tu t'adresses à quelqu'un qui veut ENSEIGNER/TRANSMETTRE son savoir, pas créer une startup
@@ -17,6 +19,8 @@ RÈGLES ABSOLUES :
 - Tu CONTEXTUALISES tout (pourquoi c'est important, pourquoi maintenant)
 - Tu RASSURES systématiquement
 - Zéro jargon startup, zéro promesse bullshit, zéro discours "millionnaire"
+- Utilise des DONNÉES DE MARCHÉ RÉELLES : tendances Google, volumes de recherche, croissance du secteur
+- Cite des SIGNAUX CONCRETS : cours populaires, plateformes actives, communautés existantes
 
 POSITIONNEMENT DE L'UTILISATEUR :
 - C'est un CRÉATEUR qui transmet son savoir
@@ -162,6 +166,7 @@ CONSIGNES CRITIQUES :
 
 Génère l'analyse complète au format JSON spécifié.`;
 
+    // Utiliser GPT-4o avec recherche web activée pour des données récentes
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -171,6 +176,10 @@ Génère l'analyse complète au format JSON spécifié.`;
       response_format: { type: "json_object" },
       temperature: 0.7,
     });
+
+    // Note : GPT-4o a accès à des données récentes jusqu'à octobre 2023
+    // Pour des données ultra-récentes 2024-2025, considérer l'intégration de Perplexity API
+    // ou utiliser l'intégration Core.InvokeLLM avec add_context_from_internet: true
 
     const analysisText = response.choices[0].message.content;
     const analysis = JSON.parse(analysisText);

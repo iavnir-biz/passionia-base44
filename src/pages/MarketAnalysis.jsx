@@ -11,7 +11,6 @@ import {
   Loader2,
   Sparkles,
   Heart,
-  DollarSign,
   User as UserIcon,
   BarChart3
 } from 'lucide-react';
@@ -99,36 +98,66 @@ export default function MarketAnalysis() {
         
         <main className="p-8 max-w-5xl mx-auto">
           {!analysis ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-20"
-            >
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="w-10 h-10 text-white" />
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Comprends ton marché
-              </h1>
-              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-                Nova va analyser qui a besoin de ton savoir, pourquoi, et comment ces personnes achètent aujourd'hui.
-              </p>
-              <GlowButton
-                onClick={handleGenerate}
-                loading={generating}
-                disabled={generating}
-                size="lg"
+            <div className="py-20">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-12"
               >
-                Lancer l'analyse
-              </GlowButton>
-            </motion.div>
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center mx-auto mb-6">
+                  <BarChart3 className="w-10 h-10 text-white" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                  Comprends ton marché
+                </h1>
+                <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                  Nova va analyser qui a besoin de ton savoir, pourquoi, et comment ces personnes achètent aujourd'hui.
+                </p>
+                <div className="flex justify-center">
+                  <GlowButton
+                    onClick={handleGenerate}
+                    loading={generating}
+                    disabled={generating}
+                    size="lg"
+                  >
+                    Lancer l'analyse
+                  </GlowButton>
+                </div>
+              </motion.div>
+
+              {/* Encadré expert */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gray-50 border border-gray-200 rounded-2xl p-8 max-w-2xl mx-auto"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                    <UserIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">Besoin d'aide ?</h3>
+                    <p className="text-gray-600 mb-4">
+                      Un expert peut vous aider à y voir plus clair et à choisir la meilleure façon d'avancer.
+                    </p>
+                    <GlowButton
+                      onClick={() => window.open('https://calendly.com/your-link', '_blank')}
+                      variant="primary"
+                    >
+                      Prendre rendez-vous
+                    </GlowButton>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           ) : (
             <div className="space-y-8">
               {/* Header */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center mb-12"
+                className="mb-12"
               >
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
                   Analyse de marché
@@ -149,7 +178,7 @@ export default function MarketAnalysis() {
                   <div className="w-12 h-12 rounded-xl bg-[#61f7a2] flex items-center justify-center">
                     <CheckCircle className="w-6 h-6 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">✅ Validation rapide</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Validation rapide</h2>
                 </div>
                 
                 <div className="space-y-4">
@@ -180,8 +209,10 @@ export default function MarketAnalysis() {
                 className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <Search className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">🔍 Signes concrets de demande</h2>
+                  <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <Search className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Signes concrets de demande</h2>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -216,8 +247,10 @@ export default function MarketAnalysis() {
                 className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <TrendingUp className="w-6 h-6 text-purple-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">📊 Ce qui existe déjà</h2>
+                  <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Ce qui existe déjà</h2>
                 </div>
 
                 <div className="space-y-4 mb-6">
@@ -243,8 +276,10 @@ export default function MarketAnalysis() {
                 className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <AlertCircle className="w-6 h-6 text-red-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">⚠️ Les vraies douleurs du marché</h2>
+                  <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+                    <AlertCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Les vraies douleurs du marché</h2>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
@@ -294,8 +329,10 @@ export default function MarketAnalysis() {
                 className="bg-gradient-to-br from-[#61f7a2]/10 to-green-50 border border-[#61f7a2]/30 rounded-2xl p-8"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <Heart className="w-6 h-6 text-[#61f7a2]" />
-                  <h2 className="text-2xl font-bold text-gray-900">💚 Pourquoi ton savoir a de la valeur</h2>
+                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-[#61f7a2]" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Pourquoi ton savoir a de la valeur</h2>
                 </div>
 
                 <ul className="space-y-3 mb-6">
@@ -320,8 +357,10 @@ export default function MarketAnalysis() {
                 className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <Users className="w-6 h-6 text-indigo-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">👥 Qui peut acheter</h2>
+                  <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+                    <Users className="w-6 h-6 text-indigo-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Qui peut acheter</h2>
                 </div>
 
                 <div className="space-y-4">
@@ -346,8 +385,10 @@ export default function MarketAnalysis() {
                 className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <Target className="w-6 h-6 text-orange-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">🎯 Comment ils achètent</h2>
+                  <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
+                    <Target className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Comment ils achètent</h2>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6">
@@ -388,8 +429,10 @@ export default function MarketAnalysis() {
                 className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <Sparkles className="w-6 h-6 text-yellow-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">✨ État du marché</h2>
+                  <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-yellow-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">État du marché</h2>
                 </div>
 
                 <div className="space-y-4">
@@ -416,8 +459,10 @@ export default function MarketAnalysis() {
                 className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl p-8"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <CheckCircle className="w-8 h-8 text-[#61f7a2]" />
-                  <h2 className="text-2xl font-bold">🎯 Conclusion</h2>
+                  <div className="w-12 h-12 rounded-xl bg-[#61f7a2] flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold">Conclusion</h2>
                 </div>
 
                 <div className="space-y-4">
@@ -437,6 +482,35 @@ export default function MarketAnalysis() {
                   <div className="bg-[#61f7a2]/20 border border-[#61f7a2] rounded-xl p-5 mt-6">
                     <p className="text-white font-bold text-lg">{analysis.synthese_finale.message_conclusion}</p>
                   </div>
+                </div>
+              </motion.div>
+
+              {/* Encadré expert en bas */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 }}
+                className="bg-gray-50 border border-gray-200 rounded-2xl p-8 mt-8"
+              >
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                      <UserIcon className="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Besoin d'aide ?</h3>
+                      <p className="text-gray-600">
+                        Un expert peut vous aider à y voir plus clair et à choisir la meilleure façon d'avancer.
+                      </p>
+                    </div>
+                  </div>
+                  <GlowButton
+                    onClick={() => window.open('https://calendly.com/your-link', '_blank')}
+                    variant="primary"
+                    size="lg"
+                  >
+                    Prendre rendez-vous
+                  </GlowButton>
                 </div>
               </motion.div>
             </div>

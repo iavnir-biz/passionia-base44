@@ -340,21 +340,53 @@ export default function Welcome() {
         transition={{ delay: 1.9 }}
         className="w-full bg-gradient-to-br from-gray-50 to-white py-24">
 
-        <div className="max-w-2xl mx-auto text-center px-6">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
-            Prêt à transformer ta passion en business ?
-          </h2>
-          <p className="text-gray-600 text-lg mb-10 leading-relaxed">
-            Découvre comment ton savoir-faire peut devenir une source de revenus grâce à l'IA.
-          </p>
-          <div className="flex justify-center">
-            <Button
-              onClick={handleStart}
-              className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="bg-white rounded-3xl shadow-xl p-12">
+            <div className="text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
+                Prêt à transformer tes <span className="text-[#61f7a2]">compétences</span> en véritable activité en ligne
+              </h2>
+              <p className="text-lg text-gray-600 mb-2">
+                Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA.
+              </p>
+              <p className="text-lg text-gray-900 font-semibold mb-8">
+                Commence dès maintenant !
+              </p>
 
-              <Sparkles className="w-5 h-5 mr-2" />
-              Commencer maintenant
-            </Button>
+              {/* Three badges */}
+              <div className="flex flex-wrap justify-center gap-3 mb-8">
+                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
+                  <span className="text-gray-700 text-sm font-medium">✓ Inscription 100% gratuite</span>
+                </div>
+                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
+                  <span className="text-gray-700 text-sm font-medium">✓ Documents IA offerts</span>
+                </div>
+                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
+                  <span className="text-gray-700 text-sm font-medium">✓ Communauté vérifiée</span>
+                </div>
+              </div>
+
+              {/* Main CTA Button */}
+              <div className="flex justify-center mb-4">
+                <Button
+                  onClick={handleStart}
+                  className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Commencer gratuitement
+                </Button>
+              </div>
+
+              {/* Login link */}
+              <p className="text-gray-700 text-sm">
+                Déjà membre ?{' '}
+                <button
+                  onClick={handleLogin}
+                  className="font-bold underline hover:text-gray-900 transition-colors"
+                >
+                  Connecte-toi
+                </button>
+              </p>
+            </div>
           </div>
         </div>
       </motion.div>

@@ -18,6 +18,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
+import OfferTransition from '@/components/offer/OfferTransition';
 import { cn } from "@/lib/utils";
 
 const mainSteps = [
@@ -168,7 +169,13 @@ export default function OfferConcretement() {
     }
   };
 
+  const [showTransition, setShowTransition] = useState(false);
+
   const handleContinue = () => {
+    setShowTransition(true);
+  };
+
+  const handleTransitionComplete = () => {
     navigate(createPageUrl('PlanAction'));
   };
 

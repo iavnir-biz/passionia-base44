@@ -292,7 +292,8 @@ export default function OnboardingDynamic() {
     );
   }
 
-  const progress = Math.min((session?.onboarding_history?.length || 0) * 9, 100);
+  // Étape 1 : 0-50% (11 questions)
+  const progress = Math.min(((session?.onboarding_history?.length || 0) / 11) * 50, 50);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
@@ -311,7 +312,7 @@ export default function OnboardingDynamic() {
               ease: "easeInOut"
             }}
           >
-            <Brain className="w-10 h-10 text-white" />
+            <Sparkles className="w-10 h-10 text-white" />
           </motion.div>
           <motion.div
             className="absolute -top-1 -right-1"
@@ -331,11 +332,11 @@ export default function OnboardingDynamic() {
 
         {/* Étape */}
         <div className="text-center mb-8">
-          <h3 className="text-lg font-bold text-gray-900 mb-1">Étape 1</h3>
+          <h3 className="text-lg font-bold text-[#61f7a2] mb-1">Étape 1</h3>
           <p className="text-sm text-gray-600">Découverte</p>
         </div>
 
-        {/* Progress vertical */}
+        {/* Progress vertical avec fusée à 50% */}
         <div className="flex-1 flex flex-col items-center w-full max-w-[200px]">
           <div className="relative w-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
             <motion.div 
@@ -344,9 +345,19 @@ export default function OnboardingDynamic() {
               animate={{ height: `${progress}%` }}
               transition={{ duration: 0.5 }}
             />
+
+            {/* Marqueur fusée à 50% */}
+            <div 
+              className="absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center"
+              style={{ top: '50%', transform: 'translate(-50%, -50%)' }}
+            >
+              <span className="text-base opacity-40">🚀</span>
+            </div>
           </div>
+
           <div className="mt-4 text-center">
             <p className="text-2xl font-bold text-[#61f7a2]">{Math.round(progress)}%</p>
+            <p className="text-xs text-gray-500 mt-1">Fin découverte : 50%</p>
           </div>
         </div>
       </div>

@@ -123,7 +123,7 @@ RÈGLES IMPORTANTES:
 Génère un message de vente puissant basé sur le contexte utilisateur fourni.`;
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: "gpt-4o",
             messages: [
                 { role: "system", content: systemMessage },
                 { role: "user", content: userContext }

@@ -130,11 +130,11 @@ Rappelle-toi : 2 statistiques minimum, 1-2 douleurs, 1 audience cible spécifiqu
     console.log('OPENAI_CALL start', { 
       fn: 'generateMarketValidation',
       sessionId,
-      model: 'gpt-4o-mini'
+      model: 'gpt-4o'
     });
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userPrompt }

@@ -372,10 +372,10 @@ Base-toi sur le summary pour créer une cohérence parfaite entre problème, qui
         });
       }
 
-      console.log("OPENAI_CALL start", { fn: "generateFullStackOffer", sessionId, model: "gpt-4o-mini", attempt: retryCount + 1 });
+      console.log("OPENAI_CALL start", { fn: "generateFullStackOffer", sessionId, model: "gpt-4o", attempt: retryCount + 1 });
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages,
         temperature: 0.4,
         max_tokens: 4000,
@@ -433,7 +433,7 @@ Base-toi sur le summary pour créer une cohérence parfaite entre problème, qui
         summaryKeys: Object.keys(summary),
         historyLength: history.length,
         retries: retryCount,
-        model: "gpt-4o-mini"
+        model: "gpt-4o"
       }
     });
 

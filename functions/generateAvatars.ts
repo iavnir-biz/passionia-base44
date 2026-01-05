@@ -113,7 +113,7 @@ Objectif final : L'utilisateur doit se dire "Je sais exactement à qui je parle,
 
         console.log('Generating client avatars...');
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: "gpt-4o",
             messages: [
                 { role: "system", content: systemMessage },
                 { role: "user", content: userContext }

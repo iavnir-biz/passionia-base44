@@ -158,10 +158,10 @@ MISSION
 ❌ Interdiction d'inventer ou de généraliser. Utilise UNIQUEMENT les données fournies.
 ⚠️ Ne saute AUCUNE étape. Développe chaque étape avec détails concrets.`;
 
-    console.log("OPENAI_CALL start", { fn: "generateFutureVision", sessionId, model: "gpt-4o-mini" });
+    console.log("OPENAI_CALL start", { fn: "generateFutureVision", sessionId, model: "gpt-4o" });
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }

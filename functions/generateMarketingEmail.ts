@@ -89,7 +89,7 @@ DONNÉES À UTILISER POUR PERSONNALISATION :
 
         // Générer l'email avec OpenAI - Méthode PASSION IA
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: "gpt-4o",
             messages: [
                 {
                     role: "system",

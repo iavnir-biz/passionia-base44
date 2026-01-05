@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { motion } from 'framer-motion';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
 import { base44 } from '@/api/base44Client';
-import { Send, Copy, Download, Eye, Loader2, Sparkles, Lock } from 'lucide-react';
+import { Send, Copy, Download, Eye, Loader2, Sparkles, Lock, Brain, Mail } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
@@ -108,7 +109,7 @@ export default function EmailsMarketing() {
       return;
     }
 
-    setLoading(true);
+    setLoading(emailType);
     try {
       const response = await base44.functions.invoke('generateMarketingEmail', {
         emailType,
@@ -132,7 +133,7 @@ export default function EmailsMarketing() {
       console.error('Error generating email:', error);
       toast.error('Erreur lors de la génération');
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
@@ -153,112 +154,122 @@ export default function EmailsMarketing() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#11112b]">
+      <div className="flex items-center justify-center h-screen bg-white">
         <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#11112b]">
+    <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="EmailsMarketing" />
       
       <div className="flex-1 ml-72">
         <TopBar 
           title="Emails Marketing" 
-          subtitle="Génère tes emails avec l'IA"
+          subtitle=""
           user={user}
         />
 
         <main className="p-8">
-          <div className="max-w-6xl mx-auto space-y-6">
+          <div className="max-w-6xl mx-auto space-y-8">
             
             {/* Header */}
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1b1b33] rounded-full mb-4">
-                <Sparkles className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm text-gray-300">Emails générés par IA</span>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-left"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
+                <Brain className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-xs font-medium text-gray-700">Emails générés par IA</span>
               </div>
-              <h1 className="text-4xl font-bold text-white mb-3">
-                Tes Emails Marketing
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                Tes emails marketing
               </h1>
-              <p className="text-gray-400 text-lg">
+              <p className="text-gray-600 text-lg">
                 Crée des emails personnalisés pour ton audience
               </p>
-            </div>
+            </motion.div>
 
             {/* Email Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {emailTypes.map((email, index) => {
                 const generated = generatedEmails[email.id];
-                const isGenerating = loading;
+                const isGenerating = loading === email.id;
 
                 return (
-                  <div
+                  <motion.div
                     key={email.id}
-                    className={cn(
-                      "relative bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300",
-                      "hover:border-[#61f7a2]/30 hover:shadow-xl",
-                      "animate-fade-in"
-                    )}
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + index * 0.03 }}
+                    className="bg-gray-50 border border-gray-200 rounded-2xl p-6 hover:border-gray-300 transition-all"
                   >
-                    {/* Gradient Header */}
+                    {/* Icon Header */}
                     <div className={cn(
-                      "w-16 h-16 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4",
+                      "w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4",
                       email.color
                     )}>
-                      <email.icon className="w-8 h-8 text-white" />
+                      <email.icon className="w-7 h-7 text-white" />
                     </div>
 
                     {/* Content */}
-                    <h3 className="text-xl font-bold text-white mb-2">
+                    <p className="text-[#61f7a2] text-xs font-semibold uppercase tracking-wide mb-1">
+                      {email.subtitle}
+                    </p>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">
                       {email.title}
                     </h3>
-                    <p className="text-[#61f7a2] text-sm mb-1">{email.subtitle}</p>
-                    <p className="text-gray-400 text-sm mb-6">{email.description}</p>
+                    <p className="text-gray-600 text-sm mb-6">{email.description}</p>
 
                     {/* Actions */}
                     {!email.locked ? (
                       generated ? (
                         <div className="space-y-3">
                           <div className="flex gap-2">
-                            <GlowButton
-                              onClick={() => setPreviewEmail({ type: email.id, content: generated })}
-                              variant="outline"
-                              size="sm"
-                              icon={Eye}
-                              className="flex-1"
+                            <button
+                              onClick={() => setPreviewEmail({ type: email.id, content: generated, title: email.title })}
+                              className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
                             >
-                              Voir
-                            </GlowButton>
-                            <GlowButton
+                              <Eye className="w-4 h-4" />
+                              <span className="text-sm font-medium">Voir</span>
+                            </button>
+                            <button
                               onClick={() => handleCopy(generated)}
-                              variant="ghost"
-                              size="sm"
-                              icon={Copy}
+                              className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
                             >
-                              Copier
-                            </GlowButton>
-                            <GlowButton
+                              <Copy className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => handleDownload(generated, email.id)}
-                              variant="ghost"
-                              size="sm"
-                              icon={Download}
+                              className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
                             >
-                              Télécharger
-                            </GlowButton>
+                              <Download className="w-4 h-4" />
+                            </button>
                           </div>
-                          <GlowButton
-                            onClick={() => handleGenerate(email.id, true)}
-                            variant="secondary"
-                            size="sm"
-                            className="w-full"
+                          <button
+                            onClick={() => {
+                              if (!hasPremium) {
+                                setShowUpgradeModal(true);
+                                return;
+                              }
+                              handleGenerate(email.id, true);
+                            }}
                             disabled={isGenerating}
-                            icon={!hasPremium ? Lock : undefined}
+                            className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-700 disabled:opacity-50"
                           >
-                            {!hasPremium ? 'Premium' : 'Régénérer'}
-                          </GlowButton>
+                            {isGenerating ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Lock className="w-4 h-4" />
+                                <span className="text-sm font-medium">
+                                  Régénération non disponible pour le plan actuel
+                                </span>
+                              </>
+                            )}
+                          </button>
                         </div>
                       ) : (
                         <GlowButton
@@ -267,7 +278,8 @@ export default function EmailsMarketing() {
                           size="default"
                           className="w-full"
                           loading={isGenerating}
-                          disabled={isGenerating}
+                          disabled={loading !== null && loading !== email.id}
+                          icon={Sparkles}
                         >
                           {isGenerating ? 'Génération...' : 'Générer'}
                         </GlowButton>
@@ -283,7 +295,7 @@ export default function EmailsMarketing() {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -293,23 +305,50 @@ export default function EmailsMarketing() {
 
       {/* Preview Modal */}
       {previewEmail && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1b1b33] rounded-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden border border-[#2a2a45]">
-            <div className="p-6 border-b border-[#2a2a45] flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">Aperçu de l'email</h3>
-              <button
-                onClick={() => setPreviewEmail(null)}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-6 overflow-y-auto max-h-[calc(80vh-100px)]">
-              <div className="prose prose-invert max-w-none">
-                <ReactMarkdown>{previewEmail.content}</ReactMarkdown>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden border border-gray-200 shadow-2xl"
+          >
+            <div className="bg-gray-100 p-6 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-gray-700" />
+                <h3 className="text-lg font-bold text-gray-900">Aperçu de l'email</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleCopy(previewEmail.content)}
+                  className="px-3 py-1.5 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-700"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span className="text-sm font-medium">Copier</span>
+                </button>
+                <button
+                  onClick={() => setPreviewEmail(null)}
+                  className="text-gray-500 hover:text-gray-900 transition-colors text-xl"
+                >
+                  ✕
+                </button>
               </div>
             </div>
-          </div>
+            <div className="p-8 overflow-y-auto max-h-[calc(85vh-100px)] bg-white">
+              <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p className="mb-4">{children}</p>,
+                    h1: ({ children }) => <h1 className="mb-4 mt-6">{children}</h1>,
+                    h2: ({ children }) => <h2 className="mb-3 mt-5">{children}</h2>,
+                    h3: ({ children }) => <h3 className="mb-3 mt-4">{children}</h3>,
+                    ul: ({ children }) => <ul className="mb-4 space-y-2">{children}</ul>,
+                    ol: ({ children }) => <ol className="mb-4 space-y-2">{children}</ol>,
+                  }}
+                >
+                  {previewEmail.content}
+                </ReactMarkdown>
+              </div>
+            </div>
+          </motion.div>
         </div>
       )}
 

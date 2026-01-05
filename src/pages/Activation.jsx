@@ -124,6 +124,8 @@ export default function Activation() {
   const [completedSteps, setCompletedSteps] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationMessage, setGenerationMessage] = useState('');
+  const [emotionalFeedback, setEmotionalFeedback] = useState('');
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -176,16 +178,33 @@ export default function Activation() {
       // Marquer comme complété
       setCompletedSteps([...completedSteps, step.id]);
       setGenerationMessage(step.successMessage);
+      setShowSuccessAnimation(true);
+      
+      // Feedback émotionnel personnalisé
+      const emotionalMessages = [
+        '🎯 Parfait, on avance !',
+        '✨ Tu gères comme un pro',
+        '🚀 Encore une de moins',
+        '💪 Tu assures vraiment',
+        '🔥 C\'est du solide',
+        '⚡ Impressionnant',
+        '🎉 Belle progression'
+      ];
+      setEmotionalFeedback(emotionalMessages[currentStepIndex % emotionalMessages.length]);
       
       // Attendre un peu pour montrer le succès
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setShowSuccessAnimation(false);
       
       // Passer à l'étape suivante
       if (currentStepIndex < STEPS.length - 1) {
         setCurrentStepIndex(currentStepIndex + 1);
         setGenerationMessage('');
+        setEmotionalFeedback('');
       } else {
         // Toutes les étapes terminées
+        setGenerationMessage('');
+        setEmotionalFeedback('');
         await base44.auth.updateMe({ activation_completed: true });
       }
     } catch (error) {
@@ -193,13 +212,29 @@ export default function Activation() {
       // Marquer comme complété quand même pour ne pas bloquer
       setCompletedSteps([...completedSteps, step.id]);
       setGenerationMessage(step.successMessage);
+      setShowSuccessAnimation(true);
       
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const emotionalMessages = [
+        '🎯 Parfait, on avance !',
+        '✨ Tu gères comme un pro',
+        '🚀 Encore une de moins',
+        '💪 Tu assures vraiment',
+        '🔥 C\'est du solide',
+        '⚡ Impressionnant',
+        '🎉 Belle progression'
+      ];
+      setEmotionalFeedback(emotionalMessages[currentStepIndex % emotionalMessages.length]);
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setShowSuccessAnimation(false);
       
       if (currentStepIndex < STEPS.length - 1) {
         setCurrentStepIndex(currentStepIndex + 1);
         setGenerationMessage('');
+        setEmotionalFeedback('');
       } else {
+        setGenerationMessage('');
+        setEmotionalFeedback('');
         await base44.auth.updateMe({ activation_completed: true });
       }
     } finally {
@@ -254,20 +289,34 @@ export default function Activation() {
                 className="relative flex items-start gap-3 mb-6"
               >
                 {/* Cercle indicateur */}
-                <div 
+                <motion.div 
                   className={`
                     relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all
                     ${isCompleted ? 'bg-[#61f7a2] border-2 border-[#61f7a2] shadow-sm' : 
                       isCurrent ? 'bg-white border-2 border-[#61f7a2] shadow-md' :
                       'bg-white border-2 border-gray-200'}
                   `}
+                  animate={
+                    isCompleted ? { scale: [1, 1.15, 1] } :
+                    isCurrent ? { scale: [1, 1.05, 1] } : {}
+                  }
+                  transition={
+                    isCompleted ? { duration: 0.4 } :
+                    isCurrent ? { duration: 2, repeat: Infinity } : {}
+                  }
                 >
                   {isCompleted ? (
-                    <CheckCircle2 className="w-5 h-5 text-white" />
+                    <motion.div
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ duration: 0.5, type: "spring" }}
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-white" />
+                    </motion.div>
                   ) : (
                     <Icon className={`w-5 h-5 ${isCurrent ? 'text-[#61f7a2]' : 'text-gray-400'}`} />
                   )}
-                </div>
+                </motion.div>
 
                 {/* Label */}
                 <div className="pt-1.5">
@@ -346,40 +395,80 @@ export default function Activation() {
                   {isGenerating ? (
                     <motion.div
                       key="generating"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
                       className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 text-center"
                     >
-                      <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-3" />
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Loader2 className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+                      </motion.div>
                       <p className="text-blue-900 font-medium">{generationMessage}</p>
                     </motion.div>
                   ) : generationMessage ? (
                     <motion.div
                       key="success"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ 
+                        opacity: 1, 
+                        scale: showSuccessAnimation ? [0.8, 1.1, 1] : 1 
+                      }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 text-center mb-6"
+                      transition={{ duration: 0.5, type: "spring" }}
+                      className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 text-center mb-6 relative overflow-hidden"
                     >
-                      <CheckCircle2 className="w-10 h-10 text-green-600 mx-auto mb-3" />
-                      <p className="text-green-900 font-medium">{generationMessage}</p>
+                      {/* Effet de brillance */}
+                      {showSuccessAnimation && (
+                        <motion.div
+                          initial={{ x: '-100%' }}
+                          animate={{ x: '200%' }}
+                          transition={{ duration: 1, ease: "easeInOut" }}
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                        />
+                      )}
+                      
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 0.6, type: "spring" }}
+                      >
+                        <CheckCircle2 className="w-10 h-10 text-green-600 mx-auto mb-3" />
+                      </motion.div>
+                      <p className="text-green-900 font-medium mb-2">{generationMessage}</p>
+                      {emotionalFeedback && (
+                        <motion.p 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                          className="text-sm text-gray-600 italic"
+                        >
+                          {emotionalFeedback}
+                        </motion.p>
+                      )}
                     </motion.div>
                   ) : (
                     <motion.div
                       key="action"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
                     >
-                      <GlowButton
-                        onClick={handleStepAction}
-                        size="lg"
-                        className="w-full mb-3"
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        {currentStep.buttonText}
-                        <ArrowRight className="w-5 h-5 ml-2" />
-                      </GlowButton>
+                        <GlowButton
+                          onClick={handleStepAction}
+                          size="lg"
+                          className="w-full mb-3"
+                        >
+                          {currentStep.buttonText}
+                          <ArrowRight className="w-5 h-5 ml-2" />
+                        </GlowButton>
+                      </motion.div>
                       <p className="text-sm text-gray-500 text-center">
                         ⏱️ {currentStep.duration} · {currentStep.subtext || 'Aucune action technique requise'}
                       </p>
@@ -390,34 +479,99 @@ export default function Activation() {
             ) : (
               <motion.div
                 key="final"
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-[#61f7a2] rounded-3xl p-10 text-center"
+                transition={{ duration: 0.6, type: "spring" }}
+                className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-[#61f7a2] rounded-3xl p-10 text-center relative overflow-hidden"
               >
-                <div className="w-20 h-20 bg-[#61f7a2] rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Rocket className="w-10 h-10 text-white" />
-                </div>
+                {/* Confettis subtils */}
+                {[...Array(12)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ 
+                      y: [0, 100, 200],
+                      opacity: [0, 1, 0],
+                      x: [0, (i % 2 === 0 ? 30 : -30)]
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      delay: i * 0.1,
+                      repeat: Infinity,
+                      repeatDelay: 2
+                    }}
+                    className="absolute w-2 h-2 bg-[#61f7a2] rounded-full"
+                    style={{ 
+                      left: `${(i / 12) * 100}%`,
+                      top: '-20px'
+                    }}
+                  />
+                ))}
                 
-                <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                  Tout est prêt.
-                </h2>
-                
-                <p className="text-gray-600 text-lg mb-2 max-w-xl mx-auto">
-                  Ton espace complet est maintenant disponible. Tu pourras affiner, modifier et lancer chaque élément à ton rythme.
-                </p>
-                
-                <p className="text-sm text-gray-500 mb-8">
-                  Chaque contenu généré t'attend dans ton dashboard. Tu contrôles la suite.
-                </p>
-                
-                <GlowButton
-                  onClick={handleAccessDashboard}
-                  size="lg"
-                  className="px-12"
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.8, type: "spring", bounce: 0.5 }}
+                  className="w-20 h-20 bg-[#61f7a2] rounded-full flex items-center justify-center mx-auto mb-6 relative z-10"
                 >
-                  Accéder à mon espace
-                  <Rocket className="w-5 h-5 ml-2" />
-                </GlowButton>
+                  <Rocket className="w-10 h-10 text-white" />
+                </motion.div>
+                
+                <motion.h2 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl font-bold text-gray-900 mb-3"
+                >
+                  Tout est prêt.
+                </motion.h2>
+                
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-gray-600 text-lg mb-2 max-w-xl mx-auto"
+                >
+                  Ton espace complet est maintenant disponible. Tu pourras affiner, modifier et lancer chaque élément à ton rythme.
+                </motion.p>
+                
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-sm text-gray-500 mb-8"
+                >
+                  Chaque contenu généré t'attend dans ton dashboard. Tu contrôles la suite.
+                </motion.p>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <GlowButton
+                    onClick={handleAccessDashboard}
+                    size="lg"
+                    className="px-12"
+                  >
+                    Accéder à mon espace
+                    <Rocket className="w-5 h-5 ml-2" />
+                  </GlowButton>
+                </motion.div>
+
+                {/* Badge final */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8, type: "spring" }}
+                  className="mt-6 inline-block bg-white px-4 py-2 rounded-full shadow-sm"
+                >
+                  <p className="text-xs font-semibold text-[#61f7a2]">
+                    ✨ Activation complétée • {STEPS.length}/{STEPS.length} étapes
+                  </p>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>

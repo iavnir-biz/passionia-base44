@@ -18,7 +18,8 @@ import {
   Magnet,
   Share2,
   Package,
-  ChevronDown
+  ChevronDown,
+  BarChart3
 } from "lucide-react";
 import ProgressBar from '@/components/ui/ProgressBar';
 
@@ -32,6 +33,7 @@ const menuStructure = [
     isFolder: true,
     items: [
       { name: 'Offres', icon: Package, page: 'MyOffers' },
+      { name: 'Analyse de marché', icon: BarChart3, page: 'MarketAnalysis' },
       { name: 'Page de vente', icon: FileText, page: 'SalesPage' },
       { name: 'Avatars clients', icon: User, page: 'AvatarClients' },
       { name: 'Messages de vente', icon: MessageCircle, page: 'SalesMessages' },

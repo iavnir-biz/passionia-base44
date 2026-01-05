@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Sparkles, Zap, Lightbulb, Target, CheckCircle, Rocket } from 'lucide-react';
 
-export default function OfferTransition({ onComplete, message = "Noah analyse ton choix...", isPlanAction = false }) {
+export default function OfferTransition({ onComplete, message = "Nova analyse ton choix...", isPlanAction = false }) {
   const [currentStep, setCurrentStep] = useState(0);
 
   const defaultSteps = [

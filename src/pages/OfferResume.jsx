@@ -171,6 +171,10 @@ export default function OfferResume() {
   };
 
   const handleContinue = () => {
+    setShowTransition(true);
+  };
+
+  const handleTransitionComplete = () => {
     navigate(createPageUrl('BonneNouvelle'));
   };
 

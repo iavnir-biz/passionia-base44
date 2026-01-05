@@ -125,6 +125,7 @@ export default function OfferConcretement() {
   const [planDeRoute, setPlanDeRoute] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -169,8 +170,6 @@ export default function OfferConcretement() {
     }
   };
 
-  const [showTransition, setShowTransition] = useState(false);
-
   const handleContinue = () => {
     setShowTransition(true);
   };
@@ -186,12 +185,7 @@ export default function OfferConcretement() {
   };
 
   if (isLoading || isGenerating) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex flex-col items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mb-4" />
-        <p className="text-gray-600">{isGenerating ? 'Nova prépare ton plan personnalisé...' : 'Chargement...'}</p>
-      </div>
-    );
+    return <OfferTransition message={isGenerating ? "Nova prépare ton plan de route..." : "Chargement..."} />;
   }
 
   if (!planDeRoute) {
@@ -260,18 +254,58 @@ export default function OfferConcretement() {
       {/* Content */}
       <div className="py-12">
         <div className="max-w-4xl mx-auto px-4">
-          {/* Title */}
+          {/* Hero Section avec visuel */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
+            className="mb-10"
           >
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">
-              Ton Plan de Route en 4 Phases
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Oublie la pression des délais. Avance à ton rythme, étape par étape, vers ton objectif.
-            </p>
+            <div className="bg-gradient-to-br from-[#61f7a2]/20 via-blue-50 to-purple-50 rounded-3xl border-2 border-[#61f7a2]/40 p-10 relative overflow-hidden shadow-lg">
+              {/* Éléments décoratifs flottants */}
+              <motion.div
+                animate={{ 
+                  y: [0, -20, 0],
+                  rotate: [0, 10, 0]
+                }}
+                transition={{ 
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="absolute top-8 right-8 w-24 h-24 bg-gradient-to-br from-[#61f7a2]/30 to-blue-300/30 rounded-2xl"
+              />
+              <motion.div
+                animate={{ 
+                  y: [0, 20, 0],
+                  rotate: [0, -10, 0]
+                }}
+                transition={{ 
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }}
+                className="absolute bottom-8 left-8 w-32 h-32 bg-gradient-to-br from-purple-300/30 to-[#61f7a2]/30 rounded-full"
+              />
+
+              <div className="relative z-10 text-center">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] shadow-lg mb-6"
+                >
+                  <span className="text-4xl">🗺️</span>
+                </motion.div>
+
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                  Bienvenue dans ton Plan de Route
+                </h1>
+                <p className="text-gray-700 text-xl max-w-2xl mx-auto">
+                  Oublie la pression des délais. Avance à ton rythme, étape par étape, vers ton objectif.
+                </p>
+              </div>
+            </div>
           </motion.div>
 
           {/* Top CTA */}

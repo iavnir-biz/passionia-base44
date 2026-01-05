@@ -85,6 +85,10 @@ export default function OfferTaVieFuture() {
   };
 
   const handleContinue = () => {
+    setShowTransition(true);
+  };
+
+  const handleTransitionComplete = () => {
     navigate(createPageUrl('OfferConcretement'));
   };
 

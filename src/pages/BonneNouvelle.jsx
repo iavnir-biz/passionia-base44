@@ -131,6 +131,10 @@ export default function BonneNouvelle() {
   };
 
   const handleContinue = () => {
+    setShowTransition(true);
+  };
+
+  const handleTransitionComplete = () => {
     navigate(createPageUrl('OfferTaVieFuture'));
   };
 

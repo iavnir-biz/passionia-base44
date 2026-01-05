@@ -32,6 +32,7 @@ import {
 import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import GlowButton from '@/components/ui/GlowButton';
 import OfferDetailCard from '@/components/offer/OfferDetailCard';
+import OfferTransition from '@/components/offer/OfferTransition';
 
 // Function to get icon based on offer content
 const getProductIcon = (offer) => {
@@ -151,6 +152,7 @@ export default function OfferResume() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDetail, setShowDetail] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [showTransition, setShowTransition] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -179,11 +181,11 @@ export default function OfferResume() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#11112b] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-      </div>);
+    return <OfferTransition message="Chargement de ton offre..." />;
+  }
 
+  if (showTransition) {
+    return <OfferTransition message="Nova analyse ton offre..." onComplete={handleTransitionComplete} />;
   }
 
   const offer = user?.offer || {};

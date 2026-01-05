@@ -14,6 +14,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
+import OfferTransition from '@/components/offer/OfferTransition';
 import { cn } from "@/lib/utils";
 
 const mainSteps = [
@@ -92,12 +93,12 @@ export default function OfferTaVieFuture() {
     navigate(createPageUrl('OfferConcretement'));
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-      </div>
-    );
+  if (isLoading || isGenerating) {
+    return <OfferTransition message={isGenerating ? "Nova écrit ta vision future..." : "Chargement..."} />;
+  }
+
+  if (showTransition) {
+    return <OfferTransition message="Nova prépare ton plan de route..." onComplete={handleTransitionComplete} />;
   }
 
   const offer = user?.offer || {};

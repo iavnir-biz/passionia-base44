@@ -138,12 +138,12 @@ export default function BonneNouvelle() {
     navigate(createPageUrl('OfferTaVieFuture'));
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-      </div>
-    );
+  if (isLoading || isGenerating) {
+    return <OfferTransition message={isGenerating ? "Nova analyse le marché..." : "Chargement..."} />;
+  }
+
+  if (showTransition) {
+    return <OfferTransition message="Nova prépare ta vision future..." onComplete={handleTransitionComplete} />;
   }
 
   const offer = user?.offer || {};

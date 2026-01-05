@@ -17,6 +17,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
+import OfferTransition from '@/components/offer/OfferTransition';
 import { cn } from "@/lib/utils";
 
 const mainSteps = [
@@ -69,6 +70,7 @@ export default function BonneNouvelle() {
   const [showDetail, setShowDetail] = useState(false);
   const [marketAnalysis, setMarketAnalysis] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -82,17 +84,8 @@ export default function BonneNouvelle() {
 
   const loadUser = async () => {
     try {
-      // Récupérer les données du localStorage
-      const firstName = localStorage.getItem('onboarding_firstName') || '';
-      const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
-      const coreSkill = onboardingData.summary?.who_to_teach || '';
-      
-      setUser({ 
-        firstName: firstName, 
-        full_name: firstName,
-        coreSkill: coreSkill,
-        sessionId: 'local'
-      });
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {

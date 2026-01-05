@@ -214,107 +214,218 @@ ${avatar.how_to_reach}
               </div>
             </motion.div>
 
-            {/* Avatar Cards - Always visible */}
-            <div className="space-y-6">
+            {/* Avatar Cards */}
+            <div className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {[0, 1, 2].map((index) => {
                   const avatar = avatars[index];
-                  const colors = avatarColors[index];
                   const isExpanded = expandedAvatar === index;
 
                   return avatar ? (
-                    <div
+                    <motion.div
                       key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + index * 0.1 }}
                       className={cn(
-                        "bg-[#1b1b33] border rounded-2xl p-6 transition-all duration-300 animate-fade-in",
-                        isExpanded ? "lg:col-span-3" : "",
-                        colors.border
+                        "bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-md",
+                        isExpanded && "lg:col-span-3"
                       )}
-                      style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       {/* Avatar Header */}
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className={cn(
-                          "w-16 h-16 rounded-2xl bg-gradient-to-br flex items-center justify-center flex-shrink-0",
-                          colors.gradient
-                        )}>
-                          <User className="w-8 h-8 text-white" />
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <User className="w-7 h-7 text-gray-600" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-2xl font-bold text-white mb-1">
+                          <h3 className="text-xl font-bold text-gray-900 mb-1">
                             {avatar.name}
                           </h3>
-                          <p className="text-[#61f7a2] text-sm font-medium">
-                            {avatar.tagline}
-                          </p>
                         </div>
                       </div>
 
-                      {/* Quick Overview */}
-                      {!isExpanded && (
-                        <div className={cn("p-4 rounded-xl mb-4", colors.bg)}>
-                          <p className="text-gray-300 text-sm line-clamp-3">
-                            {avatar.profile}
+                      {/* Quick Preview when collapsed */}
+                      {!isExpanded && avatar.identity && (
+                        <div className="space-y-3 mb-4">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Users className="w-4 h-4 text-gray-400" />
+                            <span>{avatar.identity.age_range} • {avatar.identity.job_context}</span>
+                          </div>
+                          <p className="text-gray-700 text-sm line-clamp-3">
+                            {avatar.identity.life_situation}
                           </p>
                         </div>
                       )}
 
-                      {/* Expanded Content */}
+                      {/* Full Content when expanded */}
                       {isExpanded && (
-                        <div className="space-y-4 mb-4">
-                          {/* Profile */}
-                          <div className={cn("p-4 rounded-xl", colors.bg)}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <User className="w-4 h-4 text-[#61f7a2]" />
-                              <h4 className="font-semibold text-white">Profil</h4>
+                        <div className="space-y-6 mb-6">
+                          
+                          {/* 1. IDENTITÉ */}
+                          {avatar.identity && (
+                            <div>
+                              <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <User className="w-4 h-4 text-[#61f7a2]" />
+                                IDENTITÉ DE L'AVATAR
+                              </h4>
+                              <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
+                                <div><span className="font-medium text-gray-900">Âge :</span> <span className="text-gray-700">{avatar.identity.age_range}</span></div>
+                                <div><span className="font-medium text-gray-900">Situation :</span> <span className="text-gray-700">{avatar.identity.life_situation}</span></div>
+                                <div><span className="font-medium text-gray-900">Métier :</span> <span className="text-gray-700">{avatar.identity.job_context}</span></div>
+                                <div><span className="font-medium text-gray-900">Niveau :</span> <span className="text-gray-700">{avatar.identity.experience_level}</span></div>
+                              </div>
                             </div>
-                            <p className="text-gray-300 text-sm">{avatar.profile}</p>
-                          </div>
+                          )}
 
-                          {/* Frustrations */}
-                          <div className={cn("p-4 rounded-xl", colors.bg)}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <AlertCircle className="w-4 h-4 text-[#61f7a2]" />
-                              <h4 className="font-semibold text-white">Frustrations</h4>
+                          {/* 2. ANALYSE FACTUELLE */}
+                          {avatar.factual_analysis && (
+                            <div>
+                              <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <Target className="w-4 h-4 text-[#61f7a2]" />
+                                ANALYSE FACTUELLE
+                              </h4>
+                              <div className="bg-gray-50 rounded-xl p-4 space-y-3 text-sm">
+                                <div>
+                                  <span className="font-medium text-gray-900">Situation actuelle :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.factual_analysis.current_situation}</p>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-3 pt-2">
+                                  <div className="flex items-center gap-2">
+                                    <DollarSign className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-700">{avatar.factual_analysis.budget}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="w-4 h-4 text-gray-400" />
+                                    <span className="text-gray-700">{avatar.factual_analysis.available_time}</span>
+                                  </div>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Canaux :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.factual_analysis.channels}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Formats préférés :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.factual_analysis.preferred_formats}</p>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-gray-300 text-sm">{avatar.frustrations}</p>
-                          </div>
+                          )}
 
-                          {/* Goals */}
-                          <div className={cn("p-4 rounded-xl", colors.bg)}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Target className="w-4 h-4 text-[#61f7a2]" />
-                              <h4 className="font-semibold text-white">Objectifs</h4>
+                          {/* 3. COMPORTEMENTS & ALTERNATIVES */}
+                          {avatar.behavior_alternatives && (
+                            <div>
+                              <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <Lightbulb className="w-4 h-4 text-[#61f7a2]" />
+                                COMPORTEMENTS & ALTERNATIVES
+                              </h4>
+                              <div className="bg-gray-50 rounded-xl p-4 space-y-3 text-sm">
+                                <div>
+                                  <span className="font-medium text-gray-900">A déjà essayé :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.behavior_alternatives.already_tried}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Déceptions :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.behavior_alternatives.disappointments}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Ce qu'il évite :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.behavior_alternatives.what_he_avoids}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Pourquoi pas de résultats :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.behavior_alternatives.why_no_results_yet}</p>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-gray-300 text-sm">{avatar.goals}</p>
-                          </div>
+                          )}
 
-                          {/* Desires */}
-                          <div className={cn("p-4 rounded-xl", colors.bg)}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Heart className="w-4 h-4 text-[#61f7a2]" />
-                              <h4 className="font-semibold text-white">Désirs profonds</h4>
+                          {/* 4. STORYTELLING – DANS SA TÊTE */}
+                          {avatar.in_his_head && (
+                            <div>
+                              <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <Brain className="w-4 h-4 text-[#61f7a2]" />
+                                DANS SA TÊTE
+                              </h4>
+                              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 space-y-3 text-sm border border-blue-200">
+                                <div>
+                                  <span className="font-medium text-gray-900">Journée type :</span>
+                                  <p className="text-gray-700 mt-1 italic">{avatar.in_his_head.typical_day}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">État émotionnel :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.in_his_head.dominant_emotion}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Moment critique :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.in_his_head.problem_moment}</p>
+                                </div>
+                                <div className="bg-white/70 rounded-lg p-3 border border-blue-300">
+                                  <span className="font-medium text-gray-900">💭 Sa phrase intérieure :</span>
+                                  <p className="text-gray-900 mt-1 italic font-medium">"{avatar.in_his_head.inner_phrase}"</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Déclencheur d'achat :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.in_his_head.trigger_to_action}</p>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-gray-300 text-sm">{avatar.desires}</p>
-                          </div>
+                          )}
 
-                          {/* Fears */}
-                          <div className={cn("p-4 rounded-xl", colors.bg)}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <AlertCircle className="w-4 h-4 text-[#61f7a2]" />
-                              <h4 className="font-semibold text-white">Peurs & Freins</h4>
+                          {/* 5. MOTIVATIONS D'ACHAT */}
+                          {avatar.purchase_motivations && (
+                            <div>
+                              <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <Heart className="w-4 h-4 text-[#61f7a2]" />
+                                MOTIVATIONS D'ACHAT
+                              </h4>
+                              <div className="bg-gray-50 rounded-xl p-4 space-y-3 text-sm">
+                                <div>
+                                  <span className="font-medium text-gray-900">Pourquoi une formation :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.purchase_motivations.why_training}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Pourquoi du coaching :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.purchase_motivations.why_coaching}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Pourquoi une communauté :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.purchase_motivations.why_community}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Attente réelle :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.purchase_motivations.real_expectation}</p>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-gray-300 text-sm">{avatar.fears}</p>
-                          </div>
+                          )}
 
-                          {/* How to Reach */}
-                          <div className={cn("p-4 rounded-xl", colors.bg)}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <TrendingUp className="w-4 h-4 text-[#61f7a2]" />
-                              <h4 className="font-semibold text-white">Comment les atteindre</h4>
+                          {/* 6. CE QU'IL ATTEND DE L'EXPERT */}
+                          {avatar.what_he_expects_from_expert && (
+                            <div>
+                              <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <MessageSquare className="w-4 h-4 text-[#61f7a2]" />
+                                CE QU'IL ATTEND DE TOI (L'EXPERT)
+                              </h4>
+                              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 space-y-3 text-sm border border-green-200">
+                                <div>
+                                  <span className="font-medium text-gray-900">Type d'expert recherché :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.what_he_expects_from_expert.expert_type}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Ton attendu :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.what_he_expects_from_expert.tone}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Niveau de proximité :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.what_he_expects_from_expert.proximity_level}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900">Ce qui crée la confiance :</span>
+                                  <p className="text-gray-700 mt-1">{avatar.what_he_expects_from_expert.trust_builders}</p>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-gray-300 text-sm">{avatar.how_to_reach}</p>
-                          </div>
+                          )}
                         </div>
                       )}
 
@@ -337,7 +448,7 @@ ${avatar.how_to_reach}
                           Copier
                         </GlowButton>
                       </div>
-                    </div>
+                    </motion.div>
                   ) : (
                     <div
                       key={index}

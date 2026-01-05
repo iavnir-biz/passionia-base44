@@ -69,13 +69,21 @@ export default function Welcome() {
         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg">
           <Sparkles className="w-6 h-6 text-white" />
         </div>
-        <Button
-          variant="outline"
-          onClick={handleLogin}
-          className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-2 rounded-xl font-medium"
-        >
-          Connexion
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleStart}
+            className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-8 py-2 rounded-xl font-medium shadow-sm"
+          >
+            S'inscrire
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleLogin}
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-2 rounded-xl font-medium"
+          >
+            Connexion
+          </Button>
+        </div>
       </header>
 
       {/* Hero Section with Floating Cards */}

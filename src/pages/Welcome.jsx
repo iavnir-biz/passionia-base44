@@ -232,31 +232,7 @@ export default function Welcome() {
         </motion.div>
       </div>
 
-      {/* Features Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.0 }}
-        className="w-full max-w-6xl mx-auto px-6 py-20">
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) =>
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1 + index * 0.1 }}
-            className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-shadow">
-
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center mb-5">
-                <feature.icon className="w-7 h-7 text-[#61f7a2]" />
-              </div>
-              <h3 className="text-gray-900 font-bold text-lg mb-3">{feature.title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
-            </motion.div>
-          )}
-        </div>
-      </motion.div>
 
       {/* 4 Steps Section */}
       <motion.div
@@ -273,8 +249,8 @@ export default function Welcome() {
         </div>
 
         {/* Title */}
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">4 étapes pour démarrer
-
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
+          4 étapes pour <span className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">démarrer</span>
         </h2>
 
         {/* Steps Grid */}
@@ -287,7 +263,7 @@ export default function Welcome() {
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
 
             <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/50 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center">
                 <Target className="w-7 h-7 text-blue-600" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">01</span>
@@ -306,8 +282,8 @@ export default function Welcome() {
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
 
             <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center">
-                <Sparkles className="w-7 h-7 text-[#61f7a2]" />
+              <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-pink-600" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">02</span>
             </div>
@@ -325,7 +301,7 @@ export default function Welcome() {
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
 
             <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/50 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
                 <FileText className="w-7 h-7 text-amber-600" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">03</span>
@@ -344,7 +320,7 @@ export default function Welcome() {
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
 
             <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-50 to-green-100/50 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center">
                 <TrendingUp className="w-7 h-7 text-green-600" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">04</span>
@@ -364,21 +340,53 @@ export default function Welcome() {
         transition={{ delay: 1.9 }}
         className="w-full bg-gradient-to-br from-gray-50 to-white py-24">
 
-        <div className="max-w-2xl mx-auto text-center px-6">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
-            Prêt à transformer ta passion en business ?
-          </h2>
-          <p className="text-gray-600 text-lg mb-10 leading-relaxed">
-            Découvre comment ton savoir-faire peut devenir une source de revenus grâce à l'IA.
-          </p>
-          <div className="flex justify-center">
-            <Button
-              onClick={handleStart}
-              className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="bg-white rounded-3xl shadow-xl p-12">
+            <div className="text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
+                Prêt à transformer tes <span className="text-[#61f7a2]">compétences</span> en véritable activité en ligne
+              </h2>
+              <p className="text-lg text-gray-600 mb-2">
+                Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA.
+              </p>
+              <p className="text-lg text-gray-900 font-semibold mb-8">
+                Commence dès maintenant !
+              </p>
 
-              <Sparkles className="w-5 h-5 mr-2" />
-              Commencer maintenant
-            </Button>
+              {/* Three badges */}
+              <div className="flex flex-wrap justify-center gap-3 mb-8">
+                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
+                  <span className="text-gray-700 text-sm font-medium">✓ Inscription 100% gratuite</span>
+                </div>
+                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
+                  <span className="text-gray-700 text-sm font-medium">✓ Documents IA offerts</span>
+                </div>
+                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
+                  <span className="text-gray-700 text-sm font-medium">✓ Communauté vérifiée</span>
+                </div>
+              </div>
+
+              {/* Main CTA Button */}
+              <div className="flex justify-center mb-4">
+                <Button
+                  onClick={handleStart}
+                  className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Commencer gratuitement
+                </Button>
+              </div>
+
+              {/* Login link */}
+              <p className="text-gray-700 text-sm">
+                Déjà membre ?{' '}
+                <button
+                  onClick={handleLogin}
+                  className="font-bold underline hover:text-gray-900 transition-colors"
+                >
+                  Connecte-toi
+                </button>
+              </p>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -392,11 +400,11 @@ export default function Welcome() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <div className="text-lg text-gray-600 mb-2">Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA. Commence dès maintenant !
-
-
-
-
+              <div className="text-left">
+                <p className="text-sm font-semibold text-gray-900">PassionIA</p>
+                <p className="text-xs text-gray-600">
+                  Technologie d'intelligence artificielle développée par IAVNIR INC
+                </p>
               </div>
             </div>
 

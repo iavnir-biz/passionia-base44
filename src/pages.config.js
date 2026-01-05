@@ -6,6 +6,7 @@ import DailyActions from './pages/DailyActions';
 import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
 import EmailsMarketing from './pages/EmailsMarketing';
+import Home from './pages/Home';
 import MarketAnalysis from './pages/MarketAnalysis';
 import MyOffers from './pages/MyOffers';
 import NovaChat from './pages/NovaChat';
@@ -54,7 +55,6 @@ import SalesMessages from './pages/SalesMessages';
 import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
-import Home from './pages/Home';
 import Welcome from './pages/Welcome';
 
 
@@ -67,6 +67,7 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "Documents": Documents,
     "EmailsMarketing": EmailsMarketing,
+    "Home": Home,
     "MarketAnalysis": MarketAnalysis,
     "MyOffers": MyOffers,
     "NovaChat": NovaChat,
@@ -115,7 +116,6 @@ export const PAGES = {
     "SalesPage": SalesPage,
     "Settings": Settings,
     "SocialMedia": SocialMedia,
-    "Home": Home,
     "Welcome": Welcome,
 }
 

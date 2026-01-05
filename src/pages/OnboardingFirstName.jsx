@@ -161,18 +161,19 @@ export default function OnboardingFirstName() {
           });
           sessionId = newSession.id;
         }
-        
-        await base44.auth.updateMe({ sessionId });
       }
       
+      // Sauvegarder le prénom et la session
       await base44.auth.updateMe({ 
-        firstName: firstName.trim(),
+        full_name: firstName.trim(),
         sessionId 
       });
+      
+      // Navigation vers OnboardingDynamic
       navigate(createPageUrl('OnboardingDynamic'));
     } catch (error) {
       console.error('Error saving firstName:', error);
-    } finally {
+      alert('Une erreur est survenue. Merci de réessayer.');
       setIsLoading(false);
     }
   };

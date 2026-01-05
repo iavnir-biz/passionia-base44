@@ -399,9 +399,21 @@ ${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
 ` : ''}
 
 ÉTAT :
-- Nombre de questions posées : ${workingHistory.length}/11
+- Nombre de questions déjà posées : ${workingHistory.length}
 - Prochaine question à poser : ${nextQuestionConfig ? `#${nextQuestionConfig.id} - ${nextQuestionConfig.theme}` : 'TERMINÉ'}
 - Clés remplies dans summary : ${Object.keys(summary).filter(k => summary[k] && (typeof summary[k] === 'string' ? summary[k].trim() : true)).join(', ') || 'aucune'}
+
+⚠️ IMPORTANT : Tu peux t'arrêter AVANT la question 11 si tu as collecté TOUTES les informations nécessaires dans le summary :
+- who_to_teach (compétence)
+- learner_profile (public cible + niveau expérience)
+- main_learning_problem (problème principal)
+- quick_win (premier résultat)
+- big_transformation (transformation finale)
+- method_angle (méthode unique)
+- common_mistake (erreur typique)
+- proof_or_story (histoire personnelle)
+
+Si TOUTES ces clés sont remplies ET pertinentes, tu peux renvoyer isDone: true même avant Q11.
 
 ${nextQuestionConfig ? `PROCHAINE QUESTION À POSER :
 Question #${nextQuestionConfig.id} : ${nextQuestionConfig.theme}

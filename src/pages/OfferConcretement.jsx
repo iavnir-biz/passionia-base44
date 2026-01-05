@@ -394,7 +394,13 @@ export default function OfferConcretement() {
         </div>
       </div>
 
-
+      {/* Transition Animation */}
+      {showTransition && (
+        <OfferTransition 
+          onComplete={handleTransitionComplete} 
+          isPlanAction={true}
+        />
+      )}
     </div>
   );
 }

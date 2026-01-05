@@ -96,9 +96,10 @@ export default function MarketAnalysis() {
           user={user}
         />
         
-        <main className="p-8 max-w-5xl mx-auto">
-          {!analysis ? (
-            <div className="py-20">
+        <main className="p-8">
+          <div className="max-w-5xl mx-auto space-y-8">
+            {!analysis ? (
+              <div className="py-20">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -150,19 +151,23 @@ export default function MarketAnalysis() {
                   </div>
                 </div>
               </motion.div>
-            </div>
-          ) : (
-            <div className="space-y-8">
+              </div>
+            ) : (
+              <div className="space-y-8">
               {/* Header */}
               <motion.div
-                initial={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-12 text-left"
+                className="text-left"
               >
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
+                  <BarChart3 className="w-4 h-4 text-[#61f7a2]" />
+                  <span className="text-xs font-medium text-gray-700">Analyse stratégique</span>
+                </div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-3">
                   Analyse de marché
                 </h1>
-                <p className="text-gray-600 text-lg max-w-3xl">
+                <p className="text-gray-600 text-lg">
                   Comprendre qui a besoin de ton savoir, pourquoi, et comment ces personnes achètent aujourd'hui
                 </p>
               </motion.div>
@@ -513,8 +518,9 @@ export default function MarketAnalysis() {
                   </GlowButton>
                 </div>
               </motion.div>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </main>
       </div>
     </div>

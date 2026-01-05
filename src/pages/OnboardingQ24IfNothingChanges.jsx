@@ -97,9 +97,14 @@ export default function OnboardingQ24IfNothingChanges() {
           </motion.div>
         </div>
 
-        <div className="text-center mb-8">
-          <h3 className="text-lg font-bold text-gray-900 mb-1">Étape 2</h3>
-          <p className="text-sm text-gray-600">Prise d'informations</p>
+        <div className="text-center mb-6">
+          <div className="space-y-3">
+            <div className="text-xs text-gray-500">Étape 1 : Découverte ✓</div>
+            <div>
+              <h3 className="text-lg font-bold text-[#61f7a2] mb-1">Étape 2</h3>
+              <p className="text-sm text-gray-600">Informations supplémentaires</p>
+            </div>
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col items-center w-full max-w-[200px]">
@@ -107,12 +112,28 @@ export default function OnboardingQ24IfNothingChanges() {
             <motion.div 
               className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#61f7a2] to-[#4de88f]"
               initial={{ height: '0%' }}
-              animate={{ height: '92%' }}
+              animate={{ height: '93%' }}
               transition={{ duration: 0.5 }}
             />
+            
+            {/* Marqueur 50% (fusée) */}
+            <motion.div 
+              className="absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white border-2 border-[#61f7a2] flex items-center justify-center shadow-lg"
+              style={{ top: '50%', transform: 'translate(-50%, -50%)' }}
+              animate={{
+                scale: [1, 1.2, 1],
+              }}
+              transition={{
+                duration: 0.5,
+                repeat: Infinity,
+              }}
+            >
+              <span className="text-base">🚀</span>
+            </motion.div>
           </div>
+          
           <div className="mt-4 text-center">
-            <p className="text-2xl font-bold text-[#61f7a2]">92%</p>
+            <p className="text-2xl font-bold text-[#61f7a2]">93%</p>
           </div>
         </div>
       </div>
@@ -120,7 +141,7 @@ export default function OnboardingQ24IfNothingChanges() {
       {/* Main content */}
       <div className="flex-1 flex flex-col">
         <div className="w-full bg-gray-100 h-2 md:hidden">
-          <div className="h-full bg-[#61f7a2] transition-all duration-500" style={{ width: '92%' }} />
+          <div className="h-full bg-[#61f7a2] transition-all duration-500" style={{ width: '93%' }} />
         </div>
 
         <div className="flex-1 flex items-center justify-center p-6">

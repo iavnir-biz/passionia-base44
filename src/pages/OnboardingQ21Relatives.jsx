@@ -72,7 +72,7 @@ export default function OnboardingQ21Relatives() {
       fieldName="relativesThoughts"
       nextPage="OnboardingQ22Lifestyle"
       prevPage="OnboardingQ20Emotions"
-      progress={71}
+      progress={82}
     />
   );
 }

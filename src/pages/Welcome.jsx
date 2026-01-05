@@ -139,7 +139,7 @@ export default function Welcome() {
             transition={{ delay: 0.5 }}
             className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
 
-            Transforme ta passion en business rentable avec l'aide de l'intelligence artificielle
+            Transmets ton savoir-faire, tes compétences ou ta passion et crée une véritable activité de formation en ligne, tout en impactant positivement la vie des autres.
           </motion.p>
           
           {/* Search Bar */}
@@ -319,13 +319,6 @@ export default function Welcome() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.4 }}
         className="w-full max-w-6xl mx-auto px-6 py-20">
-
-        {/* Badge */}
-        <div className="flex justify-center mb-4">
-          <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 rounded-full px-4 py-2">
-            <span className="text-[#66ffb2] text-sm font-bold">Simple & efficace</span>
-          </div>
-        </div>
 
         {/* Title */}
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">

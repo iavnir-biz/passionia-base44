@@ -76,8 +76,9 @@ export default function OnboardingTransition() {
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
+      // Récupérer le prénom du localStorage
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      setUser({ firstName: firstName, full_name: firstName });
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {

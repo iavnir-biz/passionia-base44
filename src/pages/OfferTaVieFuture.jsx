@@ -51,8 +51,17 @@ export default function OfferTaVieFuture() {
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
+      // Récupérer les données du localStorage
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
+      const coreSkill = onboardingData.summary?.who_to_teach || '';
+      
+      setUser({ 
+        firstName: firstName, 
+        full_name: firstName,
+        coreSkill: coreSkill,
+        sessionId: 'local'
+      });
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {

@@ -92,7 +92,7 @@ export default function MarketAnalysis() {
       <div className="flex-1 ml-72">
         <TopBar 
           title="Analyse de marché" 
-          subtitle="Comprendre qui a besoin de ton savoir"
+          subtitle=""
           user={user}
         />
         

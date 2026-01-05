@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Play, Brain, Database, Cpu, Network, Search, Music, Code, Languages, Dumbbell, ChefHat, Camera, Sword, Sparkle, Video, Heart, User } from "lucide-react";
+import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Play, Brain, Database, Cpu, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 // Floating AI Icons Component
 const FloatingIcon = ({ icon: Icon, delay = 0, className = "", mobile = false }) =>
@@ -52,23 +51,8 @@ const features = [
 }];
 
 
-const categories = [
-  { icon: Music, label: "Musique", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
-  { icon: Code, label: "Code", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
-  { icon: Languages, label: "Langues", color: "bg-green-100 text-green-700 hover:bg-green-200" },
-  { icon: Dumbbell, label: "Sport", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
-  { icon: ChefHat, label: "Cuisine", color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" },
-  { icon: Camera, label: "Photo", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
-  { icon: Sword, label: "Jujitsu", color: "bg-red-100 text-red-700 hover:bg-red-200" },
-  { icon: Sparkle, label: "Intelligence artificielle", color: "bg-indigo-100 text-indigo-700 hover:bg-indigo-200" },
-  { icon: Video, label: "Montage vidéo", color: "bg-cyan-100 text-cyan-700 hover:bg-cyan-200" },
-  { icon: Heart, label: "Yoga", color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
-  { icon: User, label: "Mannequin", color: "bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200" },
-];
-
 export default function Welcome() {
   const navigate = useNavigate();
-  const [searchValue, setSearchValue] = useState('');
 
   const handleStart = () => {
     navigate(createPageUrl('OnboardingFirstName'));
@@ -76,10 +60,6 @@ export default function Welcome() {
 
   const handleLogin = () => {
     base44.auth.redirectToLogin(createPageUrl('Dashboard'));
-  };
-
-  const handleCategoryClick = (category) => {
-    setSearchValue(category);
   };
 
   return (
@@ -163,46 +143,20 @@ export default function Welcome() {
             Transforme ta passion en business rentable avec l'aide de l'intelligence artificielle
           </motion.p>
           
-          {/* Search Bar */}
+          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="mb-6 max-w-2xl mx-auto">
-            
-            <div className="relative backdrop-blur-sm bg-white/95 rounded-2xl shadow-xl p-2 flex items-center gap-3 border border-gray-200">
-              <Search className="w-5 h-5 text-gray-400 ml-3" />
-              <Input
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="Quelle compétence veux-tu transmettre !"
-                className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base"
-              />
-              <Button
-                onClick={handleStart}
-                className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all">
-                Démarrer
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          </motion.div>
+            className="flex justify-center mb-6">
 
-          {/* Category Tags */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="flex flex-wrap justify-center gap-3 mb-6 max-w-4xl mx-auto">
-            {categories.map((category, index) => (
-              <button
-                key={index}
-                onClick={() => handleCategoryClick(category.label)}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all hover:scale-105 ${category.color}`}
-              >
-                <category.icon className="w-4 h-4" />
-                {category.label}
-              </button>
-            ))}
+            <Button
+              onClick={handleStart}
+              className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-8 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
+
+              Commencer maintenant
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
           </motion.div>
           
           <p className="text-gray-500 text-sm">
@@ -278,7 +232,31 @@ export default function Welcome() {
         </motion.div>
       </div>
 
+      {/* Features Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.0 }}
+        className="w-full max-w-6xl mx-auto px-6 py-20">
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, index) =>
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 + index * 0.1 }}
+            className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-shadow">
+
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center mb-5">
+                <feature.icon className="w-7 h-7 text-[#61f7a2]" />
+              </div>
+              <h3 className="text-gray-900 font-bold text-lg mb-3">{feature.title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
 
       {/* 4 Steps Section */}
       <motion.div
@@ -295,8 +273,8 @@ export default function Welcome() {
         </div>
 
         {/* Title */}
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
-          4 étapes pour <span className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">démarrer</span>
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">4 étapes pour démarrer
+
         </h2>
 
         {/* Steps Grid */}
@@ -309,7 +287,7 @@ export default function Welcome() {
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
 
             <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/50 flex items-center justify-center">
                 <Target className="w-7 h-7 text-blue-600" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">01</span>
@@ -328,8 +306,8 @@ export default function Welcome() {
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
 
             <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center">
-                <Sparkles className="w-7 h-7 text-pink-600" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#61f7a2]/20 to-[#61f7a2]/10 flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-[#61f7a2]" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">02</span>
             </div>
@@ -347,7 +325,7 @@ export default function Welcome() {
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
 
             <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/50 flex items-center justify-center">
                 <FileText className="w-7 h-7 text-amber-600" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">03</span>
@@ -366,7 +344,7 @@ export default function Welcome() {
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
 
             <div className="flex items-start justify-between mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-50 to-green-100/50 flex items-center justify-center">
                 <TrendingUp className="w-7 h-7 text-green-600" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">04</span>
@@ -386,53 +364,21 @@ export default function Welcome() {
         transition={{ delay: 1.9 }}
         className="w-full bg-gradient-to-br from-gray-50 to-white py-24">
 
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="bg-white rounded-3xl shadow-xl p-12">
-            <div className="text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
-                Prêt à transformer tes <span className="text-[#61f7a2]">compétences</span> en véritable activité en ligne
-              </h2>
-              <p className="text-lg text-gray-600 mb-2">
-                Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA.
-              </p>
-              <p className="text-lg text-gray-900 font-semibold mb-8">
-                Commence dès maintenant !
-              </p>
+        <div className="max-w-2xl mx-auto text-center px-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
+            Prêt à transformer ta passion en business ?
+          </h2>
+          <p className="text-gray-600 text-lg mb-10 leading-relaxed">
+            Découvre comment ton savoir-faire peut devenir une source de revenus grâce à l'IA.
+          </p>
+          <div className="flex justify-center">
+            <Button
+              onClick={handleStart}
+              className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
 
-              {/* Three badges */}
-              <div className="flex flex-wrap justify-center gap-3 mb-8">
-                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
-                  <span className="text-gray-700 text-sm font-medium">✓ Inscription 100% gratuite</span>
-                </div>
-                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
-                  <span className="text-gray-700 text-sm font-medium">✓ Documents IA offerts</span>
-                </div>
-                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
-                  <span className="text-gray-700 text-sm font-medium">✓ Communauté vérifiée</span>
-                </div>
-              </div>
-
-              {/* Main CTA Button */}
-              <div className="flex justify-center mb-4">
-                <Button
-                  onClick={handleStart}
-                  className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Commencer gratuitement
-                </Button>
-              </div>
-
-              {/* Login link */}
-              <p className="text-gray-700 text-sm">
-                Déjà membre ?{' '}
-                <button
-                  onClick={handleLogin}
-                  className="font-bold underline hover:text-gray-900 transition-colors"
-                >
-                  Connecte-toi
-                </button>
-              </p>
-            </div>
+              <Sparkles className="w-5 h-5 mr-2" />
+              Commencer maintenant
+            </Button>
           </div>
         </div>
       </motion.div>
@@ -446,11 +392,11 @@ export default function Welcome() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-gray-900">PassionIA</p>
-                <p className="text-xs text-gray-600">
-                  Technologie d'intelligence artificielle développée par IAVNIR INC
-                </p>
+              <div className="text-lg text-gray-600 mb-2">Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA. Commence dès maintenant !
+
+
+
+
               </div>
             </div>
 

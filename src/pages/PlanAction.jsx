@@ -602,8 +602,8 @@ export default function PlanAction() {
           className="mb-16"
         >
           <div className="bg-gradient-to-br from-yellow-50 via-amber-50 to-yellow-100 rounded-3xl border-2 border-yellow-300 p-8 shadow-lg relative overflow-hidden">
-            <div className="absolute top-4 right-4">
-              <span className="px-4 py-1.5 bg-yellow-500 text-white text-sm font-bold rounded-full uppercase shadow-md">
+            <div className="absolute top-6 right-6">
+              <span className="px-6 py-3 bg-yellow-500 text-white text-lg font-bold rounded-full uppercase shadow-lg">
                 🎁 Bonus
               </span>
             </div>

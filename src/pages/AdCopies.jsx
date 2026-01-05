@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
-import { Sparkles, Loader2, Lock, Type, Image as ImageIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Sparkles, Loader2, Lock, Type, Image as ImageIcon, Brain } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
+import ChatBubble from '@/components/chat/ChatBubble';
 import { cn } from "@/lib/utils";
 import UpgradeModal from '@/components/paywall/UpgradeModal';
 
@@ -58,39 +60,43 @@ export default function AdCopies() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#11112b]">
+      <div className="flex items-center justify-center h-screen bg-white">
         <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#11112b]">
+    <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="AdCopies" progress={0} />
       
       <div className="flex-1 ml-72">
         <TopBar 
           title="Publicité ADS" 
-          subtitle="Génère tes publicités avec l'IA"
+          subtitle=""
           user={user}
         />
         
         <main className="p-8">
-          <div className="max-w-6xl mx-auto space-y-6">
+          <div className="max-w-6xl mx-auto space-y-8">
             
             {/* Header */}
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1b1b33] rounded-full mb-4">
-                <Sparkles className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm text-gray-300">Publicités générées par IA</span>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-left"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
+                <Brain className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-xs font-medium text-gray-700">Publicités générées par IA</span>
               </div>
-              <h1 className="text-4xl font-bold text-white mb-3">
-                Tes Publicités
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                Tes publicités
               </h1>
-              <p className="text-gray-400 text-lg">
-                Copies et visuels pour maximiser tes conversions
+              <p className="text-gray-600 text-lg">
+                Copies visuelles pour maximiser tes conversions
               </p>
-            </div>
+            </motion.div>
 
             {/* Ad Type Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -98,56 +104,59 @@ export default function AdCopies() {
                 const Icon = type.icon;
                 
                 return (
-                  <div
+                  <motion.div
                     key={type.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
                     className="relative"
-                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <div className="bg-[#1b1b33] border border-[#2a2a45] rounded-2xl p-6 transition-all duration-300 hover:border-[#61f7a2]/30 animate-fade-in">
-                      {/* Gradient Header */}
-                      <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-4`}>
-                        <Icon className="w-8 h-8 text-white" />
+                    <div className={cn(
+                      "bg-gray-50 border border-gray-200 rounded-2xl p-6 transition-all",
+                      showBlur && "opacity-60"
+                    )}>
+                      {/* Icon Header */}
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-4`}>
+                        <Icon className="w-7 h-7 text-white" />
                       </div>
 
                       {/* Content */}
-                      <div className={cn(
-                        "transition-all duration-700",
-                        showBlur && "blur-[2px]"
-                      )}>
-                        <h3 className="text-2xl font-bold text-white mb-2">
+                      <div>
+                        <p className="text-[#61f7a2] text-xs font-semibold uppercase tracking-wide mb-1">
+                          {type.subtitle}
+                        </p>
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">
                           {type.title}
                         </h3>
-                        <p className="text-[#61f7a2] text-sm mb-1">{type.subtitle}</p>
-                        <p className="text-gray-400 text-sm mb-6">{type.description}</p>
+                        <p className="text-gray-600 text-sm mb-6">{type.description}</p>
 
                         {/* Fake content */}
                         <div className="space-y-3">
-                          <div className="h-16 bg-[#0f0f1f] rounded-xl" />
-                          <div className="h-16 bg-[#0f0f1f] rounded-xl" />
-                          <div className="h-16 bg-[#0f0f1f] rounded-xl" />
+                          <div className="h-16 bg-white border border-gray-200 rounded-xl" />
+                          <div className="h-16 bg-white border border-gray-200 rounded-xl" />
+                          <div className="h-16 bg-white border border-gray-200 rounded-xl" />
                         </div>
                       </div>
                     </div>
 
                     {/* Lock Overlay */}
-                    <div className={cn(
-                      "absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl transition-opacity duration-700",
-                      showBlur ? "opacity-100" : "opacity-0 pointer-events-none"
-                    )}>
-                      <Lock className="w-12 h-12 text-[#61f7a2] mb-4" />
-                      <h4 className="text-xl font-bold text-white mb-2">Premium</h4>
-                      <p className="text-gray-400 text-sm mb-4 text-center px-6">
-                        Débloque cette fonctionnalité
-                      </p>
-                      <GlowButton
-                        onClick={() => setShowUpgradeModal(true)}
-                        variant="primary"
-                        size="sm"
-                      >
-                        Passer à Premium
-                      </GlowButton>
-                    </div>
-                  </div>
+                    {showBlur && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl">
+                        <Lock className="w-10 h-10 text-gray-400 mb-3" />
+                        <h4 className="text-lg font-bold text-gray-900 mb-2">Premium</h4>
+                        <p className="text-gray-600 text-sm mb-4 text-center px-6">
+                          Débloque cette fonctionnalité
+                        </p>
+                        <GlowButton
+                          onClick={() => setShowUpgradeModal(true)}
+                          variant="primary"
+                          size="sm"
+                        >
+                          Passer à Premium
+                        </GlowButton>
+                      </div>
+                    )}
+                  </motion.div>
                 );
               })}
             </div>
@@ -156,6 +165,7 @@ export default function AdCopies() {
       </div>
 
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+      <ChatBubble />
     </div>
   );
 }

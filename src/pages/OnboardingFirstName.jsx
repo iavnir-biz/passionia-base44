@@ -141,33 +141,17 @@ export default function OnboardingFirstName() {
     
     setIsLoading(true);
     try {
-      const currentUser = await base44.auth.me();
+      // Sauvegarder le prénom dans localStorage
+      localStorage.setItem('onboarding_firstName', firstName.trim());
       
-      // Créer ou récupérer une session
-      let sessionId = currentUser.sessionId;
-      if (!sessionId) {
-        const sessions = await base44.entities.Session.filter({ 
-          created_by: currentUser.email 
-        });
-        
-        if (sessions.length > 0) {
-          sessionId = sessions[0].id;
-        } else {
-          const newSession = await base44.entities.Session.create({
-            onboarding_history: [],
-            onboarding_summary: {},
-            current_question: null,
-            is_onboarding_done: false
-          });
-          sessionId = newSession.id;
-        }
-      }
-      
-      // Sauvegarder le prénom et la session
-      await base44.auth.updateMe({ 
-        full_name: firstName.trim(),
-        sessionId 
-      });
+      // Initialiser les données d'onboarding
+      const onboardingData = {
+        history: [],
+        summary: {},
+        current_question: null,
+        is_onboarding_done: false
+      };
+      localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
       
       // Navigation vers OnboardingDynamic
       navigate(createPageUrl('OnboardingDynamic'));

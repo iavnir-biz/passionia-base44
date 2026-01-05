@@ -121,10 +121,9 @@ export default function PlanAction() {
 
   const handleCheckout = async () => {
     try {
-      const { data } = await base44.functions.invoke('createCheckout');
+      const { data } = await base44.functions.invoke('createCheckout', {});
       
       if (data.success && data.url) {
-        // Rediriger vers Stripe Checkout
         window.location.href = data.url;
       } else {
         console.error('Checkout failed:', data.error);

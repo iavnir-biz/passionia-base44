@@ -19,7 +19,7 @@ export default function OnboardingQ23Obstacles() {
       fieldName="perceivedObstacles"
       nextPage="OnboardingQ24IfNothingChanges"
       prevPage="OnboardingQ22Lifestyle"
-      progress={89}
+      progress={85}
     />
   );
 }

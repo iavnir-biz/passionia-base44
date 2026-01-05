@@ -306,54 +306,36 @@ export default function OnboardingQuestionPage({
           </div>
         </div>
 
-        {/* Progress vertical avec marqueur fusée */}
+        {/* Progress vertical - nouvelle barre pour étape 2 */}
         <div className="flex-1 flex flex-col items-center w-full max-w-[200px]">
           <div className="relative w-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
-            {/* Barre de progression */}
             <motion.div 
               className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#61f7a2] to-[#4de88f]"
               initial={{ height: '0%' }}
               animate={{ height: `${progress}%` }}
               transition={{ duration: 0.5 }}
             />
+          </div>
 
-            {/* Marqueur 50% (fusée) */}
-            <motion.div 
-              className="absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white border-2 border-[#61f7a2] flex items-center justify-center shadow-lg"
-              style={{ top: '50%', transform: 'translate(-50%, -50%)' }}
-              animate={{
-                scale: progress >= 50 ? [1, 1.2, 1] : 1,
-              }}
-              transition={{
-                duration: 0.5,
-                repeat: progress >= 50 ? Infinity : 0,
-              }}
+          <div className="mt-4 text-center space-y-3">
+            <p className="text-2xl font-bold text-[#61f7a2]">{Math.round(progress)}%</p>
+
+            {/* Teaser permanent */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-[#61f7a2] rounded-xl p-3 w-full"
             >
-              <span className="text-base">🚀</span>
+              <p className="text-xs font-bold text-gray-900 mb-1 text-center">🎁 Vous attendent</p>
+              <div className="space-y-0.5 text-xs text-gray-700">
+                <div>✨ Offres personnalisées</div>
+                <div>💰 Prix optimisés</div>
+                <div>📄 Page de vente</div>
+                <div>🎯 Offre complète</div>
+              </div>
             </motion.div>
           </div>
-
-          <div className="mt-4 text-center">
-            <p className="text-2xl font-bold text-[#61f7a2]">{Math.round(progress)}%</p>
-          </div>
         </div>
-
-        {/* Teaser à 100% */}
-        {progress === 100 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 bg-gradient-to-br from-green-50 to-blue-50 border-2 border-[#61f7a2] rounded-2xl p-4 w-full"
-          >
-            <p className="text-xs font-bold text-gray-900 mb-2 text-center">🎁 Prochaine étape</p>
-            <div className="space-y-1 text-xs text-gray-700">
-              <div>✨ Vos offres personnalisées</div>
-              <div>💰 Vos prix optimisés</div>
-              <div>📄 Votre page de vente</div>
-              <div>🎯 Votre offre complète</div>
-            </div>
-          </motion.div>
-        )}
       </div>
 
       {/* Main content */}

@@ -11,7 +11,7 @@ export default function OnboardingQ25Readiness() {
       fieldName="readinessScore"
       nextPage="OnboardingQ26DeliveryPreferences"
       prevPage="OnboardingQ24IfNothingChanges"
-      progress={96}
+      progress={95}
     />
   );
 }

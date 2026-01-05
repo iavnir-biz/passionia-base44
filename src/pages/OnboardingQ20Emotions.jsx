@@ -72,7 +72,7 @@ export default function OnboardingQ20Emotions() {
       fieldName="emotionalBenefits"
       nextPage="OnboardingQ21Relatives"
       prevPage="OnboardingQ19Impact"
-      progress={79}
+      progress={64}
     />
   );
 }

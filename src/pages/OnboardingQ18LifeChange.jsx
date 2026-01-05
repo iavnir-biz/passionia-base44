@@ -11,7 +11,7 @@ export default function OnboardingQ18LifeChange() {
       fieldName="lifeChangeStory"
       nextPage="OnboardingQ19Impact"
       prevPage="OnboardingQ17TargetDelay"
-      progress={73}
+      progress={50}
     />
   );
 }

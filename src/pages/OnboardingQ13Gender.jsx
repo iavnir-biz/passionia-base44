@@ -15,7 +15,7 @@ export default function OnboardingQ13Gender() {
       fieldName="gender"
       nextPage="OnboardingQ14Family"
       prevPage="OnboardingQ12AgeRange"
-      progress={54}
+      progress={14}
     />
   );
 }

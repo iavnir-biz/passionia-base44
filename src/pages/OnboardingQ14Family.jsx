@@ -16,7 +16,7 @@ export default function OnboardingQ14Family() {
       fieldName="familyStatus"
       nextPage="OnboardingQ15CurrentIncome"
       prevPage="OnboardingQ13Gender"
-      progress={58}
+      progress={21}
     />
   );
 }

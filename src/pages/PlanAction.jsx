@@ -699,37 +699,53 @@ export default function PlanAction() {
           transition={{ delay: 2.1 }}
           className="mb-16"
         >
-          <div className="bg-white rounded-3xl border-2 border-gray-200 p-8 shadow-lg">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-[#61f7a2] flex items-center justify-center flex-shrink-0">
-                <BarChart className="w-7 h-7 text-white" />
+          {(() => {
+            const packPrice = 67;
+            const mainProductPrice = parsePrice(products[0]?.data?.price);
+            const salesNeeded = mainProductPrice > 0 ? Math.ceil(packPrice / mainProductPrice) : 0;
+            const totalFromSales = salesNeeded * mainProductPrice;
+
+            return (
+              <div className="bg-white rounded-3xl border-2 border-gray-200 p-8 shadow-lg">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-[#61f7a2] flex items-center justify-center flex-shrink-0">
+                    <BarChart className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    Rentabilise ton investissement dès les premières ventes
+                  </h3>
+                </div>
+
+                <div className="bg-gradient-to-br from-[#61f7a2]/10 to-green-50 rounded-2xl border border-[#61f7a2]/30 p-6 mb-6">
+                  <p className="text-gray-800 text-lg mb-4">
+                    Le pack est à <span className="font-bold text-[#61f7a2]">67€</span>. 
+                    Ton produit principal est à <span className="font-bold text-[#61f7a2]">{products[0]?.data?.price || '—'}</span>.
+                  </p>
+                  {salesNeeded > 0 && (
+                    <>
+                      <p className="text-gray-900 text-xl font-bold">
+                        Il te suffira de faire <span className="text-[#61f7a2]">{salesNeeded} {salesNeeded === 1 ? 'vente' : 'ventes'}</span> pour que ce soit 
+                        <span className="text-[#61f7a2]"> 100% remboursé</span>. 
+                      </p>
+                      <p className="text-gray-600 text-base mt-2">
+                        ({salesNeeded} × {products[0]?.data?.price} = {totalFromSales}€)
+                      </p>
+                      <p className="text-gray-900 text-lg font-semibold mt-3">
+                        Tout le reste, c'est 100% de bénéfice pour toi. 💰
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-center gap-3 bg-gray-50 rounded-xl p-4">
+                  <Clock className="w-6 h-6 text-[#61f7a2]" />
+                  <p className="text-gray-700 font-medium">
+                    L'objectif : ta première vente dans les 24 heures après avoir lancé
+                  </p>
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">
-                Rentabilise ton investissement dès la première vente
-              </h3>
-            </div>
-
-            <div className="bg-gradient-to-br from-[#61f7a2]/10 to-green-50 rounded-2xl border border-[#61f7a2]/30 p-6 mb-6">
-              <p className="text-gray-800 text-lg mb-4">
-                Le pack est à <span className="font-bold text-[#61f7a2]">67€</span>. 
-                Ton produit principal est à <span className="font-bold text-[#61f7a2]">{products[0]?.data?.price || '—'}</span>.
-              </p>
-              <p className="text-gray-900 text-xl font-bold">
-                Il te suffira de faire <span className="text-[#61f7a2]">2 ventes</span> pour que ce soit 
-                <span className="text-[#61f7a2]"> 100% remboursé</span>. 
-              </p>
-              <p className="text-gray-700 text-lg mt-2">
-                Tout le reste, c'est 100% de bénéfice pour toi. 💰
-              </p>
-            </div>
-
-            <div className="flex items-center justify-center gap-3 bg-gray-50 rounded-xl p-4">
-              <Clock className="w-6 h-6 text-[#61f7a2]" />
-              <p className="text-gray-700 font-medium">
-                L'objectif : ta première vente dans les 24 heures après avoir lancé
-              </p>
-            </div>
-          </div>
+            );
+          })()}
         </motion.div>
 
         {/* 7️⃣ CTA FINAL */}

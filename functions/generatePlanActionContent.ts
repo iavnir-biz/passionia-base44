@@ -25,8 +25,28 @@ RÈGLES D'OR NOVA :
 - Chaque phrase doit donner envie d'agir MAINTENANT
 - Utilise les VRAIS noms de produits et VRAIS prix
 - Reformule tout pour qu'il soit spécifique à SA passion et SES offres
-- CRITIQUE : L'utilisateur n'est PAS un apprenant, c'est un CRÉATEUR qui va MONÉTISER son savoir
-- Le finalCTA doit parler de "transformer son savoir/expertise en revenus", JAMAIS "transformer sa passion en aventure"
+
+🚨 CRITIQUE - POSITIONNEMENT UTILISATEUR 🚨
+- L'utilisateur est un CRÉATEUR, un ENSEIGNANT, un EXPERT qui va TRANSMETTRE son savoir
+- L'utilisateur va ENSEIGNER à d'autres, PAS apprendre lui-même
+- L'utilisateur va MONÉTISER son expertise, créer un BUSINESS d'enseignement
+- Ses ÉLÈVES vont apprendre, pas lui
+- Il va transformer sa COMPÉTENCE en SOURCE DE REVENUS
+
+❌ EXEMPLES À NE JAMAIS UTILISER ❌
+- "Prêt à te lancer dans l'aventure du piano" → NON, c'est lui qui ENSEIGNE le piano
+- "Transforme ta passion en aventure" → NON, il transforme son SAVOIR en REVENUS
+- "Apprends le piano" → NON, il va ENSEIGNER le piano à ses élèves
+- Toute formulation qui positionne l'utilisateur comme un APPRENANT
+
+✅ EXEMPLES CORRECTS ✅
+- "Prêt à transformer ton expertise en source de revenus ?"
+- "Prêt à enseigner [compétence] et en vivre ?"
+- "Prêt à monétiser ton savoir-faire ?"
+- "Prêt à créer ton business d'enseignement ?"
+
+Le finalCTA doit TOUJOURS parler de MONÉTISATION, ENSEIGNEMENT, BUSINESS, REVENUS.
+JAMAIS "aventure", JAMAIS positionner l'utilisateur comme quelqu'un qui va apprendre.
 
 INTERDICTIONS ABSOLUES :
 - Ne JAMAIS répéter mot pour mot des formulations précédentes
@@ -93,8 +113,8 @@ Structure JSON STRICTE à respecter :
     }
   ],
   "finalCTA": {
-    "title": "titre final motivant orienté MONÉTISATION et REVENUS (jamais 'aventure')",
-    "subtitle": "sous-titre rassurant orienté transformation du savoir en source de revenus"
+    "title": "titre final orienté ENSEIGNEMENT et MONÉTISATION (l'utilisateur va ENSEIGNER, pas apprendre)",
+    "subtitle": "sous-titre sur la transformation de l'EXPERTISE en REVENUS (business d'enseignement)"
   }
 }`;
 

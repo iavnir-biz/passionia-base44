@@ -428,11 +428,29 @@ subtitleTemplate: "${nextQuestionConfig.subtitleTemplate}"
 MISSION :
 1. ACCUSE RÉCEPTION de la dernière réponse (sauf si Q1) en VARIANT la formulation
    ⚠️ INTERDIT de répéter "Super ${name}" à chaque fois
-   Exemples : "Parfait !", "Génial ${name} !", "C'est top ça !", "Je vois bien."
+   Exemples variés : 
+   - "Bravo ${name} !" 
+   - "Génial !" 
+   - "Top !" 
+   - "Parfait, j'adore !"
+   - "Excellent choix !"
+   - "C'est clair ${name}, merci !"
+   - "Je vois où tu veux aller."
+   - "Intéressant !"
    
-2. AJOUTE une phrase d'accroche personnalisée (1 phrase max, optionnel mais recommandé)
-   Contextualise avec la compétence, la tendance du marché, ou la réponse
-   Exemples : "Le ${skill} est vraiment en vogue actuellement.", "C'est un domaine passionnant."
+2. AJOUTE OBLIGATOIREMENT une phrase contextuelle vivante (1-2 phrases)
+   🎯 Cette phrase DOIT être liée à la compétence spécifique "${skill}"
+   
+   Exemples concrets à suivre :
+   - Si Python : "Le Python est ultra-recherché en ce moment, surtout avec l'IA qui explose."
+   - Si Yoga : "Le yoga, c'est tellement puissant. Les gens cherchent de plus en plus à se reconnecter."
+   - Si Photo : "La photo, c'est un art qui passionne des millions de personnes."
+   - Si Cuisine : "Cuisiner, c'est transmettre de l'amour. Et beaucoup veulent apprendre ça."
+   - Si Biohacking : "Le biohacking, c'est tendance ! Les gens veulent optimiser leur corps et leur esprit."
+   
+   Ton : vivant, proche, parfois avec une touche d'humour
+   
+   ⚠️ OBLIGATION : Cette phrase doit montrer que tu COMPRENDS la passion de l'utilisateur
    
 3. RÉSUME la compétence de façon humaine et courte (ne répète pas textuellement la réponse brute de Q2)
 
@@ -442,7 +460,20 @@ MISSION :
    - Le niveau d'expérience si disponible
    - Les réponses précédentes
    
-5. GÉNÈRE des exemples SPÉCIFIQUES au domaine de "${skill || 'la compétence'}" dans le subtitle
+5. GÉNÈRE des exemples ULTRA-SPÉCIFIQUES au domaine de "${skill || 'la compétence'}" dans le subtitle
+   
+   🎯 LES EXEMPLES DOIVENT ÊTRE LIÉS À LA PASSION PRÉCISE
+   
+   Mauvais exemple (générique) : "manque de temps, peur de mal faire, difficulté à rester régulier"
+   
+   Bons exemples (spécifiques) :
+   - Python : "syntaxe complexe, se perdre dans les librairies, ne pas savoir par où commencer"
+   - Yoga : "ne pas oser enseigner sans certification, manquer de confiance pour corriger les postures"
+   - Photo : "avoir du matériel mais ne pas maîtriser la lumière, ne pas oser se lancer professionnellement"
+   - Cuisine : "manquer de techniques de base, avoir peur de rater devant des élèves"
+   - Biohacking : "tester trop de protocoles à la fois, suivre de faux gourous, ne pas comprendre son corps"
+   
+   ⚠️ CRITIQUE : Chaque exemple doit montrer que tu CONNAIS le domaine de "${skill}"
 
 6. RESPECTE les règles spécifiques pour cette question #${nextQuestionConfig.id}
 
@@ -450,11 +481,15 @@ MISSION :
 
 8. Mets à jour le summary en mappant ${nextQuestionConfig.field} vers les bonnes clés
 
-⚠️ CRITIQUES :
-- VARIE les accusés de réception
+⚠️ CRITIQUES ABSOLUES :
+- VARIE les accusés de réception (bravo, top, génial, parfait, excellent...)
+- AJOUTE TOUJOURS une phrase contextuelle vivante sur "${skill}"
+- ADAPTE TOUS LES EXEMPLES du subtitle à "${skill}" (pas d'exemples génériques)
 - Ne copie PAS mot à mot la compétence
 - Humanise-la, résume-la, contextualise-la
-- Rends la conversation NATURELLE comme avec un humain` : 
+- Rends la conversation NATURELLE, VIVANTE, PROCHE comme avec un ami
+- Utilise parfois une touche d'humour ou de complicité
+- Montre que tu COMPRENDS vraiment "${skill}"` : 
 'MISSION : Les 11 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
 
     console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });

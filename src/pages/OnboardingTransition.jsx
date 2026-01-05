@@ -95,16 +95,16 @@ export default function OnboardingTransition() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-3xl"
+        className="w-full max-w-2xl"
       >
-        <div className="bg-white rounded-3xl p-10 border border-gray-200 shadow-lg">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
           {/* Cerveau IA animé au centre */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-6">
             <motion.div
               animate={{ 
                 scale: [1, 1.05, 1],
@@ -117,17 +117,17 @@ export default function OnboardingTransition() {
               }}
               className="relative"
             >
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-2xl">
-                <Brain className="w-10 h-10 text-white" />
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-xl">
+                <Brain className="w-8 h-8 text-white" />
               </div>
               {/* Particules animées autour */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-4"
+                className="absolute -inset-3"
               >
-                <Zap className="absolute top-0 left-1/2 w-4 h-4 text-[#61f7a2] opacity-60" />
-                <Sparkles className="absolute bottom-0 right-0 w-4 h-4 text-[#4de88f] opacity-60" />
+                <Zap className="absolute top-0 left-1/2 w-3 h-3 text-[#61f7a2] opacity-60" />
+                <Sparkles className="absolute bottom-0 right-0 w-3 h-3 text-[#4de88f] opacity-60" />
               </motion.div>
             </motion.div>
           </div>
@@ -137,7 +137,7 @@ export default function OnboardingTransition() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-3xl font-bold text-gray-900 mb-4 text-center leading-relaxed"
+            className="text-2xl font-bold text-gray-900 mb-3 text-center leading-tight"
           >
             Merci pour toutes ces réponses, {user?.firstName} !<br />
             Je peux déjà te dire que ta passion vaut de l'or 💎
@@ -148,7 +148,7 @@ export default function OnboardingTransition() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-gray-600 text-center mb-8 leading-relaxed"
+            className="text-gray-600 text-center mb-6 leading-relaxed text-sm"
           >
             J'analyse tes réponses pour construire une stratégie claire, simple et rentable, totalement personnalisée pour toi.
             <br />
@@ -160,13 +160,13 @@ export default function OnboardingTransition() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="mb-8"
+            className="mb-6"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-gray-700">🔍 Analyse de ton potentiel en cours</span>
-              <span className="text-sm font-bold text-[#61f7a2]">{progress}%</span>
+              <span className="text-xs font-semibold text-gray-700">🔍 Analyse de ton potentiel</span>
+              <span className="text-xs font-bold text-[#61f7a2]">{progress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-full"
                 initial={{ width: '78%' }}
@@ -179,7 +179,7 @@ export default function OnboardingTransition() {
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="text-xs text-gray-500 mt-2"
+              className="text-xs text-gray-500 mt-1"
             >
               {statusText}
             </motion.p>
@@ -190,13 +190,12 @@ export default function OnboardingTransition() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="mb-8"
           >
-            <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
-              🎁 Ce que je suis en train de construire pour toi
+            <h2 className="text-lg font-bold text-gray-900 mb-4 text-center">
+              🎁 Ce que je construis pour toi
             </h2>
             
-            <div className="space-y-4">
+            <div className="space-y-2">
               <AnimatePresence>
                 {items.slice(0, visibleItems).map((item, index) => (
                   <motion.div
@@ -204,15 +203,15 @@ export default function OnboardingTransition() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="flex items-start gap-4 p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl border border-green-200"
+                    className="flex items-start gap-3 p-3 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200"
                   >
-                    <div className="flex-shrink-0 w-10 h-10 bg-[#61f7a2] rounded-xl flex items-center justify-center">
-                      <item.icon className="w-5 h-5 text-white" />
+                    <div className="flex-shrink-0 w-8 h-8 bg-[#61f7a2] rounded-lg flex items-center justify-center">
+                      <item.icon className="w-4 h-4 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                      <h3 className="font-semibold text-gray-900 text-sm mb-0.5">{item.title}</h3>
                       {item.subtitle && (
-                        <p className="text-sm text-gray-600">{item.subtitle}</p>
+                        <p className="text-xs text-gray-600">{item.subtitle}</p>
                       )}
                     </div>
                   </motion.div>

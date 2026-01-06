@@ -45,12 +45,13 @@ export default function OnboardingDynamic() {
       setSession({ id: 'local', onboarding_history: onboardingData.history || [], firstName: firstName });
       
       const history = onboardingData.history || [];
-      setQuestionCount(Math.min(history.length, 11) + 1);
+      setQuestionCount(Math.min(history.length + 1, 11));
 
-      // Si pas de question courante, demander la première
-      if (!onboardingData.current_question) {
+      // Si pas de question courante OU si l'historique est vide, demander la première question
+      if (!onboardingData.current_question || history.length === 0) {
         await fetchNextQuestion('local', null, onboardingData);
       } else {
+        // Si on a déjà une question et un historique, afficher la question actuelle
         setCurrentQuestion(onboardingData.current_question);
         initializeValue(onboardingData.current_question.type, onboardingData.current_question);
         setIsLoading(false);
@@ -119,10 +120,15 @@ export default function OnboardingDynamic() {
     if (!canProceed()) return;
     
     setIsSaving(true);
-    setIsLoading(true); // Afficher l'animation de chargement
+    setIsLoading(true);
     await fetchNextQuestion(session.id, value);
     setValue('');
     setIsSaving(false);
+    
+    // Mettre à jour la session locale pour la progression
+    const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
+    setSession({ id: 'local', onboarding_history: onboardingData.history || [], firstName: onboardingData.firstName });
+    setQuestionCount(Math.min((onboardingData.history?.length || 0) + 1, 11));
   };
 
   const canProceed = () => {
@@ -296,9 +302,14 @@ export default function OnboardingDynamic() {
   // Étape 1 : 0-100% (11 questions)
   const progress = Math.min(((session?.onboarding_history?.length || 0) / 11) * 100, 100);
 
+  // Calculer les étapes complétées basées sur la progression
+  const completedSteps = [];
+  const historyLength = session?.onboarding_history?.length || 0;
+  if (historyLength >= 11) completedSteps.push(1); // Tes talents
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
-      <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={[]} />
+      <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">

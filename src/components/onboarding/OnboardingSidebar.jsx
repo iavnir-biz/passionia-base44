@@ -72,7 +72,7 @@ const ONBOARDING_STEPS = [
   }
 ];
 
-export default function OnboardingSidebar({ currentPage, completedSteps = [] }) {
+export default function OnboardingSidebar({ currentPage, completedSteps = [], progressInStep = 0 }) {
   // Déterminer l'étape active basée sur la page courante
   const activeStep = ONBOARDING_STEPS.find(step => 
     step.pages.includes(currentPage)

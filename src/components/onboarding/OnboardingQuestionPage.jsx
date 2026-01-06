@@ -40,7 +40,8 @@ export default function OnboardingQuestionPage({
   prevPage,
   progress,
   buttonText = 'Continuer',
-  blockType = null // 'profile' ou 'objectives'
+  blockType = null, // 'profile' ou 'objectives'
+  useLocalStorage = false // Pour les questions avant authentification
 }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -71,11 +72,24 @@ export default function OnboardingQuestionPage({
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-      
-      if (currentUser[fieldName] !== undefined && currentUser[fieldName] !== null) {
-        setValue(currentUser[fieldName]);
+      if (useLocalStorage) {
+        // Mode localStorage pour questions avant auth
+        const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
+        const firstName = localStorage.getItem('onboarding_firstName') || '';
+        const storedValue = localStorage.getItem(`onboarding_${fieldName}`);
+        
+        setUser({ firstName });
+        if (storedValue) {
+          setValue(inputType === 'checkbox' ? JSON.parse(storedValue) : storedValue);
+        }
+      } else {
+        // Mode base44 classique
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+        
+        if (currentUser[fieldName] !== undefined && currentUser[fieldName] !== null) {
+          setValue(currentUser[fieldName]);
+        }
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -98,54 +112,63 @@ export default function OnboardingQuestionPage({
     
     setIsSaving(true);
     try {
-      await base44.auth.updateMe({ [fieldName]: value });
-      
-      if (nextPage === 'OfferGenerationStart') {
-        if (user.sessionId) {
-          const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-          if (sessions.length > 0) {
-            const session = sessions[0];
-            const onboardingFull = session.onboarding_full || {};
-            const summary = session.onboarding_summary || {};
-            
-            onboardingFull[fieldName] = value;
-            
-            if (fieldName === 'deliveryPreferences') {
-              summary.format_preferences = value;
+      if (useLocalStorage) {
+        // Mode localStorage
+        localStorage.setItem(`onboarding_${fieldName}`, 
+          inputType === 'checkbox' ? JSON.stringify(value) : value
+        );
+        navigate(createPageUrl(nextPage));
+      } else {
+        // Mode base44 classique
+        await base44.auth.updateMe({ [fieldName]: value });
+        
+        if (nextPage === 'OfferGenerationStart') {
+          if (user.sessionId) {
+            const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+            if (sessions.length > 0) {
+              const session = sessions[0];
+              const onboardingFull = session.onboarding_full || {};
+              const summary = session.onboarding_summary || {};
+              
+              onboardingFull[fieldName] = value;
+              
+              if (fieldName === 'deliveryPreferences') {
+                summary.format_preferences = value;
+              }
+              
+              await base44.entities.Session.update(user.sessionId, { 
+                onboarding_full: onboardingFull,
+                onboarding_summary: summary
+              });
             }
-            
-            await base44.entities.Session.update(user.sessionId, { 
-              onboarding_full: onboardingFull,
-              onboarding_summary: summary
-            });
+          }
+          
+          const currentUser = await base44.auth.me();
+          await base44.auth.updateMe({ 
+            onboarding_completed: true,
+            targetAudience: currentUser.targetAudience || '',
+            mainProblem: currentUser.mainProblem || '',
+            firstResult: currentUser.firstResult || '',
+            finalTransformation: currentUser.finalTransformation || '',
+            uniqueMethod: currentUser.uniqueMethod || '',
+            typicalMistake: currentUser.typicalMistake || '',
+            extraDetail: currentUser.extraDetail || '',
+            deliveryPreferences: currentUser.deliveryPreferences || []
+          });
+        } else {
+          if (user.sessionId) {
+            const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+            if (sessions.length > 0) {
+              const session = sessions[0];
+              const onboardingFull = session.onboarding_full || {};
+              onboardingFull[fieldName] = value;
+              await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
+            }
           }
         }
         
-        const currentUser = await base44.auth.me();
-        await base44.auth.updateMe({ 
-          onboarding_completed: true,
-          targetAudience: currentUser.targetAudience || '',
-          mainProblem: currentUser.mainProblem || '',
-          firstResult: currentUser.firstResult || '',
-          finalTransformation: currentUser.finalTransformation || '',
-          uniqueMethod: currentUser.uniqueMethod || '',
-          typicalMistake: currentUser.typicalMistake || '',
-          extraDetail: currentUser.extraDetail || '',
-          deliveryPreferences: currentUser.deliveryPreferences || []
-        });
-      } else {
-        if (user.sessionId) {
-          const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-          if (sessions.length > 0) {
-            const session = sessions[0];
-            const onboardingFull = session.onboarding_full || {};
-            onboardingFull[fieldName] = value;
-            await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
-          }
-        }
+        navigate(createPageUrl(nextPage));
       }
-      
-      navigate(createPageUrl(nextPage));
     } catch (error) {
       console.error('Error saving:', error);
     } finally {

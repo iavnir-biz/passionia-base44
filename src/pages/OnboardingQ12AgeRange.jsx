@@ -18,6 +18,8 @@ export default function OnboardingQ12AgeRange() {
       nextPage="OnboardingQ13Gender"
       prevPage="OnboardingTransition"
       progress={7}
+      blockType="profile"
+      useLocalStorage={true}
     />
   );
 }

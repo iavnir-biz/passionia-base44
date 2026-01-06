@@ -43,6 +43,7 @@ export default function OfferTaVieFuture() {
   const [futureVision, setFutureVision] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
+  const [offerData, setOfferData] = useState({});
 
   useEffect(() => {
     loadUser();

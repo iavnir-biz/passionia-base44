@@ -13,6 +13,8 @@ export default function OnboardingQ16TargetIncome() {
       nextPage="OnboardingQ17TargetDelay"
       prevPage="OnboardingQ15CurrentIncome"
       progress={35}
+      blockType="objectives"
+      useLocalStorage={true}
     />
   );
 }

@@ -17,6 +17,8 @@ export default function OnboardingQ14Family() {
       nextPage="OnboardingQ15CurrentIncome"
       prevPage="OnboardingQ13Gender"
       progress={21}
+      blockType="profile"
+      useLocalStorage={true}
     />
   );
 }

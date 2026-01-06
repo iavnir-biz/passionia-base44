@@ -16,6 +16,8 @@ export default function OnboardingQ13Gender() {
       nextPage="OnboardingQ14Family"
       prevPage="OnboardingQ12AgeRange"
       progress={14}
+      blockType="profile"
+      useLocalStorage={true}
     />
   );
 }

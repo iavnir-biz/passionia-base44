@@ -169,9 +169,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                     "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all relative",
                     isCompleted 
                       ? "bg-gray-100" 
-                      : isActive
-                      ? `bg-gradient-to-br ${step.color}`
-                      : "bg-gray-50"
+                      : `bg-gradient-to-br ${step.color}`
                   )}>
                     {isCompleted ? (
                       <>
@@ -185,7 +183,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                         </motion.div>
                       </>
                     ) : (
-                      <Icon className={cn("w-5 h-5", isActive ? "text-white" : "text-gray-400")} />
+                      <Icon className={cn("w-5 h-5 text-white")} />
                     )}
                   </div>
 
@@ -259,13 +257,18 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   )}
                 >
                   <div className={cn(
-                    "w-6 h-6 rounded-lg flex items-center justify-center",
+                    "w-6 h-6 rounded-lg flex items-center justify-center relative",
                     isCompleted 
-                      ? "bg-[#61f7a2]" 
+                      ? "bg-gray-100" 
                       : `bg-gradient-to-br ${step.color}`
                   )}>
                     {isCompleted ? (
-                      <CheckCircle2 className="w-3 h-3 text-white" />
+                      <>
+                        <Icon className="w-3 h-3 text-gray-400" />
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#61f7a2] rounded-full flex items-center justify-center border border-white">
+                          <CheckCircle2 className="w-2 h-2 text-white" />
+                        </div>
+                      </>
                     ) : (
                       <Icon className="w-3 h-3 text-white" />
                     )}

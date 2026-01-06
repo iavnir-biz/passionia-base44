@@ -309,9 +309,42 @@ export default function Welcome() {
         className="w-full max-w-6xl mx-auto px-6 py-20">
 
         {/* Title */}
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8">
           4 étapes pour <span className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">démarrer</span>
         </h2>
+
+        {/* Progress Bar */}
+        <div className="max-w-3xl mx-auto mb-16 px-6">
+          <div className="relative">
+            {/* Background Line */}
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2" />
+            
+            {/* Animated Progress Line */}
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 2, delay: 1.6, ease: "easeInOut" }}
+              className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] -translate-y-1/2"
+            />
+            
+            {/* Step Circles */}
+            <div className="relative flex justify-between">
+              {[1, 2, 3, 4].map((step, index) => (
+                <motion.div
+                  key={step}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 1.5 + (index * 0.15), duration: 0.3 }}
+                  className="flex flex-col items-center"
+                >
+                  <div className="w-10 h-10 rounded-full bg-white border-2 border-[#61f7a2] flex items-center justify-center shadow-md">
+                    <span className="text-[#61f7a2] font-bold text-sm">{step}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
 
         {/* Steps Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

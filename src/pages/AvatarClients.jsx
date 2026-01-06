@@ -64,10 +64,16 @@ export default function AvatarClients() {
       });
       
       if (sessions.length > 0) {
-        setSession(sessions[0]);
-        if (sessions[0].generated_avatars) {
-          setAvatars(sessions[0].generated_avatars);
+        const userSession = sessions[0];
+        setSession(userSession);
+        console.log('Session loaded:', userSession);
+        console.log('Generated avatars:', userSession.generated_avatars);
+        
+        if (userSession.generated_avatars) {
+          setAvatars(userSession.generated_avatars);
         }
+      } else {
+        console.error('No session found for user');
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -88,12 +94,16 @@ export default function AvatarClients() {
         session
       });
 
-      setAvatars(response.data.avatars);
+      const generatedAvatars = response.data.avatars;
+      setAvatars(generatedAvatars);
 
       // Save to session
       await base44.entities.Session.update(session.id, {
-        generated_avatars: response.data.avatars
+        generated_avatars: generatedAvatars
       });
+
+      // Recharger pour confirmer
+      await loadData();
 
       toast.success('Avatars générés avec succès !');
     } catch (error) {

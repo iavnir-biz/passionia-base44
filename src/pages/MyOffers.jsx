@@ -46,10 +46,16 @@ export default function MyOffers() {
       });
       
       if (sessions.length > 0) {
-        setSession(sessions[0]);
-        if (sessions[0].my_generated_offers) {
-          setGeneratedOffers(sessions[0].my_generated_offers);
+        const userSession = sessions[0];
+        setSession(userSession);
+        console.log('Session loaded:', userSession);
+        console.log('My generated offers:', userSession.my_generated_offers);
+        
+        if (userSession.my_generated_offers) {
+          setGeneratedOffers(userSession.my_generated_offers);
         }
+      } else {
+        console.error('No session found for user');
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -81,6 +87,9 @@ export default function MyOffers() {
       await base44.entities.Session.update(session.id, {
         my_generated_offers: updatedOffers
       });
+
+      // Recharger pour confirmer
+      await loadData();
 
       toast.success('Offre générée !');
     } catch (error) {

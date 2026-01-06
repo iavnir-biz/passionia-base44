@@ -88,10 +88,16 @@ export default function EmailsMarketing() {
         setHasPremium(profileRes[0].has_paid === true);
       }
       if (sessionRes.length > 0) {
-        setSession(sessionRes[0]);
-        if (sessionRes[0].generated_marketing_emails) {
-          setGeneratedEmails(sessionRes[0].generated_marketing_emails);
+        const userSession = sessionRes[0];
+        setSession(userSession);
+        console.log('Session loaded:', userSession);
+        console.log('Generated marketing emails:', userSession.generated_marketing_emails);
+        
+        if (userSession.generated_marketing_emails) {
+          setGeneratedEmails(userSession.generated_marketing_emails);
         }
+      } else {
+        console.error('No session found for user');
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -127,6 +133,9 @@ export default function EmailsMarketing() {
       await base44.entities.Session.update(session.id, {
         generated_marketing_emails: updatedEmails
       });
+
+      // Recharger pour confirmer
+      await loadUserData();
 
       toast.success('Email généré avec succès !');
     } catch (error) {

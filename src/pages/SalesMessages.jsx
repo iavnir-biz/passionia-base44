@@ -46,10 +46,16 @@ export default function SalesMessages() {
       });
       
       if (sessions.length > 0) {
-        setSession(sessions[0]);
-        if (sessions[0].generated_sales_messages) {
-          setGeneratedMessages(sessions[0].generated_sales_messages);
+        const userSession = sessions[0];
+        setSession(userSession);
+        console.log('Session loaded:', userSession);
+        console.log('Generated sales messages:', userSession.generated_sales_messages);
+        
+        if (userSession.generated_sales_messages) {
+          setGeneratedMessages(userSession.generated_sales_messages);
         }
+      } else {
+        console.error('No session found for user');
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -116,6 +122,9 @@ export default function SalesMessages() {
       await base44.entities.Session.update(session.id, {
         generated_sales_messages: updatedMessages
       });
+
+      // Recharger pour confirmer
+      await loadData();
 
       toast.success('Message généré avec succès !');
     } catch (error) {

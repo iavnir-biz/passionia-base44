@@ -57,10 +57,16 @@ export default function SalesPage() {
       });
       
       if (sessions.length > 0) {
-        setSession(sessions[0]);
-        if (sessions[0].generated_sales_pages) {
-          setGeneratedPages(sessions[0].generated_sales_pages);
+        const userSession = sessions[0];
+        setSession(userSession);
+        console.log('Session loaded:', userSession);
+        console.log('Generated sales pages:', userSession.generated_sales_pages);
+        
+        if (userSession.generated_sales_pages) {
+          setGeneratedPages(userSession.generated_sales_pages);
         }
+      } else {
+        console.error('No session found for user');
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -120,6 +126,9 @@ export default function SalesPage() {
       await base44.entities.Session.update(session.id, {
         generated_sales_pages: updatedPages
       });
+
+      // Recharger pour confirmer
+      await loadData();
 
       toast.success('Page de vente générée !');
     } catch (error) {

@@ -19,7 +19,8 @@ import {
   Share2,
   Package,
   ChevronDown,
-  BarChart3
+  BarChart3,
+  Users
 } from "lucide-react";
 import ProgressBar from '@/components/ui/ProgressBar';
 

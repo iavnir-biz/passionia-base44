@@ -76,19 +76,20 @@ export default function CTAPAYWALL() {
 
     setIsCreatingCheckout(true);
     try {
-      const { data } = await base44.functions.invoke('createCheckout', {
-        userId: user.id,
-        userEmail: user.email
-      });
+      const { data } = await base44.functions.invoke('createCheckout');
 
-      if (data.success && data.checkoutUrl) {
+      console.log('Checkout response:', data);
+
+      if (data.success && data.url) {
         // Sauvegarder le timestamp de clic paywall
         await base44.auth.updateMe({
           paywall_clicked_at: new Date().toISOString()
         });
 
         // Rediriger vers Stripe Checkout
-        window.location.href = data.checkoutUrl;
+        window.location.href = data.url;
+      } else {
+        alert('Erreur: impossible de créer la session de paiement');
       }
     } catch (error) {
       console.error('Error creating checkout:', error);

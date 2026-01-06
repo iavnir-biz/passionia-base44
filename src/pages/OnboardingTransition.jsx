@@ -112,19 +112,27 @@ export default function OnboardingTransition() {
       const onboardingData = JSON.parse(onboardingDataStr);
       const firstName = localStorage.getItem('onboarding_firstName') || '';
       
-      console.log('📦 OnboardingTransition - Données localStorage:', {
+      // CRITIQUE : Normaliser les answers en strings
+      const normalizedHistory = (onboardingData.history || []).map(item => ({
+        question: item.question || '',
+        type: item.type || 'text',
+        answer: typeof item.answer === 'string' ? item.answer : JSON.stringify(item.answer),
+        at: item.at || new Date().toISOString()
+      }));
+      
+      console.log('📦 OnboardingTransition - Transfert données:', {
         firstName,
-        historyLength: onboardingData.history?.length || 0,
+        historyLength: normalizedHistory.length,
         hasSummary: !!onboardingData.summary,
-        hasSessionId: !!currentUser.sessionId
+        hasSessionId: !!currentUser.sessionId,
+        firstAnswer: normalizedHistory[0]?.answer?.substring(0, 50)
       });
       
       // La session doit déjà exister (créée dans OnboardingFirstName)
       if (!currentUser.sessionId) {
-        console.error('❌ PAS DE SESSION ID - session devrait exister !');
-        // Créer une session de secours
+        console.error('❌ PAS DE SESSION ID - création de secours');
         const session = await base44.entities.Session.create({
-          onboarding_history: onboardingData.history || [],
+          onboarding_history: normalizedHistory,
           onboarding_summary: onboardingData.summary || {},
           onboarding_full: {},
           skill: onboardingData.summary?.who_to_teach || '',
@@ -135,16 +143,23 @@ export default function OnboardingTransition() {
         return;
       }
       
-      // METTRE À JOUR la session existante avec les données de l'onboarding
+      // METTRE À JOUR la session existante avec TOUTES les données normalisées
       const summary = onboardingData.summary || {};
       
       await base44.entities.Session.update(currentUser.sessionId, {
-        onboarding_history: onboardingData.history || [],
+        onboarding_history: normalizedHistory,
         onboarding_summary: summary,
-        skill: summary.who_to_teach || ''
+        skill: summary.who_to_teach || '',
+        is_onboarding_done: false
       });
       
-      // CRITIQUE : Sauvegarder TOUTES les données clés sur le User
+      console.log('✅ Session mise à jour:', {
+        sessionId: currentUser.sessionId,
+        historyCount: normalizedHistory.length,
+        skill: summary.who_to_teach
+      });
+      
+      // Sauvegarder TOUTES les données clés sur le User
       await base44.auth.updateMe({ 
         coreSkill: summary.who_to_teach || '',
         targetAudience: summary.learner_profile || '',
@@ -156,14 +171,11 @@ export default function OnboardingTransition() {
         extraDetail: summary.proof_or_story || ''
       });
       
-      console.log('✅ Session + User mis à jour avec TOUTES les données:', {
-        sessionId: currentUser.sessionId,
-        coreSkill: summary.who_to_teach,
-        historyLength: onboardingData.history?.length
-      });
+      console.log('✅ User mis à jour avec données du summary');
       
     } catch (error) {
       console.error('❌ Erreur mise à jour session:', error);
+      console.error('Détails:', error.response?.data || error.message);
       throw error;
     }
   };

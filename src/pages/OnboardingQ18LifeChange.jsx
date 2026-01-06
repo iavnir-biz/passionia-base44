@@ -6,6 +6,7 @@ export default function OnboardingQ18LifeChange() {
     <OnboardingQuestionPage
       questionId="lifeChangeStory"
       title="Si tu gagnais {{user.targetIncome}} € par mois dans {{user.targetIncomeDelay}} mois… qu'est-ce que ça changerait dans ta vie ? Lâche-toi et autorise-toi à rêver en grand. Fais une liste de tout ce que tu ferais avec cet argent."
+      subtitle="Par exemple : voyager au Japon, offrir des cadeaux à mes proches, passer plus de temps en famille, arrêter un travail qui ne me plaît plus, investir dans un projet qui me tient à cœur…"
       placeholder="Ta réponse ici..."
       inputType="textarea"
       fieldName="lifeChangeStory"

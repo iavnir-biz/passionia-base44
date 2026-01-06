@@ -93,128 +93,111 @@ export default function OfferGenerationStart() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
-      <div className="text-center max-w-2xl">
-        {/* Animated Icon */}
+    <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center z-50">
+      <div className="text-center max-w-md px-6">
+        {/* Nova AI Avatar avec cerveau animé */}
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 relative"
+          animate={{ 
+            scale: [1, 1.08, 1],
+            rotate: [0, 3, -3, 0]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="relative mx-auto mb-8"
         >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-[#61f7a2]/10 to-[#4de88f]/5 flex items-center justify-center relative"
-          >
+          <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3ad87f] flex items-center justify-center shadow-2xl">
             <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-24 h-24 rounded-full bg-[#61f7a2]/20 flex items-center justify-center"
+              animate={{ 
+                scale: [1, 1.15, 1],
+                rotate: [0, 10, -10, 0]
+              }}
+              transition={{ 
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
             >
-              <Brain className="w-12 h-12 text-[#61f7a2]" />
+              <Brain className="w-14 h-14 text-white" />
             </motion.div>
-          </motion.div>
-
-          <motion.div
-            animate={{ 
-              y: [0, -10, 0],
-              x: [0, 10, 0]
-            }}
-            transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-            className="absolute top-2 right-12"
-          >
-            <Sparkles className="w-6 h-6 text-[#61f7a2]" />
-          </motion.div>
-
-          <motion.div
-            animate={{ 
-              y: [0, 10, 0],
-              x: [0, -10, 0]
-            }}
-            transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-            className="absolute bottom-2 left-12"
-          >
-            <Zap className="w-6 h-6 text-[#61f7a2]" />
-          </motion.div>
-        </motion.div>
-
-        {/* Text */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-3xl font-bold text-gray-900 mb-4"
-        >
-          Noah analyse ton projet…
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-gray-600 text-lg mb-8"
-        >
-          Encore un instant, je prépare ton plan personnalisé.
-        </motion.p>
-
-        {/* Animated Messages avec effet gamifié */}
-        <div className="relative h-16 mb-8">
-          <motion.div
-            key={currentMessage}
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -20 }}
-            transition={{ duration: 0.4 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <div className="bg-gradient-to-r from-[#61f7a2]/10 via-[#61f7a2]/20 to-[#61f7a2]/10 px-8 py-4 rounded-2xl border-2 border-[#61f7a2]/30 shadow-lg">
-              <motion.div
-                animate={{ scale: [1, 1.02, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className="text-gray-900 text-xl font-bold flex items-center gap-3"
-              >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                >
-                  <Sparkles className="w-5 h-5 text-[#61f7a2]" />
-                </motion.div>
-                {messages[currentMessage]}
-                <motion.span
-                  animate={{ opacity: [0, 1, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  {".".repeat((dots % 3) + 1)}
-                </motion.span>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Progress Dots */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
-          className="flex items-center justify-center gap-2"
-        >
-          {[0, 1, 2, 3, 4].map((i) => (
+          </div>
+          
+          {/* Ondes d'énergie autour */}
+          {[...Array(3)].map((_, i) => (
             <motion.div
               key={i}
-              animate={{
+              className="absolute inset-0 rounded-3xl border-2 border-[#61f7a2]"
+              initial={{ scale: 1, opacity: 0.6 }}
+              animate={{ 
+                scale: [1, 1.4, 1.8],
+                opacity: [0.6, 0.3, 0]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                delay: i * 0.6,
+                ease: "easeOut"
+              }}
+            />
+          ))}
+          
+          {/* Particules qui tournent */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+            className="absolute -inset-8"
+          >
+            <Zap className="absolute top-0 left-1/2 w-5 h-5 text-[#61f7a2] opacity-80" />
+            <Sparkles className="absolute top-1/2 right-0 w-5 h-5 text-[#4de88f] opacity-80" />
+          </motion.div>
+          
+          {/* Glow effect pulsant */}
+          <motion.div
+            animate={{ 
+              scale: [1, 1.3, 1],
+              opacity: [0.4, 0.7, 0.4]
+            }}
+            transition={{ 
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute inset-0 rounded-3xl bg-[#61f7a2] blur-2xl"
+          />
+        </motion.div>
+
+        {/* Message */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-6"
+        >
+          <p className="text-xl font-semibold text-gray-800">
+            Nova construit ton offre…
+          </p>
+        </motion.div>
+        
+        {/* Loading dots */}
+        <div className="flex items-center justify-center gap-2">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              animate={{ 
                 scale: [1, 1.5, 1],
-                backgroundColor: ['#e5e7eb', '#61f7a2', '#e5e7eb']
+                opacity: [0.3, 1, 0.3]
               }}
               transition={{
-                duration: 1.5,
+                duration: 1,
                 repeat: Infinity,
                 delay: i * 0.2
               }}
-              className="w-3 h-3 rounded-full"
+              className="w-2.5 h-2.5 rounded-full bg-[#61f7a2]"
             />
           ))}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

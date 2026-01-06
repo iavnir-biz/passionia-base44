@@ -1,5 +1,6 @@
 import React from 'react';
 import OnboardingQuestionPage from '@/components/onboarding/OnboardingQuestionPage';
+import { User, Users, MessageCircleOff } from 'lucide-react';
 
 export default function OnboardingQ13Gender() {
   return (
@@ -8,9 +9,9 @@ export default function OnboardingQ13Gender() {
       title="C'est noté. Peux-tu indiquer ton genre ? (Cela m'aidera à personnaliser les textes pour toi)"
       inputType="radio"
       options={[
-        "Homme",
-        "Femme",
-        "Je ne préfère pas le dire"
+        { label: "Homme", icon: User },
+        { label: "Femme", icon: Users },
+        { label: "Je ne préfère pas le dire", icon: MessageCircleOff }
       ]}
       fieldName="gender"
       nextPage="OnboardingQ14Family"
@@ -18,6 +19,7 @@ export default function OnboardingQ13Gender() {
       progress={14}
       blockType="profile"
       useLocalStorage={true}
+      autoSubmit={true}
     />
   );
 }

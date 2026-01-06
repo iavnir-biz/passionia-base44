@@ -42,7 +42,8 @@ export default function OnboardingQuestionPage({
   buttonText = 'Continuer',
   blockType = null, // 'profile' ou 'objectives'
   useLocalStorage = false, // Pour les questions avant authentification
-  customHandleSave = null // Handler personnalisé pour Q26
+  customHandleSave = null, // Handler personnalisé pour Q26
+  autoSubmit = false // Pour auto-submit au clic (Q12, Q14, etc.)
 }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -407,36 +408,45 @@ export default function OnboardingQuestionPage({
                 )}
 
                 {inputType === 'radio' && (
-                  <RadioGroup value={value} onValueChange={(val) => {
+                  <RadioGroup value={typeof options[0] === 'object' ? value : value} onValueChange={(val) => {
                     setValue(val);
-                    setTimeout(() => handleNext(), 300);
+                    if (autoSubmit) {
+                      setTimeout(() => handleNext(), 300);
+                    }
                   }} className="space-y-3">
-                    {options.map((option, idx) => (
+                    {options.map((option, idx) => {
+                      const optionLabel = typeof option === 'object' ? option.label : option;
+                      const OptionIcon = typeof option === 'object' ? option.icon : null;
+                      return (
                       <motion.div
                         key={idx}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: idx * 0.1 }}
                         className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
-                          value === option 
+                          value === optionLabel 
                             ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
                             : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                         }`}
                         onClick={() => {
-                          setValue(option);
-                          setTimeout(() => handleNext(), 300);
+                          setValue(optionLabel);
+                          if (autoSubmit) {
+                            setTimeout(() => handleNext(), 300);
+                          }
                         }}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <RadioGroupItem value={option} id={`option-${idx}`} />
+                        <RadioGroupItem value={optionLabel} id={`option-${idx}`} />
+                        {OptionIcon && <OptionIcon className="w-5 h-5 text-gray-600" />}
                         <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
-                          {option}
+                          {optionLabel}
                         </Label>
                       </motion.div>
-                    ))}
-                  </RadioGroup>
-                )}
+                      );
+                      })}
+                      </RadioGroup>
+                      )}
 
                 {inputType === 'checkbox' && (
                   <div className="space-y-3">

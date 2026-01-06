@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 
 export default function OnboardingQ24IfNothingChanges() {
   const navigate = useNavigate();
@@ -66,73 +66,13 @@ export default function OnboardingQ24IfNothingChanges() {
     );
   }
 
+  const completedSteps = [1, 2]; // Tes talents et Ton profil complétés
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
-      {/* Sidebar gauche */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col items-center py-12 px-6">
-        <div className="relative mb-8">
-          <motion.div
-            className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
-            animate={{ y: [0, -5, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Sparkles className="w-10 h-10 text-white" />
-          </motion.div>
-          <motion.div
-            className="absolute -top-1 -right-1"
-            animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
-            <Sparkles className="w-5 h-5 text-[#61f7a2]" />
-          </motion.div>
-        </div>
+      <OnboardingSidebar currentPage="OnboardingQ24IfNothingChanges" completedSteps={completedSteps} progressInStep={92} />
 
-        <div className="text-center mb-6">
-          <div className="space-y-3">
-            <div className="text-xs text-gray-500">Étape 1 : Découverte ✓</div>
-            <div>
-              <h3 className="text-lg font-bold text-[#61f7a2] mb-1">Étape 2</h3>
-              <p className="text-sm text-gray-600">Informations supplémentaires</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 flex flex-col items-center w-full max-w-[200px]">
-          <div className="relative w-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div 
-              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#61f7a2] to-[#4de88f]"
-              initial={{ height: '0%' }}
-              animate={{ height: '92%' }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-          
-          <div className="mt-4 text-center space-y-3">
-            <p className="text-2xl font-bold text-[#61f7a2]">92%</p>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-[#61f7a2] rounded-xl p-3 w-full"
-            >
-              <p className="text-xs font-bold text-gray-900 mb-1 text-center">🎁 Vous attendent</p>
-              <div className="space-y-0.5 text-xs text-gray-700">
-                <div>✨ Offres personnalisées</div>
-                <div>💰 Prix optimisés</div>
-                <div>📄 Page de vente</div>
-                <div>🎯 Offre complète</div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        <div className="w-full bg-gray-100 h-2 md:hidden">
-          <div className="h-full bg-[#61f7a2] transition-all duration-500" style={{ width: '92%' }} />
-        </div>
-
+      <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">
         <div className="flex-1 flex items-center justify-center p-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -83,18 +83,18 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
   return (
     <>
       {/* Desktop - Sidebar verticale */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-80 bg-gradient-to-br from-[#11112b] via-[#1a1a3e] to-[#11112b] flex-col z-50">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-80 bg-white border-r border-gray-200 flex-col z-50">
         {/* Header */}
-        <div className="p-6 border-b border-white/10">
+        <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-white">PASSION IA</h1>
+            <h1 className="text-xl font-bold text-gray-900">PASSION IA</h1>
           </div>
           <div>
-            <h2 className="text-white/90 font-semibold mb-1">Onboarding</h2>
-            <p className="text-white/60 text-xs">Étape {activeStepId}/8</p>
+            <h2 className="text-gray-900 font-semibold mb-1">Onboarding</h2>
+            <p className="text-gray-600 text-xs">Étape {activeStepId}/8</p>
           </div>
         </div>
 
@@ -110,7 +110,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
               <div key={step.id} className="relative">
                 {/* Connecting line */}
                 {index < ONBOARDING_STEPS.length - 1 && (
-                  <div className="absolute left-[23px] top-[50px] w-0.5 h-8 bg-white/10" />
+                  <div className="absolute left-[23px] top-[50px] w-0.5 h-8 bg-gray-200" />
                 )}
 
                 <motion.div
@@ -119,7 +119,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                   transition={{ delay: index * 0.1 }}
                   className={cn(
                     "relative flex items-center gap-3 p-3 rounded-xl transition-all",
-                    isActive && "bg-white/10 shadow-lg",
+                    isActive && "bg-gray-50 shadow-sm border border-gray-200",
                     isFuture && "opacity-40"
                   )}
                 >
@@ -141,7 +141,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                   <div className="flex-1">
                     <p className={cn(
                       "text-sm font-semibold",
-                      isActive || isCompleted ? "text-white" : "text-white/70"
+                      isActive || isCompleted ? "text-gray-900" : "text-gray-600"
                     )}>
                       {step.title}
                     </p>
@@ -163,7 +163,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
       </aside>
 
       {/* Mobile - Top bar horizontale */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-r from-[#11112b] via-[#1a1a3e] to-[#11112b] border-b border-white/10 z-50">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
         <div className="p-4">
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
@@ -172,17 +172,17 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-bold text-white">PASSION IA</h1>
-                <p className="text-[10px] text-white/60">Onboarding</p>
+                <h1 className="text-sm font-bold text-gray-900">PASSION IA</h1>
+                <p className="text-[10px] text-gray-600">Onboarding</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs font-semibold text-white">Étape {activeStepId}/8</p>
+              <p className="text-xs font-semibold text-gray-900">Étape {activeStepId}/8</p>
             </div>
           </div>
 
           {/* Progress bar */}
-          <div className="relative w-full h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
               initial={{ width: '0%' }}
@@ -203,7 +203,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                   key={step.id}
                   className={cn(
                     "flex items-center gap-2 px-3 py-2 rounded-lg flex-shrink-0 transition-all",
-                    isActive && "bg-white/10"
+                    isActive && "bg-gray-50"
                   )}
                 >
                   <div className={cn(
@@ -220,7 +220,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                   </div>
                   <span className={cn(
                     "text-xs font-medium whitespace-nowrap",
-                    isActive || isCompleted ? "text-white" : "text-white/50"
+                    isActive || isCompleted ? "text-gray-900" : "text-gray-500"
                   )}>
                     {step.title}
                   </span>

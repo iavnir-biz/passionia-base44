@@ -171,7 +171,7 @@ export default function Dashboard() {
   
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="Dashboard" progress={calculateProgress()} />
+      <Sidebar currentPage="Dashboard" progress={calculateProgress()} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 
@@ -199,18 +199,16 @@ export default function Dashboard() {
                   Tu avances étape par étape. Nous t'accompagnons jusqu'au bout.
                 </p>
               </div>
-              <GlowButton
+              <button
                 onClick={() => {
                   const element = document.getElementById('daily-actions');
                   element?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                variant="primary"
-                size="lg"
-                className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold shrink-0"
+                className="bg-white hover:bg-gray-50 text-gray-900 font-semibold px-6 py-3 rounded-xl transition-all shrink-0 flex items-center gap-2"
               >
                 Commencer ma première mission
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </GlowButton>
+                <ArrowRight className="w-5 h-5" />
+              </button>
             </div>
           </motion.div>
 

@@ -30,7 +30,15 @@ const menuStructure = [
   { name: 'Discuter avec Noah', icon: MessageCircle, page: 'NovaChat', locked: true },
 ];
 
-export default function Sidebar({ currentPage, progress = 0 }) {
+export default function Sidebar({ currentPage, progress = 0, user }) {
+  const calculateDay = (prog) => {
+    if (prog === 0) return 1;
+    if (prog < 30) return 1;
+    if (prog < 60) return 2;
+    if (prog < 100) return 3;
+    return 4;
+  };
+
   return (
     <aside className="w-72 h-screen bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0">
       {/* Logo */}
@@ -46,19 +54,33 @@ export default function Sidebar({ currentPage, progress = 0 }) {
       {/* User Profile - Nouveau bloc */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
-            <User className="w-6 h-6 text-white" />
-          </div>
+          {user?.profile_picture ? (
+            <img
+              src={user.profile_picture}
+              alt={user.full_name}
+              className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+              <User className="w-6 h-6 text-white" />
+            </div>
+          )}
           <div className="flex-1">
-            <p className="font-bold text-gray-900">Utilisateur</p>
-            <p className="text-xs text-gray-600">Jour 1</p>
+            <p className="font-bold text-gray-900">{user?.full_name || 'Utilisateur'}</p>
+            <p className="text-xs text-gray-600">Jour {calculateDay(progress)}</p>
           </div>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-1.5">
-          <div 
-            className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          />
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-gray-600">Progression</span>
+            <span className="text-xs font-semibold text-purple-600">{progress}%</span>
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-1.5">
+            <div 
+              className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
       </div>
 
@@ -89,13 +111,15 @@ export default function Sidebar({ currentPage, progress = 0 }) {
       {/* Bloc Besoin d'aide - Premium */}
       <div className="p-4 border-t border-gray-200">
         <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-5 mb-4">
-          <h3 className="text-white font-bold text-base mb-2">Besoin d'aide ?</h3>
+          <h3 className="text-white font-bold text-base mb-2 flex items-center gap-2">
+            ✨ Besoin d'aide ?
+          </h3>
           <p className="text-purple-100 text-xs mb-4">
             Un expert peut t'aider à avancer plus vite.
           </p>
           <Link
             to={createPageUrl('Booking')}
-            className="flex items-center justify-center gap-2 w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-2.5 px-4 rounded-xl transition-all"
+            className="flex items-center justify-center gap-2 w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold py-2.5 px-4 rounded-xl transition-all"
           >
             <Calendar className="w-4 h-4" />
             <span className="text-sm">Prendre rendez-vous</span>

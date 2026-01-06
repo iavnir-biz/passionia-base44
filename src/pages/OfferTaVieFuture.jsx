@@ -139,13 +139,40 @@ export default function OfferTaVieFuture() {
     return <OfferTransition message="Nova prépare ton plan de route..." onComplete={handleTransitionComplete} />;
   }
 
-  const offer = user?.offer || {};
+  // Récupérer les offres depuis la session
+  const [offerData, setOfferData] = useState({});
+  
+  useEffect(() => {
+    if (user?.sessionId && !offerData.product_principal) {
+      loadOfferData();
+    }
+  }, [user]);
+
+  const loadOfferData = async () => {
+    try {
+      const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+      if (sessions.length > 0) {
+        const session = sessions[0];
+        const offerChoices = session.offer_generation?.offerChoices || {};
+        
+        setOfferData({
+          product_principal: offerChoices.product_principal,
+          petit_extra: offerChoices.petit_extra,
+          offre_superieure: offerChoices.offre_superieure,
+          offre_premium: offerChoices.offre_premium
+        });
+      }
+    } catch (error) {
+      console.error('Error loading offer data:', error);
+    }
+  };
+
   const products = [
-    { key: 'product_principal', label: 'Produit Principal', data: offer.product_principal, multiplier: 30 },
-    { key: 'petit_extra', label: 'Order Bump', data: offer.petit_extra, multiplier: 15 },
-    { key: 'offre_superieure', label: 'Upsell', data: offer.offre_superieure, multiplier: 9 },
-    { key: 'offre_premium', label: 'Premium', data: offer.offre_premium, multiplier: 1 }
-  ];
+    { key: 'product_principal', label: 'Produit Principal', data: offerData.product_principal, multiplier: 30 },
+    { key: 'petit_extra', label: 'Order Bump', data: offerData.petit_extra, multiplier: 15 },
+    { key: 'offre_superieure', label: 'Upsell', data: offerData.offre_superieure, multiplier: 9 },
+    { key: 'offre_premium', label: 'Premium', data: offerData.offre_premium, multiplier: 1 }
+  ].filter(p => p.data);
 
   const revenues = products.map(p => ({
     ...p,

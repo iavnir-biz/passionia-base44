@@ -29,10 +29,10 @@ import {
   Calendar,
   Package } from
 'lucide-react';
-import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import GlowButton from '@/components/ui/GlowButton';
 import OfferDetailCard from '@/components/offer/OfferDetailCard';
 import OfferTransition from '@/components/offer/OfferTransition';
+import OfferSidebar from '@/components/onboarding/OfferSidebar';
 
 // Function to get icon based on offer content
 const getProductIcon = (offer) => {
@@ -234,8 +234,11 @@ export default function OfferResume() {
   const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
 
   return (
-    <OfferBuilderLayout currentStep={5}>
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+      <OfferSidebar currentStep={5} />
+      
+      <div className="ml-72 py-12">
+        <div className="max-w-6xl mx-auto px-4">
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -440,7 +443,8 @@ export default function OfferResume() {
             <ArrowRight className="w-5 h-5 ml-2" />
           </GlowButton>
         </motion.div>
+        </div>
       </div>
-    </OfferBuilderLayout>);
-
+    </div>
+  );
 }

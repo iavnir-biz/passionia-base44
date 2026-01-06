@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { Loader2, Presentation, GraduationCap, Video, BookOpen, Users } from 'lucide-react';
-import OfferBuilderLayout from '@/components/onboarding/OfferBuilderLayout';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 import OfferTransition from '@/components/offer/OfferTransition';
+import OfferSidebar from '@/components/onboarding/OfferSidebar';
 
 // Fonction pour déterminer l'icône selon le type de produit
 const getProductIcon = (offer) => {
@@ -118,47 +118,51 @@ export default function OfferSuperieure() {
   }
 
   return (
-    <OfferBuilderLayout currentStep={3}>
-      <div className="max-w-3xl mx-auto px-4">
-        {/* Step Title */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-2">
-            <span className="text-[#61f7a2]">Étape 3 sur 4</span>
-            <span className="text-gray-900"> : Choisis ton Offre Supérieure</span>
-          </h2>
-          <p className="text-gray-500 text-sm max-w-lg mx-auto">
-            Une solution plus complète pour tes élèves motivés.
-          </p>
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+      <OfferSidebar currentStep={3} />
+      
+      <div className="ml-72 py-12">
+        <div className="max-w-3xl mx-auto px-4">
+          {/* Step Title */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-2">
+              <span className="text-[#61f7a2]">Étape 3 sur 5</span>
+              <span className="text-gray-900"> : Choisis ton Offre Supérieure</span>
+            </h2>
+            <p className="text-gray-500 text-sm max-w-lg mx-auto">
+              Une solution plus complète pour tes élèves motivés.
+            </p>
+          </div>
+
+          {/* Offer Cards */}
+          {offers.length === 0 ? (
+            <div className="text-center py-12">
+              <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mx-auto mb-4" />
+              <p className="text-gray-600">Chargement des offres générées...</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-6">
+              {offers.map((offer) => (
+                <OfferCardNew
+                  key={offer.id}
+                  offer={offer}
+                  icon={offer.icon}
+                  isSelected={selectedOffer?.id === offer.id}
+                  onSelect={handleSelect}
+                  colorScheme="purple"
+                />
+              ))}
+            </div>
+          )}
+
+          {isSaving && (
+            <div className="mt-6 flex items-center justify-center gap-2 text-[#61f7a2]">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Enregistrement...</span>
+            </div>
+          )}
         </div>
-
-        {/* Offer Cards */}
-        {offers.length === 0 ? (
-          <div className="text-center py-12">
-            <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Chargement des offres générées...</p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {offers.map((offer) => (
-              <OfferCardNew
-                key={offer.id}
-                offer={offer}
-                icon={offer.icon}
-                isSelected={selectedOffer?.id === offer.id}
-                onSelect={handleSelect}
-                colorScheme="purple"
-              />
-            ))}
-          </div>
-        )}
-
-        {isSaving && (
-          <div className="mt-6 flex items-center justify-center gap-2 text-[#61f7a2]">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Enregistrement...</span>
-          </div>
-        )}
       </div>
-    </OfferBuilderLayout>
+    </div>
   );
 }

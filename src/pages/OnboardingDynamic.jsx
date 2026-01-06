@@ -116,11 +116,24 @@ export default function OnboardingDynamic() {
         navigate(createPageUrl('OnboardingTransition'));
       } else {
         // Sauvegarder la nouvelle question
-        if (lastAnswer) {
+        if (lastAnswer !== null && lastAnswer !== undefined) {
           onboardingData.history = onboardingData.history || [];
+          
+          // Convertir toutes les réponses en string pour la DB
+          let answerAsString = lastAnswer;
+          if (Array.isArray(lastAnswer)) {
+            answerAsString = lastAnswer.join(', ');
+          } else if (typeof lastAnswer === 'number') {
+            answerAsString = String(lastAnswer);
+          } else if (typeof lastAnswer === 'object') {
+            answerAsString = JSON.stringify(lastAnswer);
+          } else {
+            answerAsString = String(lastAnswer);
+          }
+          
           onboardingData.history.push({
             question: currentQuestion?.text || currentQuestion?.title,
-            answer: lastAnswer,
+            answer: answerAsString,
             at: new Date().toISOString()
           });
         }

@@ -106,19 +106,52 @@ export default function OnboardingTransition() {
   const createSession = async () => {
     try {
       const currentUser = await base44.auth.me();
+      console.log('🔍 OnboardingTransition - User:', {
+        email: currentUser.email,
+        firstName: currentUser.firstName,
+        hasSessionId: !!currentUser.sessionId,
+        sessionId: currentUser.sessionId
+      });
       
-      // Vérifier si une session existe déjà
+      // Récupérer les données de localStorage
+      const onboardingDataStr = localStorage.getItem('onboarding_data') || '{}';
+      const onboardingData = JSON.parse(onboardingDataStr);
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      
+      console.log('🔍 OnboardingTransition - localStorage:', {
+        hasData: !!onboardingDataStr,
+        historyLength: onboardingData.history?.length || 0,
+        hasSummary: !!onboardingData.summary,
+        firstName: firstName
+      });
+      
+      // Si le user a déjà un sessionId, on met à jour cette session
+      if (currentUser.sessionId) {
+        console.log('✅ SessionId existe sur le user, mise à jour de la session:', currentUser.sessionId);
+        
+        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+        
+        if (sessions.length > 0) {
+          console.log('✅ Session trouvée en DB, mise à jour...');
+          await base44.entities.Session.update(currentUser.sessionId, {
+            onboarding_history: onboardingData.history || [],
+            onboarding_summary: onboardingData.summary || {},
+            skill: onboardingData.summary?.who_to_teach || ''
+          });
+          console.log('✅ Session mise à jour avec', onboardingData.history?.length || 0, 'questions');
+          return;
+        } else {
+          console.warn('⚠️ SessionId existe sur user mais session introuvable en DB. Création nouvelle session...');
+        }
+      }
+      
+      // Sinon, vérifier si une session existe déjà pour cet email
       const existingSessions = await base44.entities.Session.filter({ 
         created_by: currentUser.email 
       });
       
       if (existingSessions.length > 0) {
-        console.log('✅ Session existe déjà:', existingSessions[0].id);
-        
-        // Mettre à jour la session existante avec les données du localStorage
-        const onboardingDataStr = localStorage.getItem('onboarding_data') || '{}';
-        const onboardingData = JSON.parse(onboardingDataStr);
-        const firstName = localStorage.getItem('onboarding_firstName') || '';
+        console.log('✅ Session existe déjà pour cet email:', existingSessions[0].id);
         
         await base44.entities.Session.update(existingSessions[0].id, {
           onboarding_history: onboardingData.history || [],
@@ -130,15 +163,13 @@ export default function OnboardingTransition() {
           firstName: firstName,
           sessionId: existingSessions[0].id 
         });
+        
+        console.log('✅ Session mise à jour + sessionId sauvegardé sur user');
         return;
       }
       
-      // Récupérer les données de localStorage
-      const onboardingDataStr = localStorage.getItem('onboarding_data') || '{}';
-      const onboardingData = JSON.parse(onboardingDataStr);
-      const firstName = localStorage.getItem('onboarding_firstName') || '';
-      
-      // Créer la session
+      // Créer une nouvelle session uniquement si aucune n'existe
+      console.log('🆕 Création nouvelle session...');
       const session = await base44.entities.Session.create({
         onboarding_history: onboardingData.history || [],
         onboarding_summary: onboardingData.summary || {},
@@ -155,8 +186,10 @@ export default function OnboardingTransition() {
         sessionId: session.id 
       });
       
+      console.log('✅ SessionId sauvegardé sur user');
+      
     } catch (error) {
-      console.error('❌ Erreur création session:', error);
+      console.error('❌ Erreur création/mise à jour session:', error);
     }
   };
 

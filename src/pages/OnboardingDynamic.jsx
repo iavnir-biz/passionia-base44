@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 
 export default function OnboardingDynamic() {
   const navigate = useNavigate();
@@ -297,74 +298,10 @@ export default function OnboardingDynamic() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
-      {/* Sidebar gauche */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col items-center py-12 px-6">
-        {/* Noah Avatar */}
-        <div className="relative mb-8">
-          <motion.div
-            className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
-            animate={{
-              y: [0, -5, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            <Sparkles className="w-10 h-10 text-white" />
-          </motion.div>
-          <motion.div
-            className="absolute -top-1 -right-1"
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          >
-            <Sparkles className="w-5 h-5 text-[#61f7a2]" />
-          </motion.div>
-        </div>
-
-        {/* Étape */}
-        <div className="text-center mb-8">
-          <h3 className="text-lg font-bold text-[#61f7a2] mb-1">Étape 1</h3>
-          <p className="text-sm text-gray-600">Découverte</p>
-          <p className="text-xs text-gray-500 mt-2">{Math.min(session?.onboarding_history?.length || 0, 11)}/11 questions</p>
-        </div>
-
-        {/* Progress vertical - barre complète pour étape 1 */}
-        <div className="flex-1 flex flex-col items-center w-full max-w-[200px]">
-          <div className="relative w-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div 
-              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#61f7a2] to-[#4de88f]"
-              initial={{ height: '0%' }}
-              animate={{ height: `${progress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-
-          <div className="mt-4 text-center">
-            <p className="text-2xl font-bold text-[#61f7a2]">{Math.round(progress)}%</p>
-            <p className="text-xs text-gray-500 mt-1">Question {Math.min(questionCount, 11)}/11</p>
-          </div>
-        </div>
-      </div>
+      <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={[]} />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        {/* Progress bar horizontal (mobile) */}
-        <div className="w-full bg-gray-100 h-2 md:hidden">
-          <div 
-            className="h-full bg-[#61f7a2] transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
+      <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">
         <div className="flex-1 flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { emailType, profile, session } = await req.json();
+        const { emailType, profile, session, tone, customRequest } = await req.json();
 
         if (!emailType || !profile || !session) {
             return Response.json({ 
@@ -87,19 +87,29 @@ DONNÉES À UTILISER POUR PERSONNALISATION :
 - Nom de l'Offre Premium : ${premiumTitle} (Prix : ${premiumPrice}€)
 `;
 
-        // Générer l'email avec OpenAI - Méthode PASSION IA
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                {
-                    role: "system",
-                    content: `Tu es un expert en Copywriting Émotionnel et en Storytelling de Transformation. Ta mission est de rédiger un email de séquence marketing pour un expert qui vend son savoir-faire.
+        // Ajustement du ton selon le choix de l'utilisateur
+        const toneInstructions = {
+            friendly: "Ton chaleureux et amical, comme si tu parlais à un ami proche. Utilise un langage simple et rassurant.",
+            professional: "Ton professionnel et expert, tout en restant accessible. Vocabulaire précis mais pas corporate.",
+            urgent: "Ton direct avec un sentiment d'urgence authentique (pas manipulateur). Insiste sur le coût de l'inaction.",
+            inspiring: "Ton inspirant et motivant. Focus sur la vision et la transformation possible."
+        };
+
+        const selectedTone = tone || 'friendly';
+        const toneInstruction = toneInstructions[selectedTone] || toneInstructions.friendly;
+
+        // Génération avec personnalisation de ton et requête custom
+        const systemPrompt = `Tu es un expert en Copywriting Émotionnel et en Storytelling de Transformation. Ta mission est de rédiger un email de séquence marketing pour un expert qui vend son savoir-faire.
 
 ${emailConfig.title}
 
 Sujet suggéré : ${emailConfig.subject}
 
-Angle et ton : ${emailConfig.instruction}
+Angle et ton de base : ${emailConfig.instruction}
+
+TON DEMANDÉ PAR L'UTILISATEUR : ${toneInstruction}
+
+${customRequest ? `\nDEMANDE SPÉCIFIQUE DE L'UTILISATEUR :\n${customRequest}\n` : ''}
 
 RÈGLES DE STYLE STRICTES :
 - Utilise exclusivement le 'Tu'
@@ -110,19 +120,31 @@ RÈGLES DE STYLE STRICTES :
 - Entre 200 et 400 mots maximum
 
 Structure de l'email :
-- Objet : ${emailConfig.subject} (commence par "📧 Objet: ")
-- Corps de l'email avec storytelling émotionnel
-- Call-to-action clair et motivant
-- Signature personnalisée
+1. 📧 Objet : [Crée un objet optimisé pour les taux d'ouverture, accrocheur, max 50 caractères]
+2. Corps de l'email avec storytelling émotionnel
+3. Call-to-action CLAIR et ACTIONNABLE (ex: "Clique ici pour découvrir [Produit]")
+4. Signature personnalisée
 
-Remplace les variables entre accolades par les données réelles du client fournies ci-dessous.`
+Optimisations obligatoires :
+- L'objet doit créer de la curiosité ou de l'urgence
+- Le CTA doit être explicite avec un verbe d'action fort
+- Personnalise avec les données fournies
+
+Remplace les variables entre accolades par les données réelles du client fournies ci-dessous.`;
+
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                {
+                    role: "system",
+                    content: systemPrompt
                 },
                 {
                     role: "user",
                     content: userContext
                 }
             ],
-            temperature: 0.8,
+            temperature: selectedTone === 'professional' ? 0.6 : 0.8,
         });
 
         const emailContent = completion.choices[0].message.content;

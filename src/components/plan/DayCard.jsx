@@ -1,0 +1,189 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from "@/lib/utils";
+import { ChevronDown, Lock, CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+export default function DayCard({ 
+  day, 
+  isActive, 
+  isCompleted, 
+  isLocked,
+  onComplete,
+  onChecklistChange,
+  checklist = []
+}) {
+  const [isExpanded, setIsExpanded] = useState(isActive);
+
+  const allChecked = checklist.every(item => item.checked);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn(
+        "rounded-2xl border-2 overflow-hidden transition-all",
+        isCompleted && "bg-gradient-to-br from-green-50 to-emerald-50 border-green-300",
+        isActive && !isCompleted && "bg-white border-[#61f7a2] shadow-lg",
+        isLocked && "bg-gray-50 border-gray-200 opacity-60"
+      )}
+    >
+      {/* Header */}
+      <button
+        onClick={() => !isLocked && setIsExpanded(!isExpanded)}
+        disabled={isLocked}
+        className="w-full p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
+      >
+        <div className="flex items-center gap-4">
+          {/* Icon */}
+          <div className={cn(
+            "w-14 h-14 rounded-xl flex items-center justify-center font-bold text-xl",
+            isCompleted && "bg-[#61f7a2] text-white",
+            isActive && !isCompleted && "bg-[#61f7a2]/10 text-[#61f7a2]",
+            isLocked && "bg-gray-200 text-gray-400"
+          )}>
+            {isCompleted ? (
+              <CheckCircle2 className="w-7 h-7" />
+            ) : isLocked ? (
+              <Lock className="w-6 h-6" />
+            ) : (
+              day.number
+            )}
+          </div>
+
+          {/* Title & Objective */}
+          <div className="text-left">
+            <h3 className={cn(
+              "text-xl font-bold mb-1",
+              isCompleted && "text-green-700",
+              isActive && "text-gray-900",
+              isLocked && "text-gray-500"
+            )}>
+              Jour {day.number} — {day.title}
+            </h3>
+            <p className={cn(
+              "text-sm",
+              isCompleted && "text-green-600",
+              isActive && "text-gray-600",
+              isLocked && "text-gray-400"
+            )}>
+              {day.objective}
+            </p>
+          </div>
+        </div>
+
+        {!isLocked && (
+          <ChevronDown className={cn(
+            "w-5 h-5 transition-transform text-gray-400",
+            isExpanded && "rotate-180"
+          )} />
+        )}
+      </button>
+
+      {/* Content */}
+      <AnimatePresence>
+        {isExpanded && !isLocked && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="border-t border-gray-200"
+          >
+            <div className="p-6 space-y-6">
+              {/* Key Message */}
+              {day.keyMessage && (
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <p className="text-blue-800 font-medium italic">
+                    {day.keyMessage}
+                  </p>
+                </div>
+              )}
+
+              {/* Checklist */}
+              <div className="space-y-3">
+                {checklist.map((item, idx) => (
+                  <label
+                    key={idx}
+                    className={cn(
+                      "flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all",
+                      item.checked 
+                        ? "bg-green-50 border-green-300" 
+                        : "bg-white border-gray-200 hover:border-[#61f7a2]/50"
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={item.checked}
+                      onChange={() => onChecklistChange(idx)}
+                      disabled={isCompleted}
+                      className="mt-0.5 w-5 h-5 text-[#61f7a2] rounded focus:ring-[#61f7a2] cursor-pointer"
+                    />
+                    <div className="flex-1">
+                      <span className={cn(
+                        "font-medium",
+                        item.checked ? "text-green-700 line-through" : "text-gray-900"
+                      )}>
+                        {item.text}
+                      </span>
+                      {item.action && !item.checked && (
+                        <div className="mt-2">
+                          {item.action}
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              {day.buttons && day.buttons.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {day.buttons.map((btn, idx) => (
+                    <Button
+                      key={idx}
+                      onClick={btn.onClick}
+                      variant="outline"
+                      size="sm"
+                      className="border-[#61f7a2] text-[#61f7a2] hover:bg-[#61f7a2] hover:text-white"
+                    >
+                      {btn.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
+
+              {/* Complete Button */}
+              {allChecked && !isCompleted && (
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="pt-4 border-t border-gray-200"
+                >
+                  <Button
+                    onClick={onComplete}
+                    className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-white font-bold py-6 text-lg"
+                  >
+                    ✓ Passer au Jour {day.number + 1}
+                  </Button>
+                  <p className="text-center text-gray-600 text-sm mt-3">
+                    {day.completionMessage}
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Special Message */}
+              {day.specialMessage && isCompleted && (
+                <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl p-4 text-center">
+                  <p className="text-yellow-800 font-bold text-lg">
+                    {day.specialMessage}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}

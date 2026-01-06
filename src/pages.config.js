@@ -4,6 +4,7 @@ import AdCopies from './pages/AdCopies';
 import AvatarClients from './pages/AvatarClients';
 import BonneNouvelle from './pages/BonneNouvelle';
 import Booking from './pages/Booking';
+import CTAPAYWALL from './pages/CTAPAYWALL';
 import DailyActions from './pages/DailyActions';
 import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
@@ -58,7 +59,6 @@ import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
-import CTAPAYWALL from './pages/CTAPAYWALL';
 
 
 export const PAGES = {
@@ -68,6 +68,7 @@ export const PAGES = {
     "AvatarClients": AvatarClients,
     "BonneNouvelle": BonneNouvelle,
     "Booking": Booking,
+    "CTAPAYWALL": CTAPAYWALL,
     "DailyActions": DailyActions,
     "Dashboard": Dashboard,
     "Documents": Documents,
@@ -122,7 +123,6 @@ export const PAGES = {
     "Settings": Settings,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
-    "CTAPAYWALL": CTAPAYWALL,
 }
 
 export const pagesConfig = {

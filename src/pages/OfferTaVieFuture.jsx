@@ -63,6 +63,10 @@ export default function OfferTaVieFuture() {
         const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
         if (sessions.length > 0) {
           const session = sessions[0];
+          
+          console.log('Session complète:', session);
+          console.log('offer_generation:', session.offer_generation);
+          
           const offerChoices = session.offer_generation?.offerChoices || {};
           
           // Construire l'objet offer avec les produits sélectionnés
@@ -73,10 +77,13 @@ export default function OfferTaVieFuture() {
             offre_premium: offerChoices.offre_premium || null
           };
           
+          console.log('Offres extraites:', offer);
+          
           setUser({ 
             ...currentUser,
             offer: offer,
-            sessionId: currentUser.sessionId
+            sessionId: currentUser.sessionId,
+            targetIncome: session.onboarding_full?.target_income || currentUser.targetIncome || 500
           });
         } else {
           setUser(currentUser);

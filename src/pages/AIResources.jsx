@@ -177,11 +177,8 @@ export default function AIResources() {
               <h1 className="text-4xl font-bold text-gray-900 mb-3">
                 ✨ Tes ressources IA
               </h1>
-              <p className="text-gray-600 text-lg mb-2">
+              <p className="text-gray-600 text-lg">
                 Tous les outils IA essentiels pour créer et vendre ton activité en ligne.
-              </p>
-              <p className="text-gray-500 text-sm">
-                Commence par générer chaque ressource. Tu pourras les consulter et les affiner ensuite.
               </p>
             </motion.div>
 

@@ -118,11 +118,15 @@ export default function OnboardingTransition() {
       const onboardingData = JSON.parse(onboardingDataStr);
       const firstName = localStorage.getItem('onboarding_firstName') || '';
       
+      // Extraire le coreSkill du summary
+      const coreSkill = onboardingData.summary?.who_to_teach || '';
+      
       console.log('🔍 OnboardingTransition - localStorage:', {
         hasData: !!onboardingDataStr,
         historyLength: onboardingData.history?.length || 0,
         hasSummary: !!onboardingData.summary,
-        firstName: firstName
+        firstName: firstName,
+        coreSkill: coreSkill
       });
       
       // Si le user a déjà un sessionId, on met à jour cette session
@@ -136,9 +140,16 @@ export default function OnboardingTransition() {
           await base44.entities.Session.update(currentUser.sessionId, {
             onboarding_history: onboardingData.history || [],
             onboarding_summary: onboardingData.summary || {},
-            skill: onboardingData.summary?.who_to_teach || ''
+            skill: coreSkill
           });
-          console.log('✅ Session mise à jour avec', onboardingData.history?.length || 0, 'questions');
+          
+          // Mettre à jour le coreSkill sur le User aussi
+          await base44.auth.updateMe({ 
+            firstName: firstName,
+            coreSkill: coreSkill
+          });
+          
+          console.log('✅ Session + User mis à jour avec', onboardingData.history?.length || 0, 'questions + coreSkill:', coreSkill);
           return;
         } else {
           console.warn('⚠️ SessionId existe sur user mais session introuvable en DB. Création nouvelle session...');
@@ -156,15 +167,16 @@ export default function OnboardingTransition() {
         await base44.entities.Session.update(existingSessions[0].id, {
           onboarding_history: onboardingData.history || [],
           onboarding_summary: onboardingData.summary || {},
-          skill: onboardingData.summary?.who_to_teach || ''
+          skill: coreSkill
         });
         
         await base44.auth.updateMe({ 
           firstName: firstName,
+          coreSkill: coreSkill,
           sessionId: existingSessions[0].id 
         });
         
-        console.log('✅ Session mise à jour + sessionId sauvegardé sur user');
+        console.log('✅ Session mise à jour + sessionId + coreSkill sauvegardés sur user');
         return;
       }
       
@@ -174,19 +186,20 @@ export default function OnboardingTransition() {
         onboarding_history: onboardingData.history || [],
         onboarding_summary: onboardingData.summary || {},
         onboarding_full: {},
-        skill: onboardingData.summary?.who_to_teach || '',
+        skill: coreSkill,
         is_onboarding_done: false
       });
       
       console.log('✅ Session créée:', session.id);
       
-      // Sauvegarder le sessionId sur le user
+      // Sauvegarder le sessionId + coreSkill sur le user
       await base44.auth.updateMe({ 
         firstName: firstName,
+        coreSkill: coreSkill,
         sessionId: session.id 
       });
       
-      console.log('✅ SessionId sauvegardé sur user');
+      console.log('✅ SessionId + coreSkill sauvegardés sur user');
       
     } catch (error) {
       console.error('❌ Erreur création/mise à jour session:', error);

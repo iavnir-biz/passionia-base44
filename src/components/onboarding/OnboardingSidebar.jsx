@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
+import confetti from 'canvas-confetti';
 import { 
   Sparkles, 
   User, 
@@ -80,6 +81,27 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
 
   const activeStepId = activeStep?.id || 1;
 
+  // Déclencher les confetti quand une nouvelle étape est complétée
+  useEffect(() => {
+    if (completedSteps.length > 0) {
+      const lastCompleted = completedSteps[completedSteps.length - 1];
+      const previousCompleted = JSON.parse(localStorage.getItem('onboarding_completed_steps') || '[]');
+      
+      // Si c'est une nouvelle étape complétée (pas déjà dans le localStorage)
+      if (!previousCompleted.includes(lastCompleted)) {
+        // Lancer les confetti
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+        
+        // Sauvegarder dans localStorage
+        localStorage.setItem('onboarding_completed_steps', JSON.stringify(completedSteps));
+      }
+    }
+  }, [completedSteps]);
+
   return (
     <>
       {/* Desktop - Sidebar verticale */}
@@ -138,6 +160,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   className={cn(
                     "relative flex items-center gap-3 p-3 rounded-xl transition-all",
                     isActive && "bg-gray-50 shadow-sm border border-gray-200",
+                    isCompleted && !isActive && "opacity-50",
                     isFuture && "opacity-40"
                   )}
                 >

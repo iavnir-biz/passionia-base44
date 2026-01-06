@@ -7,7 +7,6 @@ import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import DayCard from '@/components/plan/DayCard';
-import VideoGuidesSection from '@/components/plan/VideoGuidesSection';
 import ChatBubble from '@/components/chat/ChatBubble';
 import { 
   Loader2, 
@@ -318,9 +317,6 @@ export default function PlanAction() {
               Une action par jour. Pas plus. Pas moins. L'objectif : vendre avant de créer, en aidant quelqu'un avec ce que tu sais déjà.
             </p>
           </motion.div>
-
-          {/* Video Guides Section */}
-          <VideoGuidesSection />
 
           {/* Progress Bar */}
           <motion.div

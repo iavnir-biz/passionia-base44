@@ -144,16 +144,7 @@ export default function OnboardingQuestionPage({
         navigate(createPageUrl(nextPage));
       } else {
         // Mode base44 classique
-        console.log('🔍 OnboardingQuestionPage - Sauvegarde:', {
-          fieldName,
-          valueType: typeof value,
-          isArray: Array.isArray(value),
-          hasSessionId: !!user.sessionId,
-          sessionId: user.sessionId
-        });
-        
         await base44.auth.updateMe({ [fieldName]: value });
-        console.log('✅ User mis à jour avec', fieldName);
         
         if (nextPage === 'OfferGenerationStart') {
           if (user.sessionId) {
@@ -173,8 +164,6 @@ export default function OnboardingQuestionPage({
                 onboarding_full: onboardingFull,
                 onboarding_summary: summary
               });
-              
-              console.log('✅ Session mise à jour (avant OfferGenerationStart)');
             }
           }
           
@@ -190,8 +179,6 @@ export default function OnboardingQuestionPage({
             extraDetail: currentUser.extraDetail || '',
             deliveryPreferences: currentUser.deliveryPreferences || []
           });
-          
-          console.log('✅ User.onboarding_completed = true');
         } else {
           if (user.sessionId) {
             const sessions = await base44.entities.Session.filter({ id: user.sessionId });
@@ -200,12 +187,7 @@ export default function OnboardingQuestionPage({
               const onboardingFull = session.onboarding_full || {};
               onboardingFull[fieldName] = value;
               await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
-              console.log('✅ Session.onboarding_full mis à jour avec', fieldName);
-            } else {
-              console.warn('⚠️ Session introuvable pour user.sessionId:', user.sessionId);
             }
-          } else {
-            console.warn('⚠️ Pas de sessionId sur le user lors de la sauvegarde de', fieldName);
           }
         }
         

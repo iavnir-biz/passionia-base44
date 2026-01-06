@@ -12,7 +12,7 @@ const QUESTION_STRUCTURE = [
     field: "coreSkill", 
     theme: "Compétence à monétiser", 
     type: "text",
-    titleTemplate: "Salut {{firstName}} ! Quelle est ta passion ou ton savoir-faire que tu aimerais transformer en revenu ?",
+    titleTemplate: "Salut {{firstName}} ! Quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu et enseigner ?",
     subtitleTemplate: "Sois précis. Ex : peindre des aquarelles, conseiller en décoration intérieure, consulting RH, créer un programme de fitness maison."
   },
   { 

@@ -49,23 +49,16 @@ export default function OfferGenerationStart() {
         sessionId: user.sessionId
       });
       
-      // Ensure user has a sessionId
-      if (!user.sessionId) {
-        console.error('❌ User has no sessionId, redirecting to transition');
-        navigate(createPageUrl('OnboardingTransition'));
-        return;
-      }
-      
-      // Get user's session by ID directly
+      // Get user's session
       const sessions = await base44.entities.Session.filter({ 
-        id: user.sessionId
+        created_by: user.email 
       });
       
       console.log('🔍 Sessions found:', sessions.length);
       
       if (!sessions || sessions.length === 0) {
-        console.error('❌ Session not found, redirecting to transition');
-        navigate(createPageUrl('OnboardingTransition'));
+        console.error('❌ Session not found, redirecting to onboarding');
+        navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
       

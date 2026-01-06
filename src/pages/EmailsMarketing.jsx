@@ -69,10 +69,6 @@ export default function EmailsMarketing() {
   const [session, setSession] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [hasPremium, setHasPremium] = useState(false);
-  const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [selectedEmailForAI, setSelectedEmailForAI] = useState(null);
-  const [aiTone, setAiTone] = useState('friendly');
-  const [aiCustomRequest, setAiCustomRequest] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -102,7 +98,7 @@ export default function EmailsMarketing() {
     }
   };
 
-  const handleGenerate = async (emailType, isRegenerate = false, useTone = null, customReq = null) => {
+  const handleGenerate = async (emailType, isRegenerate = false) => {
     if (isRegenerate && !hasPremium) {
       setShowUpgradeModal(true);
       return;
@@ -118,9 +114,7 @@ export default function EmailsMarketing() {
       const response = await base44.functions.invoke('generateMarketingEmail', {
         emailType,
         profile,
-        session,
-        tone: useTone || 'friendly',
-        customRequest: customReq || ''
+        session
       });
 
       const updatedEmails = {
@@ -135,25 +129,12 @@ export default function EmailsMarketing() {
       });
 
       toast.success('Email généré avec succès !');
-      setShowAIAssistant(false);
     } catch (error) {
       console.error('Error generating email:', error);
       toast.error('Erreur lors de la génération');
     } finally {
       setLoading(null);
     }
-  };
-
-  const handleOpenAIAssistant = (emailId) => {
-    setSelectedEmailForAI(emailId);
-    setAiTone('friendly');
-    setAiCustomRequest('');
-    setShowAIAssistant(true);
-  };
-
-  const handleAIGenerate = () => {
-    if (!selectedEmailForAI) return;
-    handleGenerate(selectedEmailForAI, false, aiTone, aiCustomRequest);
   };
 
   const handleCopy = (content) => {
@@ -268,34 +249,40 @@ export default function EmailsMarketing() {
                             </button>
                           </div>
                           <button
-                            onClick={() => handleOpenAIAssistant(email.id)}
-                            className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#3ad87f] transition-all flex items-center justify-center gap-2 text-white font-medium"
+                            onClick={() => {
+                              if (!hasPremium) {
+                                setShowUpgradeModal(true);
+                                return;
+                              }
+                              handleGenerate(email.id, true);
+                            }}
+                            disabled={isGenerating}
+                            className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-700 disabled:opacity-50"
                           >
-                            <Brain className="w-4 h-4" />
-                            <span className="text-sm">Assistant IA</span>
+                            {isGenerating ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Lock className="w-4 h-4" />
+                                <span className="text-sm font-medium">
+                                  Régénération non disponible pour le plan actuel
+                                </span>
+                              </>
+                            )}
                           </button>
                         </div>
                       ) : (
-                        <div className="space-y-2">
-                          <GlowButton
-                            onClick={() => handleGenerate(email.id)}
-                            variant="primary"
-                            size="default"
-                            className="w-full"
-                            loading={isGenerating}
-                            disabled={loading !== null && loading !== email.id}
-                            icon={Sparkles}
-                          >
-                            {isGenerating ? 'Génération...' : 'Générer'}
-                          </GlowButton>
-                          <button
-                            onClick={() => handleOpenAIAssistant(email.id)}
-                            className="w-full px-3 py-2 text-xs rounded-lg border border-[#61f7a2] text-[#61f7a2] hover:bg-green-50 transition-all flex items-center justify-center gap-2"
-                          >
-                            <Brain className="w-3 h-3" />
-                            Personnaliser avec l'IA
-                          </button>
-                        </div>
+                        <GlowButton
+                          onClick={() => handleGenerate(email.id)}
+                          variant="primary"
+                          size="default"
+                          className="w-full"
+                          loading={isGenerating}
+                          disabled={loading !== null && loading !== email.id}
+                          icon={Sparkles}
+                        >
+                          {isGenerating ? 'Génération...' : 'Générer'}
+                        </GlowButton>
                       )
                     ) : null}
 
@@ -359,104 +346,6 @@ export default function EmailsMarketing() {
                 >
                   {previewEmail.content}
                 </ReactMarkdown>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* AI Assistant Modal */}
-      {showAIAssistant && selectedEmailForAI && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl max-w-2xl w-full border border-gray-200 shadow-2xl"
-          >
-            <div className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] p-6 rounded-t-2xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <Brain className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Assistant IA Email</h3>
-                    <p className="text-sm text-white/80">Personnalise ton email selon tes besoins</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowAIAssistant(false)}
-                  className="text-white/80 hover:text-white transition-colors text-xl"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Tone Selection */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
-                  Choisis le ton de l'email
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { value: 'friendly', label: '😊 Amical', desc: 'Chaleureux et proche' },
-                    { value: 'professional', label: '💼 Professionnel', desc: 'Expert et crédible' },
-                    { value: 'urgent', label: '⚡ Urgent', desc: 'Direct et actionnable' },
-                    { value: 'inspiring', label: '✨ Inspirant', desc: 'Motivant et visionnaire' }
-                  ].map((tone) => (
-                    <button
-                      key={tone.value}
-                      onClick={() => setAiTone(tone.value)}
-                      className={cn(
-                        "p-4 rounded-xl border-2 transition-all text-left",
-                        aiTone === tone.value
-                          ? "border-[#61f7a2] bg-green-50"
-                          : "border-gray-200 hover:border-gray-300"
-                      )}
-                    >
-                      <div className="font-semibold text-gray-900 mb-1">{tone.label}</div>
-                      <div className="text-xs text-gray-600">{tone.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Custom Request */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Demande spécifique (optionnel)
-                </label>
-                <textarea
-                  value={aiCustomRequest}
-                  onChange={(e) => setAiCustomRequest(e.target.value)}
-                  placeholder="Ex: Insiste sur le fait que c'est simple pour les débutants, ajoute un témoignage fictif, etc."
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#61f7a2] focus:ring-2 focus:ring-[#61f7a2]/20 transition-all resize-none text-gray-900"
-                  rows={3}
-                />
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowAIAssistant(false)}
-                  className="flex-1 px-4 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all font-medium"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={handleAIGenerate}
-                  disabled={loading === selectedEmailForAI}
-                  className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#3ad87f] text-white font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {loading === selectedEmailForAI ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4" />
-                  )}
-                  Générer l'email
-                </button>
               </div>
             </div>
           </motion.div>

@@ -93,10 +93,55 @@ export default function OnboardingTransition() {
       // Récupérer le prénom du localStorage
       const firstName = localStorage.getItem('onboarding_firstName') || '';
       setUser({ firstName: firstName, full_name: firstName });
+      
+      // Créer la session avec les données de l'onboarding
+      await createSession();
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const createSession = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      
+      // Vérifier si une session existe déjà
+      const existingSessions = await base44.entities.Session.filter({ 
+        created_by: currentUser.email 
+      });
+      
+      if (existingSessions.length > 0) {
+        console.log('✅ Session existe déjà:', existingSessions[0].id);
+        await base44.auth.updateMe({ sessionId: existingSessions[0].id });
+        return;
+      }
+      
+      // Récupérer les données de localStorage
+      const onboardingDataStr = localStorage.getItem('onboarding_data') || '{}';
+      const onboardingData = JSON.parse(onboardingDataStr);
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      
+      // Créer la session
+      const session = await base44.entities.Session.create({
+        onboarding_history: onboardingData.history || [],
+        onboarding_summary: onboardingData.summary || {},
+        onboarding_full: {},
+        skill: onboardingData.summary?.who_to_teach || '',
+        is_onboarding_done: false
+      });
+      
+      console.log('✅ Session créée:', session.id);
+      
+      // Sauvegarder le sessionId sur le user
+      await base44.auth.updateMe({ 
+        firstName: firstName,
+        sessionId: session.id 
+      });
+      
+    } catch (error) {
+      console.error('❌ Erreur création session:', error);
     }
   };
 

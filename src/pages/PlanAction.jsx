@@ -7,6 +7,7 @@ import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import DayCard from '@/components/plan/DayCard';
+import VideoGuidesSection from '@/components/plan/VideoGuidesSection';
 import ChatBubble from '@/components/chat/ChatBubble';
 import { 
   Loader2, 

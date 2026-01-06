@@ -41,7 +41,8 @@ export default function OnboardingQuestionPage({
   progress,
   buttonText = 'Continuer',
   blockType = null, // 'profile' ou 'objectives'
-  useLocalStorage = false // Pour les questions avant authentification
+  useLocalStorage = false, // Pour les questions avant authentification
+  customHandleSave = null // Handler personnalisé pour Q26
 }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -112,7 +113,11 @@ export default function OnboardingQuestionPage({
     
     setIsSaving(true);
     try {
-      if (useLocalStorage) {
+      if (customHandleSave) {
+        // Handler personnalisé (pour Q26)
+        await customHandleSave(user, value);
+        navigate(createPageUrl(nextPage));
+      } else if (useLocalStorage) {
         // Mode localStorage
         localStorage.setItem(`onboarding_${fieldName}`, 
           inputType === 'checkbox' ? JSON.stringify(value) : value

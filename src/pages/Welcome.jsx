@@ -90,9 +90,14 @@ export default function Welcome() {
         </div>
         <div className="flex items-center gap-3">
           <Button
+            onClick={handleLogin}
+            variant="outline"
+            className="bg-white hover:bg-gray-50 text-gray-900 px-6 py-2 rounded-xl font-medium border-2 border-gray-900">
+            Connexion
+          </Button>
+          <Button
             onClick={handleStart}
             className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-8 py-2 rounded-xl font-medium shadow-sm">
-
             Démarrer gratuitement
           </Button>
         </div>

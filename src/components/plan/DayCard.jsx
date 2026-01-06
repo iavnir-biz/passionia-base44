@@ -121,8 +121,8 @@ export default function DayCard({
                     />
                     <div className="flex-1">
                       <span className={cn(
-                        "font-medium",
-                        item.checked ? "text-green-700 line-through" : "text-gray-900"
+                        "font-medium text-gray-900",
+                        item.checked && "line-through text-green-700"
                       )}>
                         {item.text}
                       </span>

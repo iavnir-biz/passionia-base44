@@ -254,6 +254,10 @@ export default function PlanAction() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
+            <h1 className="text-5xl font-bold text-gray-900 mb-4">
+              Plan d'action
+            </h1>
+            
             <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-full mb-4">
               <Target className="w-4 h-4 text-[#61f7a2]" />
               <span className="text-[#61f7a2] font-semibold text-sm">
@@ -261,15 +265,12 @@ export default function PlanAction() {
               </span>
             </div>
             
-            <h1 className="text-5xl font-bold text-gray-900 mb-4">
-              Plan d'action – Ta première vente en 7 jours
-            </h1>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              Ta première vente en 7 jours
+            </h2>
             
-            <p className="text-xl text-gray-600 mb-2">
-              Une action par jour. Pas plus. Pas moins.
-            </p>
-            <p className="text-lg text-gray-500">
-              L'objectif : vendre avant de créer, en aidant quelqu'un avec ce que tu sais déjà.
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Une action par jour. Pas plus. Pas moins. L'objectif : vendre avant de créer, en aidant quelqu'un avec ce que tu sais déjà.
             </p>
           </motion.div>
 

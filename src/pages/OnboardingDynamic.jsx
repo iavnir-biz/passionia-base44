@@ -77,9 +77,23 @@ export default function OnboardingDynamic() {
       });
 
       if (data.isDone) {
-        // Sauvegarder en localStorage et passer à la transition
+        // Sauvegarder en localStorage
         onboardingData.is_onboarding_done = true;
         localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+        
+        // 🔥 SYNCHRONISER AVEC LA SESSION EN BASE DE DONNÉES
+        const currentUser = await base44.auth.me();
+        if (currentUser.sessionId) {
+          console.log('🔄 Synchronisation finale de la session...');
+          await base44.entities.Session.update(currentUser.sessionId, {
+            onboarding_history: onboardingData.history || [],
+            onboarding_summary: onboardingData.summary || {},
+            skill: onboardingData.summary?.who_to_teach || '',
+            is_onboarding_done: true
+          });
+          console.log('✅ Session synchronisée avec', onboardingData.history.length, 'questions');
+        }
+        
         navigate(createPageUrl('OnboardingTransition'));
       } else {
         // Sauvegarder la nouvelle question
@@ -94,6 +108,17 @@ export default function OnboardingDynamic() {
         onboardingData.current_question = data.question;
         onboardingData.summary = data.summary || onboardingData.summary;
         localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+        
+        // 🔥 SYNCHRONISER AVEC LA SESSION EN BASE DE DONNÉES AU FUR ET À MESURE
+        const currentUser = await base44.auth.me();
+        if (currentUser.sessionId && onboardingData.history.length > 0) {
+          await base44.entities.Session.update(currentUser.sessionId, {
+            onboarding_history: onboardingData.history,
+            onboarding_summary: onboardingData.summary || {},
+            skill: onboardingData.summary?.who_to_teach || ''
+          });
+          console.log('🔄 Session mise à jour:', onboardingData.history.length, 'questions');
+        }
         
         setCurrentQuestion(data.question);
         initializeValue(data.question.type, data.question);

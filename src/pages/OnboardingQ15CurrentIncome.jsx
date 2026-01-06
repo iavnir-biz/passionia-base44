@@ -21,6 +21,7 @@ export default function OnboardingQ15CurrentIncome() {
       progress={28}
       blockType="profile"
       useLocalStorage={true}
+      completedSteps={[1]}
     />
   );
 }

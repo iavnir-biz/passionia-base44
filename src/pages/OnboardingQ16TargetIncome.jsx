@@ -31,6 +31,7 @@ export default function OnboardingQ16TargetIncome() {
       progress={35}
       blockType="objectives"
       useLocalStorage={true}
+      completedSteps={[1, 2]}
     />
   );
 }

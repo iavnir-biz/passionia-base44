@@ -43,7 +43,8 @@ export default function OnboardingQuestionPage({
   blockType = null, // 'profile' ou 'objectives'
   useLocalStorage = false, // Pour les questions avant authentification
   customHandleSave = null, // Handler personnalisé pour Q26
-  autoSubmit = false // Pour auto-submit au clic (Q12, Q14, etc.)
+  autoSubmit = false, // Pour auto-submit au clic (Q12, Q14, etc.)
+  completedSteps = [] // Étapes complétées à afficher dans la sidebar
 }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -273,7 +274,7 @@ export default function OnboardingQuestionPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
-      <OnboardingSidebar currentPage={window.location.pathname.split('/').pop()} completedSteps={[]} />
+      <OnboardingSidebar currentPage={window.location.pathname.split('/').pop()} completedSteps={completedSteps} />
 
       <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">
         {/* Progress bar for current block */}

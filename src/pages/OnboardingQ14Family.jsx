@@ -20,6 +20,7 @@ export default function OnboardingQ14Family() {
       blockType="profile"
       useLocalStorage={true}
       autoSubmit={false}
+      completedSteps={[1]}
     />
   );
 }

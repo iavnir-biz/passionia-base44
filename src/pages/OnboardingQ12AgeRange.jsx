@@ -37,6 +37,7 @@ export default function OnboardingQ12AgeRange() {
       blockType="profile"
       useLocalStorage={true}
       autoSubmit={true}
+      completedSteps={[1]}
     />
   );
 }

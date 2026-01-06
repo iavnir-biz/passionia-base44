@@ -60,16 +60,27 @@ export default function MarketAnalysis() {
   };
 
   const handleGenerate = async () => {
-    if (!session?.id) return;
+    if (!session?.id) {
+      console.error('No session ID available');
+      return;
+    }
     
     setGenerating(true);
     try {
+      console.log('Generating analysis for session:', session.id);
       const { data } = await base44.functions.invoke('generateMarketAnalysisV2', {
         sessionId: session.id
       });
 
+      console.log('Generation response:', data);
+
       if (data.success) {
         setAnalysis(data.analysis);
+        // Recharger la session pour confirmer la sauvegarde
+        await loadData();
+      } else {
+        console.error('Generation failed:', data);
+        alert('Erreur lors de la génération. Réessaie dans quelques instants.');
       }
     } catch (error) {
       console.error('Error generating analysis:', error);

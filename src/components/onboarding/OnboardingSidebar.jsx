@@ -191,7 +191,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   <div className="flex-1">
                     <p className={cn(
                       "text-sm font-semibold",
-                      isCompleted ? "text-gray-500 line-through" : isActive ? "text-gray-900" : "text-gray-600"
+                      isCompleted ? "text-gray-500" : isActive ? "text-gray-900" : "text-gray-600"
                     )}>
                       {step.title}
                     </p>

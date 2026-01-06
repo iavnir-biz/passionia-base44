@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import OfferTransition from '@/components/offer/OfferTransition';
+import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
 
 const mainSteps = [
@@ -167,54 +168,15 @@ export default function BonneNouvelle() {
   const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
   const scores = marketAnalysis?.marketScores || {};
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      {/* Main Navigation Bar */}
-      <div className="bg-white border-b border-gray-200 py-4 sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-center gap-3 flex-wrap">
-            {mainSteps.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = step.id === 2;
-              const isPrevious = step.id < 2;
-              const isClickable = isPrevious;
+  const completedSteps = [1, 2, 3, 4]; // Jusqu'à Tes offres complété
 
-              return (
-                <React.Fragment key={step.id}>
-                  <button
-                    onClick={() => isClickable && navigate(createPageUrl('OfferResume'))}
-                    disabled={!isClickable}
-                    className={cn(
-                      "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap",
-                      isActive && `bg-gradient-to-br ${step.color} text-white shadow-md`,
-                      isPrevious && "bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200",
-                      !isActive && !isPrevious && "text-gray-400 bg-gray-50 cursor-not-allowed opacity-60"
-                    )}>
-                    <div className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center",
-                      isActive && "bg-white/20",
-                      isPrevious && "bg-gray-200",
-                      !isActive && !isPrevious && "bg-gray-200"
-                    )}>
-                      <Icon className={cn("w-4 h-4", isActive && "text-white", !isActive && "text-gray-500")} />
-                    </div>
-                    {step.label}
-                  </button>
-                  {index < mainSteps.length - 1 && (
-                    <div className={cn(
-                      "w-6 h-0.5",
-                      step.id < 2 ? "bg-green-500" : "bg-gray-200"
-                    )} />
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
+      <OnboardingSidebar currentPage="BonneNouvelle" completedSteps={completedSteps} progressInStep={0} />
 
       {/* Content */}
-      <div className="py-12">
+      <div className="flex-1 flex flex-col lg:ml-80">
+        <div className="py-12">
         <div className="max-w-3xl mx-auto px-4">
           {/* Title */}
           <motion.div
@@ -438,8 +400,6 @@ export default function BonneNouvelle() {
           </motion.div>
         </div>
       </div>
-
-
     </div>
   );
 }

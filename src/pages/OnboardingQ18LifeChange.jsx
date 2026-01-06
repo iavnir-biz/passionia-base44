@@ -15,6 +15,7 @@ export default function OnboardingQ18LifeChange() {
       progress={50}
       blockType="objectives"
       useLocalStorage={true}
+      completedSteps={[1, 2]}
     />
   );
 }

@@ -102,12 +102,29 @@ export default function OnboardingQuestionPage({
   };
 
   const replaceVariables = (text) => {
-    if (!text || !user) return text;
-    return text
-      .replace(/\{\{user\.firstName\}\}/g, user.firstName || '')
-      .replace(/\{\{user\.coreSkill\}\}/g, user.coreSkill || '')
-      .replace(/\{\{user\.targetIncome\}\}/g, user.targetIncome || '')
-      .replace(/\{\{user\.targetIncomeDelay\}\}/g, user.targetIncomeDelay || '');
+    if (!text) return text;
+    
+    let result = text;
+    
+    // Pour les questions en mode localStorage
+    if (useLocalStorage) {
+      const targetIncome = localStorage.getItem('onboarding_targetIncome') || '';
+      const targetIncomeDelay = localStorage.getItem('onboarding_targetIncomeDelay') || '';
+      result = result
+        .replace(/\{\{user\.targetIncome\}\}/g, targetIncome)
+        .replace(/\{\{user\.targetIncomeDelay\}\}/g, targetIncomeDelay);
+    }
+    
+    // Pour les questions authentifiées
+    if (user) {
+      result = result
+        .replace(/\{\{user\.firstName\}\}/g, user.firstName || '')
+        .replace(/\{\{user\.coreSkill\}\}/g, user.coreSkill || '')
+        .replace(/\{\{user\.targetIncome\}\}/g, user.targetIncome || '')
+        .replace(/\{\{user\.targetIncomeDelay\}\}/g, user.targetIncomeDelay || '');
+    }
+    
+    return result;
   };
 
   const handleNext = async () => {

@@ -74,7 +74,7 @@ export default function TopBar({ user }) {
                     navigate(createPageUrl('Settings'));
                     setShowUserMenu(false);
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left border-t border-gray-100 mt-1"
                 >
                   <Settings className="w-4 h-4 text-gray-600" />
                   <span className="text-sm text-gray-700">Paramètres</span>
@@ -85,7 +85,7 @@ export default function TopBar({ user }) {
                     base44.auth.logout();
                     setShowUserMenu(false);
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition-colors text-left border-t border-gray-100 mt-1"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition-colors text-left"
                 >
                   <LogOut className="w-4 h-4 text-red-600" />
                   <span className="text-sm text-red-600">Déconnexion</span>

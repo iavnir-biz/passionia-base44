@@ -153,11 +153,7 @@ export default function AIResources() {
       <Sidebar currentPage="AIResources" progress={0} />
       
       <div className="flex-1 ml-72">
-        <TopBar 
-          title="Ressources IA" 
-          subtitle="Tous les outils IA essentiels pour créer, structurer et vendre ton activité en ligne"
-          user={user}
-        />
+        <TopBar user={user} />
         
         <main className="p-8">
           <div className="max-w-7xl mx-auto space-y-8">

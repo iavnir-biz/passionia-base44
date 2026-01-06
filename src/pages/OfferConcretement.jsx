@@ -12,7 +12,11 @@ import {
   Rocket,
   Shield,
   Sparkles,
-  DollarSign
+  DollarSign,
+  Package,
+  BarChart3,
+  Sprout,
+  Map
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import OfferTransition from '@/components/offer/OfferTransition';
@@ -200,11 +204,63 @@ export default function OfferConcretement() {
 
   const completedSteps = [1, 2, 3, 4, 5, 6]; // Jusqu'à Ta vie future complété
 
+  const mainSteps = [
+    { id: 1, label: "Tes offres", icon: Package, color: "from-orange-500 to-red-500" },
+    { id: 2, label: "Ton marché", icon: BarChart3, color: "from-green-500 to-emerald-500" },
+    { id: 3, label: "Ta vie future", icon: Sprout, color: "from-amber-500 to-yellow-500" },
+    { id: 4, label: "Ton plan d'action", icon: Map, color: "from-indigo-500 to-purple-500" },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
       <OnboardingSidebar currentPage="OfferConcretement" completedSteps={completedSteps} progressInStep={0} />
 
       <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">
+        {/* Main Navigation Bar */}
+        <div className="bg-white border-b border-gray-200 py-4 sticky top-0 z-40 lg:top-0">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              {mainSteps.map((step, index) => {
+                const Icon = step.icon;
+                const isActive = step.id === 4;
+                const isPrevious = step.id < 4;
+                const isClickable = isPrevious;
+                const pageMap = { 1: 'OfferResume', 2: 'BonneNouvelle', 3: 'OfferTaVieFuture' };
+
+                return (
+                  <React.Fragment key={step.id}>
+                    <button
+                      onClick={() => isClickable && navigate(createPageUrl(pageMap[step.id]))}
+                      disabled={!isClickable}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap",
+                        isActive && `bg-gradient-to-br ${step.color} text-white shadow-md`,
+                        isPrevious && "bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200",
+                        !isActive && !isPrevious && "text-gray-400 bg-gray-50 cursor-not-allowed opacity-60"
+                      )}>
+                      <div className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center",
+                        isActive && "bg-white/20",
+                        isPrevious && "bg-gray-200",
+                        !isActive && !isPrevious && "bg-gray-200"
+                      )}>
+                        <Icon className={cn("w-4 h-4", isActive && "text-white", !isActive && "text-gray-500")} />
+                      </div>
+                      {step.label}
+                    </button>
+                    {index < mainSteps.length - 1 && (
+                      <div className={cn(
+                        "w-6 h-0.5",
+                        step.id < 4 ? "bg-indigo-500" : "bg-gray-200"
+                      )} />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-4xl mx-auto px-6 py-12">
           {/* Hero Section avec visuel */}
           <motion.div

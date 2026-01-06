@@ -55,10 +55,10 @@ const features = [
 const categories = [
   { icon: Music, label: "Composition musicale", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
   { icon: Code, label: "Code Python", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
+  { icon: Sparkle, label: "Intelligence artificielle", color: "bg-green-100 text-green-700 hover:bg-green-200" },
   { icon: Dumbbell, label: "Calisthenie", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
   { icon: ChefHat, label: "Cuisine moléculaire", color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" },
   { icon: Sword, label: "Jujitsu", color: "bg-red-100 text-red-700 hover:bg-red-200" },
-  { icon: Sparkle, label: "Intelligence artificielle", color: "bg-indigo-100 text-indigo-700 hover:bg-indigo-200" },
   { icon: Video, label: "Montage vidéo", color: "bg-cyan-100 text-cyan-700 hover:bg-cyan-200" },
   { icon: Heart, label: "Yoga", color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
 ];

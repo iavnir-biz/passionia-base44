@@ -11,12 +11,27 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
+
+// Configuration des blocs pour la barre de progression
+const BLOCK_CONFIG = {
+  profile: {
+    title: 'Ton profil',
+    pages: ['OnboardingQ12AgeRange', 'OnboardingQ13Gender', 'OnboardingQ14Family', 'OnboardingQ15CurrentIncome'],
+    totalQuestions: 4
+  },
+  objectives: {
+    title: 'Tes objectifs',
+    pages: ['OnboardingQ16TargetIncome', 'OnboardingQ17TargetDelay', 'OnboardingQ18LifeChange', 'OnboardingQ19Impact', 'OnboardingQ20Emotions', 'OnboardingQ21Relatives', 'OnboardingQ22Lifestyle', 'OnboardingQ23Obstacles', 'OnboardingQ24IfNothingChanges', 'OnboardingQ25Readiness', 'OnboardingQ26DeliveryPreferences'],
+    totalQuestions: 11
+  }
+};
 
 export default function OnboardingQuestionPage({
   questionId,
   title,
   subtitle,
-  inputType = 'textarea', // 'textarea', 'radio', 'checkbox', 'slider'
+  inputType = 'textarea',
   options = [],
   sliderConfig = { min: 0, max: 10, step: 1, suffix: '' },
   placeholder = '',
@@ -24,40 +39,41 @@ export default function OnboardingQuestionPage({
   nextPage,
   prevPage,
   progress,
-  buttonText = 'Continuer'
+  buttonText = 'Continuer',
+  blockType = null // 'profile' ou 'objectives'
 }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [value, setValue] = useState(inputType === 'checkbox' ? [] : inputType === 'slider' ? sliderConfig.min : '');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [helperText, setHelperText] = useState('');
-  const [examples, setExamples] = useState([]);
-  const [isLoadingHelper, setIsLoadingHelper] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [audioURL, setAudioURL] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const fileInputRef = useRef(null);
 
+  // Calculer la progression dans le bloc actuel
+  const blockProgress = blockType && BLOCK_CONFIG[blockType] 
+    ? ((BLOCK_CONFIG[blockType].pages.indexOf(window.location.pathname.split('/').pop()) + 1) / BLOCK_CONFIG[blockType].totalQuestions) * 100
+    : progress;
+
+  const blockTitle = blockType && BLOCK_CONFIG[blockType] ? BLOCK_CONFIG[blockType].title : '';
+  const currentQuestion = blockType && BLOCK_CONFIG[blockType] 
+    ? BLOCK_CONFIG[blockType].pages.indexOf(window.location.pathname.split('/').pop()) + 1
+    : 0;
+  const totalQuestions = blockType && BLOCK_CONFIG[blockType] ? BLOCK_CONFIG[blockType].totalQuestions : 0;
+
   useEffect(() => {
     loadUser();
   }, []);
-
-  useEffect(() => {
-    if (user && questionId) {
-      loadDynamicHelper();
-    }
-  }, [user, questionId]);
 
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       
-      // Pre-fill value if exists
       if (currentUser[fieldName] !== undefined && currentUser[fieldName] !== null) {
         setValue(currentUser[fieldName]);
       }
@@ -65,30 +81,6 @@ export default function OnboardingQuestionPage({
       console.error('Error loading user:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const loadDynamicHelper = async () => {
-    if (!user.sessionId) return;
-    
-    setIsLoadingHelper(true);
-    try {
-      const { data } = await base44.functions.invoke('onboardingHelper', {
-        sessionId: user.sessionId,
-        questionId,
-        fieldName
-      });
-      
-      if (data.helperText) {
-        setHelperText(data.helperText);
-      }
-      if (data.examples && data.examples.length > 0) {
-        setExamples(data.examples);
-      }
-    } catch (error) {
-      console.error('Error loading helper:', error);
-    } finally {
-      setIsLoadingHelper(false);
     }
   };
 
@@ -106,12 +98,9 @@ export default function OnboardingQuestionPage({
     
     setIsSaving(true);
     try {
-      // Sauvegarder sur le user
       await base44.auth.updateMe({ [fieldName]: value });
       
-      // Si c'est la dernière question (Q26), sauvegarder aussi onboarding_completed
       if (nextPage === 'OfferGenerationStart') {
-        // Mapper vers Session.onboarding_full pour sauvegarder toutes les données statiques
         if (user.sessionId) {
           const sessions = await base44.entities.Session.filter({ id: user.sessionId });
           if (sessions.length > 0) {
@@ -119,10 +108,8 @@ export default function OnboardingQuestionPage({
             const onboardingFull = session.onboarding_full || {};
             const summary = session.onboarding_summary || {};
             
-            // Sauvegarder la dernière réponse
             onboardingFull[fieldName] = value;
             
-            // Mapper deliveryPreferences vers format_preferences dans le summary
             if (fieldName === 'deliveryPreferences') {
               summary.format_preferences = value;
             }
@@ -134,7 +121,6 @@ export default function OnboardingQuestionPage({
           }
         }
         
-        // Sauvegarder les données principales sur le user
         const currentUser = await base44.auth.me();
         await base44.auth.updateMe({ 
           onboarding_completed: true,
@@ -148,7 +134,6 @@ export default function OnboardingQuestionPage({
           deliveryPreferences: currentUser.deliveryPreferences || []
         });
       } else {
-        // Questions intermédiaires : sauvegarder dans onboarding_full
         if (user.sessionId) {
           const sessions = await base44.entities.Session.filter({ id: user.sessionId });
           if (sessions.length > 0) {
@@ -212,10 +197,7 @@ export default function OnboardingQuestionPage({
 
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const url = URL.createObjectURL(audioBlob);
-        setAudioURL(url);
 
-        // Upload audio
         setIsUploading(true);
         try {
           const file = new File([audioBlob], 'voice-note.webm', { type: 'audio/webm' });
@@ -262,358 +244,261 @@ export default function OnboardingQuestionPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
-      {/* Sidebar gauche */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col items-center py-12 px-6">
-        {/* Noah Avatar */}
-        <div className="relative mb-8">
-          <motion.div
-            className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
-            animate={{
-              y: [0, -5, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            <Sparkles className="w-10 h-10 text-white" />
-          </motion.div>
-          <motion.div
-            className="absolute -top-1 -right-1"
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          >
-            <Sparkles className="w-5 h-5 text-[#61f7a2]" />
-          </motion.div>
-        </div>
+      <OnboardingSidebar currentPage={window.location.pathname.split('/').pop()} completedSteps={[]} />
 
-        {/* Étapes */}
-        <div className="text-center mb-6">
-          <div className="space-y-3">
-            <div className="text-xs text-gray-500">Étape 1 : Découverte ✓</div>
-            <div>
-              <h3 className="text-lg font-bold text-[#61f7a2] mb-1">Étape 2</h3>
-              <p className="text-sm text-gray-600">Informations supplémentaires</p>
+      <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">
+        {/* Progress bar for current block */}
+        {blockType && (
+          <div className="fixed top-0 lg:top-0 left-0 lg:left-80 right-0 bg-white border-b border-gray-200 z-40 pt-20 lg:pt-0">
+            <div className="px-6 py-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-900">{blockTitle}</span>
+                <span className="text-sm font-semibold text-[#61f7a2]">
+                  {currentQuestion}/{totalQuestions} questions
+                </span>
+              </div>
+              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${blockProgress}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Progress vertical - nouvelle barre pour étape 2 */}
-        <div className="flex-1 flex flex-col items-center w-full max-w-[200px]">
-          <div className="relative w-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div 
-              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#61f7a2] to-[#4de88f]"
-              initial={{ height: '0%' }}
-              animate={{ height: `${progress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-
-          <div className="mt-4 text-center space-y-3">
-            <p className="text-2xl font-bold text-[#61f7a2]">{Math.round(progress)}%</p>
-
-            {/* Teaser permanent */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-[#61f7a2] rounded-xl p-3 w-full"
-            >
-              <p className="text-xs font-bold text-gray-900 mb-1 text-center">🎁 Vous attendent</p>
-              <div className="space-y-0.5 text-xs text-gray-700">
-                <div>✨ Offres personnalisées</div>
-                <div>💰 Prix optimisés</div>
-                <div>📄 Page de vente</div>
-                <div>🎯 Offre complète</div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        {/* Progress bar horizontal (mobile) */}
-        <div className="w-full bg-gray-100 h-2 md:hidden">
-          <div 
-            className="h-full bg-[#61f7a2] transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        <div className="flex-1 flex items-center justify-center p-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full max-w-2xl"
-        >
-          {/* Card */}
-          <motion.div 
-            className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm"
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+        <div className={`flex-1 flex items-center justify-center p-6 ${blockType ? 'mt-24 lg:mt-20' : ''}`}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="w-full max-w-2xl"
           >
-            {/* Title */}
-            <motion.h1 
-              className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+            <motion.div 
+              className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
-              {replaceVariables(title)}
-            </motion.h1>
-
-            {/* Subtitle (static) */}
-            {subtitle && (
-              <motion.p 
-                className="text-gray-600 mb-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+              <motion.h1 
+                className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
               >
-                {replaceVariables(subtitle)}
-              </motion.p>
-            )}
+                {replaceVariables(title)}
+              </motion.h1>
 
-            {/* Helper IA avec mémoire */}
-            {isLoadingHelper && (
-              <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>L'IA analyse ton parcours...</span>
-              </div>
-            )}
+              {subtitle && (
+                <motion.p 
+                  className="text-gray-600 mb-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                  {replaceVariables(subtitle)}
+                </motion.p>
+              )}
 
-            {helperText && !isLoadingHelper && (
               <motion.div 
-                className="mb-4 p-4 bg-gradient-to-br from-green-50 to-blue-50 border border-green-200 rounded-2xl"
-                initial={{ opacity: 0, y: -10 }}
+                className="mb-8"
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
               >
-                <p className="text-sm text-gray-700 mb-2">💡 {helperText}</p>
-                {examples.length > 0 && (
-                  <div className="space-y-1 mt-2">
-                    <p className="text-xs text-gray-500 font-semibold">Exemples :</p>
-                    {examples.map((ex, idx) => (
-                      <p key={idx} className="text-xs text-gray-600">• {ex}</p>
+                {inputType === 'textarea' && (
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <Textarea
+                        value={value}
+                        onChange={(e) => setValue(e.target.value)}
+                        placeholder={placeholder}
+                        className="w-full bg-white border-gray-300 text-gray-900 min-h-[120px] text-lg p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400 transition-all duration-300"
+                      />
+                      <div className="absolute bottom-3 right-3 flex items-center gap-2">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isUploading}
+                        >
+                          {isUploading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Paperclip className="w-4 h-4" />
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className={`h-8 w-8 hover:bg-gray-100 ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-gray-700'}`}
+                          onClick={isRecording ? stopRecording : startRecording}
+                        >
+                          {isRecording ? (
+                            <StopCircle className="w-4 h-4" />
+                          ) : (
+                            <Mic className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {attachedFiles.length > 0 && (
+                      <div className="space-y-2">
+                        {attachedFiles.map((file, index) => (
+                          <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-2 border border-gray-200">
+                            <div className="flex items-center gap-2">
+                              {file.isAudio ? <Mic className="w-4 h-4 text-gray-600" /> : <Paperclip className="w-4 h-4 text-gray-600" />}
+                              <span className="text-sm text-gray-700">{file.name}</span>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => removeFile(index)}
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {inputType === 'radio' && (
+                  <RadioGroup value={value} onValueChange={(val) => {
+                    setValue(val);
+                    setTimeout(() => handleNext(), 300);
+                  }} className="space-y-3">
+                    {options.map((option, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.1 }}
+                        className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
+                          value === option 
+                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
+                            : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
+                        }`}
+                        onClick={() => {
+                          setValue(option);
+                          setTimeout(() => handleNext(), 300);
+                        }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <RadioGroupItem value={option} id={`option-${idx}`} />
+                        <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
+                          {option}
+                        </Label>
+                      </motion.div>
+                    ))}
+                  </RadioGroup>
+                )}
+
+                {inputType === 'checkbox' && (
+                  <div className="space-y-3">
+                    {options.map((option, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.1 }}
+                        className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
+                          value.includes(option)
+                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
+                            : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
+                        }`}
+                        onClick={() => handleCheckboxChange(option, !value.includes(option))}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Checkbox
+                          checked={value.includes(option)}
+                          onCheckedChange={(checked) => handleCheckboxChange(option, checked)}
+                        />
+                        <Label className="text-gray-900 cursor-pointer flex-1 font-medium">{option}</Label>
+                      </motion.div>
                     ))}
                   </div>
                 )}
-              </motion.div>
-            )}
 
-
-
-            {/* Input */}
-            <motion.div 
-              className="mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              {inputType === 'textarea' && (
-                <div className="space-y-3">
-                  <div className="relative">
-                    <Textarea
-                      value={value}
-                      onChange={(e) => setValue(e.target.value)}
-                      placeholder={placeholder}
-                      className="w-full bg-white border-gray-300 text-gray-900 min-h-[120px] text-lg p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400 transition-all duration-300"
+                {inputType === 'slider' && (
+                  <div className="space-y-6">
+                    <motion.div 
+                      className="text-center"
+                      key={value}
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <span className="text-5xl font-bold text-[#61f7a2]">
+                        {value}{sliderConfig.suffix}
+                      </span>
+                    </motion.div>
+                    <Slider
+                      value={[value]}
+                      onValueChange={(vals) => setValue(vals[0])}
+                      min={sliderConfig.min}
+                      max={sliderConfig.max}
+                      step={sliderConfig.step}
+                      className="w-full"
                     />
-                    <div className="absolute bottom-3 right-3 flex items-center gap-2">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        onChange={handleFileSelect}
-                        className="hidden"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
-                      >
-                        {isUploading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Paperclip className="w-4 h-4" />
-                        )}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className={`h-8 w-8 hover:bg-gray-100 ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-gray-700'}`}
-                        onClick={isRecording ? stopRecording : startRecording}
-                      >
-                        {isRecording ? (
-                          <StopCircle className="w-4 h-4" />
-                        ) : (
-                          <Mic className="w-4 h-4" />
-                        )}
-                      </Button>
+                    <div className="flex justify-between text-sm text-gray-600 font-medium">
+                      <span>{sliderConfig.min}{sliderConfig.suffix}</span>
+                      <span>{sliderConfig.max}{sliderConfig.suffix}</span>
                     </div>
                   </div>
+                )}
+              </motion.div>
 
-                  {/* Attached files */}
-                  {attachedFiles.length > 0 && (
-                    <div className="space-y-2">
-                      {attachedFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-2 border border-gray-200">
-                          <div className="flex items-center gap-2">
-                            {file.isAudio ? <Mic className="w-4 h-4 text-gray-600" /> : <Paperclip className="w-4 h-4 text-gray-600" />}
-                            <span className="text-sm text-gray-700">{file.name}</span>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => removeFile(index)}
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {inputType === 'radio' && (
-                <RadioGroup value={value} onValueChange={(val) => {
-                  setValue(val);
-                  // Auto-submit après sélection
-                  setTimeout(() => handleNext(), 300);
-                }} className="space-y-3">
-                  {options.map((option, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: idx * 0.1 }}
-                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
-                        value === option 
-                          ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
-                          : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
-                      }`}
-                      onClick={() => {
-                        setValue(option);
-                        setTimeout(() => handleNext(), 300);
-                      }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+              <motion.div 
+                className="flex gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                {prevPage && (
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      variant="outline"
+                      onClick={handleBack}
+                      className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300"
                     >
-                      <RadioGroupItem value={option} id={`option-${idx}`} />
-                      <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
-                        {option}
-                      </Label>
-                    </motion.div>
-                  ))}
-                </RadioGroup>
-              )}
-
-              {inputType === 'checkbox' && (
-                <div className="space-y-3">
-                  {options.map((option, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: idx * 0.1 }}
-                      className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
-                        value.includes(option)
-                          ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
-                          : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
-                      }`}
-                      onClick={() => handleCheckboxChange(option, !value.includes(option))}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Checkbox
-                        checked={value.includes(option)}
-                        onCheckedChange={(checked) => handleCheckboxChange(option, checked)}
-                      />
-                      <Label className="text-gray-900 cursor-pointer flex-1 font-medium">{option}</Label>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-
-              {inputType === 'slider' && (
-                <div className="space-y-6">
-                  <motion.div 
-                    className="text-center"
-                    key={value}
-                    initial={{ scale: 1.1 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <span className="text-5xl font-bold text-[#61f7a2]">
-                      {value}{sliderConfig.suffix}
-                    </span>
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Retour
+                    </Button>
                   </motion.div>
-                  <Slider
-                    value={[value]}
-                    onValueChange={(vals) => setValue(vals[0])}
-                    min={sliderConfig.min}
-                    max={sliderConfig.max}
-                    step={sliderConfig.step}
+                )}
+                <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <GlowButton
+                    onClick={handleNext}
+                    disabled={!canProceed()}
+                    loading={isSaving}
                     className="w-full"
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 font-medium">
-                    <span>{sliderConfig.min}{sliderConfig.suffix}</span>
-                    <span>{sliderConfig.max}{sliderConfig.suffix}</span>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-
-            {/* Buttons */}
-            <motion.div 
-              className="flex gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
-              {prevPage && (
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    variant="outline"
-                    onClick={handleBack}
-                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300"
+                    size="lg"
                   >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Retour
-                  </Button>
+                    {buttonText}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </GlowButton>
                 </motion.div>
-              )}
-              <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <GlowButton
-                  onClick={handleNext}
-                  disabled={!canProceed()}
-                  loading={isSaving}
-                  className="w-full"
-                  size="lg"
-                >
-                  {buttonText}
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </GlowButton>
               </motion.div>
-              </motion.div>
-              </motion.div>
-        </motion.div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>

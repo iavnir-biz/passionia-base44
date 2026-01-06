@@ -302,7 +302,27 @@ export default function OnboardingDynamic() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">
-        <div className="flex-1 flex items-center justify-center p-6">
+        {/* Progress bar for current block */}
+        <div className="fixed top-0 lg:top-0 left-0 lg:left-80 right-0 bg-white border-b border-gray-200 z-40 pt-20 lg:pt-0">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-900">Tes talents</span>
+              <span className="text-sm font-semibold text-[#61f7a2]">
+                {Math.min(session?.onboarding_history?.length || 0, 11)}/11 questions
+              </span>
+            </div>
+            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
+                initial={{ width: '0%' }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center p-6 mt-24 lg:mt-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

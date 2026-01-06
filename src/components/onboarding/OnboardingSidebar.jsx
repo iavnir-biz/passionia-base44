@@ -108,9 +108,19 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
 
             return (
               <div key={step.id} className="relative">
-                {/* Connecting line */}
+                {/* Connecting line with progress */}
                 {index < ONBOARDING_STEPS.length - 1 && (
-                  <div className="absolute left-[23px] top-[50px] w-0.5 h-8 bg-gray-200" />
+                  <div className="absolute left-[19px] top-[42px] w-0.5 h-8">
+                    <div className="absolute inset-0 bg-gray-200" />
+                    {isCompleted && (
+                      <motion.div 
+                        className="absolute inset-0 bg-[#61f7a2]"
+                        initial={{ height: 0 }}
+                        animate={{ height: '100%' }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    )}
+                  </div>
                 )}
 
                 <motion.div
@@ -125,15 +135,15 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                 >
                   {/* Icon */}
                   <div className={cn(
-                    "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all",
+                    "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all",
                     isCompleted 
                       ? "bg-[#61f7a2]" 
                       : `bg-gradient-to-br ${step.color}`
                   )}>
                     {isCompleted ? (
-                      <CheckCircle2 className="w-6 h-6 text-white" />
+                      <CheckCircle2 className="w-5 h-5 text-white" />
                     ) : (
-                      <Icon className="w-6 h-6 text-white" />
+                      <Icon className="w-5 h-5 text-white" />
                     )}
                   </div>
 

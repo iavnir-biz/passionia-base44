@@ -309,51 +309,39 @@ export default function Welcome() {
         className="w-full max-w-6xl mx-auto px-6 py-20">
 
         {/* Title */}
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
           4 étapes pour <span className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">démarrer</span>
         </h2>
 
-        {/* Progress Bar */}
-        <div className="max-w-3xl mx-auto mb-16 px-6">
-          <div className="relative">
-            {/* Background Line */}
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2" />
-            
-            {/* Animated Progress Line */}
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: '100%' }}
-              transition={{ duration: 2, delay: 1.6, ease: "easeInOut" }}
-              className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] -translate-y-1/2"
-            />
-            
-            {/* Step Circles */}
-            <div className="relative flex justify-between">
-              {[1, 2, 3, 4].map((step, index) => (
-                <motion.div
-                  key={step}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 1.5 + (index * 0.15), duration: 0.3 }}
-                  className="flex flex-col items-center"
-                >
-                  <div className="w-10 h-10 rounded-full bg-white border-2 border-[#61f7a2] flex items-center justify-center shadow-md">
-                    <span className="text-[#61f7a2] font-bold text-sm">{step}</span>
-                  </div>
-                </motion.div>
-              ))}
+        {/* Steps with Progress Line */}
+        <div className="relative hidden lg:grid lg:grid-cols-4 gap-6">
+          {/* Progress Line (behind cards) */}
+          <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 px-12 pointer-events-none">
+            <div className="relative h-1 bg-gray-200">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 2, delay: 1.6, ease: "easeInOut" }}
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
+              />
             </div>
           </div>
-        </div>
-
-        {/* Steps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Step 01 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.5 }}
-            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
+            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group z-10">
+
+            {/* Step Circle on Line */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 1.65, duration: 0.3 }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-3 border-[#61f7a2] flex items-center justify-center shadow-lg z-20"
+            >
+              <span className="text-[#61f7a2] font-bold">1</span>
+            </motion.div>
 
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center">
@@ -372,7 +360,17 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6 }}
-            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
+            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group z-10">
+
+            {/* Step Circle on Line */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 1.8, duration: 0.3 }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-3 border-[#61f7a2] flex items-center justify-center shadow-lg z-20"
+            >
+              <span className="text-[#61f7a2] font-bold">2</span>
+            </motion.div>
 
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center">
@@ -391,7 +389,17 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.7 }}
-            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
+            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group z-10">
+
+            {/* Step Circle on Line */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 1.95, duration: 0.3 }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-3 border-[#61f7a2] flex items-center justify-center shadow-lg z-20"
+            >
+              <span className="text-[#61f7a2] font-bold">3</span>
+            </motion.div>
 
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
@@ -410,13 +418,94 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.8 }}
-            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
+            className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group z-10">
+
+            {/* Step Circle on Line */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 2.1, duration: 0.3 }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-3 border-[#61f7a2] flex items-center justify-center shadow-lg z-20"
+            >
+              <span className="text-[#61f7a2] font-bold">4</span>
+            </motion.div>
 
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center">
                 <TrendingUp className="w-7 h-7 text-green-600" />
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">04</span>
+            </div>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Passe à l'action</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Un plan d'action personnalisé pour avancer concrètement, jour après jour.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Mobile Version (without progress line) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.5 }}
+            className="relative bg-white rounded-3xl p-8 shadow-sm">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                <Target className="w-7 h-7 text-blue-600" />
+              </div>
+              <span className="text-6xl font-bold text-gray-200">01</span>
+            </div>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Crée ton profil</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Présente ta passion, ton expérience ou ton savoir-faire. L'IA s'adapte à ton parcours.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.6 }}
+            className="relative bg-white rounded-3xl p-8 shadow-sm">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-pink-600" />
+              </div>
+              <span className="text-6xl font-bold text-gray-200">02</span>
+            </div>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Discute avec l'IA</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Notre IA t'aide à transformer ta passion en activité viable en quelques minutes.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.7 }}
+            className="relative bg-white rounded-3xl p-8 shadow-sm">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
+                <FileText className="w-7 h-7 text-amber-600" />
+              </div>
+              <span className="text-6xl font-bold text-gray-200">03</span>
+            </div>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Récupère tes documents IA</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Offre, avatars, messages de vente, emails et page de vente prêts à l'emploi.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8 }}
+            className="relative bg-white rounded-3xl p-8 shadow-sm">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center">
+                <TrendingUp className="w-7 h-7 text-green-600" />
+              </div>
+              <span className="text-6xl font-bold text-gray-200">04</span>
             </div>
             <h3 className="text-gray-900 font-bold text-lg mb-3">Passe à l'action</h3>
             <p className="text-gray-600 text-sm leading-relaxed">

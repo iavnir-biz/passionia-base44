@@ -92,7 +92,7 @@ export default function Welcome() {
           <Button
             onClick={handleLogin}
             variant="outline"
-            className="bg-white hover:bg-gray-50 text-gray-900 px-6 py-2 rounded-xl font-medium border-2 border-gray-900">
+            className="bg-white hover:bg-gray-50 text-gray-700 px-6 py-2 rounded-xl font-medium border border-gray-300">
             Connexion
           </Button>
           <Button

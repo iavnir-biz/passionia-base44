@@ -27,9 +27,34 @@ export default function OnboardingQ26DeliveryPreferences() {
         
         // Sauvegarder dans le user authentifié
         const currentUser = await base44.auth.me();
+        
+        // CRITIQUE : Récupérer TOUTES les données des questions statiques
+        const targetIncome = localStorage.getItem('onboarding_targetIncome') || '';
+        const targetIncomeDelay = localStorage.getItem('onboarding_targetIncomeDelay') || '';
+        const ageRange = localStorage.getItem('onboarding_ageRange') || '';
+        const gender = localStorage.getItem('onboarding_gender') || '';
+        const familyStatus = localStorage.getItem('onboarding_familyStatus') || '';
+        const currentIncome = localStorage.getItem('onboarding_currentIncome') || '';
+        const lifestyleGoals = JSON.parse(localStorage.getItem('onboarding_lifestyleGoals') || '[]');
+        const obstacles = JSON.parse(localStorage.getItem('onboarding_obstacles') || '[]');
+        
         await base44.auth.updateMe({ 
           deliveryPreferences: value,
+          targetIncome: targetIncome,
+          targetIncomeDelay: targetIncomeDelay,
+          ageRange: ageRange,
+          gender: gender,
+          familyStatus: familyStatus,
+          currentIncome: currentIncome,
+          lifestyleGoals: lifestyleGoals,
+          obstacles: obstacles,
           onboarding_completed: true
+        });
+        
+        console.log('✅ User mis à jour avec TOUTES les données statiques:', {
+          targetIncome,
+          targetIncomeDelay,
+          deliveryPreferences: value
         });
         
         console.log('🎯 Début sauvegarde Q26 - sessionId:', currentUser.sessionId);

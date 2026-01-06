@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, CheckCircle2, Package, DollarSign, Mail, FileText, Rocket, Brain, Zap } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
+import confetti from 'canvas-confetti';
 
 export default function OnboardingTransition() {
   const navigate = useNavigate();
@@ -33,6 +34,19 @@ export default function OnboardingTransition() {
 
   useEffect(() => {
     loadUser();
+    
+    // Déclencher les confettis au chargement de la page
+    const hasShownConfetti = sessionStorage.getItem('talents_confetti_shown');
+    if (!hasShownConfetti) {
+      setTimeout(() => {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 }
+        });
+      }, 500);
+      sessionStorage.setItem('talents_confetti_shown', 'true');
+    }
   }, []);
 
   useEffect(() => {

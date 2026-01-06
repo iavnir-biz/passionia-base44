@@ -160,21 +160,32 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   className={cn(
                     "relative flex items-center gap-3 p-3 rounded-xl transition-all",
                     isActive && "bg-gray-50 shadow-sm border border-gray-200",
-                    isCompleted && !isActive && "opacity-50",
+                    isCompleted && !isActive && "opacity-60 bg-gray-50",
                     isFuture && "opacity-40"
                   )}
                 >
                   {/* Icon */}
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all",
+                    "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all relative",
                     isCompleted 
-                      ? "bg-[#61f7a2]" 
-                      : `bg-gradient-to-br ${step.color}`
+                      ? "bg-gray-100" 
+                      : isActive
+                      ? `bg-gradient-to-br ${step.color}`
+                      : "bg-gray-50"
                   )}>
                     {isCompleted ? (
-                      <CheckCircle2 className="w-5 h-5 text-white" />
+                      <>
+                        <Icon className="w-5 h-5 text-gray-400" />
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-[#61f7a2] rounded-full flex items-center justify-center border-2 border-white shadow-sm"
+                        >
+                          <CheckCircle2 className="w-3 h-3 text-white" />
+                        </motion.div>
+                      </>
                     ) : (
-                      <Icon className="w-5 h-5 text-white" />
+                      <Icon className={cn("w-5 h-5", isActive ? "text-white" : "text-gray-400")} />
                     )}
                   </div>
 
@@ -182,7 +193,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   <div className="flex-1">
                     <p className={cn(
                       "text-sm font-semibold",
-                      isActive || isCompleted ? "text-gray-900" : "text-gray-600"
+                      isCompleted ? "text-gray-500 line-through" : isActive ? "text-gray-900" : "text-gray-600"
                     )}>
                       {step.title}
                     </p>

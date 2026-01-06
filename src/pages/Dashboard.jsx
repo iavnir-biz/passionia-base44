@@ -411,11 +411,6 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          {/* Section restante avec colonnes */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-
-
-
           {/* Bandeau Ressources IA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

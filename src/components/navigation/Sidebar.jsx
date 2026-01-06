@@ -39,20 +39,27 @@ export default function Sidebar({ currentPage, progress = 0 }) {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">PASSION IA</h1>
-            <p className="text-xs text-gray-600">Transformer son savoir-faire en activité de formation en ligne</p>
-          </div>
+          <h1 className="text-lg font-bold text-gray-900">PASSION IA</h1>
         </div>
       </div>
 
-      {/* Progress */}
+      {/* User Profile - Nouveau bloc */}
       <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-600">Progression globale</span>
-          <span className="text-sm font-semibold text-[#61f7a2]">{progress}%</span>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+            <User className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-gray-900">Utilisateur</p>
+            <p className="text-xs text-gray-600">Jour 1</p>
+          </div>
         </div>
-        <ProgressBar value={progress} max={100} size="sm" />
+        <div className="w-full bg-gray-100 rounded-full h-1.5">
+          <div 
+            className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
 
       {/* Navigation */}
@@ -79,8 +86,22 @@ export default function Sidebar({ currentPage, progress = 0 }) {
         })}
       </nav>
 
-      {/* Settings & Logout */}
+      {/* Bloc Besoin d'aide - Premium */}
       <div className="p-4 border-t border-gray-200">
+        <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-5 mb-4">
+          <h3 className="text-white font-bold text-base mb-2">Besoin d'aide ?</h3>
+          <p className="text-purple-100 text-xs mb-4">
+            Un expert peut t'aider à avancer plus vite.
+          </p>
+          <Link
+            to={createPageUrl('Booking')}
+            className="flex items-center justify-center gap-2 w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-2.5 px-4 rounded-xl transition-all"
+          >
+            <Calendar className="w-4 h-4" />
+            <span className="text-sm">Prendre rendez-vous</span>
+          </Link>
+        </div>
+
         <Link
           to={createPageUrl('Settings')}
           className={cn(

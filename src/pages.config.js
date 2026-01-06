@@ -1,3 +1,4 @@
+import AIResources from './pages/AIResources';
 import Activation from './pages/Activation';
 import AdCopies from './pages/AdCopies';
 import AvatarClients from './pages/AvatarClients';
@@ -57,10 +58,10 @@ import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
-import AIResources from './pages/AIResources';
 
 
 export const PAGES = {
+    "AIResources": AIResources,
     "Activation": Activation,
     "AdCopies": AdCopies,
     "AvatarClients": AvatarClients,
@@ -120,7 +121,6 @@ export const PAGES = {
     "Settings": Settings,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
-    "AIResources": AIResources,
 }
 
 export const pagesConfig = {

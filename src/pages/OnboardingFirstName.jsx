@@ -153,6 +153,49 @@ export default function OnboardingFirstName() {
       };
       localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
       
+      // CRÉER LA SESSION ICI (l'utilisateur est déjà authentifié)
+      const currentUser = await base44.auth.me();
+      
+      // Vérifier si une session existe déjà
+      const existingSessions = await base44.entities.Session.filter({ 
+        created_by: currentUser.email 
+      });
+      
+      let sessionId;
+      
+      if (existingSessions.length > 0) {
+        console.log('✅ Session existe déjà:', existingSessions[0].id);
+        sessionId = existingSessions[0].id;
+        
+        // Réinitialiser la session
+        await base44.entities.Session.update(sessionId, {
+          onboarding_history: [],
+          onboarding_summary: {},
+          onboarding_full: {},
+          skill: '',
+          is_onboarding_done: false
+        });
+      } else {
+        // Créer la session
+        const session = await base44.entities.Session.create({
+          onboarding_history: [],
+          onboarding_summary: {},
+          onboarding_full: {},
+          skill: '',
+          is_onboarding_done: false
+        });
+        sessionId = session.id;
+        console.log('✅ Session créée:', sessionId);
+      }
+      
+      // Sauvegarder le sessionId et le prénom sur le user
+      await base44.auth.updateMe({ 
+        firstName: firstName.trim(),
+        sessionId: sessionId
+      });
+      
+      console.log('✅ User mis à jour avec prénom et sessionId:', sessionId);
+      
       // Navigation vers OnboardingDynamic
       navigate(createPageUrl('OnboardingDynamic'));
     } catch (error) {

@@ -112,61 +112,44 @@ export default function OnboardingTransition() {
       const onboardingData = JSON.parse(onboardingDataStr);
       const firstName = localStorage.getItem('onboarding_firstName') || '';
       
-      console.log('📦 Données récupérées du localStorage:', {
+      console.log('📦 OnboardingTransition - Données localStorage:', {
         firstName,
         historyLength: onboardingData.history?.length || 0,
-        hasSummary: !!onboardingData.summary
+        hasSummary: !!onboardingData.summary,
+        hasSessionId: !!currentUser.sessionId
       });
       
-      // Vérifier si une session existe déjà
-      const existingSessions = await base44.entities.Session.filter({ 
-        created_by: currentUser.email 
-      });
-      
-      if (existingSessions.length > 0) {
-        console.log('✅ Session existe déjà, mise à jour:', existingSessions[0].id);
-        
-        // MISE À JOUR COMPLÈTE de la session existante
-        await base44.entities.Session.update(existingSessions[0].id, {
+      // La session doit déjà exister (créée dans OnboardingFirstName)
+      if (!currentUser.sessionId) {
+        console.error('❌ PAS DE SESSION ID - session devrait exister !');
+        // Créer une session de secours
+        const session = await base44.entities.Session.create({
           onboarding_history: onboardingData.history || [],
           onboarding_summary: onboardingData.summary || {},
           onboarding_full: {},
           skill: onboardingData.summary?.who_to_teach || '',
           is_onboarding_done: false
         });
-        
-        await base44.auth.updateMe({ 
-          firstName: firstName,
-          sessionId: existingSessions[0].id,
-          coreSkill: onboardingData.summary?.who_to_teach || ''
-        });
-        
-        console.log('✅ Session et User mis à jour');
+        await base44.auth.updateMe({ sessionId: session.id });
+        console.log('✅ Session de secours créée:', session.id);
         return;
       }
       
-      // CRÉER la session avec TOUTES les données
-      const session = await base44.entities.Session.create({
+      // METTRE À JOUR la session existante avec les données de l'onboarding
+      await base44.entities.Session.update(currentUser.sessionId, {
         onboarding_history: onboardingData.history || [],
         onboarding_summary: onboardingData.summary || {},
-        onboarding_full: {},
-        skill: onboardingData.summary?.who_to_teach || '',
-        is_onboarding_done: false
+        skill: onboardingData.summary?.who_to_teach || ''
       });
       
-      console.log('✅ Session créée:', session.id);
-      
-      // Sauvegarder le sessionId et les infos de base sur le user
       await base44.auth.updateMe({ 
-        firstName: firstName,
-        sessionId: session.id,
         coreSkill: onboardingData.summary?.who_to_teach || ''
       });
       
-      console.log('✅ User mis à jour avec sessionId');
+      console.log('✅ Session mise à jour avec données onboarding:', currentUser.sessionId);
       
     } catch (error) {
-      console.error('❌ Erreur création session:', error);
+      console.error('❌ Erreur mise à jour session:', error);
       throw error;
     }
   };

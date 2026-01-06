@@ -314,7 +314,7 @@ export default function PlanAction() {
             </h2>
             
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Une action par jour. Pas plus. Pas moins. L'objectif : vendre avant de créer, en aidant quelqu'un avec ce que tu sais déjà.
+              Une action par jour. Pas plus. Pas moins.
             </p>
           </motion.div>
 

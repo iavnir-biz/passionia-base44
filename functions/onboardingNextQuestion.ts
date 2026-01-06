@@ -345,14 +345,8 @@ Deno.serve(async (req) => {
     const workingHistory = history || [];
     const workingSummary = summary || {};
     
-    // Récupérer le prénom depuis l'utilisateur Base44
-    let firstName = '';
-    try {
-      const user = await base44.auth.me();
-      firstName = user?.full_name || '';
-    } catch (e) {
-      console.log('User not authenticated, using default');
-    }
+    // Utiliser le prénom passé en paramètre
+    const name = firstName || '';
     
     const skill = workingSummary.who_to_teach || '';
 

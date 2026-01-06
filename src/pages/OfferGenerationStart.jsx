@@ -79,19 +79,56 @@ export default function OfferGenerationStart() {
 
       // Vérifier que toutes les données nécessaires sont présentes
       const missingData = [];
-      if (!user.firstName) missingData.push('firstName');
-      if (!session.skill && !session.onboarding_summary?.who_to_teach) missingData.push('skill');
-      if (!session.onboarding_history || session.onboarding_history.length < 11) {
-        missingData.push(`onboarding_history (${session.onboarding_history?.length || 0}/11 questions)`);
+      
+      // Vérifier firstName
+      if (!user.firstName) {
+        missingData.push('firstName (→ OnboardingFirstName)');
       }
+      
+      // Vérifier skill/compétence
+      if (!session.skill && !session.onboarding_summary?.who_to_teach) {
+        missingData.push('skill (→ OnboardingDynamic)');
+      }
+      
+      // Vérifier les 11 questions de l'onboarding dynamic
+      if (!session.onboarding_history || session.onboarding_history.length < 11) {
+        console.error('❌ onboarding_history incomplet:', {
+          length: session.onboarding_history?.length || 0,
+          history: session.onboarding_history
+        });
+        missingData.push(`onboarding_history (${session.onboarding_history?.length || 0}/11 questions → OnboardingDynamic)`);
+      }
+      
+      // Vérifier les données statiques (Q12-Q26)
       if (!session.onboarding_full || Object.keys(session.onboarding_full).length === 0) {
-        missingData.push('réponses statiques post-transition');
+        console.error('❌ onboarding_full vide:', session.onboarding_full);
+        missingData.push('réponses statiques post-transition (→ OnboardingQ12AgeRange)');
       }
 
       if (missingData.length > 0) {
         console.error('❌ Données manquantes pour générer l\'offre:', missingData);
-        alert(`Données manquantes: ${missingData.join(', ')}\n\nRedirection vers l'onboarding...`);
-        navigate(createPageUrl('OnboardingDynamic'));
+        console.log('📦 État complet de la session:', {
+          sessionId: session.id,
+          skill: session.skill,
+          onboarding_summary: session.onboarding_summary,
+          onboarding_history_length: session.onboarding_history?.length || 0,
+          onboarding_full_keys: Object.keys(session.onboarding_full || {}),
+          user_firstName: user.firstName,
+          user_coreSkill: user.coreSkill,
+          user_targetIncome: user.targetIncome
+        });
+        
+        // Rediriger intelligemment selon ce qui manque
+        if (missingData.some(d => d.includes('onboarding_history'))) {
+          alert(`⚠️ Onboarding incomplet (${session.onboarding_history?.length || 0}/11 questions)\n\nTu vas être redirigé pour finir les questions.`);
+          navigate(createPageUrl('OnboardingDynamic'));
+        } else if (missingData.some(d => d.includes('réponses statiques'))) {
+          alert(`⚠️ Questions de profil incomplètes\n\nTu vas être redirigé pour finir ton profil.`);
+          navigate(createPageUrl('OnboardingQ12AgeRange'));
+        } else {
+          alert(`⚠️ Données manquantes: ${missingData.join(', ')}\n\nRedirection...`);
+          navigate(createPageUrl('OnboardingFirstName'));
+        }
         return;
       }
       

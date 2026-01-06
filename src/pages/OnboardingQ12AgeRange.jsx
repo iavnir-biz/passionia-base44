@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import OnboardingQuestionPage from '@/components/onboarding/OnboardingQuestionPage';
+import confetti from 'canvas-confetti';
 
 export default function OnboardingQ12AgeRange() {
+  // Déclencher les confetti au chargement (passage à Ton profil)
+  useEffect(() => {
+    const hasShownConfetti = sessionStorage.getItem('profile_confetti_shown');
+    if (!hasShownConfetti) {
+      setTimeout(() => {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }, 300);
+      sessionStorage.setItem('profile_confetti_shown', 'true');
+    }
+  }, []);
+
   return (
     <OnboardingQuestionPage
       questionId="ageRange"

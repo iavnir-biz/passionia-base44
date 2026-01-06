@@ -15,13 +15,13 @@ export default function OnboardingTransition() {
   const [statusText, setStatusText] = useState('Analyse de ton positionnement…');
 
   const items = [
-    { icon: CheckCircle2, title: 'Validation complète de ton idée', subtitle: 'Marché, cible et positionnement clair' },
-    { icon: Package, title: 'Tes 4 offres prêtes à vendre', subtitle: 'Structure complète, pensée pour démarrer vite' },
-    { icon: DollarSign, title: 'Les prix parfaits', subtitle: 'Optimisés pour vendre sans brader ta valeur' },
-    { icon: Mail, title: 'Les emails marketing essentiels', subtitle: 'Pour générer tes premières ventes simplement' },
-    { icon: FileText, title: 'Une page de vente à haute conversion', subtitle: 'Avec la structure et les messages qui fonctionnent' },
-    { icon: Rocket, title: 'Un plan d\'action sur 7 jours', subtitle: 'Étape par étape, sans dispersion' },
-    { icon: Brain, title: 'Le protocole complet pour créer ton activité de formation en ligne', subtitle: '' }
+    { icon: CheckCircle2, title: 'Validation complète de ton idée' },
+    { icon: Package, title: 'Tes 4 offres prêtes à vendre' },
+    { icon: DollarSign, title: 'Les prix parfaits' },
+    { icon: Mail, title: 'Les emails marketing essentiels' },
+    { icon: FileText, title: 'Une page de vente à haute conversion' },
+    { icon: Rocket, title: 'Un plan d\'action sur 7 jours' },
+    { icon: Brain, title: 'Le protocole complet pour créer ton activité de formation en ligne' }
   ];
 
   const statusTexts = [
@@ -67,10 +67,10 @@ export default function OnboardingTransition() {
   }, []);
 
   useEffect(() => {
-    // Redirection automatique après 8 secondes
+    // Redirection automatique après 12 secondes (plus long)
     const redirectTimer = setTimeout(() => {
       navigate(createPageUrl('OnboardingQ12AgeRange'));
-    }, 8000);
+    }, 12000);
     return () => clearTimeout(redirectTimer);
   }, [navigate]);
 
@@ -195,7 +195,7 @@ export default function OnboardingTransition() {
               🎁 Ce que je construis pour toi
             </h2>
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               <AnimatePresence>
                 {items.slice(0, visibleItems).map((item, index) => (
                   <motion.div
@@ -203,16 +203,13 @@ export default function OnboardingTransition() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="flex items-start gap-3 p-3 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200"
+                    className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200"
                   >
-                    <div className="flex-shrink-0 w-8 h-8 bg-[#61f7a2] rounded-lg flex items-center justify-center">
-                      <item.icon className="w-4 h-4 text-white" />
+                    <div className="flex-shrink-0 w-10 h-10 bg-[#61f7a2] rounded-lg flex items-center justify-center">
+                      <item.icon className="w-5 h-5 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 text-sm mb-0.5">{item.title}</h3>
-                      {item.subtitle && (
-                        <p className="text-xs text-gray-600">{item.subtitle}</p>
-                      )}
+                      <h3 className="font-semibold text-gray-900 text-base">{item.title}</h3>
                     </div>
                   </motion.div>
                 ))}

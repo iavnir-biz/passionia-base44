@@ -114,7 +114,22 @@ export default function OnboardingTransition() {
       
       if (existingSessions.length > 0) {
         console.log('✅ Session existe déjà:', existingSessions[0].id);
-        await base44.auth.updateMe({ sessionId: existingSessions[0].id });
+        
+        // Mettre à jour la session existante avec les données du localStorage
+        const onboardingDataStr = localStorage.getItem('onboarding_data') || '{}';
+        const onboardingData = JSON.parse(onboardingDataStr);
+        const firstName = localStorage.getItem('onboarding_firstName') || '';
+        
+        await base44.entities.Session.update(existingSessions[0].id, {
+          onboarding_history: onboardingData.history || [],
+          onboarding_summary: onboardingData.summary || {},
+          skill: onboardingData.summary?.who_to_teach || ''
+        });
+        
+        await base44.auth.updateMe({ 
+          firstName: firstName,
+          sessionId: existingSessions[0].id 
+        });
         return;
       }
       

@@ -136,17 +136,31 @@ export default function OnboardingTransition() {
       }
       
       // METTRE À JOUR la session existante avec les données de l'onboarding
+      const summary = onboardingData.summary || {};
+      
       await base44.entities.Session.update(currentUser.sessionId, {
         onboarding_history: onboardingData.history || [],
-        onboarding_summary: onboardingData.summary || {},
-        skill: onboardingData.summary?.who_to_teach || ''
+        onboarding_summary: summary,
+        skill: summary.who_to_teach || ''
       });
       
+      // CRITIQUE : Sauvegarder TOUTES les données clés sur le User
       await base44.auth.updateMe({ 
-        coreSkill: onboardingData.summary?.who_to_teach || ''
+        coreSkill: summary.who_to_teach || '',
+        targetAudience: summary.learner_profile || '',
+        mainProblem: summary.main_learning_problem || '',
+        firstResult: summary.quick_win || '',
+        finalTransformation: summary.big_transformation || '',
+        uniqueMethod: summary.method_angle || '',
+        typicalMistake: summary.common_mistake || '',
+        extraDetail: summary.proof_or_story || ''
       });
       
-      console.log('✅ Session mise à jour avec données onboarding:', currentUser.sessionId);
+      console.log('✅ Session + User mis à jour avec TOUTES les données:', {
+        sessionId: currentUser.sessionId,
+        coreSkill: summary.who_to_teach,
+        historyLength: onboardingData.history?.length
+      });
       
     } catch (error) {
       console.error('❌ Erreur mise à jour session:', error);

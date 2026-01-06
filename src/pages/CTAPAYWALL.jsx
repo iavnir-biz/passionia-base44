@@ -52,11 +52,11 @@ export default function CTAPAYWALL() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Vérifier si l'utilisateur a déjà payé
-      if (currentUser.has_purchased) {
-        navigate(createPageUrl('Dashboard'));
-        return;
-      }
+      // Vérification temporairement désactivée pour test
+      // if (currentUser.has_purchased) {
+      //   navigate(createPageUrl('Dashboard'));
+      //   return;
+      // }
 
       if (currentUser.sessionId) {
         const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });

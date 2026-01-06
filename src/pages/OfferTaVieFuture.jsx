@@ -414,6 +414,7 @@ export default function OfferTaVieFuture() {
             </GlowButton>
           </motion.div>
         </div>
+        </div>
       </div>
 
       {/* Transition Animation */}

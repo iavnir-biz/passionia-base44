@@ -64,16 +64,35 @@ export default function OnboardingDynamic() {
 
   const fetchNextQuestion = async (sessionId, lastAnswer = null, currentData = null) => {
     try {
+      console.log('🔵 FetchNextQuestion - Démarrage:', {
+        sessionId,
+        lastAnswer,
+        hasCurrentData: !!currentData
+      });
+      
       // Récupérer les données actuelles
       const onboardingData = currentData || JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
       const firstName = localStorage.getItem('onboarding_firstName') || '';
       
+      console.log('🔵 FetchNextQuestion - Données:', {
+        historyLength: onboardingData.history?.length || 0,
+        hasSummary: !!onboardingData.summary,
+        firstName
+      });
+      
+      console.log('🔵 Appel API onboardingNextQuestion...');
       const { data } = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId,
         userAnswer: lastAnswer,
         history: onboardingData.history || [],
         summary: onboardingData.summary || {},
         firstName: firstName
+      });
+
+      console.log('✅ Réponse API reçue:', {
+        isDone: data.isDone,
+        hasQuestion: !!data.question,
+        hasSummary: !!data.summary
       });
 
       if (data.isDone) {
@@ -109,22 +128,36 @@ export default function OnboardingDynamic() {
         onboardingData.summary = data.summary || onboardingData.summary;
         localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
         
+        console.log('🔵 Sauvegarde nouvelle question en localStorage...');
+        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+        
         // 🔥 SYNCHRONISER AVEC LA SESSION EN BASE DE DONNÉES AU FUR ET À MESURE
+        console.log('🔵 Synchronisation avec la session DB...');
         const currentUser = await base44.auth.me();
         if (currentUser.sessionId && onboardingData.history.length > 0) {
+          console.log('🔵 Mise à jour session:', currentUser.sessionId);
           await base44.entities.Session.update(currentUser.sessionId, {
             onboarding_history: onboardingData.history,
             onboarding_summary: onboardingData.summary || {},
             skill: onboardingData.summary?.who_to_teach || ''
           });
-          console.log('🔄 Session mise à jour:', onboardingData.history.length, 'questions');
+          console.log('✅ Session mise à jour:', onboardingData.history.length, 'questions');
+        } else {
+          console.warn('⚠️ Pas de sessionId ou history vide:', {
+            hasSessionId: !!currentUser.sessionId,
+            sessionId: currentUser.sessionId,
+            historyLength: onboardingData.history.length
+          });
         }
         
+        console.log('🔵 Affichage nouvelle question:', data.question.type);
         setCurrentQuestion(data.question);
         initializeValue(data.question.type, data.question);
+        console.log('✅ FetchNextQuestion - Terminé');
       }
     } catch (error) {
-      console.error('Error fetching next question:', error);
+      console.error('❌ Error fetching next question:', error);
+      throw error; // Re-throw pour être capturé par handleNext
     } finally {
       setIsLoading(false);
     }
@@ -143,15 +176,31 @@ export default function OnboardingDynamic() {
   const handleNext = async () => {
     if (!canProceed()) return;
     
+    console.log('🔵 HandleNext - Démarrage:', {
+      sessionId: session?.id,
+      value,
+      valueType: typeof value,
+      currentQuestionType: currentQuestion?.type
+    });
+    
     setIsSaving(true);
     setIsLoading(true);
-    await fetchNextQuestion(session.id, value);
-    setValue('');
-    setIsSaving(false);
     
-    // Mettre à jour la session locale pour la progression
-    const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
-    setSession(prev => ({ ...prev, onboarding_history: onboardingData.history || [] }));
+    try {
+      await fetchNextQuestion(session.id, value);
+      setValue('');
+      
+      // Mettre à jour la session locale pour la progression
+      const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
+      setSession(prev => ({ ...prev, onboarding_history: onboardingData.history || [] }));
+      
+      console.log('✅ HandleNext - Terminé avec succès');
+    } catch (error) {
+      console.error('❌ HandleNext - Erreur:', error);
+      alert(`Erreur lors de la sauvegarde: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const canProceed = () => {

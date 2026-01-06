@@ -34,16 +34,23 @@ export default function MarketAnalysis() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      if (currentUser.sessionId) {
+      if (currentUser?.sessionId) {
         const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
         if (sessions.length > 0) {
           const userSession = sessions[0];
           setSession(userSession);
           
+          console.log('Session loaded:', userSession);
+          console.log('Market analysis v2:', userSession.market_analysis_v2);
+          
           if (userSession.market_analysis_v2) {
             setAnalysis(userSession.market_analysis_v2);
           }
+        } else {
+          console.error('No session found for ID:', currentUser.sessionId);
         }
+      } else {
+        console.error('No sessionId on user:', currentUser);
       }
     } catch (error) {
       console.error('Error loading data:', error);

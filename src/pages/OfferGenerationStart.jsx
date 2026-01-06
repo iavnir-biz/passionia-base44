@@ -42,20 +42,40 @@ export default function OfferGenerationStart() {
   const generateOffer = async () => {
     try {
       const user = await base44.auth.me();
+      console.log('🔍 OfferGenerationStart - User loaded:', { 
+        email: user.email,
+        firstName: user.firstName,
+        hasSessionId: !!user.sessionId,
+        sessionId: user.sessionId
+      });
       
       // Get user's session
       const sessions = await base44.entities.Session.filter({ 
         created_by: user.email 
       });
       
+      console.log('🔍 Sessions found:', sessions.length);
+      
       if (!sessions || sessions.length === 0) {
-        console.error('Session not found, redirecting to onboarding');
+        console.error('❌ Session not found, redirecting to onboarding');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
       
       const session = sessions[0];
       const sessionId = session.id;
+
+      console.log('🔍 Session data:', {
+        sessionId,
+        hasOnboardingHistory: !!session.onboarding_history,
+        onboardingHistoryLength: session.onboarding_history?.length || 0,
+        hasOnboardingSummary: !!session.onboarding_summary,
+        hasOnboardingFull: !!session.onboarding_full,
+        onboardingFullKeys: Object.keys(session.onboarding_full || {}),
+        hasSkill: !!session.skill,
+        skill: session.skill,
+        hasOfferGeneration: !!session.offer_generation
+      });
 
       // Vérifier que toutes les données nécessaires sont présentes
       const missingData = [];
@@ -69,25 +89,37 @@ export default function OfferGenerationStart() {
       }
 
       if (missingData.length > 0) {
-        console.error('Données manquantes pour générer l\'offre:', missingData);
-        // Rediriger vers l'onboarding dynamic pour compléter
+        console.error('❌ Données manquantes pour générer l\'offre:', missingData);
+        alert(`Données manquantes: ${missingData.join(', ')}\n\nRedirection vers l'onboarding...`);
         navigate(createPageUrl('OnboardingDynamic'));
         return;
       }
+      
+      console.log('✅ Toutes les données présentes, génération de l\'offre...');
       
       // Generate Full Stack Offer (P.S.S.O.)
       const response = await base44.functions.invoke('generateFullStackOffer', {
         sessionId
       });
 
+      console.log('🔍 Response from generateFullStackOffer:', {
+        hasError: !!response.data?.error,
+        error: response.data?.error,
+        success: response.data?.success,
+        fromCache: response.data?.fromCache
+      });
+
       if (response.data?.error) {
-        console.error('Erreur génération offre:', response.data.error);
+        console.error('❌ Erreur génération offre:', response.data.error);
+        alert(`Erreur lors de la génération: ${response.data.error}`);
       }
       
       // Navigate to offer selection pages
+      console.log('➡️ Navigation vers OfferProductPrincipal');
       navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
-      console.error('Error:', error);
+      console.error('❌ Error in generateOffer:', error);
+      alert(`Erreur: ${error.message}`);
       navigate(createPageUrl('OfferProductPrincipal'));
     }
   };

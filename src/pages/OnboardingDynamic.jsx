@@ -45,13 +45,13 @@ export default function OnboardingDynamic() {
       setSession({ id: 'local', onboarding_history: onboardingData.history || [], firstName: firstName });
       
       const history = onboardingData.history || [];
-      setQuestionCount(Math.min(history.length + 1, 11));
+      setQuestionCount(Math.min(history.length, 11));
 
-      // Si pas de question courante OU si l'historique est vide, demander la première question
-      if (!onboardingData.current_question || history.length === 0) {
+      // Si pas de question courante, demander la première question
+      if (!onboardingData.current_question) {
         await fetchNextQuestion('local', null, onboardingData);
       } else {
-        // Si on a déjà une question et un historique, afficher la question actuelle
+        // Si on a déjà une question, afficher la question actuelle
         setCurrentQuestion(onboardingData.current_question);
         initializeValue(onboardingData.current_question.type, onboardingData.current_question);
         setIsLoading(false);
@@ -97,7 +97,6 @@ export default function OnboardingDynamic() {
         
         setCurrentQuestion(data.question);
         initializeValue(data.question.type, data.question);
-        setQuestionCount(prev => Math.min(prev + 1, 11));
       }
     } catch (error) {
       console.error('Error fetching next question:', error);
@@ -127,8 +126,7 @@ export default function OnboardingDynamic() {
     
     // Mettre à jour la session locale pour la progression
     const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
-    setSession({ id: 'local', onboarding_history: onboardingData.history || [], firstName: onboardingData.firstName });
-    setQuestionCount(Math.min((onboardingData.history?.length || 0) + 1, 11));
+    setSession(prev => ({ ...prev, onboarding_history: onboardingData.history || [] }));
   };
 
   const canProceed = () => {

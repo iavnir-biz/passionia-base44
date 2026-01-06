@@ -120,6 +120,14 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                         transition={{ duration: 0.5 }}
                       />
                     )}
+                    {isActive && progressInStep > 0 && (
+                      <motion.div 
+                        className="absolute inset-0 bg-[#61f7a2]"
+                        initial={{ height: 0 }}
+                        animate={{ height: `${progressInStep}%` }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    )}
                   </div>
                 )}
 

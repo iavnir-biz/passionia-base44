@@ -304,10 +304,13 @@ export default function OnboardingDynamic() {
   const completedSteps = [];
   const historyLength = session?.onboarding_history?.length || 0;
   if (historyLength >= 11) completedSteps.push(1); // Tes talents
+  
+  // Calculer la progression dans l'étape actuelle (pour la ligne verte)
+  const progressInStep = historyLength < 11 ? progress : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
-      <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} />
+      <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progressInStep} />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">

@@ -126,6 +126,24 @@ export default function Sidebar({ currentPage, progress = 0, user }) {
           </Link>
         </div>
 
+        <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-5 mb-4">
+          <h3 className="text-white font-bold text-base mb-2 flex items-center gap-2">
+            ✨ Accéder à la communauté
+          </h3>
+          <p className="text-amber-50 text-xs mb-4">
+            Partage avec d'autres adhérents, reçois du soutien.
+          </p>
+          <a
+            href="https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold py-2.5 px-4 rounded-xl transition-all"
+          >
+            <Users className="w-4 h-4" />
+            <span className="text-sm">Accéder à Skool</span>
+          </a>
+        </div>
+
         <Link
           to={createPageUrl('Settings')}
           className={cn(

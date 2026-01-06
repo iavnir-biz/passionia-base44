@@ -26,10 +26,11 @@ export default function OnboardingQ24IfNothingChanges() {
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-      if (currentUser.ifNothingChanges) {
-        setValue(currentUser.ifNothingChanges);
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      const storedValue = localStorage.getItem(`onboarding_ifNothingChanges`);
+      setUser({ firstName });
+      if (storedValue) {
+        setValue(storedValue);
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -43,18 +44,7 @@ export default function OnboardingQ24IfNothingChanges() {
     setIsSaving(true);
     
     try {
-      await base44.auth.updateMe({ ifNothingChanges: option });
-      
-      if (user.sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-        if (sessions.length > 0) {
-          const session = sessions[0];
-          const onboardingFull = session.onboarding_full || {};
-          onboardingFull.ifNothingChanges = option;
-          await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
-        }
-      }
-      
+      localStorage.setItem(`onboarding_ifNothingChanges`, option);
       setTimeout(() => {
         navigate(createPageUrl('OnboardingQ25Readiness'));
       }, 300);

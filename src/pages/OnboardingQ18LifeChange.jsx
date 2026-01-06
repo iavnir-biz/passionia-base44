@@ -12,6 +12,8 @@ export default function OnboardingQ18LifeChange() {
       nextPage="OnboardingQ19Impact"
       prevPage="OnboardingQ17TargetDelay"
       progress={50}
+      blockType="objectives"
+      useLocalStorage={true}
     />
   );
 }

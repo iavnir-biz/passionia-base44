@@ -13,8 +13,9 @@ export default function OnboardingQ21Relatives() {
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
+      const gender = localStorage.getItem('onboarding_gender');
+      const firstName = localStorage.getItem('onboarding_firstName');
+      setUser({ gender, firstName });
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
@@ -73,6 +74,8 @@ export default function OnboardingQ21Relatives() {
       nextPage="OnboardingQ22Lifestyle"
       prevPage="OnboardingQ20Emotions"
       progress={71}
+      blockType="objectives"
+      useLocalStorage={true}
     />
   );
 }

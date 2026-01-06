@@ -25,10 +25,17 @@ export default function OnboardingQ17TargetDelay() {
 
   const loadUser = async () => {
     try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-      if (currentUser.targetIncomeDelay) {
-        setValue(currentUser.targetIncomeDelay);
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      const storedValue = localStorage.getItem(`onboarding_targetIncomeDelay`);
+      const storedIncome = localStorage.getItem(`onboarding_targetIncome`);
+      
+      setUser({ 
+        firstName, 
+        targetIncome: storedIncome ? parseInt(storedIncome) : 5000 
+      });
+      
+      if (storedValue) {
+        setValue(parseInt(storedValue));
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -52,18 +59,7 @@ export default function OnboardingQ17TargetDelay() {
   const saveAndContinue = async (delay) => {
     setIsSaving(true);
     try {
-      await base44.auth.updateMe({ targetIncomeDelay: delay });
-      
-      if (user.sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-        if (sessions.length > 0) {
-          const session = sessions[0];
-          const onboardingFull = session.onboarding_full || {};
-          onboardingFull.targetIncomeDelay = delay;
-          await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
-        }
-      }
-      
+      localStorage.setItem(`onboarding_targetIncomeDelay`, delay);
       navigate(createPageUrl('OnboardingQ18LifeChange'));
     } catch (error) {
       console.error('Error saving:', error);
@@ -78,25 +74,10 @@ export default function OnboardingQ17TargetDelay() {
     const newIncome = realisticChoice === 'option1' ? 3000 : 5000;
     setShowWarning(false);
     
-    // Sauvegarder le nouveau revenu cible ET le délai
     setIsSaving(true);
     try {
-      await base44.auth.updateMe({ 
-        targetIncome: newIncome,
-        targetIncomeDelay: value 
-      });
-      
-      if (user.sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-        if (sessions.length > 0) {
-          const session = sessions[0];
-          const onboardingFull = session.onboarding_full || {};
-          onboardingFull.targetIncome = newIncome;
-          onboardingFull.targetIncomeDelay = value;
-          await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
-        }
-      }
-      
+      localStorage.setItem(`onboarding_targetIncome`, newIncome);
+      localStorage.setItem(`onboarding_targetIncomeDelay`, value);
       navigate(createPageUrl('OnboardingQ18LifeChange'));
     } catch (error) {
       console.error('Error saving:', error);

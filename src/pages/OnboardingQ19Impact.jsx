@@ -19,6 +19,8 @@ export default function OnboardingQ19Impact() {
       nextPage="OnboardingQ20Emotions"
       prevPage="OnboardingQ18LifeChange"
       progress={57}
+      blockType="objectives"
+      useLocalStorage={true}
     />
   );
 }

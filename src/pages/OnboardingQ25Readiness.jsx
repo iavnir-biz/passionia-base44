@@ -12,6 +12,8 @@ export default function OnboardingQ25Readiness() {
       nextPage="OnboardingQ26DeliveryPreferences"
       prevPage="OnboardingQ24IfNothingChanges"
       progress={95}
+      blockType="objectives"
+      useLocalStorage={true}
     />
   );
 }

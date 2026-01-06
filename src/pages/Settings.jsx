@@ -127,6 +127,39 @@ export default function Settings() {
       content: (
         <div className="space-y-4">
           <div>
+            <label className="block text-sm text-gray-400 mb-2">Photo de profil</label>
+            <div className="flex items-center gap-4">
+              {user?.profile_picture ? (
+                <img
+                  src={user.profile_picture}
+                  alt={user.full_name}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-[#2a2a45]"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    try {
+                      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                      await base44.auth.updateMe({ profile_picture: file_url });
+                      await loadData();
+                    } catch (error) {
+                      console.error('Error uploading photo:', error);
+                    }
+                  }
+                }}
+                className="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#61f7a2]/10 file:text-[#61f7a2] hover:file:bg-[#61f7a2]/20 file:cursor-pointer"
+              />
+            </div>
+          </div>
+          <div>
             <label className="block text-sm text-gray-400 mb-2">Nom complet</label>
             <input
               type="text"
@@ -231,7 +264,7 @@ export default function Settings() {
   
   return (
     <div className="flex min-h-screen bg-[#11112b]">
-      <Sidebar currentPage="Settings" progress={progress} />
+      <Sidebar currentPage="Settings" progress={progress} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

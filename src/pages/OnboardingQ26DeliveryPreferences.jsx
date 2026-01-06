@@ -18,7 +18,7 @@ export default function OnboardingQ26DeliveryPreferences() {
         "Organiser des événements en présentiel (pour le high-ticket)"
       ]}
       fieldName="deliveryPreferences"
-      nextPage="OnboardingTransition"
+      nextPage="OfferGenerationStart"
       blockType="objectives"
       useLocalStorage={true}
       customHandleSave={async (user, value) => {

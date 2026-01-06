@@ -136,18 +136,11 @@ export default function OfferTaVieFuture() {
     return <OfferTransition message={isGenerating ? "Nova écrit ta vision future..." : "Chargement..."} />;
   }
 
-  if (showTransition) {
-    return <OfferTransition message="Nova prépare ton plan de route..." onComplete={handleTransitionComplete} />;
-  }
-
-  // Récupérer les offres depuis la session
-  const [offerData, setOfferData] = useState({});
-  
   useEffect(() => {
     if (user?.sessionId && !offerData.product_principal) {
       loadOfferData();
     }
-  }, [user]);
+  }, [user, offerData.product_principal]);
 
   const loadOfferData = async () => {
     try {
@@ -167,6 +160,10 @@ export default function OfferTaVieFuture() {
       console.error('Error loading offer data:', error);
     }
   };
+
+  if (showTransition) {
+    return <OfferTransition message="Nova prépare ton plan de route..." onComplete={handleTransitionComplete} />;
+  }
 
   const products = [
     { key: 'product_principal', label: 'Produit Principal', data: offerData.product_principal, multiplier: 30 },

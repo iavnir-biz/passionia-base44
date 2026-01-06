@@ -9,25 +9,15 @@ import {
   Target,
   CheckCircle,
   Zap,
-  TrendingUp,
   Rocket,
   Shield,
   Sparkles,
-  Users,
-  DollarSign,
-  RefreshCw
+  DollarSign
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import OfferTransition from '@/components/offer/OfferTransition';
+import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
-
-const mainSteps = [
-  { id: 1, label: "Ton Offre", page: "OfferResume" },
-  { id: 2, label: "Bonne nouvelle !", page: "BonneNouvelle" },
-  { id: 3, label: "Ta Vie Future", page: "OfferTaVieFuture" },
-  { id: 4, label: "Concrètement ?", page: "OfferConcretement" },
-  { id: 5, label: "Plan d'Action", page: "PlanAction" },
-];
 
 function parsePrice(priceStr) {
   if (!priceStr) return 0;
@@ -178,12 +168,6 @@ export default function OfferConcretement() {
     navigate(createPageUrl('PlanAction'));
   };
 
-  const handleStepClick = (step) => {
-    if (step.page) {
-      navigate(createPageUrl(step.page));
-    }
-  };
-
   if (isLoading || isGenerating) {
     return <OfferTransition message={isGenerating ? "Nova prépare ton plan de route..." : "Chargement..."} />;
   }
@@ -214,46 +198,14 @@ export default function OfferConcretement() {
     ...adv
   }));
 
+  const completedSteps = [1, 2, 3, 4, 5, 6]; // Jusqu'à Ta vie future complété
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      {/* Main Navigation Bar */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 py-4 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
-            {mainSteps.map((step, index) => {
-              const isActive = step.id === 4;
-              const isPrevious = step.id < 4;
-              const isClickable = isPrevious;
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
+      <OnboardingSidebar currentPage="OfferConcretement" completedSteps={completedSteps} progressInStep={0} />
 
-              return (
-                <React.Fragment key={step.id}>
-                  <button
-                    onClick={() => isClickable && step.page && navigate(createPageUrl(step.page))}
-                    disabled={!isClickable}
-                    className={cn(
-                      "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
-                      isActive && "bg-[#61f7a2] text-white shadow-md",
-                      isPrevious && "text-[#61f7a2] bg-[#61f7a2]/10 cursor-pointer hover:opacity-80",
-                      !isActive && !isPrevious && "text-gray-400 bg-gray-100 cursor-not-allowed"
-                    )}>
-                    {step.id}. {step.label}
-                  </button>
-                  {index < mainSteps.length - 1 && (
-                    <div className={cn(
-                      "w-4 md:w-8 h-[2px]",
-                      step.id < 4 ? "bg-[#61f7a2]" : "bg-gray-200"
-                    )} />
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="py-12">
-        <div className="max-w-4xl mx-auto px-4">
+      <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">
+        <div className="max-w-4xl mx-auto px-6 py-12">
           {/* Hero Section avec visuel */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

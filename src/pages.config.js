@@ -58,6 +58,7 @@ import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
+import PlanActionPaywall from './pages/PlanActionPaywall';
 
 
 export const PAGES = {
@@ -121,6 +122,7 @@ export const PAGES = {
     "Settings": Settings,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
+    "PlanActionPaywall": PlanActionPaywall,
 }
 
 export const pagesConfig = {

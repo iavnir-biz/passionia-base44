@@ -169,7 +169,7 @@ export default function OfferConcretement() {
   };
 
   const handleTransitionComplete = () => {
-    navigate(createPageUrl('PlanAction'));
+    navigate(createPageUrl('PlanActionPaywall'));
   };
 
   if (isLoading || isGenerating) {

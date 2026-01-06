@@ -318,6 +318,9 @@ export default function PlanAction() {
             </p>
           </motion.div>
 
+          {/* Video Guides Section */}
+          <VideoGuidesSection />
+
           {/* Progress Bar */}
           <motion.div
             initial={{ opacity: 0, scaleX: 0 }}

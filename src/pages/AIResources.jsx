@@ -16,7 +16,8 @@ import {
   Share2,
   Megaphone,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -30,8 +31,9 @@ const resources = [
     description: 'Valide ton idée avec des données réelles sur ton marché cible',
     icon: BarChart3,
     color: 'from-blue-500 to-cyan-500',
+    bgColor: 'bg-blue-50',
     page: 'MarketAnalysis',
-    category: 'Stratégie'
+    isBeta: false
   },
   {
     id: 'avatars',
@@ -39,8 +41,9 @@ const resources = [
     description: 'Définis précisément qui sont tes clients idéaux et leurs besoins',
     icon: User,
     color: 'from-purple-500 to-pink-500',
+    bgColor: 'bg-purple-50',
     page: 'AvatarClients',
-    category: 'Stratégie'
+    isBeta: false
   },
   {
     id: 'offers',
@@ -48,8 +51,9 @@ const resources = [
     description: 'Structure tes produits et services avec des prix optimisés',
     icon: Package,
     color: 'from-orange-500 to-red-500',
+    bgColor: 'bg-orange-50',
     page: 'MyOffers',
-    category: 'Produits'
+    isBeta: false
   },
   {
     id: 'sales-page',
@@ -57,8 +61,9 @@ const resources = [
     description: 'Crée une landing page qui convertit tes visiteurs en clients',
     icon: FileText,
     color: 'from-green-500 to-emerald-500',
+    bgColor: 'bg-green-50',
     page: 'SalesPage',
-    category: 'Marketing'
+    isBeta: false
   },
   {
     id: 'sales-messages',
@@ -66,8 +71,9 @@ const resources = [
     description: 'Génère des scripts de vente persuasifs pour convaincre',
     icon: MessageCircle,
     color: 'from-indigo-500 to-purple-500',
+    bgColor: 'bg-indigo-50',
     page: 'SalesMessages',
-    category: 'Marketing'
+    isBeta: false
   },
   {
     id: 'emails',
@@ -75,8 +81,9 @@ const resources = [
     description: 'Automatise tes campagnes email pour nurture tes prospects',
     icon: Send,
     color: 'from-pink-500 to-rose-500',
+    bgColor: 'bg-pink-50',
     page: 'EmailsMarketing',
-    category: 'Marketing'
+    isBeta: false
   },
   {
     id: 'social-media',
@@ -84,8 +91,9 @@ const resources = [
     description: 'Crée du contenu viral pour Instagram, TikTok, LinkedIn',
     icon: Share2,
     color: 'from-amber-500 to-orange-500',
+    bgColor: 'bg-amber-50',
     page: 'SocialMedia',
-    category: 'Contenu'
+    isBeta: true
   },
   {
     id: 'ads',
@@ -93,8 +101,9 @@ const resources = [
     description: 'Génère des copies publicitaires qui performent',
     icon: Megaphone,
     color: 'from-red-500 to-pink-500',
+    bgColor: 'bg-red-50',
     page: 'AdCopies',
-    category: 'Acquisition'
+    isBeta: true
   }
 ];
 
@@ -145,9 +154,6 @@ export default function AIResources() {
     );
   }
 
-  // Grouper les ressources par catégorie
-  const categories = [...new Set(resources.map(r => r.category))];
-
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="AIResources" progress={0} />
@@ -169,85 +175,81 @@ export default function AIResources() {
                 <span className="text-xs font-semibold text-[#61f7a2]">Générés par IA</span>
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                🎯 Tes ressources IA
+                ✨ Tes ressources IA
               </h1>
               <p className="text-gray-600 text-lg mb-2">
-                Tous les outils IA essentiels pour créer, structurer et vendre ton activité en ligne.
+                Tous les outils IA essentiels pour créer et vendre ton activité en ligne.
               </p>
               <p className="text-gray-500 text-sm">
                 Commence par générer chaque ressource. Tu pourras les consulter et les affiner ensuite.
               </p>
             </motion.div>
 
-            {/* Resources Grid par catégorie */}
-            {categories.map((category, catIndex) => (
-              <div key={category}>
-                <motion.h2
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: catIndex * 0.1 }}
-                  className="text-xl font-bold text-gray-900 mb-4"
-                >
-                  {category}
-                </motion.h2>
+            {/* Resources Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {resources.map((resource, index) => {
+                const Icon = resource.icon;
+                const isGenerated = generatedResources[resource.id];
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {resources
-                    .filter(r => r.category === category)
-                    .map((resource, index) => {
-                      const Icon = resource.icon;
-                      const isGenerated = generatedResources[resource.id];
-                      
-                      return (
-                        <motion.div
-                          key={resource.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.1 + index * 0.05 }}
-                          onClick={() => handleResourceClick(resource.page)}
-                          className="group cursor-pointer"
-                        >
-                          <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-[#61f7a2] hover:shadow-lg transition-all duration-300">
-                            {/* Icon Header */}
-                            <div className="flex items-start justify-between mb-4">
-                              <div className={cn(
-                                "w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center",
-                                resource.color
-                              )}>
-                                <Icon className="w-7 h-7 text-white" />
-                              </div>
-                              {isGenerated && (
-                                <div className="flex items-center gap-1 px-2 py-1 bg-green-50 rounded-lg">
-                                  <CheckCircle2 className="w-3 h-3 text-green-600" />
-                                  <span className="text-xs font-medium text-green-600">Généré</span>
-                                </div>
-                              )}
+                return (
+                  <motion.div
+                    key={resource.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    onClick={() => handleResourceClick(resource.page)}
+                    className="group cursor-pointer"
+                  >
+                    <div className={cn(
+                      "border border-gray-200 rounded-2xl p-6 hover:border-[#61f7a2] hover:shadow-lg transition-all duration-300",
+                      resource.bgColor
+                    )}>
+                      {/* Icon Header */}
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={cn(
+                          "w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center",
+                          resource.color
+                        )}>
+                          <Icon className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          {isGenerated && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-green-50 rounded-lg border border-green-200">
+                              <CheckCircle2 className="w-3 h-3 text-green-600" />
+                              <span className="text-xs font-medium text-green-600">Généré</span>
                             </div>
+                          )}
+                          {resource.isBeta && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 rounded-lg border border-amber-200">
+                              <span className="text-xs font-medium text-amber-700">Bêta</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
-                            {/* Content */}
-                            <div className="mb-4">
-                              <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#61f7a2] transition-colors">
-                                {resource.title}
-                              </h3>
-                              <p className="text-gray-600 text-sm leading-relaxed">
-                                {resource.description}
-                              </p>
-                            </div>
+                      {/* Content */}
+                      <div className="mb-4">
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#61f7a2] transition-colors">
+                          {resource.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                          {resource.description}
+                        </p>
+                      </div>
 
-                            {/* Button */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-semibold text-[#61f7a2] group-hover:underline">
-                                {isGenerated ? 'Consulter' : 'Générer'}
-                              </span>
-                              <ArrowRight className="w-4 h-4 text-[#61f7a2] group-hover:translate-x-1 transition-transform" />
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                </div>
-              </div>
-            ))}
+                      {/* Button */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-[#61f7a2] group-hover:underline flex items-center gap-2">
+                          {isGenerated ? 'Consulter' : 'Générer'}
+                          {resource.isBeta && <Lock className="w-3 h-3" />}
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-[#61f7a2] group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </main>
       </div>

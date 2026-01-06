@@ -53,17 +53,17 @@ const features = [
 
 
 const categories = [
-  { icon: Music, label: "Composition musicale", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
-  { icon: Code, label: "Code Python", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
-  { icon: Languages, label: "Apprendre l'anglais", color: "bg-green-100 text-green-700 hover:bg-green-200" },
-  { icon: Dumbbell, label: "Calisthenie", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
-  { icon: ChefHat, label: "Cuisine moléculaire", color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" },
-  { icon: Camera, label: "Photo", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
-  { icon: Sword, label: "Jujitsu", color: "bg-red-100 text-red-700 hover:bg-red-200" },
-  { icon: Sparkle, label: "Intelligence artificielle", color: "bg-indigo-100 text-indigo-700 hover:bg-indigo-200" },
-  { icon: Video, label: "Montage vidéo", color: "bg-cyan-100 text-cyan-700 hover:bg-cyan-200" },
-  { icon: Heart, label: "Yoga", color: "bg-rose-100 text-rose-700 hover:bg-rose-200" },
-];
+{ icon: Music, label: "Composition musicale", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
+{ icon: Code, label: "Code Python", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
+{ icon: Languages, label: "Apprendre l'anglais", color: "bg-green-100 text-green-700 hover:bg-green-200" },
+{ icon: Dumbbell, label: "Calisthenie", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
+{ icon: ChefHat, label: "Cuisine moléculaire", color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" },
+{ icon: Camera, label: "Photo", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
+{ icon: Sword, label: "Jujitsu", color: "bg-red-100 text-red-700 hover:bg-red-200" },
+{ icon: Sparkle, label: "Intelligence artificielle", color: "bg-indigo-100 text-indigo-700 hover:bg-indigo-200" },
+{ icon: Video, label: "Montage vidéo", color: "bg-cyan-100 text-cyan-700 hover:bg-cyan-200" },
+{ icon: Heart, label: "Yoga", color: "bg-rose-100 text-rose-700 hover:bg-rose-200" }];
+
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -147,8 +147,8 @@ export default function Welcome() {
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Quelle compétence veux-tu transmettre !"
-                className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base h-12"
-              />
+                className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base h-12" />
+
               <Button
                 onClick={handleStart}
                 className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-6 h-12 rounded-xl font-semibold shadow-md transition-all">
@@ -164,24 +164,24 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
             className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
-            {categories.map((category, index) => (
-              <button
-                key={index}
-                onClick={() => handleCategoryClick(category.label)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105 ${category.color}`}
-              >
+            {categories.map((category, index) =>
+            <button
+              key={index}
+              onClick={() => handleCategoryClick(category.label)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105 ${category.color}`}>
+
                 <category.icon className="w-3.5 h-3.5" />
                 {category.label}
               </button>
-            ))}
+            )}
           </motion.div>
         </div>
 
         {/* Floating Cards around Hero - Smaller */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: 1, 
+          animate={{
+            opacity: 1,
             y: [20, 0, -10, 0],
             rotate: [0, 5, -5, 0]
           }}
@@ -200,8 +200,8 @@ export default function Welcome() {
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: 1, 
+          animate={{
+            opacity: 1,
             y: [20, 0, -10, 0],
             rotate: [0, -5, 5, 0]
           }}
@@ -220,8 +220,8 @@ export default function Welcome() {
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: 1, 
+          animate={{
+            opacity: 1,
             y: [20, 0, -10, 0],
             rotate: [0, 5, -5, 0]
           }}
@@ -240,8 +240,8 @@ export default function Welcome() {
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: 1, 
+          animate={{
+            opacity: 1,
             y: [20, 0, -10, 0],
             rotate: [0, -5, 5, 0]
           }}
@@ -260,8 +260,8 @@ export default function Welcome() {
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: 1, 
+          animate={{
+            opacity: 1,
             y: [20, 0, -10, 0],
             rotate: [0, 5, -5, 0]
           }}
@@ -280,8 +280,8 @@ export default function Welcome() {
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: 1, 
+          animate={{
+            opacity: 1,
             y: [20, 0, -10, 0],
             rotate: [0, -5, 5, 0]
           }}
@@ -450,8 +450,8 @@ export default function Welcome() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-gray-900">PassionIA</p>
-                <p className="text-xs text-gray-600">
-                  Technologie d'intelligence artificielle développée par IAVNIR INC
+                <p className="text-xs text-gray-600">Technologie IA développée par IAVNIR©
+
                 </p>
               </div>
             </div>

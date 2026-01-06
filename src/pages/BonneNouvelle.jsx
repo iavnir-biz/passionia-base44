@@ -399,6 +399,7 @@ export default function BonneNouvelle() {
             </GlowButton>
           </motion.div>
         </div>
+        </div>
       </div>
     </div>
   );

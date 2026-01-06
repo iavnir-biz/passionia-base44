@@ -125,32 +125,6 @@ export default function MarketAnalysis() {
                   </GlowButton>
                 </div>
               </motion.div>
-
-              {/* Encadré expert */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-gray-50 border border-gray-200 rounded-2xl p-8 max-w-2xl mx-auto"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                    <UserIcon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">Besoin d'aide ?</h3>
-                    <p className="text-gray-600 mb-4">
-                      Un expert peut vous aider à y voir plus clair et à choisir la meilleure façon d'avancer.
-                    </p>
-                    <GlowButton
-                      onClick={() => window.open('https://calendly.com/your-link', '_blank')}
-                      variant="primary"
-                    >
-                      Prendre rendez-vous
-                    </GlowButton>
-                  </div>
-                </div>
-              </motion.div>
               </div>
             ) : (
               <div className="space-y-8">

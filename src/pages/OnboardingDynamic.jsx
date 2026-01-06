@@ -359,13 +359,37 @@ export default function OnboardingDynamic() {
               <div className="flex items-start gap-2 mb-4">
                 <Sparkles className="w-5 h-5 text-[#61f7a2] mt-1 flex-shrink-0" />
                 <h1 className="text-2xl font-bold text-gray-900 leading-relaxed">
-                  {currentQuestion.title || currentQuestion.text}
+                  {currentQuestion.text || currentQuestion.title}
                 </h1>
               </div>
               {currentQuestion.subtitle && (
                 <p className="text-gray-600 mb-6 ml-7 text-sm">
                   {currentQuestion.subtitle}
                 </p>
+              )}
+              
+              {/* Badge spécial pour la question 11 (dernière question) */}
+              {(session?.onboarding_history?.length || 0) === 10 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="ml-7 mb-6 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400 rounded-lg"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">💡</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-800 font-medium mb-1">
+                        <strong>Astuce de Noah :</strong>
+                      </p>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        Plus tu me donnes de contexte, plus je pourrai créer des offres personnalisées et un univers cohérent pour toi. N'hésite pas à détailler !
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
               )}
             </motion.div>
 

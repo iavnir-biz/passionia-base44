@@ -141,6 +141,8 @@ export default function OnboardingFirstName() {
     
     setIsLoading(true);
     try {
+      console.log('🔍 OnboardingFirstName - START');
+      
       // Sauvegarder le prénom dans localStorage
       localStorage.setItem('onboarding_firstName', firstName.trim());
       
@@ -153,10 +155,48 @@ export default function OnboardingFirstName() {
       };
       localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
       
+      // 🔥 CRÉER LA SESSION DÈS MAINTENANT
+      const currentUser = await base44.auth.me();
+      console.log('🔍 OnboardingFirstName - User:', { 
+        email: currentUser.email,
+        hasSessionId: !!currentUser.sessionId 
+      });
+      
+      // Vérifier si une session existe déjà
+      const existingSessions = await base44.entities.Session.filter({ 
+        created_by: currentUser.email 
+      });
+      
+      let sessionId;
+      
+      if (existingSessions.length > 0) {
+        sessionId = existingSessions[0].id;
+        console.log('✅ Session existe déjà:', sessionId);
+      } else {
+        // Créer la session maintenant
+        const session = await base44.entities.Session.create({
+          onboarding_history: [],
+          onboarding_summary: {},
+          onboarding_full: {},
+          skill: '',
+          is_onboarding_done: false
+        });
+        sessionId = session.id;
+        console.log('✅ Session créée:', sessionId);
+      }
+      
+      // Sauvegarder le sessionId + firstName sur le user
+      await base44.auth.updateMe({ 
+        firstName: firstName.trim(),
+        sessionId: sessionId
+      });
+      
+      console.log('✅ User mis à jour avec firstName + sessionId');
+      
       // Navigation vers OnboardingDynamic
       navigate(createPageUrl('OnboardingDynamic'));
     } catch (error) {
-      console.error('Error saving firstName:', error);
+      console.error('❌ Erreur création session:', error);
       alert('Une erreur est survenue. Merci de réessayer.');
       setIsLoading(false);
     }

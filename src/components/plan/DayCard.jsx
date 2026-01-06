@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from "@/lib/utils";
-import { ChevronDown, Lock, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, Lock, CheckCircle2, PartyPopper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ChecklistItem from './ChecklistItem';
+import confetti from 'canvas-confetti';
 
 export default function DayCard({ 
   day, 
@@ -14,8 +16,24 @@ export default function DayCard({
   checklist = []
 }) {
   const [isExpanded, setIsExpanded] = useState(isActive);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const allChecked = checklist.every(item => item.checked);
+
+  useEffect(() => {
+    if (isCompleted && isActive) {
+      setShowCelebration(true);
+      // Trigger confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+      
+      // Hide celebration after 3 seconds
+      setTimeout(() => setShowCelebration(false), 3000);
+    }
+  }, [isCompleted, isActive]);
 
   return (
     <motion.div
@@ -91,50 +109,47 @@ export default function DayCard({
             className="border-t border-gray-200"
           >
             <div className="p-6 space-y-6">
-              {/* Key Message */}
-              {day.keyMessage && (
-                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
-                  <p className="text-blue-800 font-medium italic">
-                    {day.keyMessage}
+              {/* Celebration Message */}
+              {showCelebration && (
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-2xl p-6 text-center text-white"
+                >
+                  <PartyPopper className="w-12 h-12 mx-auto mb-3" />
+                  <h3 className="text-2xl font-bold mb-2">Félicitations ! 🎉</h3>
+                  <p className="text-lg">
+                    Vous avez bien complété les actions du Jour {day.number} !
                   </p>
-                </div>
+                </motion.div>
               )}
 
-              {/* Checklist */}
-              <div className="space-y-3">
-                {checklist.map((item, idx) => (
-                  <label
-                    key={idx}
-                    className={cn(
-                      "flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all",
-                      item.checked 
-                        ? "bg-green-50 border-green-300" 
-                        : "bg-white border-gray-200 hover:border-[#61f7a2]/50"
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={item.checked}
-                      onChange={() => onChecklistChange(idx)}
-                      disabled={isCompleted}
-                      className="mt-0.5 w-5 h-5 text-[#61f7a2] rounded focus:ring-[#61f7a2] cursor-pointer"
-                    />
-                    <div className="flex-1">
-                      <span className={cn(
-                        "font-medium text-gray-900",
-                        item.checked && "line-through text-green-700"
-                      )}>
-                        {item.text}
-                      </span>
-                      {item.action && !item.checked && (
-                        <div className="mt-2">
-                          {item.action}
-                        </div>
-                      )}
+              {!isCompleted && (
+                <>
+                  {/* Key Message */}
+                  {day.keyMessage && (
+                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                      <p className="text-blue-800 font-medium italic">
+                        {day.keyMessage}
+                      </p>
                     </div>
-                  </label>
-                ))}
-              </div>
+                  )}
+
+                  {/* Checklist */}
+                  <div className="space-y-3">
+                    {checklist.map((item, idx) => (
+                      <ChecklistItem
+                        key={idx}
+                        item={item}
+                        checked={item.checked}
+                        onChange={() => onChecklistChange(idx)}
+                        disabled={isCompleted}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
 
               {/* Action Buttons */}
               {day.buttons && day.buttons.length > 0 && (

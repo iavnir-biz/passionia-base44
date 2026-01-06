@@ -101,15 +101,59 @@ export default function PlanAction() {
     // Default checklists
     const defaults = {
       1: [
-        { text: "Ajouter ma photo de profil dans Passion IA", checked: false },
-        { text: "Rejoindre la communauté Skool", checked: false },
-        { text: "Me présenter dans la communauté", checked: false },
-        { text: "Générer mon analyse de marché", checked: false },
-        { text: "Générer mes avatars clients", checked: false },
-        { text: "Générer mes offres (produits & prix)", checked: false },
-        { text: "Générer ma page de vente", checked: false },
-        { text: "Générer mes messages de vente", checked: false },
-        { text: "Générer mes emails marketing", checked: false }
+        { 
+          text: "Ajouter ma photo de profil dans Passion IA", 
+          checked: false,
+          details: "Vous retrouverez cela dans les paramètres de l'application.",
+          action: { type: "link", label: "Aller aux paramètres", page: "Settings" }
+        },
+        { 
+          text: "Rejoindre la communauté Skool", 
+          checked: false,
+          details: "Rejoignez notre communauté pour échanger avec d'autres membres et obtenir du soutien.",
+          action: { type: "external", label: "Cliquer ici pour rejoindre", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
+        },
+        { 
+          text: "Me présenter dans la communauté", 
+          checked: false,
+          details: "Présentez-vous aux autres membres : qui vous êtes, ce que vous voulez vendre, quels sont vos objectifs. Cela vous aidera à créer des liens et à obtenir des conseils. N'hésitez pas à faire une vidéo directement dans la communauté pour vous présenter de manière authentique !"
+        },
+        { 
+          text: "Générer mon analyse de marché", 
+          checked: false,
+          details: "L'analyse de marché vous aide à comprendre votre positionnement et valider la demande.",
+          action: { type: "link", label: "Cliquer ici pour générer votre analyse de marché", page: "MarketAnalysis" }
+        },
+        { 
+          text: "Générer mes avatars clients", 
+          checked: false,
+          details: "Définissez précisément qui sont vos clients idéaux pour mieux les adresser.",
+          action: { type: "link", label: "Cliquer ici pour générer vos avatars clients", page: "AvatarClients" }
+        },
+        { 
+          text: "Générer mes offres (produits & prix)", 
+          checked: false,
+          details: "Créez votre gamme d'offres avec des prix cohérents et attractifs.",
+          action: { type: "link", label: "Cliquer ici pour générer vos offres", page: "MyOffers" }
+        },
+        { 
+          text: "Générer ma page de vente", 
+          checked: false,
+          details: "Une page de vente professionnelle pour présenter votre offre de manière convaincante.",
+          action: { type: "link", label: "Cliquer ici pour générer votre page de vente", page: "SalesPage" }
+        },
+        { 
+          text: "Générer mes messages de vente", 
+          checked: false,
+          details: "Des messages prêts à l'emploi pour approcher vos prospects avec confiance.",
+          action: { type: "link", label: "Cliquer ici pour générer vos messages de vente", page: "SalesMessages" }
+        },
+        { 
+          text: "Générer mes emails marketing", 
+          checked: false,
+          details: "Une séquence d'emails automatiques pour nurture vos prospects.",
+          action: { type: "link", label: "Cliquer ici pour générer vos emails marketing", page: "EmailsMarketing" }
+        }
       ],
       2: [
         { text: "Identifier où se trouve mon avatar (réseaux / groupes)", checked: false },
@@ -254,16 +298,16 @@ export default function PlanAction() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl font-bold text-gray-900 mb-4">
-              Plan d'action
-            </h1>
-            
             <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-full mb-4">
               <Target className="w-4 h-4 text-[#61f7a2]" />
               <span className="text-[#61f7a2] font-semibold text-sm">
                 Jour {currentDay} / 7
               </span>
             </div>
+            
+            <h1 className="text-5xl font-bold text-gray-900 mb-4">
+              Plan d'action
+            </h1>
             
             <h2 className="text-3xl font-bold text-gray-900 mb-3">
               Ta première vente en 7 jours

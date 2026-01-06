@@ -28,7 +28,6 @@ const menuStructure = [
   { name: 'Ressources IA', icon: Sparkles, page: 'AIResources' },
   { name: 'Plan d\'action', icon: Target, page: 'PlanAction' },
   { name: 'Discuter avec Noah', icon: MessageCircle, page: 'NovaChat', locked: true },
-  { name: 'Paramètres', icon: Settings, page: 'Settings' },
 ];
 
 export default function Sidebar({ currentPage, progress = 0 }) {
@@ -80,8 +79,20 @@ export default function Sidebar({ currentPage, progress = 0 }) {
         })}
       </nav>
 
-      {/* Logout */}
+      {/* Settings & Logout */}
       <div className="p-4 border-t border-gray-200">
+        <Link
+          to={createPageUrl('Settings')}
+          className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 mb-1",
+            currentPage === 'Settings'
+              ? "bg-[#61f7a2]/10 text-[#61f7a2] border border-[#61f7a2]/20"
+              : "text-gray-600 hover:text-gray-900 hover:bg-blue-900/10"
+          )}
+        >
+          <Settings className="w-5 h-5" />
+          <span className="font-medium">Paramètres</span>
+        </Link>
         <button 
           className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-blue-900/10 w-full transition-all"
         >

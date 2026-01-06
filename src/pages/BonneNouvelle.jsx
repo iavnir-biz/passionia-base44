@@ -22,10 +22,9 @@ import { cn } from "@/lib/utils";
 
 const mainSteps = [
   { id: 1, label: "Ton Offre" },
-  { id: 2, label: "Bonne nouvelle !" },
-  { id: 3, label: "Ta Vie Future" },
-  { id: 4, label: "Concrètement ?" },
-  { id: 5, label: "Plan d'Action" },
+  { id: 2, label: "Ton marché" },
+  { id: 3, label: "Ta vie future" },
+  { id: 4, label: "Ton plan d'action" },
 ];
 
 function parsePrice(priceStr) {
@@ -168,9 +167,9 @@ export default function BonneNouvelle() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       {/* Main Navigation Bar */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 py-4 sticky top-0 z-40">
+      <div className="bg-white border-b border-gray-200 py-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
             {mainSteps.map((step, index) => {
               const isActive = step.id === 2;
               const isPrevious = step.id < 2;
@@ -182,16 +181,16 @@ export default function BonneNouvelle() {
                     onClick={() => isClickable && navigate(createPageUrl('OfferResume'))}
                     disabled={!isClickable}
                     className={cn(
-                      "px-3 py-1.5 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap",
-                      isActive && "bg-[#61f7a2] text-white shadow-md",
-                      isPrevious && "text-[#61f7a2] bg-[#61f7a2]/10 cursor-pointer hover:opacity-80",
-                      !isActive && !isPrevious && "text-gray-400 bg-gray-100 cursor-not-allowed"
+                      "px-4 py-2 rounded-xl text-sm font-semibold transition-all whitespace-nowrap",
+                      isActive && "bg-gradient-to-br from-green-500 to-emerald-500 text-white shadow-md",
+                      isPrevious && "bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200",
+                      !isActive && !isPrevious && "text-gray-400 bg-gray-50 cursor-not-allowed"
                     )}>
-                    {step.id}. {step.label}
+                    {step.label}
                   </button>
                   {index < mainSteps.length - 1 && (
                     <div className={cn(
-                      "w-4 md:w-8 h-[2px]",
+                      "w-8 h-0.5",
                       step.id < 2 ? "bg-[#61f7a2]" : "bg-gray-200"
                     )} />
                   )}

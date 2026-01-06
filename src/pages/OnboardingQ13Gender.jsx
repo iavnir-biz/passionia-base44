@@ -20,6 +20,7 @@ export default function OnboardingQ13Gender() {
       blockType="profile"
       useLocalStorage={true}
       autoSubmit={true}
+      completedSteps={[1]}
     />
   );
 }

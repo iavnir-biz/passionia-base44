@@ -115,53 +115,17 @@ export default function OnboardingDynamic() {
         
         navigate(createPageUrl('OnboardingTransition'));
       } else {
-        // Sauvegarder la nouvelle question
-        if (lastAnswer !== null && lastAnswer !== undefined) {
-          onboardingData.history = onboardingData.history || [];
-          
-          // Convertir toutes les réponses en string pour la DB
-          let answerAsString = lastAnswer;
-          if (Array.isArray(lastAnswer)) {
-            answerAsString = lastAnswer.join(', ');
-          } else if (typeof lastAnswer === 'number') {
-            answerAsString = String(lastAnswer);
-          } else if (typeof lastAnswer === 'object') {
-            answerAsString = JSON.stringify(lastAnswer);
-          } else {
-            answerAsString = String(lastAnswer);
-          }
-          
-          onboardingData.history.push({
-            question: currentQuestion?.text || currentQuestion?.title,
-            answer: answerAsString,
-            at: new Date().toISOString()
-          });
-        }
-        onboardingData.current_question = data.question;
+        // Mettre à jour le summary d'abord
         onboardingData.summary = data.summary || onboardingData.summary;
-        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
         
+        // Sauvegarder la nouvelle question SANS ajouter l'ancienne réponse ici
+        // (elle sera ajoutée au prochain appel)
+        onboardingData.current_question = data.question;
+        
+        // L'historique sera construit côté backend par onboardingNextQuestion
+        // On ne stocke que la question courante ici
         console.log('🔵 Sauvegarde nouvelle question en localStorage...');
         localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
-        
-        // 🔥 SYNCHRONISER AVEC LA SESSION EN BASE DE DONNÉES AU FUR ET À MESURE
-        console.log('🔵 Synchronisation avec la session DB...');
-        const currentUser = await base44.auth.me();
-        if (currentUser.sessionId && onboardingData.history.length > 0) {
-          console.log('🔵 Mise à jour session:', currentUser.sessionId);
-          await base44.entities.Session.update(currentUser.sessionId, {
-            onboarding_history: onboardingData.history,
-            onboarding_summary: onboardingData.summary || {},
-            skill: onboardingData.summary?.who_to_teach || ''
-          });
-          console.log('✅ Session mise à jour:', onboardingData.history.length, 'questions');
-        } else {
-          console.warn('⚠️ Pas de sessionId ou history vide:', {
-            hasSessionId: !!currentUser.sessionId,
-            sessionId: currentUser.sessionId,
-            historyLength: onboardingData.history.length
-          });
-        }
         
         console.log('🔵 Affichage nouvelle question:', data.question.type);
         setCurrentQuestion(data.question);

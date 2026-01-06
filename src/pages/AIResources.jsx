@@ -214,9 +214,9 @@ export default function AIResources() {
                         </div>
                         <div className="flex flex-col items-end gap-1">
                           {isGenerated && (
-                            <div className="flex items-center gap-1 px-2 py-1 bg-green-50 rounded-lg border border-green-200">
-                              <CheckCircle2 className="w-3 h-3 text-green-600" />
-                              <span className="text-xs font-medium text-green-600">Généré</span>
+                            <div className="flex items-center gap-1 px-2 py-1 bg-[#11112b]/10 rounded-lg border border-[#11112b]/20">
+                              <CheckCircle2 className="w-3 h-3 text-green-500" />
+                              <span className="text-xs font-medium text-[#1e3a8a]">Généré</span>
                             </div>
                           )}
                           {resource.isBeta && (

@@ -15,6 +15,14 @@ const steps = [
 export default function OfferSidebar({ currentStep }) {
   const navigate = useNavigate();
 
+  const stepColors = {
+    1: { bg: 'from-blue-500 to-blue-600', light: 'bg-blue-50', text: 'text-blue-500', iconBg: 'bg-blue-500/20' },
+    2: { bg: 'from-green-500 to-green-600', light: 'bg-green-50', text: 'text-green-500', iconBg: 'bg-green-500/20' },
+    3: { bg: 'from-purple-500 to-purple-600', light: 'bg-purple-50', text: 'text-purple-500', iconBg: 'bg-purple-500/20' },
+    4: { bg: 'from-yellow-500 to-yellow-600', light: 'bg-yellow-50', text: 'text-yellow-600', iconBg: 'bg-yellow-500/20' },
+    5: { bg: 'from-[#61f7a2] to-[#4de88f]', light: 'bg-[#61f7a2]/10', text: 'text-[#61f7a2]', iconBg: 'bg-[#61f7a2]/20' }
+  };
+
   return (
     <div className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 p-6 flex flex-col z-40">
       {/* Header */}
@@ -29,6 +37,7 @@ export default function OfferSidebar({ currentStep }) {
           const isActive = step.id === currentStep;
           const isPrevious = step.id < currentStep;
           const isClickable = isPrevious;
+          const colors = stepColors[step.id];
 
           return (
             <button
@@ -37,21 +46,21 @@ export default function OfferSidebar({ currentStep }) {
               disabled={!isClickable}
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left",
-                isActive && "bg-gradient-to-r from-[#61f7a2] to-[#4de88f] text-white shadow-lg",
-                isPrevious && "bg-[#61f7a2]/10 text-[#61f7a2] hover:bg-[#61f7a2]/20 cursor-pointer",
+                isActive && `bg-gradient-to-r ${colors.bg} text-white shadow-lg`,
+                isPrevious && `${colors.light} ${colors.text} hover:opacity-80 cursor-pointer`,
                 !isActive && !isPrevious && "bg-gray-50 text-gray-400 cursor-not-allowed"
               )}
             >
               <div className={cn(
                 "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
                 isActive && "bg-white/20",
-                isPrevious && "bg-[#61f7a2]/20",
+                isPrevious && colors.iconBg,
                 !isActive && !isPrevious && "bg-gray-100"
               )}>
                 <step.icon className={cn(
                   "w-5 h-5",
                   isActive && "text-white",
-                  isPrevious && "text-[#61f7a2]",
+                  isPrevious && colors.text,
                   !isActive && !isPrevious && "text-gray-400"
                 )} />
               </div>

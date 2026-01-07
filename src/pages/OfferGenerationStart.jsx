@@ -41,68 +41,58 @@ export default function OfferGenerationStart() {
 
   const generateOffer = async () => {
     try {
+      // 🔥 LECTURE EXCLUSIVE DEPUIS SESSION (pas localStorage)
       const user = await base44.auth.me();
-      console.log('🔍 OfferGenerationStart - User loaded:', { 
-        email: user.email,
-        firstName: user.firstName,
-        hasSessionId: !!user.sessionId,
-        sessionId: user.sessionId
-      });
       
-      // Get user's session
-      const sessions = await base44.entities.Session.filter({ 
-        created_by: user.email 
-      });
-      
-      console.log('🔍 Sessions found:', sessions.length);
-      
-      if (!sessions || sessions.length === 0) {
-        console.error('❌ Session not found, redirecting to onboarding');
+      if (!user.sessionId) {
+        console.error('❌ [OfferGenerationStart] Pas de sessionId');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
+
+      const sessions = await base44.entities.Session.filter({ id: user.sessionId });
       
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ [OfferGenerationStart] Session introuvable');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
       const session = sessions[0];
       const sessionId = session.id;
 
-      console.log('🔍 Session data:', {
+      console.log('📊 [OfferGenerationStart] Session loaded:', {
         sessionId,
-        hasOnboardingHistory: !!session.onboarding_history,
-        onboardingHistoryLength: session.onboarding_history?.length || 0,
-        hasOnboardingSummary: !!session.onboarding_summary,
-        hasOnboardingFull: !!session.onboarding_full,
-        onboardingFullKeys: Object.keys(session.onboarding_full || {}),
-        hasSkill: !!session.skill,
-        skill: session.skill,
-        hasOfferGeneration: !!session.offer_generation
+        historyLength: session.onboarding_history?.length || 0,
+        summaryKeys: Object.keys(session.onboarding_summary || {}),
+        fullKeys: Object.keys(session.onboarding_full || {}),
+        isDone: session.is_onboarding_done,
+        skill: session.skill
       });
 
-      // Vérifier que toutes les données nécessaires sont présentes
+      // ✅ Validation stricte DB-first
+      if (!session.is_onboarding_done || (session.onboarding_history?.length || 0) < 11) {
+        console.error('❌ [OfferGenerationStart] Onboarding incomplet:', {
+          isDone: session.is_onboarding_done,
+          historyLength: session.onboarding_history?.length || 0
+        });
+        navigate(createPageUrl('OnboardingDynamic'));
+        return;
+      }
+
       const missingData = [];
       
-      // Vérifier firstName
       if (!user.firstName) {
-        missingData.push('firstName (→ OnboardingFirstName)');
+        missingData.push('firstName');
       }
       
-      // Vérifier skill/compétence
       if (!session.skill && !session.onboarding_summary?.who_to_teach) {
-        missingData.push('skill (→ OnboardingDynamic)');
+        missingData.push('skill');
       }
       
-      // Vérifier les 11 questions de l'onboarding dynamic
-      if (!session.onboarding_history || session.onboarding_history.length < 11) {
-        console.error('❌ onboarding_history incomplet:', {
-          length: session.onboarding_history?.length || 0,
-          history: session.onboarding_history
-        });
-        missingData.push(`onboarding_history (${session.onboarding_history?.length || 0}/11 questions → OnboardingDynamic)`);
-      }
-      
-      // Vérifier les données statiques (Q12-Q26)
       if (!session.onboarding_full || Object.keys(session.onboarding_full).length === 0) {
-        console.error('❌ onboarding_full vide:', session.onboarding_full);
-        missingData.push('réponses statiques post-transition (→ OnboardingQ12AgeRange)');
+        console.error('❌ [OfferGenerationStart] onboarding_full vide');
+        missingData.push('réponses statiques');
       }
 
       if (missingData.length > 0) {

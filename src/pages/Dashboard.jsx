@@ -67,7 +67,9 @@ export default function Dashboard() {
           const userSession = sessions[0];
           
           const requiredFields = [
+            'market_validation',
             'generated_avatars',
+            'my_generated_offers',
             'generated_sales_messages',
             'generated_marketing_emails',
             'generated_sales_pages',

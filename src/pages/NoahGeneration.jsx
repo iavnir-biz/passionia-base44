@@ -8,45 +8,38 @@ import { Loader2, CheckCircle, Brain } from 'lucide-react';
 const generationSteps = [
   { 
     id: 'market',
-    label: 'Analyse de marché prête à être exploitée',
-    duration: 8000,
-    function: 'generateMarketValidation'
+    label: 'Validation marché avec données réelles',
+    duration: 8000
   },
   { 
     id: 'avatars',
     label: 'Profils clients exploitables pour vendre',
-    duration: 10000,
-    function: 'generateAvatars'
+    duration: 10000
   },
   { 
     id: 'offers',
-    label: 'Offres structurées avec prix, promesse et positionnement',
-    duration: 15000,
-    function: 'generateMyOffers'
+    label: 'Offres structurées avec prix et positionnement',
+    duration: 15000
   },
   { 
     id: 'messages',
-    label: 'Messages prêts à envoyer pour obtenir tes premières ventes',
-    duration: 12000,
-    function: 'generateSalesMessage'
+    label: 'Messages prêts à envoyer pour premières ventes',
+    duration: 12000
   },
   { 
     id: 'emails',
-    label: 'Séquence email automatique opérationnelle',
-    duration: 18000,
-    function: 'generateMarketingEmail'
+    label: 'Séquence email automatique (5 types)',
+    duration: 18000
   },
   { 
     id: 'salespage',
-    label: 'Page de vente prête à convertir tes visiteurs',
-    duration: 20000,
-    function: 'generateSalesPage'
+    label: 'Page de vente prête à convertir',
+    duration: 20000
   },
   { 
     id: 'plan',
-    label: 'Plan d\'action personnalisé pour ta première vente',
-    duration: 8000,
-    function: 'generatePlanDeRoute'
+    label: 'Plan d\'action personnalisé 7 jours',
+    duration: 8000
   }
 ];
 
@@ -95,11 +88,12 @@ export default function NoahGeneration() {
     console.log('[NoahGeneration] 🚀 START - Orchestrated generation');
     
     try {
-      // 🔥 P0-5: Appel UNIQUE à l'orchestrateur
+      // 🔥 P0-3: Appel UNIQUE à l'orchestrateur avec sessionId
       setCurrentStep(0);
       
       // Démarrer l'orchestrateur en arrière-plan
-      const generationPromise = base44.functions.invoke('generateAllAssets', {});
+      const sessionId = currentUser.sessionId;
+      const generationPromise = base44.functions.invoke('generateAllAssets', { sessionId });
       
       // Simuler la progression visuelle pendant l'orchestration
       let visualProgress = 0;

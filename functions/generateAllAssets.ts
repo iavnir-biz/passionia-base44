@@ -88,7 +88,9 @@ Deno.serve(async (req) => {
     // 3. Pipeline de génération (ordre logique)
     const statusByAsset = {};
     const generationSteps = [
+      { name: 'marketValidation', field: 'market_validation', function: 'generateMarketValidation' },
       { name: 'avatars', field: 'generated_avatars', function: 'generateAvatars' },
+      { name: 'myOffers', field: 'my_generated_offers', function: 'generateMyOffers' },
       { name: 'salesMessages', field: 'generated_sales_messages', function: 'generateSalesMessage' },
       { name: 'marketingEmails', field: 'generated_marketing_emails', function: 'generateMarketingEmail' },
       { name: 'salesPages', field: 'generated_sales_pages', function: 'generateSalesPage' },
@@ -136,15 +138,25 @@ Deno.serve(async (req) => {
       await new Promise(resolve => setTimeout(resolve, 500));
     }
 
-    // 4. Vérifier que tout est prêt (P1-8: vérifier non-vide)
+    // 4. Vérifier que tout est prêt (P0-BONUS: vérifier non-vide robuste)
     const finalSession = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     const updatedSession = finalSession[0];
     
-    const readyForDashboard = generationSteps.every(step => {
-      const value = updatedSession[step.field];
-      return value !== null && value !== undefined && 
-             (typeof value === 'object' ? Object.keys(value).length > 0 : value.length > 0);
-    });
+    const isNonEmpty = (value) => {
+      if (value === null || value === undefined) return false;
+      if (typeof value === 'string') return value.trim().length > 0;
+      if (typeof value === 'number') return true;
+      if (typeof value === 'boolean') return true;
+      if (Array.isArray(value)) return value.length > 0;
+      if (typeof value === 'object') return Object.keys(value).length > 0;
+      return false;
+    };
+
+    const readyForDashboard = generationSteps.every(step => isNonEmpty(updatedSession[step.field]));
+    
+    const failedAssets = Object.entries(statusByAsset)
+      .filter(([_, status]) => status === 'failed')
+      .map(([name]) => name);
 
     const duration = Date.now() - startTime;
     
@@ -152,7 +164,8 @@ Deno.serve(async (req) => {
     await base44.asServiceRole.entities.Session.update(sessionId, {
       assets_generation_in_progress: false,
       assets_generation_completed_at: new Date().toISOString(),
-      status_by_asset: statusByAsset
+      assets_generation_status_by_asset: statusByAsset,
+      assets_generation_failed_assets: failedAssets
     });
 
     console.log('[generateAllAssets] END', { 

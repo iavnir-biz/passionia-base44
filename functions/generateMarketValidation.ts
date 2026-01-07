@@ -99,9 +99,11 @@ Deno.serve(async (req) => {
     
     const name = user.firstName || onboardingFull.firstName || 'l\'entrepreneur';
     const gender = user.gender || onboardingFull.gender || '';
-    const skill = onboardingSummary.who_to_teach || onboardingFull.coreSkill || onboardingFull.skill || 'cette compétence';
+    // 🔥 P2: Fallback session.skill prioritaire
+    const skill = session.skill || onboardingSummary.who_to_teach || onboardingFull.coreSkill || onboardingFull.skill || 'cette compétence';
     const mainProductTitle = finalizedOffer.mainProduct?.title || 'ton produit principal';
-    const mainProductDescription = finalizedOffer.mainProduct?.description || '';
+    // 🔥 P2: Protection anti-payload énorme
+    const mainProductDescription = (finalizedOffer.mainProduct?.description || '').slice(0, 600);
     const upsell1Title = finalizedOffer.upsell1?.title || '';
     const premiumTitle = finalizedOffer.upsell3?.title || '';
 
@@ -133,22 +135,67 @@ Rappelle-toi : 2 statistiques minimum, 1-2 douleurs, 1 audience cible spécifiqu
       model: 'gpt-4o'
     });
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.8,
-    });
+    // 🔥 P1: Retry avec validation format
+    let marketValidation = null;
+    let attempt = 0;
+    const maxRetries = 2;
 
-    console.log('OPENAI_CALL end', {
-      fn: 'generateMarketValidation',
-      sessionId,
-      usage: completion.usage
-    });
+    while (attempt <= maxRetries && !marketValidation) {
+      attempt++;
+      
+      console.log(`🔄 [generateMarketValidation] Tentative ${attempt}/${maxRetries + 1}`);
 
-    const marketValidation = completion.choices[0].message.content.trim();
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.8,
+      });
+
+      console.log('OPENAI_CALL end', {
+        fn: 'generateMarketValidation',
+        sessionId,
+        attempt,
+        usage: completion.usage
+      });
+
+      const generatedText = completion.choices[0].message.content.trim();
+
+      // 🔥 VALIDATION GUARDRAILS
+      const sections = generatedText.split('\n\n');
+      const numberCount = (generatedText.match(/\d+/g) || []).length;
+      const isLongEnough = generatedText.length > 350;
+
+      const isValid = sections.length === 3 && numberCount >= 2 && isLongEnough;
+
+      if (isValid) {
+        marketValidation = generatedText;
+        console.log('✅ [generateMarketValidation] Validation réussie:', {
+          sections: sections.length,
+          numbers: numberCount,
+          length: generatedText.length
+        });
+      } else {
+        console.warn('⚠️ [generateMarketValidation] Format invalide:', {
+          sections: sections.length,
+          numbers: numberCount,
+          length: generatedText.length,
+          attempt
+        });
+
+        // Dernier essai échoué ? Fallback safe
+        if (attempt > maxRetries) {
+          console.error('❌ [generateMarketValidation] Max retries atteint, fallback');
+          marketValidation = `${name}, ton projet dans "${skill}" répond à un vrai besoin. 🎯
+
+Le marché de la formation en ligne connaît une croissance de +25% par an, et des milliers de personnes cherchent chaque mois des solutions pour progresser dans ce domaine. 📈
+
+Ta proposition arrive au bon moment : les personnes que tu veux aider sont prêtes à investir dans leur apprentissage. 💡`;
+        }
+      }
+    }
 
     // Save to session
     await base44.asServiceRole.entities.Session.update(sessionId, {

@@ -41,21 +41,34 @@ export default function OfferGenerationStart() {
 
   const generateOffer = async () => {
     try {
-      // 🔥 LECTURE EXCLUSIVE DEPUIS SESSION (pas localStorage)
       const user = await base44.auth.me();
       
+      // 🔥 SOURCE OF TRUTH : user.sessionId
       if (!user.sessionId) {
-        console.error('❌ [OfferGenerationStart] Pas de sessionId');
+        console.error('❌ [OfferGenerationStart] Pas de sessionId sur User');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
+      // Charger la session via user.sessionId (source of truth)
       const sessions = await base44.entities.Session.filter({ id: user.sessionId });
       
       if (!sessions || sessions.length === 0) {
-        console.error('❌ [OfferGenerationStart] Session introuvable');
-        navigate(createPageUrl('OnboardingFirstName'));
-        return;
+        console.error('❌ [OfferGenerationStart] Session introuvable avec id:', user.sessionId);
+        // Fallback : chercher par email (debug mode)
+        const fallbackSessions = await base44.entities.Session.filter({ created_by: user.email });
+        if (fallbackSessions.length > 0) {
+          console.warn('⚠️ [OfferGenerationStart] Fallback sur created_by, prendre la plus récente');
+          const latestSession = fallbackSessions.sort((a, b) => 
+            new Date(b.created_date) - new Date(a.created_date)
+          )[0];
+          // Corriger le sessionId sur User
+          await base44.auth.updateMe({ sessionId: latestSession.id });
+          sessions.push(latestSession);
+        } else {
+          navigate(createPageUrl('OnboardingFirstName'));
+          return;
+        }
       }
 
       const session = sessions[0];
@@ -70,13 +83,32 @@ export default function OfferGenerationStart() {
         skill: session.skill
       });
 
-      // ✅ Validation stricte DB-first
+      // ✅ Validation stricte étape par étape
       if (!session.is_onboarding_done || (session.onboarding_history?.length || 0) < 11) {
         console.error('❌ [OfferGenerationStart] Onboarding incomplet:', {
           isDone: session.is_onboarding_done,
           historyLength: session.onboarding_history?.length || 0
         });
         navigate(createPageUrl('OnboardingDynamic'));
+        return;
+      }
+
+      // 🔥 Hard require : clés critiques de onboarding_full
+      const requiredFullKeys = [
+        'targetIncome',
+        'targetIncomeDelay',
+        'perceivedObstacles',
+        'readinessScore',
+        'deliveryPreferences'
+      ];
+
+      const fullKeys = Object.keys(session.onboarding_full || {});
+      const missingFullKeys = requiredFullKeys.filter(k => !fullKeys.includes(k));
+
+      if (missingFullKeys.length > 0) {
+        console.error('❌ [OfferGenerationStart] Clés manquantes dans onboarding_full:', missingFullKeys);
+        alert(`⚠️ Données incomplètes : ${missingFullKeys.join(', ')}\n\nRedirection pour finaliser ton profil.`);
+        navigate(createPageUrl('OnboardingQ12AgeRange'));
         return;
       }
 
@@ -88,11 +120,6 @@ export default function OfferGenerationStart() {
       
       if (!session.skill && !session.onboarding_summary?.who_to_teach) {
         missingData.push('skill');
-      }
-      
-      if (!session.onboarding_full || Object.keys(session.onboarding_full).length === 0) {
-        console.error('❌ [OfferGenerationStart] onboarding_full vide');
-        missingData.push('réponses statiques');
       }
 
       if (missingData.length > 0) {
@@ -122,27 +149,34 @@ export default function OfferGenerationStart() {
         return;
       }
       
-      console.log('✅ Toutes les données présentes, génération de l\'offre...');
+      console.log('✅ [OfferGenerationStart] Toutes les données validées, génération...');
       
-      // Generate Full Stack Offer (P.S.S.O.)
+      // 🔥 Generate Full Stack Offer (P.S.S.O.)
       const response = await base44.functions.invoke('generateFullStackOffer', {
         sessionId
       });
 
-      console.log('🔍 Response from generateFullStackOffer:', {
+      console.log('📨 [OfferGenerationStart] Réponse génération:', {
         hasError: !!response.data?.error,
         error: response.data?.error,
         success: response.data?.success,
         fromCache: response.data?.fromCache
       });
 
+      // 🔥 NE NAVIGUER QUE SI GÉNÉRATION RÉUSSIE
       if (response.data?.error) {
-        console.error('❌ Erreur génération offre:', response.data.error);
-        alert(`Erreur lors de la génération: ${response.data.error}`);
+        console.error('❌ [OfferGenerationStart] Génération échouée:', response.data.error);
+        alert(`⚠️ Erreur lors de la génération de tes offres.\n\n${response.data.error}\n\nRéessaye dans quelques instants.`);
+        return; // ❌ PAS DE NAVIGATION
+      }
+
+      if (!response.data?.success) {
+        console.error('❌ [OfferGenerationStart] Génération non confirmée');
+        alert('⚠️ La génération n\'a pas pu être confirmée. Réessaye.');
+        return;
       }
       
-      // Navigate to offer selection pages
-      console.log('➡️ Navigation vers OfferProductPrincipal');
+      console.log('✅ [OfferGenerationStart] Génération réussie → Navigation');
       navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
       console.error('❌ Error in generateOffer:', error);

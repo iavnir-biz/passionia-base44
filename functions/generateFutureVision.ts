@@ -100,20 +100,36 @@ Deno.serve(async (req) => {
     const gender = user.gender || onboardingFull.gender || '';
     const skill = onboardingSummary.who_to_teach || onboardingFull.coreSkill || onboardingFull.skill || 'cette compétence';
     
-    // Personal answers (effet miroir + nouvelle réalité)
+    // 🔥 DB-FIRST KEYS MAPPING (clés réelles stockées)
     const personalAnswers = {
-      obstacles: onboardingFull.obstacles || '',
+      obstacles: onboardingFull.perceivedObstacles || onboardingFull.obstacles || '',
       ifNothingChanges: onboardingFull.ifNothingChanges || ''
     };
     
-    // Goal answers (vision + style de vie)
     const goalAnswers = {
-      lifeChange: onboardingFull.lifeChange || '',
-      impact: onboardingFull.impact || '',
-      emotions: onboardingFull.emotions || '',
-      relatives: onboardingFull.relatives || '',
-      lifestyle: onboardingFull.lifestyle || ''
+      lifeChange: onboardingFull.lifeChangeStory || onboardingFull.lifeChange || '',
+      impact: onboardingFull.impactGoals || onboardingFull.impact || '',
+      emotions: onboardingFull.emotionalBenefits || onboardingFull.emotions || '',
+      relatives: onboardingFull.relativesThoughts || onboardingFull.relatives || '',
+      lifestyle: onboardingFull.lifestyleGoals || onboardingFull.lifestyle || '',
+      readiness: onboardingFull.readinessScore || onboardingFull.readiness || ''
     };
+
+    // 🔥 DEBUG LOG: clés disponibles
+    console.log('📊 [generateFutureVision] onboarding_full keys:', Object.keys(onboardingFull));
+    console.log('📊 [generateFutureVision] Mapped data:', {
+      name,
+      skill,
+      gender,
+      personalAnswers,
+      goalAnswers,
+      hasObstacles: !!personalAnswers.obstacles,
+      hasLifeChange: !!goalAnswers.lifeChange,
+      hasImpact: !!goalAnswers.impact,
+      hasEmotions: !!goalAnswers.emotions,
+      hasRelatives: !!goalAnswers.relatives,
+      hasLifestyle: !!goalAnswers.lifestyle
+    });
 
     const mainProductTitle = finalizedOffer.mainProduct?.title || 'ton produit principal';
     const mainProductType = finalizedOffer.mainProduct?.productType || '';

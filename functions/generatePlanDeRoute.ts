@@ -117,8 +117,18 @@ Deno.serve(async (req) => {
     const premiumOffer = finalizedOffer.upsell3 || {};
     
     const revenueObjective = session.potential_revenue || 0;
-    const userLevel = onboardingFull.experienceLevel || 'intermédiaire';
-    const confidenceLevel = onboardingFull.readiness || 'moyen';
+    
+    // 🔥 P1-5: Mapping DB-first (readinessScore existe, experienceLevel absent)
+    const readinessScore = onboardingFull.readinessScore || 5;
+    const userLevel = readinessScore >= 7 ? 'motivé' : readinessScore >= 4 ? 'intermédiaire' : 'débutant';
+    const confidenceLevel = readinessScore >= 7 ? 'élevé' : readinessScore >= 4 ? 'moyen' : 'faible';
+
+    console.log('📊 [generatePlanDeRoute] Mapped data:', {
+      readinessScore,
+      userLevel,
+      confidenceLevel,
+      revenueObjective
+    });
 
     const userPrompt = `DONNÉES OBLIGATOIRES À UTILISER
 

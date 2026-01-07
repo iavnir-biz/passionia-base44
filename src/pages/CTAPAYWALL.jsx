@@ -109,12 +109,12 @@ export default function CTAPAYWALL() {
 
   const completedSteps = [1, 2, 3, 4, 5, 6];
 
-  // Récupérer les offres de la session
-  const offerChoices = session?.offer_generation?.offerChoices || {};
-  const productPrincipal = offerChoices.product_principal;
-  const petitExtra = offerChoices.petit_extra;
-  const offreSuperieure = offerChoices.offre_superieure;
-  const offrePremium = offerChoices.offre_premium;
+  // 🔥 P0-1: Source of truth = session.finalized_offer
+  const finalizedOffer = session?.finalized_offer || {};
+  const productPrincipal = finalizedOffer.mainProduct;
+  const petitExtra = finalizedOffer.orderBump;
+  const offreSuperieure = finalizedOffer.upsell1;
+  const offrePremium = finalizedOffer.upsell3;
 
   const products = [
     { label: 'Produit Principal', data: productPrincipal, multiplier: 30 },
@@ -123,10 +123,8 @@ export default function CTAPAYWALL() {
     { label: 'Premium', data: offrePremium, multiplier: 1 }
   ].filter(p => p.data);
 
-  const totalMonthly = products.reduce((sum, p) => {
-    const price = parsePrice(p.data?.price);
-    return sum + (price * p.multiplier);
-  }, 0);
+  // 🔥 P0-2: Utiliser potential_revenue (pas recalcul)
+  const potentialRevenue = session?.potential_revenue || 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
@@ -204,10 +202,10 @@ export default function CTAPAYWALL() {
               ))}
             </div>
 
-            {totalMonthly > 0 && (
+            {potentialRevenue > 0 && (
               <div className="bg-gradient-to-br from-[#61f7a2]/10 to-blue-50 rounded-2xl p-6 text-center mb-4">
                 <p className="text-gray-600 mb-2">Potentiel mensuel estimé</p>
-                <p className="text-4xl font-bold text-gray-900">{totalMonthly.toLocaleString('fr-FR')} €</p>
+                <p className="text-4xl font-bold text-gray-900">{potentialRevenue.toLocaleString('fr-FR')} €</p>
               </div>
             )}
 
@@ -330,7 +328,7 @@ export default function CTAPAYWALL() {
                     <Rocket className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-2">🚀 Ta première vente à {productPrincipal ? productPrincipal.price : '27€'} en 24h</h3>
+                    <h3 className="text-xl font-bold mb-2">🚀 Ta première vente à {productPrincipal ? productPrincipal.price : '27€'}</h3>
                     <ul className="space-y-2 text-gray-200">
                       <li>• Messages déjà rédigés</li>
                       <li>• Pas besoin de communauté</li>
@@ -341,7 +339,7 @@ export default function CTAPAYWALL() {
                 </div>
                 <div className="bg-[#61f7a2]/20 rounded-xl p-4 border border-[#61f7a2]">
                   <p className="text-white font-bold">
-                    👉 Ta première rentrée d'argent dans les prochaines 24h
+                    👉 Tu sais exactement quoi faire dès aujourd'hui pour ta première vente
                   </p>
                 </div>
               </div>

@@ -8,43 +8,43 @@ import { Loader2, CheckCircle, Brain } from 'lucide-react';
 const generationSteps = [
   { 
     id: 'market',
-    label: 'Analyse de marché',
+    label: 'Analyse de marché prête à être exploitée',
     duration: 8000,
     function: 'generateMarketValidation'
   },
   { 
     id: 'avatars',
-    label: 'Création des avatars clients',
+    label: 'Profils clients exploitables pour vendre',
     duration: 10000,
     function: 'generateAvatars'
   },
   { 
     id: 'offers',
-    label: 'Génération des offres complètes',
+    label: 'Offres structurées avec prix, promesse et positionnement',
     duration: 15000,
     function: 'generateMyOffers'
   },
   { 
     id: 'messages',
-    label: 'Rédaction des messages de vente',
+    label: 'Messages prêts à envoyer pour obtenir tes premières ventes',
     duration: 12000,
     function: 'generateSalesMessage'
   },
   { 
     id: 'emails',
-    label: 'Création de la séquence email',
+    label: 'Séquence email automatique opérationnelle',
     duration: 18000,
     function: 'generateMarketingEmail'
   },
   { 
     id: 'salespage',
-    label: 'Construction de la page de vente',
+    label: 'Page de vente prête à convertir tes visiteurs',
     duration: 20000,
     function: 'generateSalesPage'
   },
   { 
     id: 'plan',
-    label: 'Personnalisation du plan d\'action',
+    label: 'Plan d\'action personnalisé pour ta première vente',
     duration: 8000,
     function: 'generatePlanDeRoute'
   }
@@ -227,11 +227,14 @@ export default function NovaGeneration() {
             ))}
           </motion.div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Noha prépare ton business
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">
+            Noah construit ton business personnalisé
           </h1>
-          <p className="text-gray-600">
-            Génération de tous les éléments en cours...
+          <p className="text-gray-700 text-lg mb-2">
+            Tout ce dont tu as besoin pour vendre est en train d'être préparé pour toi.
+          </p>
+          <p className="text-gray-600 text-sm">
+            Tu n'as rien à faire. Noah s'occupe de tout pendant que tu avances vers ton premier client.
           </p>
         </motion.div>
 
@@ -249,6 +252,11 @@ export default function NovaGeneration() {
               transition={{ duration: 0.5 }}
             />
           </div>
+          <p className="text-xs text-gray-600 mt-2 text-center">
+            {completedSteps.length < generationSteps.length 
+              ? `Étape ${completedSteps.length + 1} sur ${generationSteps.length} en cours`
+              : "Chaque élément est généré une seule fois, pour toi"}
+          </p>
         </div>
 
         {/* Steps List */}
@@ -272,21 +280,31 @@ export default function NovaGeneration() {
                       : 'bg-white border-gray-200'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  isCompleted
-                    ? 'bg-[#61f7a2]'
-                    : isCurrent
-                      ? 'bg-[#61f7a2]/20 border-2 border-[#61f7a2]'
-                      : 'bg-gray-100'
-                }`}>
+                <motion.div 
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    isCompleted
+                      ? 'bg-[#61f7a2]'
+                      : isCurrent
+                        ? 'bg-[#61f7a2]/20 border-2 border-[#61f7a2]'
+                        : 'bg-gray-100'
+                  }`}
+                  animate={isCompleted ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.3 }}
+                >
                   {isCompleted ? (
-                    <CheckCircle className="w-6 h-6 text-white" />
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </motion.div>
                   ) : isCurrent ? (
                     <Loader2 className="w-6 h-6 text-[#61f7a2] animate-spin" />
                   ) : (
                     <span className="text-gray-400 font-bold">{index + 1}</span>
                   )}
-                </div>
+                </motion.div>
 
                 <div className="flex-1">
                   <p className={`font-semibold ${
@@ -297,18 +315,27 @@ export default function NovaGeneration() {
                 </div>
 
                 {isCompleted && (
-                  <span className="text-xs text-[#61f7a2] font-medium">Terminé</span>
+                  <motion.span 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-xs text-[#61f7a2] font-medium"
+                  >
+                    ✓ Prêt
+                  </motion.span>
                 )}
                 {isCurrent && (
-                  <span className="text-xs text-gray-600">En cours...</span>
+                  <span className="text-xs text-gray-600">En préparation...</span>
+                )}
+                {isPending && (
+                  <span className="text-xs text-gray-400">À venir</span>
                 )}
               </motion.div>
             );
           })}
         </div>
 
-        {/* Success Message */}
-        {!isGenerating && !error && (
+        {/* Projection Finale */}
+        {!isGenerating && !error ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -320,6 +347,18 @@ export default function NovaGeneration() {
             </h3>
             <p className="text-gray-700">
               Redirection vers ton dashboard...
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl border border-blue-200 p-5 text-center"
+          >
+            <p className="text-gray-700 text-sm leading-relaxed">
+              Une fois terminé, tu accéderas à ton dashboard.<br />
+              <strong className="text-gray-900">Tout sera déjà prêt. Il ne te restera qu'à vendre.</strong>
             </p>
           </motion.div>
         )}

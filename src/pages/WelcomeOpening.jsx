@@ -154,7 +154,7 @@ Tu vas simplement piloter.`;
               <span className="text-2xl">🤖</span>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900">Noha</h3>
+              <h3 className="text-lg font-bold text-gray-900">Noah</h3>
               <p className="text-sm text-gray-600">Ton cofondateur IA</p>
             </div>
           </div>
@@ -203,7 +203,7 @@ Tu vas simplement piloter.`;
 
           <div className="mt-6 p-4 bg-gradient-to-br from-blue-50 to-green-50 rounded-xl border border-blue-200">
             <p className="text-sm text-gray-700 text-center">
-              <strong className="text-gray-900">Tout est pris en charge par Noha.</strong><br />
+              <strong className="text-gray-900">Tout est pris en charge par Noah.</strong><br />
               Tu n'as rien à configurer. Tu vas simplement piloter.
             </p>
           </div>

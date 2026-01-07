@@ -47,6 +47,11 @@ export default function OnboardingTransition() {
       }, 500);
       sessionStorage.setItem('talents_confetti_shown', 'true');
     }
+
+    // Cleanup du flag confetti après navigation
+    return () => {
+      sessionStorage.removeItem('talents_confetti_shown');
+    };
   }, []);
 
   useEffect(() => {
@@ -81,52 +86,71 @@ export default function OnboardingTransition() {
   }, []);
 
   useEffect(() => {
-    // Redirection automatique après 12 secondes (plus long)
-    const redirectTimer = setTimeout(() => {
-      navigate(createPageUrl('OnboardingQ12AgeRange'));
-    }, 12000);
-    return () => clearTimeout(redirectTimer);
-  }, [navigate]);
+    // Redirection automatique UNIQUEMENT si données OK
+    if (!isLoading && user) {
+      const redirectTimer = setTimeout(() => {
+        handleNext();
+      }, 10000);
+      return () => clearTimeout(redirectTimer);
+    }
+  }, [isLoading, user]);
 
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
       const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
+      
+      // Vérifier que la Session existe et contient les données
+      if (!currentUser.sessionId) {
+        console.error('❌ [OnboardingTransition] Pas de sessionId');
+        // Rediriger vers l'onboarding pour reprendre
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ [OnboardingTransition] Session introuvable');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      const session = sessions[0];
+      const summary = session.onboarding_summary || {};
+      
+      console.log('✅ [OnboardingTransition] Session chargée:', {
+        sessionId: session.id,
+        historyLength: session.onboarding_history?.length || 0,
+        skill: session.skill,
+        isDone: session.is_onboarding_done
+      });
+
+      // Vérifier que l'onboarding est complet
+      if ((session.onboarding_history?.length || 0) < 11) {
+        console.error('❌ [OnboardingTransition] Onboarding incomplet');
+        navigate(createPageUrl('OnboardingDynamic'));
+        return;
+      }
+
       setUser({ firstName: firstName, full_name: firstName });
 
-      // ✅ La Session existe déjà et contient toutes les données
-      // Plus besoin de sync lourde, juste vérifier et enrichir le User
-      if (currentUser.sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
-        if (sessions && sessions.length > 0) {
-          const session = sessions[0];
-          const summary = session.onboarding_summary || {};
-          
-          console.log('✅ [OnboardingTransition] Session chargée:', {
-            sessionId: session.id,
-            historyLength: session.onboarding_history?.length || 0,
-            skill: session.skill,
-            isDone: session.is_onboarding_done
-          });
+      // Enrichir le User avec les données du summary (une seule fois)
+      await base44.auth.updateMe({ 
+        coreSkill: session.skill || summary.who_to_teach || '',
+        targetAudience: summary.learner_profile || '',
+        mainProblem: summary.main_learning_problem || '',
+        firstResult: summary.quick_win || '',
+        finalTransformation: summary.big_transformation || '',
+        uniqueMethod: summary.method_angle || '',
+        typicalMistake: summary.common_mistake || '',
+        extraDetail: summary.proof_or_story || ''
+      });
 
-          // Enrichir le User avec les données du summary
-          await base44.auth.updateMe({ 
-            coreSkill: session.skill || summary.who_to_teach || '',
-            targetAudience: summary.learner_profile || '',
-            mainProblem: summary.main_learning_problem || '',
-            firstResult: summary.quick_win || '',
-            finalTransformation: summary.big_transformation || '',
-            uniqueMethod: summary.method_angle || '',
-            typicalMistake: summary.common_mistake || '',
-            extraDetail: summary.proof_or_story || ''
-          });
-
-          console.log('✅ [OnboardingTransition] User enrichi avec summary');
-        }
-      }
+      console.log('✅ [OnboardingTransition] User enrichi avec summary');
+      
+      setIsLoading(false);
     } catch (error) {
       console.error('❌ [OnboardingTransition] Error:', error);
-    } finally {
       setIsLoading(false);
     }
   };

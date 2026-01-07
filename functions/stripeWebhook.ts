@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
           });
           
           // Générer un lien de connexion magique
+          const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';
           const magicLinkResponse = await fetch(`https://api.base44.com/v1/auth/magic-link`, {
             method: 'POST',
             headers: {
@@ -65,7 +66,7 @@ Deno.serve(async (req) => {
             },
             body: JSON.stringify({
               email: customerEmail,
-              redirectTo: 'https://6930250f9337193d59c1dcf5.base44.app/WelcomeOpening'
+              redirectTo: `${APP_URL}/WelcomeOpening`
             })
           });
           

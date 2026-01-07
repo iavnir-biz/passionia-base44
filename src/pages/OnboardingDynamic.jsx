@@ -47,8 +47,8 @@ export default function OnboardingDynamic() {
       const history = onboardingData.history || [];
       setQuestionCount(Math.min(history.length, 11));
 
-      // Si pas de question courante, demander la première question
-      if (!onboardingData.current_question) {
+      // Demander la première question ou charger la question actuelle
+      if (!onboardingData.current_question || history.length === 0) {
         await fetchNextQuestion('local', null, onboardingData);
       } else {
         // Si on a déjà une question, afficher la question actuelle

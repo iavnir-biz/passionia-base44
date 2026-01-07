@@ -59,6 +59,8 @@ import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
+import WelcomeOpening from './pages/WelcomeOpening';
+import NovaGeneration from './pages/NovaGeneration';
 
 
 export const PAGES = {
@@ -123,6 +125,8 @@ export const PAGES = {
     "Settings": Settings,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
+    "WelcomeOpening": WelcomeOpening,
+    "NovaGeneration": NovaGeneration,
 }
 
 export const pagesConfig = {

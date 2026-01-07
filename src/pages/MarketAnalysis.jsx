@@ -183,6 +183,7 @@ export default function MarketAnalysis() {
               </motion.div>
 
               {/* 1. Résumé Express */}
+              {analysis?.resume_express && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -215,8 +216,10 @@ export default function MarketAnalysis() {
                   </div>
                 </div>
               </motion.div>
+              )}
 
               {/* 2. Demande existante */}
+              {analysis?.demande_existante && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -234,7 +237,7 @@ export default function MarketAnalysis() {
                   <div>
                     <p className="text-sm font-semibold text-gray-700 mb-2">Types de recherches</p>
                     <ul className="space-y-1">
-                      {analysis.demande_existante.types_recherches.map((r, i) => (
+                      {analysis.demande_existante.types_recherches?.map((r, i) => (
                         <li key={i} className="text-gray-600 text-sm">• {r}</li>
                       ))}
                     </ul>
@@ -242,7 +245,7 @@ export default function MarketAnalysis() {
                   <div>
                     <p className="text-sm font-semibold text-gray-700 mb-2">Questions récurrentes</p>
                     <ul className="space-y-1">
-                      {analysis.demande_existante.questions_recurrentes.map((q, i) => (
+                      {analysis.demande_existante.questions_recurrentes?.map((q, i) => (
                         <li key={i} className="text-gray-600 text-sm">• {q}</li>
                       ))}
                     </ul>
@@ -253,8 +256,10 @@ export default function MarketAnalysis() {
                   <p className="text-gray-900 font-medium">{analysis.demande_existante.interpretation}</p>
                 </div>
               </motion.div>
+              )}
 
               {/* 3. Solutions actuelles */}
+              {analysis?.solutions_actuelles && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -269,7 +274,7 @@ export default function MarketAnalysis() {
                 </div>
 
                 <div className="space-y-4 mb-6">
-                  {analysis.solutions_actuelles.solutions.map((sol, i) => (
+                  {analysis.solutions_actuelles.solutions?.map((sol, i) => (
                     <div key={i} className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                       <p className="font-semibold text-gray-900 mb-2">{sol.type}</p>
                       <p className="text-gray-600 text-sm mb-2">✅ {sol.aide_comment}</p>
@@ -282,8 +287,10 @@ export default function MarketAnalysis() {
                   <p className="text-gray-900 font-medium">{analysis.solutions_actuelles.conclusion}</p>
                 </div>
               </motion.div>
+              )}
 
               {/* 4. Frictions majeures */}
+              {analysis?.frictions_majeures && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -301,7 +308,7 @@ export default function MarketAnalysis() {
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                     <p className="font-semibold text-blue-900 mb-2">🟦 Fonctionnelles</p>
                     <ul className="space-y-1">
-                      {analysis.frictions_majeures.fonctionnelles.map((f, i) => (
+                      {analysis.frictions_majeures.fonctionnelles?.map((f, i) => (
                         <li key={i} className="text-gray-700 text-sm">• {f}</li>
                       ))}
                     </ul>
@@ -310,7 +317,7 @@ export default function MarketAnalysis() {
                   <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
                     <p className="font-semibold text-purple-900 mb-2">🟪 Émotionnelles</p>
                     <ul className="space-y-1">
-                      {analysis.frictions_majeures.emotionnelles.map((e, i) => (
+                      {analysis.frictions_majeures.emotionnelles?.map((e, i) => (
                         <li key={i} className="text-gray-700 text-sm">• {e}</li>
                       ))}
                     </ul>
@@ -319,7 +326,7 @@ export default function MarketAnalysis() {
                   <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                     <p className="font-semibold text-yellow-900 mb-2">🟨 Identitaires</p>
                     <ul className="space-y-1">
-                      {analysis.frictions_majeures.identitaires.map((id, i) => (
+                      {analysis.frictions_majeures.identitaires?.map((id, i) => (
                         <li key={i} className="text-gray-700 text-sm">• {id}</li>
                       ))}
                     </ul>
@@ -328,15 +335,17 @@ export default function MarketAnalysis() {
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                     <p className="font-semibold text-red-900 mb-2">🟥 Financières</p>
                     <ul className="space-y-1">
-                      {analysis.frictions_majeures.financieres.map((fin, i) => (
+                      {analysis.frictions_majeures.financieres?.map((fin, i) => (
                         <li key={i} className="text-gray-700 text-sm">• {fin}</li>
                       ))}
                     </ul>
                   </div>
                 </div>
               </motion.div>
+              )}
 
               {/* 5. Pourquoi ton savoir vaut */}
+              {analysis?.pourquoi_ton_savoir_vaut && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -351,7 +360,7 @@ export default function MarketAnalysis() {
                 </div>
 
                 <ul className="space-y-3 mb-6">
-                  {analysis.pourquoi_ton_savoir_vaut.raisons.map((r, i) => (
+                  {analysis.pourquoi_ton_savoir_vaut.raisons?.map((r, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
                       <span className="text-gray-900">{r}</span>
@@ -363,8 +372,10 @@ export default function MarketAnalysis() {
                   <p className="text-gray-900 font-bold text-lg">{analysis.pourquoi_ton_savoir_vaut.message_cle}</p>
                 </div>
               </motion.div>
+              )}
 
               {/* 6. Profils acheteurs */}
+              {analysis?.profils_acheteurs && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -379,7 +390,7 @@ export default function MarketAnalysis() {
                 </div>
 
                 <div className="space-y-4">
-                  {analysis.profils_acheteurs.map((profil, i) => (
+                  {analysis.profils_acheteurs?.map((profil, i) => (
                     <div key={i} className="bg-indigo-50 border border-indigo-200 rounded-xl p-5">
                       <div className="flex items-center gap-2 mb-2">
                         <UserIcon className="w-5 h-5 text-indigo-600" />
@@ -391,8 +402,10 @@ export default function MarketAnalysis() {
                   ))}
                 </div>
               </motion.div>
+              )}
 
               {/* 7. Comportement d'achat */}
+              {analysis?.comportement_achat && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -410,7 +423,7 @@ export default function MarketAnalysis() {
                   <div>
                     <p className="font-semibold text-gray-900 mb-3">Déclencheurs</p>
                     <ul className="space-y-2">
-                      {analysis.comportement_achat.declencheurs.map((d, i) => (
+                      {analysis.comportement_achat.declencheurs?.map((d, i) => (
                         <li key={i} className="text-gray-600 text-sm">✅ {d}</li>
                       ))}
                     </ul>
@@ -419,7 +432,7 @@ export default function MarketAnalysis() {
                   <div>
                     <p className="font-semibold text-gray-900 mb-3">Freins</p>
                     <ul className="space-y-2">
-                      {analysis.comportement_achat.freins.map((f, i) => (
+                      {analysis.comportement_achat.freins?.map((f, i) => (
                         <li key={i} className="text-gray-600 text-sm">⚠️ {f}</li>
                       ))}
                     </ul>
@@ -428,15 +441,17 @@ export default function MarketAnalysis() {
                   <div>
                     <p className="font-semibold text-gray-900 mb-3">Attentes</p>
                     <ul className="space-y-2">
-                      {analysis.comportement_achat.attentes.map((a, i) => (
+                      {analysis.comportement_achat.attentes?.map((a, i) => (
                         <li key={i} className="text-gray-600 text-sm">💡 {a}</li>
                       ))}
                     </ul>
                   </div>
                 </div>
               </motion.div>
+              )}
 
               {/* 8. Maturité du marché */}
+              {analysis?.maturite_marche && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -465,8 +480,10 @@ export default function MarketAnalysis() {
                   </div>
                 </div>
               </motion.div>
+              )}
 
               {/* 9. Synthèse finale */}
+              {analysis?.synthese_finale && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -499,6 +516,7 @@ export default function MarketAnalysis() {
                   </div>
                 </div>
               </motion.div>
+              )}
               </div>
             )}
           </div>

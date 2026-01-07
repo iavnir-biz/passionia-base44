@@ -738,9 +738,11 @@ export default function CTAPAYWALL() {
             transition={{ delay: 0.9 }}
             className="text-center"
           >
+            <p className="text-gray-900 mb-3 text-2xl font-bold">
+              Ton business personnalisé est prêt.
+            </p>
             <p className="text-gray-700 mb-6 text-xl">
-              Tout ce que tu as vu jusqu'ici est déjà prêt.<br />
-              Il ne manque plus qu'une décision.
+              Il t'attend juste derrière ces portes.
             </p>
             <GlowButton
               onClick={handleGetAccess}

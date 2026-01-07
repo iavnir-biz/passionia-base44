@@ -556,7 +556,42 @@ MISSION :
 
     const result = JSON.parse(completion.choices[0].message.content);
 
-    // Retourner les données sans sauvegarder en DB (c'est géré côté front en localStorage)
+    // 🔥 SAUVEGARDER EN BASE44 SESSION (plus de localStorage)
+    if (userAnswer) {
+      const normalizedAnswer = typeof userAnswer === 'string' 
+        ? userAnswer 
+        : JSON.stringify(userAnswer);
+
+      const updatedHistory = [
+        ...workingHistory,
+        {
+          question: lastEntry ? lastEntry.question : `Question ${workingHistory.length + 1}`,
+          type: nextQuestionConfig?.type || 'text',
+          answer: normalizedAnswer,
+          at: new Date().toISOString()
+        }
+      ];
+
+      // Extraire le coreSkill de la Q1 si c'est la première réponse
+      const coreSkill = workingHistory.length === 0 
+        ? normalizedAnswer 
+        : (result.summary.who_to_teach || workingSummary.who_to_teach || '');
+
+      await base44.asServiceRole.entities.Session.update(sessionId, {
+        onboarding_history: updatedHistory,
+        onboarding_summary: result.summary,
+        skill: coreSkill || result.summary.who_to_teach || '',
+        is_onboarding_done: result.isDone
+      });
+
+      console.log('✅ [onboardingNextQuestion] Session updated:', { 
+        sessionId, 
+        historyLength: updatedHistory.length,
+        skill: coreSkill,
+        isDone: result.isDone
+      });
+    }
+
     return Response.json({
       isDone: result.isDone,
       question: result.isDone ? null : result.question,

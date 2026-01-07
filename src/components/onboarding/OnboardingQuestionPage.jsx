@@ -164,6 +164,12 @@ export default function OnboardingQuestionPage({
                 onboarding_full: onboardingFull,
                 onboarding_summary: summary
               });
+
+              console.log('✅ [OnboardingQuestionPage] Q26 - Session mise à jour:', {
+                sessionId: user.sessionId,
+                fieldName,
+                fullKeys: Object.keys(onboardingFull)
+              });
             }
           }
           

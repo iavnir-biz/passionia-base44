@@ -111,7 +111,9 @@ export default function AIResources() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [generatedResources, setGeneratedResources] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -119,34 +121,91 @@ export default function AIResources() {
     }
   }, [isAuthenticated]);
 
+  const isNonEmpty = (value) => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === 'string') return value.trim().length > 0;
+    if (typeof value === 'number') return true;
+    if (typeof value === 'boolean') return true;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'object') return Object.keys(value).length > 0;
+    return false;
+  };
+
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      
-      // Charger l'état de génération des ressources depuis le storage
-      // Pour simplifier, on considère qu'une ressource est générée si elle existe
-      // Tu peux adapter cette logique selon tes besoins
+
+      // 🔥 P0: DB-first - charger Session via sessionId
+      const sessionId = currentUser.sessionId;
+      if (!sessionId) {
+        console.warn('[AIResources] No sessionId');
+        setLoading(false);
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ id: sessionId });
+      const userSession = sessions?.[0];
+      setSession(userSession);
+
+      if (!userSession) {
+        console.warn('[AIResources] Session not found');
+        setLoading(false);
+        return;
+      }
+
+      // Guard: Si payé + assets incomplets → redirect NoahGeneration
+      if (currentUser.has_purchased) {
+        const required = [
+          'market_validation',
+          'generated_avatars',
+          'my_generated_offers',
+          'generated_sales_messages',
+          'generated_marketing_emails',
+          'generated_sales_pages',
+          'plan_de_route'
+        ];
+
+        const missing = required.filter(f => !isNonEmpty(userSession[f]));
+        
+        console.log('[AIResources] Generation check', {
+          sessionId,
+          allGenerated: missing.length === 0,
+          missing
+        });
+
+        if (missing.length > 0) {
+          console.log('[AIResources] Redirecting to NoahGeneration - incomplete assets');
+          navigate(createPageUrl('NoahGeneration'));
+          return;
+        }
+      }
+
+      // Construire état "Prêt" depuis Session
       setGeneratedResources({
-        'market-analysis': !!currentUser?.market_validation,
-        'avatars': !!currentUser?.avatars_generated,
-        'offers': !!currentUser?.offers_generated,
-        'sales-page': !!currentUser?.sales_page_generated,
-        'sales-messages': !!currentUser?.sales_messages_generated,
-        'emails': !!currentUser?.emails_generated,
+        'market-analysis': isNonEmpty(userSession?.market_validation),
+        'avatars': isNonEmpty(userSession?.generated_avatars),
+        'offers': isNonEmpty(userSession?.my_generated_offers),
+        'sales-messages': isNonEmpty(userSession?.generated_sales_messages),
+        'emails': isNonEmpty(userSession?.generated_marketing_emails),
+        'sales-page': isNonEmpty(userSession?.generated_sales_pages),
         'social-media': false,
         'ads': false
       });
+
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('[AIResources] Error loading data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleResourceClick = (page) => {
-    navigate(createPageUrl(page));
+  const handleResourceClick = (resource) => {
+    if (resource.isBeta) return; // Bloquer clic sur bêta
+    navigate(createPageUrl(resource.page));
   };
 
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
         <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
@@ -164,10 +223,25 @@ export default function AIResources() {
         <main className="p-8">
           <div className="max-w-7xl mx-auto space-y-8">
             
+            {/* Bandeau "Tout est prêt" */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-r from-[#61f7a2]/10 to-green-50 border border-[#61f7a2]/30 rounded-2xl p-4 mb-6"
+            >
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-5 h-5 text-[#61f7a2]" />
+                <p className="text-gray-900 font-medium">
+                  ✅ Tout est prêt. Ouvre chaque ressource quand tu veux.
+                </p>
+              </div>
+            </motion.div>
+
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
               className="text-left"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#61f7a2]/10 rounded-full mb-4">
@@ -193,13 +267,17 @@ export default function AIResources() {
                     key={resource.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + index * 0.05 }}
-                    onClick={() => handleResourceClick(resource.page)}
-                    className="group cursor-pointer"
+                    transition={{ delay: 0.2 + index * 0.05 }}
+                    onClick={() => handleResourceClick(resource)}
+                    className={cn(
+                      "group",
+                      resource.isBeta ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                    )}
                   >
                     <div className={cn(
-                      "border border-gray-200 rounded-2xl p-6 hover:border-[#61f7a2] hover:shadow-lg transition-all duration-300",
-                      resource.bgColor
+                      "border border-gray-200 rounded-2xl p-6 transition-all duration-300",
+                      resource.bgColor,
+                      !resource.isBeta && "hover:border-[#61f7a2] hover:shadow-lg"
                     )}>
                       {/* Icon Header */}
                       <div className="flex items-start justify-between mb-4">
@@ -210,14 +288,15 @@ export default function AIResources() {
                           <Icon className="w-7 h-7 text-white" />
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                          {isGenerated && (
-                            <div className="flex items-center gap-1 px-2 py-1 bg-[#11112b]/10 rounded-lg border border-[#11112b]/20">
-                              <CheckCircle2 className="w-3 h-3 text-green-500" />
-                              <span className="text-xs font-medium text-[#1e3a8a]">Généré</span>
+                          {isGenerated && !resource.isBeta && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-green-50 rounded-lg border border-green-200">
+                              <CheckCircle2 className="w-3 h-3 text-green-600" />
+                              <span className="text-xs font-medium text-green-700">Prêt</span>
                             </div>
                           )}
                           {resource.isBeta && (
                             <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 rounded-lg border border-amber-200">
+                              <Lock className="w-3 h-3 text-amber-600" />
                               <span className="text-xs font-medium text-amber-700">Bêta</span>
                             </div>
                           )}
@@ -226,7 +305,10 @@ export default function AIResources() {
 
                       {/* Content */}
                       <div className="mb-4">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#61f7a2] transition-colors">
+                        <h3 className={cn(
+                          "text-lg font-bold text-gray-900 mb-2 transition-colors",
+                          !resource.isBeta && "group-hover:text-[#61f7a2]"
+                        )}>
                           {resource.title}
                         </h3>
                         <p className="text-gray-600 text-sm leading-relaxed">
@@ -236,11 +318,15 @@ export default function AIResources() {
 
                       {/* Button */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-[#61f7a2] group-hover:underline flex items-center gap-2">
-                          {isGenerated ? 'Consulter' : 'Générer'}
-                          {resource.isBeta && <Lock className="w-3 h-3" />}
+                        <span className={cn(
+                          "text-sm font-semibold flex items-center gap-2",
+                          resource.isBeta ? "text-gray-400" : "text-[#61f7a2] group-hover:underline"
+                        )}>
+                          {resource.isBeta ? 'Bientôt disponible' : 'Ouvrir'}
                         </span>
-                        <ArrowRight className="w-4 h-4 text-[#61f7a2] group-hover:translate-x-1 transition-transform" />
+                        {!resource.isBeta && (
+                          <ArrowRight className="w-4 h-4 text-[#61f7a2] group-hover:translate-x-1 transition-transform" />
+                        )}
                       </div>
                     </div>
                   </motion.div>

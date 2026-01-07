@@ -77,6 +77,13 @@ export default function SalesPage() {
       if (isNonEmpty(userSession.generated_sales_pages)) {
         setGeneratedPages(userSession.generated_sales_pages);
       }
+      
+      // 🧪 QA CHECK (temporary)
+      console.log('[DB-FIRST]', {
+        page: 'SalesPage',
+        sessionId,
+        hasData: isNonEmpty(userSession.generated_sales_pages)
+      });
 
       const profiles = await base44.entities.UserProfile.filter({ 
         created_by: currentUser.email 

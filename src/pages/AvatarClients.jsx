@@ -84,6 +84,13 @@ export default function AvatarClients() {
       if (isNonEmpty(userSession.generated_avatars)) {
         setAvatars(userSession.generated_avatars);
       }
+      
+      // 🧪 QA CHECK (temporary)
+      console.log('[DB-FIRST]', {
+        page: 'AvatarClients',
+        sessionId,
+        hasData: isNonEmpty(userSession.generated_avatars)
+      });
 
       const profiles = await base44.entities.UserProfile.filter({ 
         created_by: currentUser.email 

@@ -183,7 +183,7 @@ export default function AIResources() {
       }
 
       // Construire état "Prêt" depuis Session
-      setGeneratedResources({
+      const resourcesState = {
         'market-analysis': isNonEmpty(userSession?.market_validation),
         'avatars': isNonEmpty(userSession?.generated_avatars),
         'offers': isNonEmpty(userSession?.my_generated_offers),
@@ -192,6 +192,15 @@ export default function AIResources() {
         'sales-page': isNonEmpty(userSession?.generated_sales_pages),
         'social-media': false,
         'ads': false
+      };
+      
+      setGeneratedResources(resourcesState);
+      
+      // 🧪 QA CHECK (temporary)
+      console.log('[DB-FIRST]', {
+        page: 'AIResources',
+        sessionId,
+        resourcesState
       });
 
     } catch (error) {

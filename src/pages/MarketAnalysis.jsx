@@ -57,6 +57,13 @@ export default function MarketAnalysis() {
           if (isNonEmpty(userSession.market_validation)) {
             setAnalysis(userSession.market_validation);
           }
+          
+          // 🧪 QA CHECK (temporary)
+          console.log('[DB-FIRST]', {
+            page: 'MarketAnalysis',
+            sessionId: currentUser.sessionId,
+            hasData: isNonEmpty(userSession.market_validation)
+          });
         } else {
           console.error('[MarketAnalysis] No session found for ID:', currentUser.sessionId);
         }

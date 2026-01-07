@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
       }, { status: 400 });
     }
 
-    const sessions = await base44.entities.Session.filter({ id: sessionId });
+    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (sessions.length === 0) {
       console.error('[generateAllAssets] FAIL: Session not found');
       return Response.json({ 
@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
       console.log(`[generateAllAssets] Processing ${step.name}...`);
       
       // Check cache
-      const currentSession = await base44.entities.Session.filter({ id: sessionId });
+      const currentSession = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
       const latestSession = currentSession[0];
       
       if (latestSession[step.field]) {
@@ -98,18 +98,18 @@ Deno.serve(async (req) => {
       // Generate
       try {
         console.log(`[generateAllAssets] Calling ${step.function}...`);
-        const result = await base44.functions.invoke(step.function, {});
+        const result = await base44.asServiceRole.functions.invoke(step.function, {});
         
         if (result.data?.success || result.data?.message) {
           statusByAsset[step.name] = 'generated';
-          console.log(`[generateAllAssets] ${step.name} generated successfully`);
+          console.log(`[generateAllAssets] ${step.name} ✅ SAVED`);
         } else {
           statusByAsset[step.name] = 'failed';
-          console.error(`[generateAllAssets] ${step.name} failed`, result.data);
+          console.error(`[generateAllAssets] ${step.name} ❌ FAILED`, result.data);
         }
       } catch (error) {
         statusByAsset[step.name] = 'failed';
-        console.error(`[generateAllAssets] ${step.name} error`, error.message);
+        console.error(`[generateAllAssets] ${step.name} ERROR`, error.message);
         // Continue même en cas d'erreur pour ne pas bloquer les autres
       }
 
@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
     }
 
     // 4. Vérifier que tout est prêt
-    const finalSession = await base44.entities.Session.filter({ id: sessionId });
+    const finalSession = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     const updatedSession = finalSession[0];
     
     const readyForDashboard = generationSteps.every(step => 

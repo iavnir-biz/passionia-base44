@@ -139,66 +139,7 @@ export default function NovaGeneration() {
     }
   };
 
-  const generateStep = async (step, currentUser, userSession) => {
-    // Vérifier si déjà généré
-    const checkKeys = {
-      market: 'market_validation',
-      avatars: 'generated_avatars',
-      offers: 'my_generated_offers',
-      messages: 'generated_sales_messages',
-      emails: 'generated_marketing_emails',
-      salespage: 'generated_sales_pages',
-      plan: 'plan_de_route'
-    };
 
-    const sessionKey = checkKeys[step.id];
-    if (userSession[sessionKey]) {
-      console.log(`${step.id} already generated, skipping`);
-      return;
-    }
-
-    // Appel backend selon le type
-    switch (step.id) {
-      case 'market':
-        await base44.functions.invoke('generateMarketValidation', { sessionId: userSession.id });
-        break;
-      case 'avatars':
-        await base44.functions.invoke('generateAvatars', { sessionId: userSession.id });
-        break;
-      case 'offers':
-        // Générer les 4 offres
-        for (const offerType of ['low', 'bump', 'mid', 'high']) {
-          await base44.functions.invoke('generateMyOffers', { 
-            session: userSession,
-            offerType 
-          });
-        }
-        break;
-      case 'messages':
-        await base44.functions.invoke('generateSalesMessage', { sessionId: userSession.id });
-        break;
-      case 'emails':
-        // Générer les 5 emails
-        for (const emailType of ['contraste', 'validation', 'calcul', 'impact', 'urgence']) {
-          await base44.functions.invoke('generateMarketingEmail', {
-            emailType,
-            session: userSession
-          });
-        }
-        break;
-      case 'salespage':
-        await base44.functions.invoke('generateSalesPage', {
-          session: userSession,
-          offerType: 'low',
-          color: '#61f7a2',
-          tone: 'inspirant'
-        });
-        break;
-      case 'plan':
-        await base44.functions.invoke('generatePlanDeRoute', { sessionId: userSession.id });
-        break;
-    }
-  };
 
   const progress = ((completedSteps.length / generationSteps.length) * 100).toFixed(0);
 

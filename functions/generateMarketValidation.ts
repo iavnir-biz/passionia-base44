@@ -9,35 +9,23 @@ const SYSTEM_PROMPT = `Tu es Noah, une IA analyste marché et stratège pédagog
 
 🌐 RECHERCHE WEB OBLIGATOIRE
 AVANT de répondre, tu DOIS effectuer une recherche web approfondie sur :
-- Le marché de la niche exacte de l'utilisateur
+- Le marché de la niche EXACTE de l'utilisateur (pas juste "e-learning")
 - Les statistiques sectorielles récentes (Statista, études de marché, rapports)
 - Les tendances de recherche et comportements d'achat
-- La croissance du e-learning dans ce secteur spécifique
+- La croissance du secteur spécifique
 - Les données de demande (volume de recherches, forums, communautés)
 
-❌ INTERDIT : utiliser des chiffres génériques ou inventés
-✅ OBLIGATOIRE : s'appuyer sur des données réelles trouvées en ligne
+❌ INTERDIT : 
+- Utiliser des chiffres génériques ou inventés
+- Parler uniquement du "marché e-learning global"
+- Utiliser des pourcentages ultra-précis (14,7% → arrondir à 15%)
+- Donner des chiffres sans contexte temporel
 
-OBJECTIF :
-Rassurer l'utilisateur avec des PREUVES RÉELLES que son marché existe et est viable.
-
-TON & STYLE
-- Ton rassurant, professionnel, humain
-- Jamais vendeur agressif
-- Toujours spécifique à la niche EXACTE (pas générique)
-- Tutoiement obligatoire
-- Adresse-toi à l'utilisateur par son prénom
-- Texte fluide, pas de formatage Markdown
-- Paragraphes courts et aérés (3 sections distinctes)
-- 2-3 émojis pertinents (🎯, 💡, 🚀, 📈, ✨, 💰)
-
-CONTENU ATTENDU
-1) Introduction personnalisée avec le prénom
-2) AU MOINS 2-3 statistiques RÉELLES et SPÉCIFIQUES à la niche
-3) Frustrations et douleurs RÉELLES de la cible (trouvées via recherche)
-4) Preuve que des gens cherchent activement cette solution
-5) Validation que ce marché peut être monétisé
-6) Conclusion motivante et réaliste
+✅ OBLIGATOIRE :
+- AU MOINS 1 statistique SPÉCIFIQUE à la niche (pas juste e-learning)
+- Arrondir les pourcentages (≈, environ, plus de, etc.)
+- Mentionner l'année ou la période (2024, ces dernières années, etc.)
+- S'appuyer sur des données réelles trouvées en ligne
 
 FORMAT JSON DE SORTIE STRICT :
 {
@@ -48,6 +36,11 @@ FORMAT JSON DE SORTIE STRICT :
     "revenueRecurrence": 68,
     "onlineAccessibility": 90,
     "easeOfImplementation": 70
+  },
+  "sources": {
+    "foundNicheData": true,
+    "dataQuality": "high",
+    "statsCount": 3
   }
 }
 
@@ -58,13 +51,20 @@ SCORES (0-100) :
 - onlineAccessibility : Facilité d'accès global/online
 - easeOfImplementation : Facilité de mise en œuvre
 
+SOURCES :
+- foundNicheData : true si données spécifiques à la niche trouvées
+- dataQuality : "high", "medium", "low"
+- statsCount : nombre de statistiques chiffrées utilisées
+
 ⚠️ Les scores DOIVENT varier selon la niche réelle analysée
 ⚠️ Si aucune donnée fiable : fallback qualitatif + scores conservateurs (50-65)
 
-INTERDICTIONS :
-- Stats génériques identiques pour tous
-- Chiffres inventés sans source
-- Ton marketing agressif`;
+TON & STYLE
+- Ton rassurant, professionnel, humain
+- Toujours spécifique à la niche EXACTE
+- Tutoiement + prénom
+- 2-3 émojis pertinents (🎯, 💡, 🚀, 📈, ✨, 💰)
+- Paragraphes courts (3 sections distinctes)`;
 
 Deno.serve(async (req) => {
   try {
@@ -136,8 +136,8 @@ CONTEXTE UTILISATEUR :
 
 🔍 ÉTAPE 1 (OBLIGATOIRE) : RECHERCHE WEB
 Effectue une recherche approfondie sur :
-- Le marché de "${skill}" (taille, croissance, tendances)
-- Les statistiques sectorielles récentes
+- Le marché SPÉCIFIQUE de "${skill}" (pas juste "e-learning global")
+- Les statistiques sectorielles RÉCENTES (avec année/période)
 - La demande en ligne (volume de recherches, forums, communautés)
 - Les frustrations réelles des apprenants dans ce domaine
 - Les comportements d'achat dans cette niche
@@ -145,11 +145,12 @@ Effectue une recherche approfondie sur :
 🎯 ÉTAPE 2 : RÉDACTION
 Basé sur les données trouvées, rédige :
 - Une analyse en 3 sections (séparées par \\n\\n)
-- Minimum 2-3 statistiques RÉELLES et SPÉCIFIQUES
+- AU MOINS 1 statistique SPÉCIFIQUE à "${skill}" (pas juste e-learning)
+- Chiffres arrondis avec contexte temporel (≈, environ, 2024, etc.)
 - Des douleurs concrètes identifiées via ta recherche
 - 2-3 émojis bien placés
 
-📊 ÉTAPE 3 : CALCUL DES SCORES
+📊 ÉTAPE 3 : CALCUL DES SCORES + METADATA
 Évalue 5 dimensions sur 100 selon les données trouvées :
 - marketSize : taille réelle du marché
 - demandIntensity : intensité actuelle de la demande
@@ -157,9 +158,14 @@ Basé sur les données trouvées, rédige :
 - onlineAccessibility : accessibilité globale/online
 - easeOfImplementation : facilité de mise en œuvre
 
-⚠️ Si données insuffisantes : analyse qualitative + scores conservateurs (50-65)
+AJOUTE LES METADATA SOURCES :
+- foundNicheData : true si tu as trouvé des données spécifiques à "${skill}"
+- dataQuality : "high" si plusieurs sources fiables, "medium" si partiel, "low" si peu de données
+- statsCount : nombre de statistiques chiffrées dans ton texte
 
-RETOURNE UN JSON STRICT avec validationText + marketScores`;
+⚠️ Si données insuffisantes : analyse qualitative + scores conservateurs (50-65) + foundNicheData=false
+
+RETOURNE UN JSON STRICT avec validationText + marketScores + sources`;
 
     console.log('🔍 [generateMarketValidation] Démarrage recherche web', { 
       fn: 'generateMarketValidation',
@@ -198,41 +204,62 @@ RETOURNE UN JSON STRICT avec validationText + marketScores`;
                 easeOfImplementation: { type: "number", minimum: 0, maximum: 100 }
               },
               required: ["marketSize", "demandIntensity", "revenueRecurrence", "onlineAccessibility", "easeOfImplementation"]
+            },
+            sources: {
+              type: "object",
+              properties: {
+                foundNicheData: { type: "boolean" },
+                dataQuality: { type: "string", enum: ["high", "medium", "low"] },
+                statsCount: { type: "number", minimum: 0 }
+              },
+              required: ["foundNicheData", "dataQuality", "statsCount"]
             }
           },
-          required: ["validationText", "marketScores"]
+          required: ["validationText", "marketScores", "sources"]
         }
       });
 
+      const sources = llmResponse?.sources || { foundNicheData: false, dataQuality: 'low', statsCount: 0 };
+      
       console.log('✅ [generateMarketValidation] LLM response reçu', {
         attempt,
+        skill,
         hasText: !!llmResponse?.validationText,
-        hasScores: !!llmResponse?.marketScores
+        hasScores: !!llmResponse?.marketScores,
+        foundNicheData: sources.foundNicheData,
+        dataQuality: sources.dataQuality,
+        statsCount: sources.statsCount
       });
 
       const generatedText = llmResponse?.validationText?.trim() || '';
       const marketScores = llmResponse?.marketScores || null;
 
-      // 🔥 VALIDATION GUARDRAILS
+      // 🔥 VALIDATION GUARDRAILS RENFORCÉS
       const sections = generatedText.split('\n\n');
       const numberCount = (generatedText.match(/\d+/g) || []).length;
       const isLongEnough = generatedText.length > 350;
       const hasValidScores = marketScores && 
         Object.keys(marketScores).length === 5 &&
         Object.values(marketScores).every(v => typeof v === 'number' && v >= 0 && v <= 100);
+      
+      // 🔥 VALIDATION SOURCES : au moins 2 stats + qualité medium minimum
+      const hasGoodData = sources.foundNicheData && sources.statsCount >= 2 && sources.dataQuality !== 'low';
 
-      const isValid = sections.length === 3 && numberCount >= 2 && isLongEnough && hasValidScores;
+      const isValid = sections.length === 3 && numberCount >= 2 && isLongEnough && hasValidScores && hasGoodData;
 
       if (isValid) {
         result = {
           validationText: generatedText,
-          marketScores
+          marketScores,
+          sources
         };
         console.log('✅ [generateMarketValidation] Validation réussie:', {
           sections: sections.length,
           numbers: numberCount,
           length: generatedText.length,
-          scores: marketScores
+          scores: marketScores,
+          foundNicheData: sources.foundNicheData,
+          dataQuality: sources.dataQuality
         });
       } else {
         console.warn('⚠️ [generateMarketValidation] Format invalide:', {
@@ -240,12 +267,21 @@ RETOURNE UN JSON STRICT avec validationText + marketScores`;
           numbers: numberCount,
           length: generatedText.length,
           hasValidScores,
+          hasGoodData,
+          foundNicheData: sources.foundNicheData,
+          dataQuality: sources.dataQuality,
+          statsCount: sources.statsCount,
           attempt
         });
 
-        // Dernier essai échoué ? Fallback safe
+        // Dernier essai échoué ? Fallback safe avec scores conservateurs
         if (attempt > maxRetries) {
-          console.error('❌ [generateMarketValidation] Max retries atteint, fallback');
+          console.error('❌ [generateMarketValidation] Max retries atteint, fallback conservateur', {
+            reason: !hasGoodData ? 'données_insuffisantes' : 'format_invalide',
+            foundNicheData: sources.foundNicheData,
+            dataQuality: sources.dataQuality,
+            statsCount: sources.statsCount
+          });
           result = {
             validationText: `${name}, ton projet dans "${skill}" répond à un vrai besoin. 🎯
 
@@ -253,27 +289,43 @@ Le marché de la formation en ligne connaît une croissance significative, et de
 
 Ta proposition arrive au bon moment : les personnes que tu veux aider sont prêtes à investir dans leur apprentissage. 💡`,
             marketScores: {
-              marketSize: 60,
-              demandIntensity: 65,
-              revenueRecurrence: 58,
-              onlineAccessibility: 75,
-              easeOfImplementation: 62
+              marketSize: 55,
+              demandIntensity: 60,
+              revenueRecurrence: 52,
+              onlineAccessibility: 70,
+              easeOfImplementation: 58
+            },
+            sources: {
+              foundNicheData: false,
+              dataQuality: 'low',
+              statsCount: 0
             }
           };
         }
       }
     }
 
-    // Save to session
+    // Save to session avec metadata sources
     await base44.asServiceRole.entities.Session.update(sessionId, {
       market_validation: result.validationText,
-      market_validation_scores: result.marketScores
+      market_validation_scores: result.marketScores,
+      market_validation_sources: result.sources
+    });
+
+    console.log('💾 [generateMarketValidation] Sauvegardé en session:', {
+      sessionId,
+      skill,
+      foundNicheData: result.sources.foundNicheData,
+      dataQuality: result.sources.dataQuality,
+      statsCount: result.sources.statsCount,
+      avgScore: Math.round(Object.values(result.marketScores).reduce((a, b) => a + b, 0) / 5)
     });
 
     return Response.json({
       success: true,
       marketValidation: result.validationText,
-      marketScores: result.marketScores
+      marketScores: result.marketScores,
+      sources: result.sources
     });
 
   } catch (error) {

@@ -48,7 +48,7 @@ export default function WelcomeOpening() {
   };
 
   const handleStart = () => {
-    navigate(createPageUrl('NovaGeneration'));
+    navigate(createPageUrl('NoahGeneration'));
   };
 
   if (isLoading) {

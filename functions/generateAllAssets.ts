@@ -70,6 +70,21 @@ Deno.serve(async (req) => {
 
     console.log('[generateAllAssets] Pre-requisites validated');
 
+    // 🔒 LOCK anti double-run
+    if (session.assets_generation_in_progress) {
+      console.warn('[generateAllAssets] Generation already in progress, aborting');
+      return Response.json({ 
+        error: 'generation_in_progress',
+        message: 'Assets generation is already running for this session'
+      }, { status: 409 });
+    }
+
+    // Activer le lock
+    await base44.asServiceRole.entities.Session.update(sessionId, {
+      assets_generation_in_progress: true,
+      assets_generation_started_at: new Date().toISOString()
+    });
+
     // 3. Pipeline de génération (ordre logique)
     const statusByAsset = {};
     const generationSteps = [
@@ -98,7 +113,11 @@ Deno.serve(async (req) => {
       // Generate
       try {
         console.log(`[generateAllAssets] Calling ${step.function}...`);
-        const result = await base44.asServiceRole.functions.invoke(step.function, {});
+        
+        // 🔥 P0-2: TOUJOURS passer sessionId
+        const result = await base44.asServiceRole.functions.invoke(step.function, { 
+          sessionId 
+        });
         
         if (result.data?.success || result.data?.message) {
           statusByAsset[step.name] = 'generated';
@@ -117,15 +136,25 @@ Deno.serve(async (req) => {
       await new Promise(resolve => setTimeout(resolve, 500));
     }
 
-    // 4. Vérifier que tout est prêt
+    // 4. Vérifier que tout est prêt (P1-8: vérifier non-vide)
     const finalSession = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     const updatedSession = finalSession[0];
     
-    const readyForDashboard = generationSteps.every(step => 
-      updatedSession[step.field] !== null && updatedSession[step.field] !== undefined
-    );
+    const readyForDashboard = generationSteps.every(step => {
+      const value = updatedSession[step.field];
+      return value !== null && value !== undefined && 
+             (typeof value === 'object' ? Object.keys(value).length > 0 : value.length > 0);
+    });
 
     const duration = Date.now() - startTime;
+    
+    // 🔓 Désactiver le lock
+    await base44.asServiceRole.entities.Session.update(sessionId, {
+      assets_generation_in_progress: false,
+      assets_generation_completed_at: new Date().toISOString(),
+      status_by_asset: statusByAsset
+    });
+
     console.log('[generateAllAssets] END', { 
       duration: `${duration}ms`,
       statusByAsset,
@@ -141,6 +170,21 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[generateAllAssets] FATAL ERROR', error);
+    
+    // 🔓 Désactiver le lock en cas d'erreur
+    try {
+      const sessionId = user?.sessionId;
+      if (sessionId) {
+        await base44.asServiceRole.entities.Session.update(sessionId, {
+          assets_generation_in_progress: false,
+          assets_generation_error: error.message,
+          assets_generation_failed_at: new Date().toISOString()
+        });
+      }
+    } catch (unlockError) {
+      console.error('[generateAllAssets] Failed to unlock:', unlockError);
+    }
+    
     return Response.json({ 
       error: error.message,
       stack: error.stack 

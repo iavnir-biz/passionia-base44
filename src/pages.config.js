@@ -61,6 +61,7 @@ import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
 import NovaGeneration from './pages/NovaGeneration';
+import NoahGeneration from './pages/NoahGeneration';
 
 
 export const PAGES = {
@@ -127,6 +128,7 @@ export const PAGES = {
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
     "NovaGeneration": NovaGeneration,
+    "NoahGeneration": NoahGeneration,
 }
 
 export const pagesConfig = {

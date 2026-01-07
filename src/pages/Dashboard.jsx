@@ -74,9 +74,13 @@ export default function Dashboard() {
             'plan_de_route'
           ];
 
-          const missingFields = requiredFields.filter(field => 
-            !userSession[field] || userSession[field] === null
-          );
+          // P1-8: Vérifier non-vide
+          const missingFields = requiredFields.filter(field => {
+            const value = userSession[field];
+            return !value || value === null || 
+                   (typeof value === 'object' && Object.keys(value).length === 0) ||
+                   (typeof value === 'string' && value.trim() === '');
+          });
 
           console.log('[Dashboard] Generation check', {
             sessionId,
@@ -87,7 +91,7 @@ export default function Dashboard() {
           
           if (missingFields.length > 0) {
             console.log('[Dashboard] Redirecting to NoahGeneration - incomplete assets');
-            navigate(createPageUrl('NovaGeneration'));
+            navigate(createPageUrl('NoahGeneration'));
             return;
           }
         }

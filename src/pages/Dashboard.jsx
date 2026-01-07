@@ -126,11 +126,12 @@ export default function Dashboard() {
             missing: missingFields
           });
           
-          if (missingFields.length > 0) {
-            console.log('[Dashboard] Redirecting to NoahGeneration - incomplete assets');
-            navigate(createPageUrl('NoahGeneration'));
-            return;
-          }
+          // 🧪 DÉSACTIVÉ POUR TESTS - À RÉACTIVER EN PROD
+          // if (missingFields.length > 0) {
+          //   console.log('[Dashboard] Redirecting to NoahGeneration - incomplete assets');
+          //   navigate(createPageUrl('NoahGeneration'));
+          //   return;
+          // }
         }
       }
       

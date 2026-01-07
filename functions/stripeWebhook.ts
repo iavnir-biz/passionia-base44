@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
             },
             body: JSON.stringify({
               email: customerEmail,
-              redirectTo: 'https://6930250f9337193d59c1dcf5.base44.app/Dashboard'
+              redirectTo: 'https://6930250f9337193d59c1dcf5.base44.app/WelcomeOpening'
             })
           });
           

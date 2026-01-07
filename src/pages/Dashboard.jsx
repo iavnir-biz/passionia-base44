@@ -45,9 +45,43 @@ export default function Dashboard() {
   
   useEffect(() => {
     if (isAuthenticated) {
-      loadData();
+      checkGenerationComplete();
     }
   }, [isAuthenticated]);
+
+  const checkGenerationComplete = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      
+      if (currentUser.has_purchased) {
+        const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+        if (sessions.length > 0) {
+          const userSession = sessions[0];
+          
+          // Vérifier si la génération est complète
+          const isGenerationComplete = 
+            userSession.market_validation &&
+            userSession.generated_avatars &&
+            userSession.my_generated_offers &&
+            userSession.generated_sales_messages &&
+            userSession.generated_marketing_emails &&
+            userSession.generated_sales_pages &&
+            userSession.plan_de_route;
+          
+          if (!isGenerationComplete) {
+            // Rediriger vers la page de génération
+            navigate(createPageUrl('NovaGeneration'));
+            return;
+          }
+        }
+      }
+      
+      loadData();
+    } catch (error) {
+      console.error('Error checking generation:', error);
+      loadData();
+    }
+  };
   
   const loadData = async () => {
     try {

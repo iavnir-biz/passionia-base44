@@ -28,10 +28,44 @@ export default function SalesMessages() {
     }
   }, [isAuthenticated]);
 
+  const isNonEmpty = (value) => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === 'string') return value.trim().length > 0;
+    if (typeof value === 'number') return true;
+    if (typeof value === 'boolean') return true;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'object') return Object.keys(value).length > 0;
+    return false;
+  };
+
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      // 🔥 DB-first: charger Session via sessionId
+      const sessionId = currentUser.sessionId;
+      if (!sessionId) {
+        console.error('[SalesMessages] No sessionId');
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ id: sessionId });
+      const userSession = sessions?.[0];
+      
+      if (!userSession) {
+        console.error('[SalesMessages] Session not found');
+        return;
+      }
+
+      setSession(userSession);
+      console.log('[SalesMessages] Session loaded:', userSession);
+      console.log('[SalesMessages] Generated sales messages:', userSession.generated_sales_messages);
+      
+      // Charger messages si présents
+      if (isNonEmpty(userSession.generated_sales_messages)) {
+        setGeneratedMessages(userSession.generated_sales_messages);
+      }
 
       const profiles = await base44.entities.UserProfile.filter({ 
         created_by: currentUser.email 
@@ -40,25 +74,8 @@ export default function SalesMessages() {
         setProfile(profiles[0]);
         setHasPremium(profiles[0].has_paid === true);
       }
-
-      const sessions = await base44.entities.Session.filter({ 
-        created_by: currentUser.email 
-      });
-      
-      if (sessions.length > 0) {
-        const userSession = sessions[0];
-        setSession(userSession);
-        console.log('Session loaded:', userSession);
-        console.log('Generated sales messages:', userSession.generated_sales_messages);
-        
-        if (userSession.generated_sales_messages) {
-          setGeneratedMessages(userSession.generated_sales_messages);
-        }
-      } else {
-        console.error('No session found for user');
-      }
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('[SalesMessages] Error loading data:', error);
     }
   };
 

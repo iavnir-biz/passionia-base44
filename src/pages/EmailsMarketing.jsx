@@ -76,31 +76,49 @@ export default function EmailsMarketing() {
     }
   }, [user]);
 
+  const isNonEmpty = (value) => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === 'string') return value.trim().length > 0;
+    if (typeof value === 'number') return true;
+    if (typeof value === 'boolean') return true;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'object') return Object.keys(value).length > 0;
+    return false;
+  };
+
   const loadUserData = async () => {
     try {
-      const [profileRes, sessionRes] = await Promise.all([
-        base44.entities.UserProfile.filter({ created_by: user.email }),
-        base44.entities.Session.filter({ created_by: user.email })
-      ]);
+      // 🔥 DB-first: charger Session via sessionId
+      const sessionId = user.sessionId;
+      if (!sessionId) {
+        console.error('[EmailsMarketing] No sessionId');
+        return;
+      }
 
+      const sessions = await base44.entities.Session.filter({ id: sessionId });
+      const userSession = sessions?.[0];
+      
+      if (!userSession) {
+        console.error('[EmailsMarketing] Session not found');
+        return;
+      }
+
+      setSession(userSession);
+      console.log('[EmailsMarketing] Session loaded:', userSession);
+      console.log('[EmailsMarketing] Generated marketing emails:', userSession.generated_marketing_emails);
+      
+      // Charger emails si présents
+      if (isNonEmpty(userSession.generated_marketing_emails)) {
+        setGeneratedEmails(userSession.generated_marketing_emails);
+      }
+
+      const profileRes = await base44.entities.UserProfile.filter({ created_by: user.email });
       if (profileRes.length > 0) {
         setProfile(profileRes[0]);
         setHasPremium(profileRes[0].has_paid === true);
       }
-      if (sessionRes.length > 0) {
-        const userSession = sessionRes[0];
-        setSession(userSession);
-        console.log('Session loaded:', userSession);
-        console.log('Generated marketing emails:', userSession.generated_marketing_emails);
-        
-        if (userSession.generated_marketing_emails) {
-          setGeneratedEmails(userSession.generated_marketing_emails);
-        }
-      } else {
-        console.error('No session found for user');
-      }
     } catch (error) {
-      console.error('Error loading user data:', error);
+      console.error('[EmailsMarketing] Error loading user data:', error);
     }
   };
 

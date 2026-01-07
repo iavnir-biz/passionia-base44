@@ -29,6 +29,16 @@ export default function MarketAnalysis() {
     loadData();
   }, []);
 
+  const isNonEmpty = (value) => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === 'string') return value.trim().length > 0;
+    if (typeof value === 'number') return true;
+    if (typeof value === 'boolean') return true;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'object') return Object.keys(value).length > 0;
+    return false;
+  };
+
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
@@ -40,20 +50,21 @@ export default function MarketAnalysis() {
           const userSession = sessions[0];
           setSession(userSession);
           
-          console.log('Session loaded:', userSession);
-          console.log('Market analysis v2:', userSession.market_analysis_v2);
+          console.log('[MarketAnalysis] Session loaded:', userSession);
+          console.log('[MarketAnalysis] market_validation:', userSession.market_validation);
           
-          if (userSession.market_analysis_v2) {
-            setAnalysis(userSession.market_analysis_v2);
+          // 🔥 DB-first: lire depuis Session.market_validation
+          if (isNonEmpty(userSession.market_validation)) {
+            setAnalysis(userSession.market_validation);
           }
         } else {
-          console.error('No session found for ID:', currentUser.sessionId);
+          console.error('[MarketAnalysis] No session found for ID:', currentUser.sessionId);
         }
       } else {
-        console.error('No sessionId on user:', currentUser);
+        console.error('[MarketAnalysis] No sessionId on user:', currentUser);
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('[MarketAnalysis] Error loading data:', error);
     } finally {
       setLoading(false);
     }
@@ -130,7 +141,7 @@ export default function MarketAnalysis() {
                   Comprends ton marché
                 </h1>
                 <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-                  Nova va analyser qui a besoin de ton savoir, pourquoi, et comment ces personnes achètent aujourd'hui.
+                  Noah va analyser qui a besoin de ton savoir, pourquoi, et comment ces personnes achètent aujourd'hui.
                 </p>
                 <div className="flex justify-center">
                   <GlowButton

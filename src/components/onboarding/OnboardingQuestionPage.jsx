@@ -193,6 +193,13 @@ export default function OnboardingQuestionPage({
               const onboardingFull = session.onboarding_full || {};
               onboardingFull[fieldName] = value;
               await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
+              
+              console.log('✅ [OnboardingQuestionPage] Field saved:', {
+                sessionId: user.sessionId,
+                fieldName,
+                valueType: typeof value,
+                fullKeys: Object.keys(onboardingFull)
+              });
             }
           }
         }

@@ -59,11 +59,46 @@ export default function OnboardingQ17TargetDelay() {
   const saveAndContinue = async (delay) => {
     setIsSaving(true);
     try {
+      // 1️⃣ Sauvegarder en DB d'abord
+      const { base44 } = await import('@/api/base44Client');
+      const currentUser = await base44.auth.me();
+      
+      if (!currentUser.sessionId) {
+        console.error('❌ [Q17] Pas de sessionId');
+        alert('Session introuvable. Merci de recommencer.');
+        setIsSaving(false);
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ [Q17] Session introuvable');
+        setIsSaving(false);
+        return;
+      }
+
+      const session = sessions[0];
+      const onboardingFull = session.onboarding_full || {};
+      
+      onboardingFull.targetIncomeDelay = delay.toString();
+      
+      await base44.entities.Session.update(currentUser.sessionId, {
+        onboarding_full: onboardingFull
+      });
+
+      console.log('✅ [Q17] Session updated:', { 
+        sessionId: currentUser.sessionId, 
+        targetIncomeDelay: delay 
+      });
+
+      // 2️⃣ Backup localStorage (optionnel)
       localStorage.setItem(`onboarding_targetIncomeDelay`, delay);
+      
+      // 3️⃣ Navigate uniquement après save OK
       navigate(createPageUrl('OnboardingQ18LifeChange'));
     } catch (error) {
-      console.error('Error saving:', error);
-    } finally {
+      console.error('❌ [Q17] Error saving:', error);
+      alert('Erreur de sauvegarde. Merci de réessayer.');
       setIsSaving(false);
     }
   };
@@ -76,12 +111,49 @@ export default function OnboardingQ17TargetDelay() {
     
     setIsSaving(true);
     try {
+      // 1️⃣ Sauvegarder targetIncome + targetIncomeDelay en DB
+      const { base44 } = await import('@/api/base44Client');
+      const currentUser = await base44.auth.me();
+      
+      if (!currentUser.sessionId) {
+        console.error('❌ [Q17 Garde-fou] Pas de sessionId');
+        alert('Session introuvable. Merci de recommencer.');
+        setIsSaving(false);
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ [Q17 Garde-fou] Session introuvable');
+        setIsSaving(false);
+        return;
+      }
+
+      const session = sessions[0];
+      const onboardingFull = session.onboarding_full || {};
+      
+      onboardingFull.targetIncome = newIncome.toString();
+      onboardingFull.targetIncomeDelay = value.toString();
+      
+      await base44.entities.Session.update(currentUser.sessionId, {
+        onboarding_full: onboardingFull
+      });
+
+      console.log('✅ [Q17 Garde-fou] Session updated:', { 
+        sessionId: currentUser.sessionId, 
+        targetIncome: newIncome,
+        targetIncomeDelay: value
+      });
+
+      // 2️⃣ Backup localStorage
       localStorage.setItem(`onboarding_targetIncome`, newIncome);
       localStorage.setItem(`onboarding_targetIncomeDelay`, value);
+      
+      // 3️⃣ Navigate après save
       navigate(createPageUrl('OnboardingQ18LifeChange'));
     } catch (error) {
-      console.error('Error saving:', error);
-    } finally {
+      console.error('❌ [Q17 Garde-fou] Error:', error);
+      alert('Erreur de sauvegarde. Merci de réessayer.');
       setIsSaving(false);
     }
   };

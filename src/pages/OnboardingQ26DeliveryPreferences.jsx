@@ -22,105 +22,55 @@ export default function OnboardingQ26DeliveryPreferences() {
       blockType="objectives"
       useLocalStorage={true}
       customHandleSave={async (user, value) => {
-        // Sauvegarder dans localStorage
-        localStorage.setItem(`onboarding_deliveryPreferences`, JSON.stringify(value));
-        
-        // Sauvegarder dans le user authentifié
         const currentUser = await base44.auth.me();
         
-        // CRITIQUE : Récupérer TOUTES les données des questions statiques
-        const targetIncome = localStorage.getItem('onboarding_targetIncome') || '';
-        const targetIncomeDelay = localStorage.getItem('onboarding_targetIncomeDelay') || '';
-        const ageRange = localStorage.getItem('onboarding_ageRange') || '';
-        const gender = localStorage.getItem('onboarding_gender') || '';
-        const familyStatus = localStorage.getItem('onboarding_familyStatus') || '';
-        const currentIncome = localStorage.getItem('onboarding_currentIncome') || '';
-        const lifestyleGoals = JSON.parse(localStorage.getItem('onboarding_lifestyleGoals') || '[]');
-        const obstacles = JSON.parse(localStorage.getItem('onboarding_obstacles') || '[]');
-        
-        await base44.auth.updateMe({ 
-          deliveryPreferences: value,
-          targetIncome: targetIncome,
-          targetIncomeDelay: targetIncomeDelay,
-          ageRange: ageRange,
-          gender: gender,
-          familyStatus: familyStatus,
-          currentIncome: currentIncome,
-          lifestyleGoals: lifestyleGoals,
-          obstacles: obstacles,
-          onboarding_completed: true
-        });
-        
-        console.log('✅ User mis à jour avec TOUTES les données statiques:', {
-          targetIncome,
-          targetIncomeDelay,
-          deliveryPreferences: value
-        });
-        
-        console.log('🎯 Début sauvegarde Q26 - sessionId:', currentUser.sessionId);
-        
-        // CRITIQUE : Mettre à jour la session avec TOUTES les données
         if (!currentUser.sessionId) {
-          console.error('❌ PAS DE SESSION ID sur le user !');
-          alert('Erreur: Session non trouvée. Merci de recommencer.');
+          console.error('❌ [Q26] Pas de sessionId');
+          alert('Session introuvable. Merci de recommencer.');
           return;
         }
         
         const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
         if (sessions.length === 0) {
-          console.error('❌ Session introuvable:', currentUser.sessionId);
-          alert('Erreur: Session introuvable. Merci de recommencer.');
+          console.error('❌ [Q26] Session introuvable');
+          alert('Session introuvable. Merci de recommencer.');
           return;
         }
         
         const session = sessions[0];
-        console.log('📦 Session actuelle:', {
-          id: session.id,
-          hasHistory: !!session.onboarding_history,
-          hasSummary: !!session.onboarding_summary,
-          historyLength: session.onboarding_history?.length || 0
+        
+        console.log('📦 [Q26] Session avant merge:', {
+          sessionId: session.id,
+          historyLength: session.onboarding_history?.length || 0,
+          fullKeys: Object.keys(session.onboarding_full || {})
         });
         
-        // Construire onboarding_full avec TOUTES les réponses statiques
-        const onboardingFull = {
-          // Questions statiques du profil
-          ageRange: localStorage.getItem('onboarding_ageRange') || currentUser.ageRange || '',
-          gender: localStorage.getItem('onboarding_gender') || currentUser.gender || '',
-          familyStatus: localStorage.getItem('onboarding_familyStatus') || currentUser.familyStatus || '',
-          currentIncome: localStorage.getItem('onboarding_currentIncome') || currentUser.currentIncome || '',
-          
-          // Questions statiques des objectifs
-          targetIncome: localStorage.getItem('onboarding_targetIncome') || currentUser.targetIncome || '',
-          targetIncomeDelay: localStorage.getItem('onboarding_targetIncomeDelay') || currentUser.targetIncomeDelay || '',
-          lifeChangeIfSuccess: localStorage.getItem('onboarding_lifeChangeIfSuccess') || currentUser.lifeChangeIfSuccess || '',
-          impactOnLife: localStorage.getItem('onboarding_impactOnLife') || currentUser.impactOnLife || '',
-          emotionsAboutProject: localStorage.getItem('onboarding_emotionsAboutProject') || currentUser.emotionsAboutProject || '',
-          relativesReaction: localStorage.getItem('onboarding_relativesReaction') || currentUser.relativesReaction || '',
-          
-          // Tableaux
-          lifestyleGoals: JSON.parse(localStorage.getItem('onboarding_lifestyleGoals') || '[]'),
-          obstacles: JSON.parse(localStorage.getItem('onboarding_obstacles') || '[]'),
-          
-          // Dernières questions
-          ifNothingChanges: localStorage.getItem('onboarding_ifNothingChanges') || currentUser.ifNothingChanges || '',
-          readiness: localStorage.getItem('onboarding_readiness') || currentUser.readiness || '',
-          deliveryPreferences: value
-        };
+        // 🔥 MERGE UNIQUEMENT deliveryPreferences (pas de rebuild)
+        const onboardingFull = { ...session.onboarding_full };
+        onboardingFull.deliveryPreferences = value;
         
-        console.log('💾 onboarding_full construit:', onboardingFull);
-        
-        // Mettre à jour summary avec les préférences de formats
         const summary = { ...session.onboarding_summary };
         summary.format_preferences = value;
         
-        // MISE À JOUR COMPLÈTE de la session
         await base44.entities.Session.update(currentUser.sessionId, {
           onboarding_full: onboardingFull,
           onboarding_summary: summary,
           is_onboarding_done: true
         });
         
-        console.log('✅ Session mise à jour avec onboarding_full complet et is_onboarding_done=true');
+        console.log('✅ [Q26] Session updated (merge only):', {
+          sessionId: currentUser.sessionId,
+          deliveryPreferences: value,
+          fullKeys: Object.keys(onboardingFull)
+        });
+        
+        // Update User aussi
+        await base44.auth.updateMe({ 
+          deliveryPreferences: value,
+          onboarding_completed: true
+        });
+        
+        console.log('✅ [Q26] User updated with deliveryPreferences');
       }}
       prevPage="OnboardingQ25Readiness"
       progress={100}

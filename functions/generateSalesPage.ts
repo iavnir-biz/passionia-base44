@@ -14,7 +14,52 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { profile, session } = await req.json();
+    const { sessionId } = await req.json();
+
+    if (!sessionId) {
+      return Response.json({ error: 'sessionId required' }, { status: 400 });
+    }
+
+    // 🔥 P0-5: DB-first
+    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+    if (!sessions || sessions.length === 0) {
+      return Response.json({ error: 'Session not found' }, { status: 404 });
+    }
+
+    const session = sessions[0];
+
+    // Check cache
+    if (session.generated_sales_pages) {
+      return Response.json({
+        success: true,
+        salesPage: session.generated_sales_pages,
+        fromCache: true
+      });
+    }
+
+    const finalizedOffer = session.finalized_offer || {};
+    const onboardingSummary = session.onboarding_summary || {};
+    const onboardingFull = session.onboarding_full || {};
+
+    const skill = session.skill || onboardingSummary.who_to_teach || 'ta compétence';
+    const mainProduct = finalizedOffer.mainProduct || {};
+    const painPoints = onboardingSummary.main_learning_problem || '';
+    const lifeChanges = onboardingFull.life_change || '';
+    const inactionCost = onboardingFull.if_nothing_changes || '';
+
+    const profile = {
+      passion: skill,
+      transformation: onboardingSummary.big_transformation || mainProduct.outcome || '',
+      quick_win: onboardingSummary.quick_win || '',
+      main_problem: painPoints
+    };
+
+    session.offer_generation = {
+      offerChoices: {
+        product_principal: mainProduct
+      }
+    };
+    session.onboarding_full = onboardingFull;
 
     // Generate hero image with DALL-E
     const imagePrompt = `Professional hero image for a ${profile.passion} online course/training. Modern, clean, professional style with soft colors. Show success, transformation, learning. No text, photorealistic, inspirational.`;
@@ -177,6 +222,11 @@ Retourne UNIQUEMENT le code HTML complet (pas de \`\`\`html, pas d'explication).
       heroImage: heroImageUrl,
       generatedAt: new Date().toISOString()
     };
+
+    // 🔥 Save to Session
+    await base44.asServiceRole.entities.Session.update(sessionId, {
+      generated_sales_pages: salesPage
+    });
 
     return Response.json({
       success: true,

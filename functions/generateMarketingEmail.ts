@@ -42,12 +42,14 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { emailType, profile, session } = await req.json();
+        const { emailType, sessionId } = await req.json();
 
-        if (!emailType || !profile || !session) {
-            return Response.json({ 
-                error: 'Missing required fields' 
-            }, { status: 400 });
+        if (!emailType) {
+            return Response.json({ error: 'emailType required' }, { status: 400 });
+        }
+
+        if (!sessionId) {
+            return Response.json({ error: 'sessionId required' }, { status: 400 });
         }
 
         const emailConfig = EMAIL_PROMPTS[emailType];
@@ -57,20 +59,40 @@ Deno.serve(async (req) => {
             }, { status: 400 });
         }
 
+        // 🔥 P0-5: DB-first
+        const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+        if (!sessions || sessions.length === 0) {
+            return Response.json({ error: 'Session not found' }, { status: 404 });
+        }
+
+        const session = sessions[0];
+
+        // Check cache
+        if (session.generated_marketing_emails?.[emailType]) {
+            return Response.json({
+                ...session.generated_marketing_emails[emailType],
+                fromCache: true
+            });
+        }
+
+        const finalizedOffer = session.finalized_offer || {};
+        const onboardingSummary = session.onboarding_summary || {};
+        const onboardingFull = session.onboarding_full || {};
+
         // Extraire les données pour personnalisation
-        const skill = profile.passion || 'ta compétence';
+        const skill = session.skill || onboardingSummary.who_to_teach || 'ta compétence';
         const name = user.full_name || 'l\'expert';
-        const incomeGoal = session.onboarding_full?.target_income || 5000;
-        const lifeChanges = session.onboarding_full?.life_change || 'vivre de ta passion';
-        const impact = session.onboarding_full?.impact || 'aider les autres';
-        const pride = session.onboarding_full?.emotions || 'fierté';
-        const socialValidation = session.onboarding_full?.relatives || 'reconnaissance de tes proches';
-        const painPoints = profile.main_problem || 'tes blocages actuels';
+        const incomeGoal = onboardingFull.target_income || onboardingFull.targetIncome || 5000;
+        const lifeChanges = onboardingFull.life_change || 'vivre de ta passion';
+        const impact = onboardingFull.impact || 'aider les autres';
+        const pride = onboardingFull.emotions || 'fierté';
+        const socialValidation = onboardingFull.relatives || 'reconnaissance de tes proches';
+        const painPoints = onboardingSummary.main_learning_problem || 'tes blocages actuels';
         
-        const mainProductTitle = session.offer_generation?.offerChoices?.product_principal?.title || 'ton produit';
-        const mainProductPrice = session.offer_generation?.offerChoices?.product_principal?.price || 97;
-        const premiumTitle = session.offer_generation?.offerChoices?.offre_premium?.title || 'ton offre premium';
-        const premiumPrice = session.offer_generation?.offerChoices?.offre_premium?.price || 997;
+        const mainProductTitle = finalizedOffer.mainProduct?.title || 'ton produit';
+        const mainProductPrice = finalizedOffer.mainProduct?.price || '97€';
+        const premiumTitle = finalizedOffer.upsell3?.title || 'ton offre premium';
+        const premiumPrice = finalizedOffer.upsell3?.price || '997€';
 
         // Construire le contexte utilisateur
         const userContext = `
@@ -127,11 +149,26 @@ Remplace les variables entre accolades par les données réelles du client fourn
 
         const emailContent = completion.choices[0].message.content;
 
-        return Response.json({
+        const result = {
             success: true,
             email: emailContent,
             type: emailType,
-            title: emailConfig.title
+            title: emailConfig.title,
+            generatedAt: new Date().toISOString()
+        };
+
+        // 🔥 Save to Session (merge avec existant)
+        const currentEmails = session.generated_marketing_emails || {};
+        await base44.asServiceRole.entities.Session.update(sessionId, {
+            generated_marketing_emails: {
+                ...currentEmails,
+                [emailType]: result
+            }
+        });
+
+        return Response.json({
+            ...result,
+            fromCache: false
         });
 
     } catch (error) {

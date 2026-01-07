@@ -14,7 +14,31 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { profile, session } = await req.json();
+        const { sessionId } = await req.json();
+
+        if (!sessionId) {
+            return Response.json({ error: 'sessionId required' }, { status: 400 });
+        }
+
+        // 🔥 P0-5: DB-first - lire Session
+        const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+        if (!sessions || sessions.length === 0) {
+            return Response.json({ error: 'Session not found' }, { status: 404 });
+        }
+
+        const session = sessions[0];
+
+        // Check cache
+        if (session.generated_avatars) {
+            return Response.json({
+                avatars: session.generated_avatars.avatars || session.generated_avatars,
+                generatedAt: session.generated_avatars.generatedAt || new Date().toISOString(),
+                fromCache: true
+            });
+        }
+
+        const finalizedOffer = session.finalized_offer || {};
+        const onboardingSummary = session.onboarding_summary || {};
 
         // Construct user context
         const userContext = `
@@ -23,28 +47,15 @@ PROFIL UTILISATEUR:
 - Email: ${user.email}
 
 PROFIL BUSINESS:
-${profile ? `
-- Passion/Expertise: ${profile.passion || 'Non défini'}
-- Audience cible: ${profile.target_audience || 'Non défini'}
-- Problème principal: ${profile.main_problem || 'Non défini'}
-- Quick win promis: ${profile.quick_win || 'Non défini'}
-- Transformation finale: ${profile.transformation || 'Non défini'}
-- Méthode unique: ${profile.unique_method || 'Non défini'}
-` : 'Profil non renseigné'}
+- Passion/Expertise: ${session.skill || onboardingSummary.who_to_teach || 'Non défini'}
+- Audience cible: ${onboardingSummary.learner_profile || 'Non défini'}
+- Problème principal: ${onboardingSummary.main_learning_problem || 'Non défini'}
+- Quick win promis: ${onboardingSummary.quick_win || 'Non défini'}
+- Transformation promise: ${onboardingSummary.big_transformation || 'Non défini'}
+- Angle de méthode: ${onboardingSummary.method_angle || 'Non défini'}
 
-INFORMATIONS ONBOARDING:
-${session?.onboarding_summary ? `
-- Qui enseigner: ${session.onboarding_summary.who_to_teach || 'Non défini'}
-- Profil apprenant: ${session.onboarding_summary.learner_profile || 'Non défini'}
-- Problème d'apprentissage: ${session.onboarding_summary.main_learning_problem || 'Non défini'}
-- Transformation promise: ${session.onboarding_summary.big_transformation || 'Non défini'}
-- Angle de méthode: ${session.onboarding_summary.method_angle || 'Non défini'}
-` : 'Onboarding non complété'}
-
-OFFRE SÉLECTIONNÉE:
-${session?.offer_generation ? `
-${JSON.stringify(session.offer_generation, null, 2)}
-` : 'Offre non définie'}
+OFFRE FINALISÉE:
+${JSON.stringify(finalizedOffer, null, 2)}
         `.trim();
 
         const systemMessage = `Tu es Nova, coach business expert en psychologie client et création d'avatars stratégiques.
@@ -124,7 +135,16 @@ Objectif final : L'utilisateur doit se dire "Je sais exactement à qui je parle,
 
         const result = JSON.parse(completion.choices[0].message.content);
 
+        // 🔥 Save to Session
+        await base44.asServiceRole.entities.Session.update(sessionId, {
+            generated_avatars: {
+                avatars: result.avatars,
+                generatedAt: new Date().toISOString()
+            }
+        });
+
         return Response.json({
+            success: true,
             avatars: result.avatars,
             generatedAt: new Date().toISOString()
         });

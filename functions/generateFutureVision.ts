@@ -38,15 +38,20 @@ INTERDICTIONS ABSOLUES
 - Pas de promesse irréaliste
 - Pas de répétition brute des titres d'offres
 
+✅ AUTORISATIONS (P1-1)
+- Utiliser des transitions neutres si données faibles
+- Phrases de pont : "Même si aujourd'hui tout n'est pas encore clair…"
+- Ponts narratifs non factuels autorisés pour fluidité
+
 STRUCTURE OBLIGATOIRE (8 ÉTAPES — À RESPECTER)
 1. Décrire sa situation actuelle avec ses propres mots (effet miroir)
 2. Le moment du déclic, sans héroïsation
-3. La première vente (produit principal sélectionné)
-4. Le changement d'identité ("tu n'essaies plus, tu es…")
-5. L'activation des autres offres et la montée des revenus jusqu'au potentiel calculé
+3. La première vente (produit principal) – INCLURE 1 MICRO-DÉTAIL CONCRET (format/livrable/durée) sans répéter titre exact (P1-3)
+4. Le changement d'identité ("tu n'essaies plus, tu es…") – PRIORITÉ ABSOLUE AVANT REVENUS (P1-4)
+5. L'activation des autres offres – DISTINGUER OBJECTIF vs POTENTIEL (P1-2) : "Tu avais X€ en tête, ton système peut atteindre Y€"
 6. La nouvelle réalité de vie (temps, liberté, environnement)
 7. L'impact sur les élèves et la transmission
-8. Une conclusion qui ancre que ce futur commence maintenant
+8. Une conclusion ANCRÉE AU PRÉSENT (P1-5) : "Ce futur commence maintenant", pas futur abstrait
 
 ⚠️ Ne saute AUCUNE étape.
 - Développe chaque étape avec assez de détails : pas un résumé.
@@ -111,8 +116,10 @@ Deno.serve(async (req) => {
     };
 
     const mainProductTitle = finalizedOffer.mainProduct?.title || 'ton produit principal';
+    const mainProductType = finalizedOffer.mainProduct?.productType || '';
     const upsell1Title = finalizedOffer.upsell1?.title || '';
     const premiumTitle = finalizedOffer.upsell3?.title || '';
+    const targetIncome = onboardingFull.targetIncome || 500;
 
     // Déterminer les accords grammaticaux selon le genre
     let genderAgreement = '';
@@ -130,7 +137,10 @@ DONNÉES OBLIGATOIRES À UTILISER
 
 Prénom : ${name}
 Compétence : ${skill}
-Potentiel de revenus calculé : ${potentialRevenue}€/mois
+
+REVENUS (P1-2 : DISTINGUER) :
+- Objectif déclaré : ${targetIncome}€/mois (ce que tu visais)
+- Potentiel système : ${potentialRevenue}€/mois (ce que ton offre peut atteindre)
 
 Réponses d'onboarding dynamique : ${JSON.stringify(onboardingSummary, null, 2)}
 
@@ -138,8 +148,9 @@ Réponses statiques (objectifs, freins, projection) :
 Blocages actuels : ${JSON.stringify(personalAnswers, null, 2)}
 Style de vie souhaité : ${JSON.stringify(goalAnswers, null, 2)}
 
-Offres sélectionnées (ne PAS répéter les titres bruts, reformuler naturellement) :
-Produit Principal : ${mainProductTitle}
+Offres sélectionnées :
+Produit Principal : ${mainProductTitle} (Format: ${mainProductType})
+→ P1-3 : INCLURE 1 micro-détail concret (format/durée) sans répéter titre exact
 Upsell : ${upsell1Title}
 Premium : ${premiumTitle}
 
@@ -147,15 +158,28 @@ MISSION
 Écris le récit de transformation de ${name}, en 8 étapes obligatoires :
 
 1. Situation actuelle avec ses propres mots (effet miroir des blocages)
-2. Moment du déclic, sans héroïsation
-3. Première vente du produit principal (moment précis, excitation)
-4. Changement d'identité ("tu n'essaies plus, tu es...")
-5. Activation des autres offres, montée progressive vers ${potentialRevenue}€/mois
-6. Nouvelle réalité de vie (temps, liberté, environnement basé sur ses objectifs)
-7. Impact sur les élèves et transmission
-8. Conclusion qui ancre que ce futur commence maintenant
+   ✅ P1-1 : Transitions neutres autorisées si données faibles
 
-❌ Interdiction d'inventer ou de généraliser. Utilise UNIQUEMENT les données fournies.
+2. Moment du déclic, sans héroïsation
+
+3. Première vente du produit principal (moment précis, excitation)
+   ✅ P1-3 : INCLURE 1 micro-détail concret (format: ${mainProductType}) sans répéter "${mainProductTitle}"
+
+4. Changement d'identité ("tu n'essaies plus, tu es...")
+   🔥 P1-4 : IDENTITÉ D'ABORD, AVANT TOUTE MENTION CHIFFRÉE
+
+5. Activation des autres offres
+   ✅ P1-2 : "Tu visais ${targetIncome}€, ton système peut atteindre ${potentialRevenue}€"
+
+6. Nouvelle réalité de vie (temps, liberté, environnement basé sur ses objectifs)
+
+7. Impact sur les élèves et transmission
+
+8. Conclusion ANCRÉE AU PRÉSENT
+   ✅ P1-5 : "Ce futur n'est pas devant toi, il a déjà commencé" (pas futur abstrait)
+
+✅ Autorisation : utiliser des ponts narratifs neutres si données insuffisantes
+❌ Interdiction d'inventer des faits. Les transitions sont autorisées, pas l'invention.
 ⚠️ Ne saute AUCUNE étape. Développe chaque étape avec détails concrets.`;
 
     console.log("OPENAI_CALL start", { fn: "generateFutureVision", sessionId, model: "gpt-4o" });

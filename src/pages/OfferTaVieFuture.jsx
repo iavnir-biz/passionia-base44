@@ -37,75 +37,79 @@ function parsePrice(priceStr) {
 
 export default function OfferTaVieFuture() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showDetail, setShowDetail] = useState(false);
   const [futureVision, setFutureVision] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
-  const [offerData, setOfferData] = useState({});
 
   useEffect(() => {
-    loadUser();
+    loadSession();
   }, []);
 
   useEffect(() => {
-    if (user && !futureVision) {
+    if (session && !futureVision) {
       generateFutureVision();
     }
-  }, [user]);
+  }, [session, futureVision]);
 
-  const loadUser = async () => {
+  const loadSession = async () => {
     try {
       const currentUser = await base44.auth.me();
-      
-      // Récupérer la session pour les offres
-      if (currentUser.sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
-        if (sessions.length > 0) {
-          const session = sessions[0];
-          
-          console.log('Session complète:', session);
-          console.log('offer_generation:', session.offer_generation);
-          
-          const offerChoices = session.offer_generation?.offerChoices || {};
-          
-          // Construire l'objet offer avec les produits sélectionnés
-          const offer = {
-            product_principal: offerChoices.product_principal || null,
-            petit_extra: offerChoices.petit_extra || null,
-            offre_superieure: offerChoices.offre_superieure || null,
-            offre_premium: offerChoices.offre_premium || null
-          };
-          
-          console.log('Offres extraites:', offer);
-          
-          setUser({ 
-            ...currentUser,
-            offer: offer,
-            sessionId: currentUser.sessionId,
-            targetIncome: session.onboarding_full?.target_income || currentUser.targetIncome || 500
-          });
-        } else {
-          setUser(currentUser);
-        }
-      } else {
-        setUser(currentUser);
+      const realSessionId = currentUser.sessionId;
+
+      if (!realSessionId) {
+        console.error('❌ No sessionId');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
       }
+
+      const sessions = await base44.entities.Session.filter({ id: realSessionId });
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ Session not found');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      const loadedSession = sessions[0];
+
+      // 🔥 P0-1: Vérifier potential_revenue
+      if (!loadedSession.potential_revenue || loadedSession.potential_revenue === 0) {
+        console.warn('⚠️ potential_revenue = 0, redirect OfferResume');
+        navigate(createPageUrl('OfferResume'));
+        return;
+      }
+
+      // 🔥 P0-1: Vérifier finalized_offer
+      if (!loadedSession.finalized_offer || !loadedSession.is_offer_complete) {
+        console.warn('⚠️ Offre incomplète, redirect OfferResume');
+        navigate(createPageUrl('OfferResume'));
+        return;
+      }
+
+      console.log('✅ Session chargée:', {
+        sessionId: loadedSession.id,
+        potential_revenue: loadedSession.potential_revenue,
+        is_offer_complete: loadedSession.is_offer_complete,
+        has_future_vision: !!loadedSession.future_vision
+      });
+
+      setSession(loadedSession);
     } catch (error) {
-      console.error('Error loading user:', error);
+      console.error('Error loading session:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const generateFutureVision = async () => {
-    if (!user?.sessionId) return;
+    if (!session?.id) return;
     
     setIsGenerating(true);
     try {
       const { data } = await base44.functions.invoke('generateFutureVision', {
-        sessionId: user.sessionId
+        sessionId: session.id
       });
       
       if (data.success) {
@@ -115,9 +119,9 @@ export default function OfferTaVieFuture() {
       }
     } catch (error) {
       console.error('Error generating vision:', error);
-      // Fallback text
+      const skill = session.skill || session.onboarding_summary?.who_to_teach || 'ta compétence';
       setFutureVision({
-        narrativeText: `Imagine-toi, dans quelques mois… Tu te réveilles le matin en sachant que des dizaines de personnes comptent sur toi pour progresser en ${user.coreSkill || 'ta compétence'}. Ton premier réflexe ? Consulter les messages de tes élèves qui te remercient pour la transformation que tu leur apportes.\n\nTu as réussi à structurer ton savoir-faire en une offre claire, accessible, et qui résonne avec ton audience. Chaque jour, de nouvelles personnes découvrent ton travail et décident de te faire confiance. Tes revenus augmentent régulièrement, te permettant de vivre de ta passion tout en ayant l'impact que tu souhaitais.\n\nTu n'es plus seul(e) à avancer. Ta communauté grandit, tes témoignages s'accumulent, et tu ressens cette fierté profonde d'avoir osé franchir le pas. Tu as transformé ton expertise en véritable activité pérenne.\n\nCette vie, elle t'attend. Il te suffit maintenant de passer à l'action, étape par étape.`
+        narrativeText: `Imagine-toi, dans quelques mois… Tu te réveilles le matin en sachant que des dizaines de personnes comptent sur toi pour progresser en ${skill}.\n\nTu as réussi à structurer ton savoir-faire en une offre claire, accessible, et qui résonne avec ton audience. Chaque jour, de nouvelles personnes découvrent ton travail et décident de te faire confiance.\n\nTu n'es plus seul(e) à avancer. Ta communauté grandit, tes témoignages s'accumulent, et tu ressens cette fierté profonde d'avoir osé franchir le pas.\n\nCette vie, elle t'attend. Il te suffit maintenant de passer à l'action, étape par étape.`
       });
     } finally {
       setIsGenerating(false);
@@ -136,40 +140,19 @@ export default function OfferTaVieFuture() {
     return <OfferTransition message={isGenerating ? "Nova écrit ta vision future..." : "Chargement..."} />;
   }
 
-  useEffect(() => {
-    if (user?.sessionId && !offerData.product_principal) {
-      loadOfferData();
-    }
-  }, [user, offerData.product_principal]);
-
-  const loadOfferData = async () => {
-    try {
-      const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-      if (sessions.length > 0) {
-        const session = sessions[0];
-        const offerChoices = session.offer_generation?.offerChoices || {};
-        
-        setOfferData({
-          product_principal: offerChoices.product_principal,
-          petit_extra: offerChoices.petit_extra,
-          offre_superieure: offerChoices.offre_superieure,
-          offre_premium: offerChoices.offre_premium
-        });
-      }
-    } catch (error) {
-      console.error('Error loading offer data:', error);
-    }
-  };
-
   if (showTransition) {
     return <OfferTransition message="Nova prépare ton plan de route..." onComplete={handleTransitionComplete} />;
   }
 
+  // 🔥 P0-1: Source of truth = session.finalized_offer
+  const finalizedOffer = session?.finalized_offer || {};
+  const potentialRevenue = session?.potential_revenue || 0;
+
   const products = [
-    { key: 'product_principal', label: 'Produit Principal', data: offerData.product_principal, multiplier: 30 },
-    { key: 'petit_extra', label: 'Order Bump', data: offerData.petit_extra, multiplier: 15 },
-    { key: 'offre_superieure', label: 'Upsell', data: offerData.offre_superieure, multiplier: 9 },
-    { key: 'offre_premium', label: 'Premium', data: offerData.offre_premium, multiplier: 1 }
+    { key: 'mainProduct', label: 'Produit Principal', data: finalizedOffer.mainProduct, multiplier: 30 },
+    { key: 'orderBump', label: 'Order Bump', data: finalizedOffer.orderBump, multiplier: 15 },
+    { key: 'upsell1', label: 'Upsell', data: finalizedOffer.upsell1, multiplier: 9 },
+    { key: 'upsell3', label: 'Premium', data: finalizedOffer.upsell3, multiplier: 1 }
   ].filter(p => p.data);
 
   const revenues = products.map(p => ({
@@ -177,14 +160,12 @@ export default function OfferTaVieFuture() {
     price: parsePrice(p.data?.price),
     total: parsePrice(p.data?.price) * p.multiplier
   }));
-
-  const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
   
-  // Calculate sales needed to reach goal using same proportions as revenue potential
-  const revenueGoal = parseInt(user?.targetIncome) || 500;
+  // 🔥 P0-5: Clé correcte targetIncome
+  const revenueGoal = parseInt(session?.onboarding_full?.targetIncome) || 500;
   
-  // Calculate the multiplier to reach the goal from current potential
-  const multiplier = totalMonthly > 0 ? revenueGoal / totalMonthly : 1;
+  // Calculate the multiplier to reach the goal from potential_revenue
+  const multiplier = potentialRevenue > 0 ? revenueGoal / potentialRevenue : 1;
   
   // Apply the multiplier to each product's sales count to maintain proportions
   const salesNeeded = revenues.map(r => {
@@ -318,7 +299,7 @@ export default function OfferTaVieFuture() {
               transition={{ delay: 0.4 }}
             >
               <span className="text-5xl md:text-7xl font-bold text-[#61f7a2]">
-                {totalMonthly.toLocaleString('fr-FR')} €
+                {potentialRevenue.toLocaleString('fr-FR')} €
               </span>
               <p className="text-gray-400 mt-3 text-lg font-medium">par mois</p>
             </motion.div>
@@ -365,7 +346,7 @@ export default function OfferTaVieFuture() {
                 <div className="flex items-center justify-between py-4 px-4 bg-[#2a2a45] rounded-2xl border-2 border-[#61f7a2]/30">
                   <span className="text-white font-bold">Total Mensuel</span>
                   <span className="text-[#61f7a2] font-bold text-xl">
-                    {totalMonthly.toLocaleString('fr-FR')} €
+                    {potentialRevenue.toLocaleString('fr-FR')} €
                   </span>
                 </div>
               </motion.div>
@@ -388,7 +369,7 @@ export default function OfferTaVieFuture() {
                   Ton Plan de Route pour Atteindre ton Objectif
                 </h2>
                 <p className="text-gray-600 text-sm">
-                  Nombre de ventes nécessaires par mois pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
+                  Scénario indicatif pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
                   {totalProjected > 0 && (
                     <span className="block mt-1 text-[#61f7a2] font-semibold">
                       → Projection totale : {totalProjected.toLocaleString('fr-FR')}€/mois
@@ -428,7 +409,7 @@ export default function OfferTaVieFuture() {
               className="mt-6 p-5 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border border-yellow-200"
             >
               <p className="text-gray-700 text-sm text-center leading-relaxed">
-                💡 <strong className="text-gray-900">Astuce :</strong> Commence par te concentrer sur ton Produit Principal pour valider le marché, puis ajoute progressivement les autres offres.
+                💡 <strong className="text-gray-900">Astuce :</strong> Commence par te concentrer sur ton Produit Principal pour valider le marché, puis ajoute progressivement les autres offres. Ces volumes sont indicatifs et s'ajustent avec ton expérience.
               </p>
             </motion.div>
           </motion.div>

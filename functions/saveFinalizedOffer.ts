@@ -122,8 +122,9 @@ Deno.serve(async (req) => {
 
     let updateData = { finalized_offer: currentFinalized };
 
-    // 🔥 P0-2: Invalider le cache market_validation (car offre modifiée)
+    // 🔥 P0-2: Invalider les caches (car offre modifiée)
     updateData.market_validation = null;
+    updateData.future_vision = null;
 
     if (isComplete) {
       const parsePrice = (priceStr) => {

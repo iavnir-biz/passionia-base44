@@ -53,23 +53,40 @@ export default function Dashboard() {
     try {
       const currentUser = await base44.auth.me();
       
+      // 🔥 GUARD : Si payé, vérifier que tout est généré (DB-first)
       if (currentUser.has_purchased) {
-        const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+        const sessionId = currentUser.sessionId;
+        if (!sessionId) {
+          console.warn('[Dashboard] No sessionId, allowing access');
+          loadData();
+          return;
+        }
+
+        const sessions = await base44.entities.Session.filter({ id: sessionId });
         if (sessions.length > 0) {
           const userSession = sessions[0];
           
-          // Vérifier si la génération est complète
-          const isGenerationComplete = 
-            userSession.market_validation &&
-            userSession.generated_avatars &&
-            userSession.my_generated_offers &&
-            userSession.generated_sales_messages &&
-            userSession.generated_marketing_emails &&
-            userSession.generated_sales_pages &&
-            userSession.plan_de_route;
+          const requiredFields = [
+            'generated_avatars',
+            'generated_sales_messages',
+            'generated_marketing_emails',
+            'generated_sales_pages',
+            'plan_de_route'
+          ];
+
+          const missingFields = requiredFields.filter(field => 
+            !userSession[field] || userSession[field] === null
+          );
+
+          console.log('[Dashboard] Generation check', {
+            sessionId,
+            allGenerated: missingFields.length === 0,
+            present: requiredFields.filter(f => userSession[f]),
+            missing: missingFields
+          });
           
-          if (!isGenerationComplete) {
-            // Rediriger vers la page de génération
+          if (missingFields.length > 0) {
+            console.log('[Dashboard] Redirecting to NoahGeneration - incomplete assets');
             navigate(createPageUrl('NovaGeneration'));
             return;
           }
@@ -78,7 +95,7 @@ export default function Dashboard() {
       
       loadData();
     } catch (error) {
-      console.error('Error checking generation:', error);
+      console.error('[Dashboard] Error checking generation:', error);
       loadData();
     }
   };
@@ -106,17 +123,24 @@ export default function Dashboard() {
   };
   
   const calculateProgress = () => {
+    // 🔥 LECTURE SEULE : basé sur présence des contenus générés (DB-first)
     if (!session) return 0;
-    let completed = 0;
-    let total = 5;
     
-    if (session.offer_generation) completed++;
-    if (session.generated_avatars) completed++;
-    if (session.generated_sales_messages) completed++;
-    if (session.generated_emails) completed++;
-    if (session.generated_sales_page) completed++;
+    const generatedFields = [
+      'generated_avatars',
+      'generated_sales_messages',
+      'generated_marketing_emails',
+      'generated_sales_pages',
+      'plan_de_route',
+      'market_validation',
+      'future_vision'
+    ];
     
-    return Math.round((completed / total) * 100);
+    const completed = generatedFields.filter(field => 
+      session[field] !== null && session[field] !== undefined
+    ).length;
+    
+    return Math.round((completed / generatedFields.length) * 100);
   };
   
   const getCurrentStep = () => {

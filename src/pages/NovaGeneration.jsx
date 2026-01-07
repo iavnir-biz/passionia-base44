@@ -85,27 +85,45 @@ export default function NovaGeneration() {
   };
 
   const startGeneration = async (currentUser, userSession) => {
+    console.log('[NoahGeneration] 🚀 START - Orchestrated generation');
+    
     try {
-      for (let i = 0; i < generationSteps.length; i++) {
-        const step = generationSteps[i];
-        setCurrentStep(i);
-
-        // Attendre un peu pour l'effet visuel
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Appeler la fonction backend correspondante
-        try {
-          await generateStep(step, currentUser, userSession);
-          setCompletedSteps(prev => [...prev, step.id]);
-        } catch (err) {
-          console.error(`Error generating ${step.id}:`, err);
-          // Continue même en cas d'erreur pour ne pas bloquer le flow
-          setCompletedSteps(prev => [...prev, step.id]);
+      // 🔥 APPEL UNIQUE à l'orchestrateur avec gestion visuelle progressive
+      setCurrentStep(0);
+      
+      // Démarrer l'orchestrateur en arrière-plan
+      const generationPromise = base44.functions.invoke('generateAllAssets', {});
+      
+      // Simuler la progression visuelle pendant l'orchestration
+      let visualProgress = 0;
+      const visualInterval = setInterval(() => {
+        if (visualProgress < generationSteps.length) {
+          setCurrentStep(visualProgress);
+          setCompletedSteps(prev => [...prev, generationSteps[visualProgress].id]);
+          visualProgress++;
         }
+      }, 3000);
+
+      // Attendre la fin de l'orchestration
+      const { data } = await generationPromise;
+      clearInterval(visualInterval);
+
+      console.log('[NoahGeneration] Generation complete', data);
+      
+      if (data.error) {
+        setError(data.error === 'missing_data' 
+          ? `Données manquantes : ${data.missing?.join(', ')}`
+          : 'Erreur lors de la génération'
+        );
+        setIsGenerating(false);
+        return;
       }
 
-      // Attendre un peu avant de rediriger
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Compléter visuellement les étapes restantes
+      for (let i = visualProgress; i < generationSteps.length; i++) {
+        setCompletedSteps(prev => [...prev, generationSteps[i].id]);
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
       
       setIsGenerating(false);
       
@@ -113,10 +131,10 @@ export default function NovaGeneration() {
       setTimeout(() => {
         navigate(createPageUrl('Dashboard'));
       }, 1500);
-
+      
     } catch (error) {
-      console.error('Generation error:', error);
-      setError('Erreur lors de la génération');
+      console.error('[NoahGeneration] FATAL ERROR:', error);
+      setError('Une erreur est survenue lors de la génération');
       setIsGenerating(false);
     }
   };

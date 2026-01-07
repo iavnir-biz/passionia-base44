@@ -122,10 +122,26 @@ Deno.serve(async (req) => {
 
     let updateData = { finalized_offer: currentFinalized };
 
-    // 🔥 P0-4: Invalider tous les caches (car offre modifiée)
-    updateData.market_validation = null;
-    updateData.future_vision = null;
-    updateData.plan_de_route = null;
+    // 🔥 INVALIDATION CACHE COMPLÈTE : Reset tous les contenus générés qui dépendent de l'offre
+    const cacheInvalidation = {
+      market_validation: null,
+      future_vision: null,
+      plan_de_route: null,
+      generated_sales_messages: null,
+      generated_marketing_emails: null,
+      generated_sales_pages: null,
+      my_generated_offers: null,
+      generated_avatars: null
+    };
+
+    console.log('🔥 CACHE_INVALIDATED', { 
+      sessionId, 
+      keysReset: Object.keys(cacheInvalidation),
+      reason: 'finalized_offer_updated',
+      timestamp: new Date().toISOString()
+    });
+
+    Object.assign(updateData, cacheInvalidation);
 
     if (isComplete) {
       const parsePrice = (priceStr) => {

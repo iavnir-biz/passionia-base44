@@ -34,85 +34,108 @@ export default function OnboardingDynamic() {
 
   const initializeOnboarding = async () => {
     try {
-      // Récupérer les données du localStorage
-      const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
-      const firstName = localStorage.getItem('onboarding_firstName') || '';
-      
-      // Sauvegarder le prénom dans onboardingData pour le passer à l'API
-      onboardingData.firstName = firstName;
+      // 1️⃣ RÉCUPÉRER LE SESSION ID DEPUIS LE USER
+      const currentUser = await base44.auth.me();
+      const realSessionId = currentUser.sessionId;
+
+      if (!realSessionId) {
+        console.error('❌ [OnboardingDynamic] Pas de sessionId sur User → redirect');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      console.log('✅ [OnboardingDynamic] SessionId récupéré:', realSessionId);
+
+      // 2️⃣ CHARGER LA SESSION DEPUIS BASE44
+      const sessions = await base44.entities.Session.filter({ id: realSessionId });
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ [OnboardingDynamic] Session inexistante en base');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      const loadedSession = sessions[0];
+      const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
       
       setUser({ full_name: firstName, firstName: firstName });
-      setSession({ id: 'local', onboarding_history: onboardingData.history || [], firstName: firstName });
+      setSession(loadedSession);
       
-      const history = onboardingData.history || [];
+      const history = loadedSession.onboarding_history || [];
       setQuestionCount(Math.min(history.length, 11));
 
-      // Vérifier si on a déjà une question courante sauvegardée
-      if (onboardingData.current_question && history.length > 0) {
-        // On a déjà une question en cours, l'afficher directement
-        setCurrentQuestion(onboardingData.current_question);
-        initializeValue(onboardingData.current_question.type, onboardingData.current_question);
-        setIsLoading(false);
-      } else {
-        // Première visite ou pas de question sauvegardée, demander la première
-        await fetchNextQuestion('local', null, onboardingData);
+      console.log('📊 [OnboardingDynamic] Session chargée:', {
+        sessionId: loadedSession.id,
+        historyLength: history.length,
+        isDone: loadedSession.is_onboarding_done
+      });
+
+      // Si déjà terminé, rediriger
+      if (loadedSession.is_onboarding_done) {
+        console.log('✅ [OnboardingDynamic] Onboarding déjà terminé → redirect Transition');
+        navigate(createPageUrl('OnboardingTransition'));
+        return;
       }
+
+      // 3️⃣ CHARGER LA PROCHAINE QUESTION
+      await fetchNextQuestion(realSessionId, null);
     } catch (error) {
-      console.error('Error initializing onboarding:', error);
+      console.error('❌ [OnboardingDynamic] Error initializing:', error);
       setIsLoading(false);
     }
   };
 
-  const fetchNextQuestion = async (sessionId, lastAnswer = null, currentData = null) => {
+  const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
     try {
-      // Récupérer les données actuelles
-      const onboardingData = currentData || JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
+      // 1️⃣ CHARGER LA SESSION DEPUIS BASE44
+      const sessions = await base44.entities.Session.filter({ id: sessionId });
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ [fetchNextQuestion] Session introuvable');
+        return;
+      }
+
+      const currentSession = sessions[0];
+      const history = currentSession.onboarding_history || [];
+      const summary = currentSession.onboarding_summary || {};
       const firstName = localStorage.getItem('onboarding_firstName') || '';
-      
+
+      // 2️⃣ APPELER L'API AVEC DONNÉES RÉELLES
       const { data } = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId,
         userAnswer: lastAnswer,
-        history: onboardingData.history || [],
-        summary: onboardingData.summary || {},
-        firstName: firstName
+        history,
+        summary,
+        firstName
+      });
+
+      console.log('📨 [fetchNextQuestion] Réponse API:', {
+        isDone: data.isDone,
+        hasQuestion: !!data.question,
+        summaryUpdated: !!data.summary
       });
 
       if (data.isDone) {
-        // Sauvegarder en localStorage et passer à la transition
-        onboardingData.is_onboarding_done = true;
-        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+        // 3️⃣ MARQUER LA SESSION COMME TERMINÉE
+        await base44.entities.Session.update(sessionId, {
+          is_onboarding_done: true,
+          onboarding_summary: data.summary || summary
+        });
+
+        console.log('✅ [fetchNextQuestion] Onboarding marqué terminé');
         navigate(createPageUrl('OnboardingTransition'));
       } else {
-        // Sauvegarder la nouvelle question
-        if (lastAnswer !== null && lastAnswer !== undefined) {
-          onboardingData.history = onboardingData.history || [];
-          
-          // CRITIQUE : Convertir answer en string pour éviter l'erreur 422
-          const answerAsString = typeof lastAnswer === 'string' 
-            ? lastAnswer 
-            : JSON.stringify(lastAnswer);
-          
-          onboardingData.history.push({
-            question: currentQuestion?.text || currentQuestion?.title,
-            answer: answerAsString,
-            at: new Date().toISOString()
-          });
-          
-          console.log('💾 Answer sauvegardée:', { 
-            question: currentQuestion?.text, 
-            answerType: typeof lastAnswer,
-            answerLength: answerAsString.length 
-          });
-        }
-        onboardingData.current_question = data.question;
-        onboardingData.summary = data.summary || onboardingData.summary;
-        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
-        
+        // 4️⃣ AFFICHER LA PROCHAINE QUESTION
         setCurrentQuestion(data.question);
         initializeValue(data.question.type, data.question);
+        
+        // Recharger la session pour avoir l'historique à jour
+        const updatedSessions = await base44.entities.Session.filter({ id: sessionId });
+        if (updatedSessions && updatedSessions.length > 0) {
+          setSession(updatedSessions[0]);
+          setQuestionCount(Math.min(updatedSessions[0].onboarding_history?.length || 0, 11));
+        }
       }
     } catch (error) {
-      console.error('Error fetching next question:', error);
+      console.error('❌ [fetchNextQuestion] Error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -133,13 +156,23 @@ export default function OnboardingDynamic() {
     
     setIsSaving(true);
     setIsLoading(true);
-    await fetchNextQuestion(session.id, value);
+
+    // 🔥 NORMALISER LA RÉPONSE EN STRING
+    const normalizedAnswer = typeof value === 'string' 
+      ? value 
+      : JSON.stringify(value);
+
+    console.log('📤 [handleNext] Envoi réponse:', {
+      type: currentQuestion?.type,
+      originalType: typeof value,
+      normalizedLength: normalizedAnswer.length
+    });
+
+    await fetchNextQuestion(session.id, normalizedAnswer);
+    
+    // Reset typé selon le prochain type de question
     setValue('');
     setIsSaving(false);
-    
-    // Mettre à jour la session locale pour la progression
-    const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{"history": [], "summary": {}}');
-    setSession(prev => ({ ...prev, onboarding_history: onboardingData.history || [] }));
   };
 
   const canProceed = () => {
@@ -445,10 +478,13 @@ export default function OnboardingDynamic() {
               )}
 
               {currentQuestion.type === 'single_choice' && (
-                <RadioGroup value={value} onValueChange={(val) => {
+                <RadioGroup value={value} onValueChange={async (val) => {
                   setValue(val);
-                  // Auto-submit après sélection
-                  setTimeout(() => handleNext(), 300);
+                  // 🔥 FIX RACE CONDITION : envoyer directement la valeur sélectionnée
+                  setIsSaving(true);
+                  setIsLoading(true);
+                  await fetchNextQuestion(session.id, val);
+                  setIsSaving(false);
                 }} className="space-y-3">
                   {(currentQuestion.options || []).map((option, idx) => (
                     <motion.div
@@ -461,9 +497,13 @@ export default function OnboardingDynamic() {
                           ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
                           : 'bg-white border-gray-200 hover:border-gray-300'
                       }`}
-                      onClick={() => {
+                      onClick={async () => {
                         setValue(option);
-                        setTimeout(() => handleNext(), 300);
+                        // 🔥 FIX RACE CONDITION : envoyer directement
+                        setIsSaving(true);
+                        setIsLoading(true);
+                        await fetchNextQuestion(session.id, option);
+                        setIsSaving(false);
                       }}
                     >
                       <RadioGroupItem value={option} id={`option-${idx}`} />

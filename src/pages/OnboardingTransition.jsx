@@ -90,107 +90,44 @@ export default function OnboardingTransition() {
 
   const loadUser = async () => {
     try {
-      // Récupérer le prénom du localStorage
-      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      const currentUser = await base44.auth.me();
+      const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
       setUser({ firstName: firstName, full_name: firstName });
-      
-      // Créer la session avec les données de l'onboarding
-      await createSession();
+
+      // ✅ La Session existe déjà et contient toutes les données
+      // Plus besoin de sync lourde, juste vérifier et enrichir le User
+      if (currentUser.sessionId) {
+        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+        if (sessions && sessions.length > 0) {
+          const session = sessions[0];
+          const summary = session.onboarding_summary || {};
+          
+          console.log('✅ [OnboardingTransition] Session chargée:', {
+            sessionId: session.id,
+            historyLength: session.onboarding_history?.length || 0,
+            skill: session.skill,
+            isDone: session.is_onboarding_done
+          });
+
+          // Enrichir le User avec les données du summary
+          await base44.auth.updateMe({ 
+            coreSkill: session.skill || summary.who_to_teach || '',
+            targetAudience: summary.learner_profile || '',
+            mainProblem: summary.main_learning_problem || '',
+            firstResult: summary.quick_win || '',
+            finalTransformation: summary.big_transformation || '',
+            uniqueMethod: summary.method_angle || '',
+            typicalMistake: summary.common_mistake || '',
+            extraDetail: summary.proof_or_story || ''
+          });
+
+          console.log('✅ [OnboardingTransition] User enrichi avec summary');
+        }
+      }
     } catch (error) {
-      console.error('Error loading user:', error);
+      console.error('❌ [OnboardingTransition] Error:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const createSession = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      
-      // Récupérer TOUTES les données de localStorage
-      const onboardingDataStr = localStorage.getItem('onboarding_data') || '{}';
-      const onboardingData = JSON.parse(onboardingDataStr);
-      const firstName = localStorage.getItem('onboarding_firstName') || '';
-      
-      // CRITIQUE : Normaliser les answers en strings
-      const normalizedHistory = (onboardingData.history || []).map(item => ({
-        question: item.question || '',
-        type: item.type || 'text',
-        answer: typeof item.answer === 'string' ? item.answer : JSON.stringify(item.answer),
-        at: item.at || new Date().toISOString()
-      }));
-      
-      console.log('📦 OnboardingTransition - Transfert données:', {
-        firstName,
-        historyLength: normalizedHistory.length,
-        hasSummary: !!onboardingData.summary,
-        hasSessionId: !!currentUser.sessionId,
-        firstAnswer: normalizedHistory[0]?.answer?.substring(0, 50)
-      });
-      
-      // La session doit déjà exister (créée dans OnboardingFirstName)
-      if (!currentUser.sessionId) {
-        console.error('❌ PAS DE SESSION ID - création de secours');
-        const session = await base44.entities.Session.create({
-          onboarding_history: normalizedHistory,
-          onboarding_summary: onboardingData.summary || {},
-          onboarding_full: {},
-          skill: onboardingData.summary?.who_to_teach || '',
-          is_onboarding_done: false
-        });
-        await base44.auth.updateMe({ sessionId: session.id });
-        console.log('✅ Session de secours créée:', session.id);
-        return;
-      }
-      
-      // METTRE À JOUR la session existante avec TOUTES les données normalisées
-      const summary = onboardingData.summary || {};
-      
-      // CRITIQUE : Extraire le coreSkill de la première réponse (Q1)
-      // La première question demande la compétence/passion, c'est la réponse Q1
-      const coreSkillFromHistory = normalizedHistory.length > 0 ? normalizedHistory[0].answer : '';
-      const coreSkill = summary.who_to_teach || coreSkillFromHistory || '';
-      
-      console.log('🎯 CoreSkill extrait:', { 
-        fromSummary: summary.who_to_teach,
-        fromHistory: coreSkillFromHistory,
-        final: coreSkill 
-      });
-      
-      await base44.entities.Session.update(currentUser.sessionId, {
-        onboarding_history: normalizedHistory,
-        onboarding_summary: {
-          ...summary,
-          who_to_teach: coreSkill
-        },
-        skill: coreSkill,
-        is_onboarding_done: false
-      });
-      
-      console.log('✅ Session mise à jour:', {
-        sessionId: currentUser.sessionId,
-        historyCount: normalizedHistory.length,
-        skill: summary.who_to_teach
-      });
-      
-      // Sauvegarder TOUTES les données clés sur le User
-      await base44.auth.updateMe({ 
-        coreSkill: coreSkill,
-        targetAudience: summary.learner_profile || '',
-        mainProblem: summary.main_learning_problem || '',
-        firstResult: summary.quick_win || '',
-        finalTransformation: summary.big_transformation || '',
-        uniqueMethod: summary.method_angle || '',
-        typicalMistake: summary.common_mistake || '',
-        extraDetail: summary.proof_or_story || ''
-      });
-      
-      console.log('✅ User mis à jour avec données du summary');
-      
-    } catch (error) {
-      console.error('❌ Erreur mise à jour session:', error);
-      console.error('Détails:', error.response?.data || error.message);
-      throw error;
     }
   };
 

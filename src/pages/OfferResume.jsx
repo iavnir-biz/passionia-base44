@@ -149,10 +149,11 @@ function parsePrice(priceStr) {
 export default function OfferResume() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showDetail, setShowDetail] = useState(false);
-  const [sessionId, setSessionId] = useState(null);
   const [showTransition, setShowTransition] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -162,13 +163,47 @@ export default function OfferResume() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      if (currentUser.sessionId) {
-        setSessionId(currentUser.sessionId);
+      
+      if (!currentUser.sessionId) {
+        console.error('❌ [OfferResume] No sessionId');
+        return;
       }
+
+      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ [OfferResume] Session not found');
+        return;
+      }
+
+      setSession(sessions[0]);
+
+      console.log('📊 [OfferResume] Session loaded:', {
+        hasOfferGeneration: !!sessions[0].offer_generation,
+        hasFinalizedOffer: !!sessions[0].finalized_offer,
+        finalizedKeys: Object.keys(sessions[0].finalized_offer || {})
+      });
+
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    setRegenerating(true);
+    try {
+      await base44.functions.invoke('generateFullStackOffer', {
+        sessionId: session.id
+      });
+      // Reload session
+      await loadUser();
+    } catch (error) {
+      console.error('Error regenerating:', error);
+      alert('Erreur lors de la régénération. Réessaye.');
+    } finally {
+      setRegenerating(false);
     }
   };
 
@@ -188,37 +223,60 @@ export default function OfferResume() {
     return <OfferTransition message="Nova analyse ton offre..." onComplete={handleTransitionComplete} />;
   }
 
-  const offer = user?.offer || {};
+  // 🔥 FALLBACK : si pas d'offres générées
+  if (!session?.finalized_offer || Object.keys(session.finalized_offer).length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
+        <div className="max-w-md text-center">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Offres non générées</h2>
+          <p className="text-gray-600 mb-6">
+            Une erreur s'est produite lors de la génération de tes offres.
+          </p>
+          <GlowButton 
+            onClick={handleRegenerate} 
+            disabled={regenerating}
+            loading={regenerating}
+            size="lg"
+          >
+            {regenerating ? 'Regénération...' : 'Regénérer mes offres'}
+          </GlowButton>
+        </div>
+      </div>
+    );
+  }
+
+  const finalizedOffer = session.finalized_offer || {};
   const products = [
   {
-    key: 'product_principal',
+    key: 'mainProduct',
     offerType: 'low',
     label: 'Produit d\'appel (Low ticket)',
-    data: offer.product_principal,
+    data: finalizedOffer.mainProduct,
     multiplier: 30,
     conversionLabel: '1 vente/jour × 30 jours'
   },
   {
-    key: 'petit_extra',
+    key: 'orderBump',
     offerType: 'bump',
     label: 'Vente additionnelle (Order bump)',
-    data: offer.petit_extra,
+    data: finalizedOffer.orderBump,
     multiplier: 15,
     conversionLabel: '50% conversion × 30 jours'
   },
   {
-    key: 'offre_superieure',
+    key: 'upsell1',
     offerType: 'mid',
     label: 'Offre intermédiaire (Mid ticket)',
-    data: offer.offre_superieure,
+    data: finalizedOffer.upsell1,
     multiplier: 9,
     conversionLabel: '30% conversion × 30 jours'
   },
   {
-    key: 'offre_premium',
+    key: 'upsell3',
     offerType: 'high',
     label: 'Offre premium (High ticket)',
-    data: offer.offre_premium,
+    data: finalizedOffer.upsell3,
     multiplier: 1,
     conversionLabel: '3% conversion × 30 jours'
   }];

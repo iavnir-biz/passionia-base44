@@ -69,8 +69,8 @@ export default function OfferSuperieure() {
         }
       }
       
-      if (currentUser.offer?.offre_superieure) {
-        setSelectedOffer(currentUser.offer.offre_superieure);
+      if (userSession.finalized_offer?.upsell1) {
+        setSelectedOffer(userSession.finalized_offer.upsell1);
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -84,16 +84,10 @@ export default function OfferSuperieure() {
     setIsSaving(true);
     
     try {
-      // Sauvegarder dans Session.finalized_offer
-      if (session) {
-        const finalizedOffer = session.finalized_offer || {};
-        finalizedOffer.upsell1 = offer;
-        await base44.entities.Session.update(session.id, { finalized_offer: finalizedOffer });
-      }
-      
-      const currentOffer = user?.offer || {};
-      await base44.auth.updateMe({ 
-        offer: { ...currentOffer, offre_superieure: offer }
+      await base44.functions.invoke('saveFinalizedOffer', {
+        sessionId: session.id,
+        key: 'upsell1',
+        offer
       });
       
       setIsSaving(false);

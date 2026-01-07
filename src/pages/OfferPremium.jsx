@@ -66,8 +66,8 @@ export default function OfferPremium() {
         }
       }
       
-      if (currentUser.offer?.offre_premium) {
-        setSelectedOffer(currentUser.offer.offre_premium);
+      if (userSession.finalized_offer?.upsell3) {
+        setSelectedOffer(userSession.finalized_offer.upsell3);
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -81,41 +81,14 @@ export default function OfferPremium() {
     setIsSaving(true);
     
     try {
-      // Sauvegarder dans Session.finalized_offer
-      if (session) {
-        const finalizedOffer = session.finalized_offer || {};
-        finalizedOffer.upsell3 = offer;
-        
-        // Calculer le potentiel de revenus
-        const parsePrice = (priceStr) => {
-          if (!priceStr) return 0;
-          const cleaned = priceStr.replace(/[^0-9]/g, '');
-          return parseInt(cleaned, 10) || 0;
-        };
-        
-        const mainPrice = parsePrice(finalizedOffer.mainProduct?.price || '0');
-        const bumpPrice = parsePrice(finalizedOffer.orderBump?.price || '0');
-        const upsell1Price = parsePrice(finalizedOffer.upsell1?.price || '0');
-        const upsell3Price = parsePrice(offer.price || '0');
-        
-        const mainSales = 30;
-        const bumpSales = Math.round(30 * 0.5);
-        const upsell1Sales = Math.round(30 * 0.3);
-        const upsell3Sales = Math.max(1, Math.round(30 * 0.03));
-        
-        const monthlyRevenue = (mainPrice * mainSales) + (bumpPrice * bumpSales) + (upsell1Price * upsell1Sales) + (upsell3Price * upsell3Sales);
-        
-        await base44.entities.Session.update(session.id, { 
-          finalized_offer: finalizedOffer,
-          potential_revenue: monthlyRevenue,
-          is_offer_complete: true
-        });
-      }
-      
-      const currentOffer = user?.offer || {};
-      await base44.auth.updateMe({ 
-        offer: { ...currentOffer, offre_premium: offer }
+      // 🔥 SAVE + AUTO-CALC potential_revenue (backend)
+      const result = await base44.functions.invoke('saveFinalizedOffer', {
+        sessionId: session.id,
+        key: 'upsell3',
+        offer
       });
+
+      console.log('✅ [OfferPremium] Offre complète:', result.data);
       
       setIsSaving(false);
       setShowTransition(true);

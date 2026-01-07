@@ -69,8 +69,8 @@ export default function OfferPetitExtra() {
         }
       }
       
-      if (currentUser.offer?.petit_extra) {
-        setSelectedOffer(currentUser.offer.petit_extra);
+      if (userSession.finalized_offer?.orderBump) {
+        setSelectedOffer(userSession.finalized_offer.orderBump);
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -84,16 +84,10 @@ export default function OfferPetitExtra() {
     setIsSaving(true);
     
     try {
-      // Sauvegarder dans Session.finalized_offer
-      if (session) {
-        const finalizedOffer = session.finalized_offer || {};
-        finalizedOffer.orderBump = offer;
-        await base44.entities.Session.update(session.id, { finalized_offer: finalizedOffer });
-      }
-      
-      const currentOffer = user?.offer || {};
-      await base44.auth.updateMe({ 
-        offer: { ...currentOffer, petit_extra: offer }
+      await base44.functions.invoke('saveFinalizedOffer', {
+        sessionId: session.id,
+        key: 'orderBump',
+        offer
       });
       
       setIsSaving(false);

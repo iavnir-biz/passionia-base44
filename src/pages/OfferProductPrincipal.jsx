@@ -96,9 +96,9 @@ export default function OfferProductPrincipal() {
         console.error('OfferProductPrincipal: User has no sessionId');
       }
       
-      // Fallback sur l'ancien système si pas de session
-      if (currentUser.offer?.product_principal) {
-        setSelectedOffer(currentUser.offer.product_principal);
+      // Charger la sélection précédente si existe
+      if (userSession.finalized_offer?.mainProduct) {
+        setSelectedOffer(userSession.finalized_offer.mainProduct);
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -112,17 +112,11 @@ export default function OfferProductPrincipal() {
     setIsSaving(true);
 
     try {
-      // Sauvegarder dans Session.finalized_offer
-      if (session) {
-        const finalizedOffer = session.finalized_offer || {};
-        finalizedOffer.mainProduct = offer;
-        await base44.entities.Session.update(session.id, { finalized_offer: finalizedOffer });
-      }
-      
-      // Sauvegarder aussi sur user pour compatibilité
-      const currentOffer = user?.offer || {};
-      await base44.auth.updateMe({
-        offer: { ...currentOffer, product_principal: offer }
+      // 🔥 SAVE BACKEND ATOMIC (anti-race)
+      await base44.functions.invoke('saveFinalizedOffer', {
+        sessionId: session.id,
+        key: 'mainProduct',
+        offer
       });
       
       setIsSaving(false);

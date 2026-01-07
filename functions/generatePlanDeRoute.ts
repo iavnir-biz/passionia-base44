@@ -130,10 +130,12 @@ Deno.serve(async (req) => {
     const confidenceLevel = readinessScore >= 7 ? 'élevé' : readinessScore >= 4 ? 'moyen' : 'faible';
 
     console.log('📊 [generatePlanDeRoute] Mapped data:', {
+      sessionId,
       readinessScore,
       userLevel,
       confidenceLevel,
-      revenueObjective
+      targetIncome,
+      potentialRevenue
     });
 
     const userPrompt = `DONNÉES OBLIGATOIRES À UTILISER

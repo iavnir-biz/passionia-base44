@@ -155,11 +155,37 @@ export default function CTAPAYWALL() {
             </p>
           </motion.div>
 
-          {/* CTA Top */}
+          {/* 🔥 A) RÉCAP OFFRES - Compact, ancrage cohérence */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 p-6 mb-8"
+          >
+            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
+              📋 Ton écosystème d'offres
+            </h3>
+            <div className="space-y-2 mb-4">
+              {products.map((product, idx) => (
+                <div key={idx} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-700">{product.data.title}</span>
+                  <span className="text-gray-900 font-semibold">{product.data.price}</span>
+                </div>
+              ))}
+            </div>
+            {potentialRevenue > 0 && (
+              <div className="pt-3 border-t border-gray-200 text-center">
+                <span className="text-gray-600 text-sm">Potentiel estimé : </span>
+                <span className="text-[#61f7a2] font-bold text-lg">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
+              </div>
+            )}
+          </motion.div>
+
+          {/* CTA Top */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
             className="flex justify-center mb-12"
           >
             <GlowButton
@@ -534,6 +560,90 @@ export default function CTAPAYWALL() {
               <p className="text-xl font-bold text-gray-900">
                 "Tu n'as pas besoin d'être prêt(e). Tu as juste besoin de commencer."
               </p>
+            </div>
+          </motion.div>
+
+          {/* 🔥 B) CE QUE TU ACHÈTES / CE QUE TU N'ACHÈTES PAS */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+            className="bg-white rounded-3xl border border-gray-200 p-8 mb-8"
+          >
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+              💡 Soyons clairs
+            </h2>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Tu achètes */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <CheckCircle className="w-5 h-5 text-[#61f7a2]" />
+                  <h3 className="font-bold text-gray-900">Tu achètes</h3>
+                </div>
+                <ul className="space-y-2 text-gray-700">
+                  <li>• Clarté (tu sais quoi faire)</li>
+                  <li>• Structure (tu as un plan)</li>
+                  <li>• Guidance pas à pas (tu n'es pas seul·e)</li>
+                  <li>• Exécution (on te montre comment)</li>
+                </ul>
+              </div>
+
+              {/* Tu n'achètes pas */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <X className="w-5 h-5 text-gray-400" />
+                  <h3 className="font-bold text-gray-900">Tu n'achètes pas</h3>
+                </div>
+                <ul className="space-y-2 text-gray-600">
+                  <li>• Une promesse magique</li>
+                  <li>• Un rêve flou</li>
+                  <li>• Un hack miracle</li>
+                  <li>• Des revenus garantis</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+              <p className="text-center text-gray-700 text-sm">
+                On te donne les outils et la méthode. C'est toi qui fais le chemin.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* 🔥 C) CE PACK EST FAIT POUR TOI SI */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.68 }}
+            className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl border border-blue-200 p-8 mb-8"
+          >
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Fait pour toi */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <CheckCircle className="w-5 h-5 text-[#61f7a2]" />
+                  <h3 className="font-bold text-gray-900">Ce pack est fait pour toi si</h3>
+                </div>
+                <ul className="space-y-2 text-gray-700">
+                  <li>• Tu veux transmettre ton savoir-faire</li>
+                  <li>• Tu cherches un chemin clair</li>
+                  <li>• Tu es prêt·e à agir maintenant</li>
+                </ul>
+              </div>
+
+              {/* Pas pour toi */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <X className="w-5 h-5 text-gray-400" />
+                  <h3 className="font-bold text-gray-900">Ce n'est pas pour toi si</h3>
+                </div>
+                <ul className="space-y-2 text-gray-600">
+                  <li>• Tu cherches un système automatique</li>
+                  <li>• Tu veux juste "tester" sans t'investir</li>
+                  <li>• Tu attends des résultats sans effort</li>
+                </ul>
+              </div>
             </div>
           </motion.div>
 

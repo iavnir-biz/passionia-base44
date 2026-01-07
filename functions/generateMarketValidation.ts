@@ -7,58 +7,64 @@ const openai = new OpenAI({
 
 const SYSTEM_PROMPT = `Tu es Noah, une IA analyste marché et stratège pédagogique.
 
+🌐 RECHERCHE WEB OBLIGATOIRE
+AVANT de répondre, tu DOIS effectuer une recherche web approfondie sur :
+- Le marché de la niche exacte de l'utilisateur
+- Les statistiques sectorielles récentes (Statista, études de marché, rapports)
+- Les tendances de recherche et comportements d'achat
+- La croissance du e-learning dans ce secteur spécifique
+- Les données de demande (volume de recherches, forums, communautés)
+
+❌ INTERDIT : utiliser des chiffres génériques ou inventés
+✅ OBLIGATOIRE : s'appuyer sur des données réelles trouvées en ligne
+
 OBJECTIF :
-Rassurer l'utilisateur, valider la demande réelle de son projet et déclencher un sentiment de légitimité et d'excitation.
+Rassurer l'utilisateur avec des PREUVES RÉELLES que son marché existe et est viable.
 
 TON & STYLE
 - Ton rassurant, professionnel, humain
 - Jamais vendeur agressif
-- Jamais générique
-- Toujours spécifique à la passion et à la cible
+- Toujours spécifique à la niche EXACTE (pas générique)
 - Tutoiement obligatoire
 - Adresse-toi à l'utilisateur par son prénom
-- Texte fluide, pas de formatage Markdown (pas d'astérisques, pas de listes, pas de gras)
-- Paragraphes courts et aérés (3 sections distinctes séparées par des sauts de ligne)
-- Ajoute 2-3 émojis pertinents pour dynamiser le texte (🎯, 💡, 🚀, 📈, ✨, 💰, etc.)
+- Texte fluide, pas de formatage Markdown
+- Paragraphes courts et aérés (3 sections distinctes)
+- 2-3 émojis pertinents (🎯, 💡, 🚀, 📈, ✨, 💰)
 
-TEXTE TRANSFORMATIONNEL PRINCIPAL (OBLIGATOIRE)
-Rédige un texte fluide et humain qui :
-- Explique pourquoi des personnes cherchent activement à résoudre ce problème
-- Décrit les frustrations, blocages et douleurs réelles de la cible
-- Montre que la compétence de l'utilisateur répond à un besoin existant
-- Relie la passion à une transformation concrète
+CONTENU ATTENDU
+1) Introduction personnalisée avec le prénom
+2) AU MOINS 2-3 statistiques RÉELLES et SPÉCIFIQUES à la niche
+3) Frustrations et douleurs RÉELLES de la cible (trouvées via recherche)
+4) Preuve que des gens cherchent activement cette solution
+5) Validation que ce marché peut être monétisé
+6) Conclusion motivante et réaliste
 
-Ce texte doit donner l'impression d'une analyse de consultant, pas d'un texte marketing.
+FORMAT JSON DE SORTIE STRICT :
+{
+  "validationText": "Texte en 3 sections séparées par \\n\\n",
+  "marketScores": {
+    "marketSize": 75,
+    "demandIntensity": 82,
+    "revenueRecurrence": 68,
+    "onlineAccessibility": 90,
+    "easeOfImplementation": 70
+  }
+}
 
-VALIDATION MARCHÉ – DONNÉES CONTEXTUELLES
-Présente une validation marché basée sur :
-- La taille globale du marché lié à la niche (ordre de grandeur)
-- La croissance actuelle ou émergente du secteur
-- La demande en ligne (recherches, tendances, intérêt croissant)
-- L'évolution des comportements des utilisateurs
+SCORES (0-100) :
+- marketSize : Taille du marché (petit=40-60, moyen=60-80, grand=80-100)
+- demandIntensity : Intensité de la demande actuelle
+- revenueRecurrence : Potentiel de revenus récurrents
+- onlineAccessibility : Facilité d'accès global/online
+- easeOfImplementation : Facilité de mise en œuvre
 
-Tu peux t'inspirer de sources comme :
-Statista, Google Trends, rapports sectoriels, études consommateurs (sans citer de lien précis).
+⚠️ Les scores DOIVENT varier selon la niche réelle analysée
+⚠️ Si aucune donnée fiable : fallback qualitatif + scores conservateurs (50-65)
 
-RÈGLES DE CONTENU (OBLIGATOIRES)
-1) Commence par une introduction positive et personnalisée avec le prénom
-2) Inclure AU MOINS 2-3 statistiques chiffrées pertinentes liées à la niche EXACTE
-3) Décrire les frustrations, blocages et douleurs réelles de la cible
-4) Identifier pourquoi des personnes cherchent activement cette solution
-5) Expliquer pourquoi ce marché peut être monétisé
-6) Conclure en préparant psychologiquement l'utilisateur : "Ok, c'est réel. Il y a des gens qui attendent exactement ça."
-
-INTERDICTIONS ABSOLUES
-- Ne JAMAIS répéter mot pour mot une étape précédente
-- Ne JAMAIS être générique ou vague
-- Ne JAMAIS utiliser un ton marketing agressif
-
-FORMAT DE SORTIE
-- Texte brut uniquement
-- EXACTEMENT 3 sections distinctes séparées par "\n\n" (double saut de ligne)
-- Chaque section : 2-3 phrases maximum
-- Intègre 2-3 émojis pertinents dans le texte pour le rendre vivant
-- Pas de titres ni de sous-titres`;
+INTERDICTIONS :
+- Stats génériques identiques pour tous
+- Chiffres inventés sans source
+- Ton marketing agressif`;
 
 Deno.serve(async (req) => {
   try {
@@ -119,92 +125,155 @@ Deno.serve(async (req) => {
 
     const userPrompt = `${genderAgreement}
 
-L'utilisateur, ${name}, veut lancer une offre pour ENSEIGNER sa compétence : "${skill}".
+NICHE À ANALYSER : "${skill}"
 
-Voici les produits qu'il a sélectionnés :
-Produit Principal : "${mainProductTitle}" (${mainProductDescription})
-Upsell : "${upsell1Title}"
-Offre Premium : "${premiumTitle}"
+CONTEXTE UTILISATEUR :
+- Prénom : ${name}
+- Produit Principal : "${mainProductTitle}"
+- Description : ${mainProductDescription}
+- Offre Supérieure : "${upsell1Title}"
+- Offre Premium : "${premiumTitle}"
 
-Ta tâche : Rédige une analyse courte, aérée et encourageante en EXACTEMENT 3 sections distinctes séparées par un double saut de ligne (\n\n).
-Rappelle-toi : 2 statistiques minimum, 1-2 douleurs, 1 audience cible spécifique, une conclusion motivante, et 2-3 émojis bien placés pour dynamiser le texte (🎯, 💡, 🚀, 📈, ✨, 💰, etc.).`;
+🔍 ÉTAPE 1 (OBLIGATOIRE) : RECHERCHE WEB
+Effectue une recherche approfondie sur :
+- Le marché de "${skill}" (taille, croissance, tendances)
+- Les statistiques sectorielles récentes
+- La demande en ligne (volume de recherches, forums, communautés)
+- Les frustrations réelles des apprenants dans ce domaine
+- Les comportements d'achat dans cette niche
 
-    console.log('OPENAI_CALL start', { 
+🎯 ÉTAPE 2 : RÉDACTION
+Basé sur les données trouvées, rédige :
+- Une analyse en 3 sections (séparées par \\n\\n)
+- Minimum 2-3 statistiques RÉELLES et SPÉCIFIQUES
+- Des douleurs concrètes identifiées via ta recherche
+- 2-3 émojis bien placés
+
+📊 ÉTAPE 3 : CALCUL DES SCORES
+Évalue 5 dimensions sur 100 selon les données trouvées :
+- marketSize : taille réelle du marché
+- demandIntensity : intensité actuelle de la demande
+- revenueRecurrence : potentiel de revenus récurrents
+- onlineAccessibility : accessibilité globale/online
+- easeOfImplementation : facilité de mise en œuvre
+
+⚠️ Si données insuffisantes : analyse qualitative + scores conservateurs (50-65)
+
+RETOURNE UN JSON STRICT avec validationText + marketScores`;
+
+    console.log('🔍 [generateMarketValidation] Démarrage recherche web', { 
       fn: 'generateMarketValidation',
       sessionId,
-      model: 'gpt-4o'
+      skill
     });
 
-    // 🔥 P1: Retry avec validation format
-    let marketValidation = null;
+    // 🔥 P1: Retry avec validation format + recherche web
+    let result = null;
     let attempt = 0;
     const maxRetries = 2;
 
-    while (attempt <= maxRetries && !marketValidation) {
+    while (attempt <= maxRetries && !result) {
       attempt++;
       
       console.log(`🔄 [generateMarketValidation] Tentative ${attempt}/${maxRetries + 1}`);
 
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.8,
+      // 🌐 Utiliser InvokeLLM avec recherche web
+      const llmResponse = await base44.integrations.Core.InvokeLLM({
+        prompt: `${SYSTEM_PROMPT}\n\n---\n\n${userPrompt}`,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            validationText: {
+              type: "string",
+              description: "Texte de validation en 3 sections séparées par \\n\\n"
+            },
+            marketScores: {
+              type: "object",
+              properties: {
+                marketSize: { type: "number", minimum: 0, maximum: 100 },
+                demandIntensity: { type: "number", minimum: 0, maximum: 100 },
+                revenueRecurrence: { type: "number", minimum: 0, maximum: 100 },
+                onlineAccessibility: { type: "number", minimum: 0, maximum: 100 },
+                easeOfImplementation: { type: "number", minimum: 0, maximum: 100 }
+              },
+              required: ["marketSize", "demandIntensity", "revenueRecurrence", "onlineAccessibility", "easeOfImplementation"]
+            }
+          },
+          required: ["validationText", "marketScores"]
+        }
       });
 
-      console.log('OPENAI_CALL end', {
-        fn: 'generateMarketValidation',
-        sessionId,
+      console.log('✅ [generateMarketValidation] LLM response reçu', {
         attempt,
-        usage: completion.usage
+        hasText: !!llmResponse?.validationText,
+        hasScores: !!llmResponse?.marketScores
       });
 
-      const generatedText = completion.choices[0].message.content.trim();
+      const generatedText = llmResponse?.validationText?.trim() || '';
+      const marketScores = llmResponse?.marketScores || null;
 
       // 🔥 VALIDATION GUARDRAILS
       const sections = generatedText.split('\n\n');
       const numberCount = (generatedText.match(/\d+/g) || []).length;
       const isLongEnough = generatedText.length > 350;
+      const hasValidScores = marketScores && 
+        Object.keys(marketScores).length === 5 &&
+        Object.values(marketScores).every(v => typeof v === 'number' && v >= 0 && v <= 100);
 
-      const isValid = sections.length === 3 && numberCount >= 2 && isLongEnough;
+      const isValid = sections.length === 3 && numberCount >= 2 && isLongEnough && hasValidScores;
 
       if (isValid) {
-        marketValidation = generatedText;
+        result = {
+          validationText: generatedText,
+          marketScores
+        };
         console.log('✅ [generateMarketValidation] Validation réussie:', {
           sections: sections.length,
           numbers: numberCount,
-          length: generatedText.length
+          length: generatedText.length,
+          scores: marketScores
         });
       } else {
         console.warn('⚠️ [generateMarketValidation] Format invalide:', {
           sections: sections.length,
           numbers: numberCount,
           length: generatedText.length,
+          hasValidScores,
           attempt
         });
 
         // Dernier essai échoué ? Fallback safe
         if (attempt > maxRetries) {
           console.error('❌ [generateMarketValidation] Max retries atteint, fallback');
-          marketValidation = `${name}, ton projet dans "${skill}" répond à un vrai besoin. 🎯
+          result = {
+            validationText: `${name}, ton projet dans "${skill}" répond à un vrai besoin. 🎯
 
-Le marché de la formation en ligne connaît une croissance de +25% par an, et des milliers de personnes cherchent chaque mois des solutions pour progresser dans ce domaine. 📈
+Le marché de la formation en ligne connaît une croissance significative, et de nombreuses personnes cherchent des solutions pour progresser dans ce domaine. 📈
 
-Ta proposition arrive au bon moment : les personnes que tu veux aider sont prêtes à investir dans leur apprentissage. 💡`;
+Ta proposition arrive au bon moment : les personnes que tu veux aider sont prêtes à investir dans leur apprentissage. 💡`,
+            marketScores: {
+              marketSize: 60,
+              demandIntensity: 65,
+              revenueRecurrence: 58,
+              onlineAccessibility: 75,
+              easeOfImplementation: 62
+            }
+          };
         }
       }
     }
 
     // Save to session
     await base44.asServiceRole.entities.Session.update(sessionId, {
-      market_validation: marketValidation
+      market_validation: result.validationText,
+      market_validation_scores: result.marketScores
     });
 
     return Response.json({
       success: true,
-      marketValidation
+      marketValidation: result.validationText,
+      marketScores: result.marketScores
     });
 
   } catch (error) {

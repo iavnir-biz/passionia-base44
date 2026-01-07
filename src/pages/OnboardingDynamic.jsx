@@ -47,14 +47,15 @@ export default function OnboardingDynamic() {
       const history = onboardingData.history || [];
       setQuestionCount(Math.min(history.length, 11));
 
-      // Demander la première question ou charger la question actuelle
-      if (!onboardingData.current_question || history.length === 0) {
-        await fetchNextQuestion('local', null, onboardingData);
-      } else {
-        // Si on a déjà une question, afficher la question actuelle
+      // Vérifier si on a déjà une question courante sauvegardée
+      if (onboardingData.current_question && history.length > 0) {
+        // On a déjà une question en cours, l'afficher directement
         setCurrentQuestion(onboardingData.current_question);
         initializeValue(onboardingData.current_question.type, onboardingData.current_question);
         setIsLoading(false);
+      } else {
+        // Première visite ou pas de question sauvegardée, demander la première
+        await fetchNextQuestion('local', null, onboardingData);
       }
     } catch (error) {
       console.error('Error initializing onboarding:', error);

@@ -147,8 +147,15 @@ export default function OnboardingTransition() {
       const summary = onboardingData.summary || {};
       
       // CRITIQUE : Extraire le coreSkill de la première réponse (Q1)
+      // La première question demande la compétence/passion, c'est la réponse Q1
       const coreSkillFromHistory = normalizedHistory.length > 0 ? normalizedHistory[0].answer : '';
       const coreSkill = summary.who_to_teach || coreSkillFromHistory || '';
+      
+      console.log('🎯 CoreSkill extrait:', { 
+        fromSummary: summary.who_to_teach,
+        fromHistory: coreSkillFromHistory,
+        final: coreSkill 
+      });
       
       await base44.entities.Session.update(currentUser.sessionId, {
         onboarding_history: normalizedHistory,

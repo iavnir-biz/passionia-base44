@@ -339,11 +339,22 @@ export default function CTAPAYWALL() {
             transition={{ delay: 0.5 }}
             className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-10 mb-8 text-white shadow-2xl"
           >
+            {/* 🔥 P0-2: Ce qui t'attend après paiement */}
+            <div className="bg-[#61f7a2]/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#61f7a2]/30">
+              <p className="text-white text-lg text-center leading-relaxed">
+                <strong className="text-[#61f7a2]">Dès ton accès,</strong> tu arrives dans un dashboard où tout est déjà prêt pour toi :<br/>
+                ✅ Offres prêtes • ✅ Messages prêts • ✅ Plan d'action personnalisé • ✅ Checklist quotidienne
+              </p>
+              <p className="text-[#61f7a2] text-center mt-3 font-bold">
+                Accès immédiat • Accès à vie
+              </p>
+            </div>
+
             <h2 className="text-3xl font-bold mb-4 text-center">
               Voici ce qu'on a préparé pour toi
             </h2>
             <p className="text-gray-300 text-center mb-10">
-              Grâce à notre technologie IA, tout est déjà structuré.
+              Tu n'achètes pas du contenu. Tu accèdes à un système qui travaille avec toi.
             </p>
 
             <div className="space-y-8">
@@ -704,6 +715,19 @@ export default function CTAPAYWALL() {
             </h3>
             <p className="text-gray-700 leading-relaxed max-w-2xl mx-auto">
               Teste le pack pendant 30 jours. Si tu ne vois pas la valeur, on te rembourse intégralement. Aucune justification nécessaire.
+            </p>
+          </motion.div>
+
+          {/* 🔥 P1-7: Promesse de continuité post-paiement */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.85 }}
+            className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-200 p-6 mb-8 text-center"
+          >
+            <p className="text-gray-700 text-lg">
+              <strong className="text-gray-900">Après le paiement,</strong> tu accèdes immédiatement à ton dashboard.<br/>
+              Tout ce que tu as créé ici t'y attend, prêt à être utilisé.
             </p>
           </motion.div>
 

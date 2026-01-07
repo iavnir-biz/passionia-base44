@@ -204,12 +204,16 @@ export default function OfferConcretement() {
 
   const completedSteps = [1, 2, 3, 4, 5, 6]; // Jusqu'à Ta vie future complété
 
-  const mainSteps = [
-    { id: 1, label: "Tes offres", icon: Package, color: "from-orange-500 to-red-500" },
-    { id: 2, label: "Ton marché", icon: BarChart3, color: "from-green-500 to-emerald-500" },
-    { id: 3, label: "Ta vie future", icon: Sprout, color: "from-amber-500 to-yellow-500" },
-    { id: 4, label: "Ton plan d'action", icon: Map, color: "from-indigo-500 to-purple-500" },
-  ];
+  // 🔥 P0-1: Récap offres + potentiel (Source: session.finalized_offer)
+  const finalizedOffer = session?.finalized_offer || {};
+  const products = [
+    { label: 'Produit Principal', data: finalizedOffer.mainProduct },
+    { label: 'Order Bump', data: finalizedOffer.orderBump },
+    { label: 'Upsell', data: finalizedOffer.upsell1 },
+    { label: 'Premium', data: finalizedOffer.upsell3 }
+  ].filter(p => p.data);
+
+  const potentialRevenue = session?.potential_revenue || 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
@@ -217,6 +221,31 @@ export default function OfferConcretement() {
 
       <div className="flex-1 flex flex-col lg:ml-80">
         <div className="max-w-4xl mx-auto px-6 py-12">
+          {/* 🔥 P0-1: RÉCAP OFFRES TOUT EN HAUT */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 p-6 mb-6"
+          >
+            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
+              ✨ Ce que tu as déjà construit
+            </h3>
+            <div className="space-y-2 mb-4">
+              {products.map((product, idx) => (
+                <div key={idx} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-700">{product.data.title}</span>
+                  <span className="text-gray-900 font-semibold">{product.data.price}</span>
+                </div>
+              ))}
+            </div>
+            {potentialRevenue > 0 && (
+              <div className="pt-3 border-t border-gray-200 text-center">
+                <span className="text-gray-600 text-sm">Potentiel estimé : </span>
+                <span className="text-[#61f7a2] font-bold text-lg">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
+              </div>
+            )}
+          </motion.div>
+
           {/* Hero Section avec visuel */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -370,6 +399,21 @@ export default function OfferConcretement() {
             </h2>
             <p className="text-gray-700 leading-relaxed text-lg">
               {planDeRoute.conclusion}
+            </p>
+          </motion.div>
+
+          {/* 🔥 P0-2: Transformation Avant/Après */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.15 }}
+            className="bg-white rounded-2xl border border-gray-200 p-8 mb-8 text-center"
+          >
+            <p className="text-gray-700 text-lg mb-4">
+              <strong className="text-gray-900">Avant,</strong> tu avais une idée et des doutes.
+            </p>
+            <p className="text-gray-900 text-xl font-bold">
+              <strong className="text-[#61f7a2]">Maintenant,</strong> tu as un système clair et un plan précis.
             </p>
           </motion.div>
 

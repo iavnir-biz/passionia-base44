@@ -74,7 +74,7 @@ export default function WelcomeOpening() {
             transition={{ delay: 0.2, type: "spring" }}
             className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] shadow-2xl mb-8"
           >
-            <CheckCircle className="w-14 h-14 text-white" />
+            <Sparkles className="w-14 h-14 text-white" />
           </motion.div>
 
           <motion.h1 
@@ -103,7 +103,7 @@ export default function WelcomeOpening() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="mb-10"
+              className="flex justify-center"
             >
               <GlowButton
                 onClick={handleStart}
@@ -112,27 +112,6 @@ export default function WelcomeOpening() {
               >
                 Démarrer mon aventure
               </GlowButton>
-            </motion.div>
-
-            {/* Mini récap optionnel */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="flex items-center justify-center gap-8 text-sm text-gray-600"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#61f7a2]" />
-                <span>Offres structurées</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#61f7a2]" />
-                <span>Validation marché</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#61f7a2]" />
-                <span>Plan d'action</span>
-              </div>
             </motion.div>
           </motion.div>
         </motion.div>

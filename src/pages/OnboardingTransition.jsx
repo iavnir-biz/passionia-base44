@@ -146,10 +146,17 @@ export default function OnboardingTransition() {
       // METTRE À JOUR la session existante avec TOUTES les données normalisées
       const summary = onboardingData.summary || {};
       
+      // CRITIQUE : Extraire le coreSkill de la première réponse (Q1)
+      const coreSkillFromHistory = normalizedHistory.length > 0 ? normalizedHistory[0].answer : '';
+      const coreSkill = summary.who_to_teach || coreSkillFromHistory || '';
+      
       await base44.entities.Session.update(currentUser.sessionId, {
         onboarding_history: normalizedHistory,
-        onboarding_summary: summary,
-        skill: summary.who_to_teach || '',
+        onboarding_summary: {
+          ...summary,
+          who_to_teach: coreSkill
+        },
+        skill: coreSkill,
         is_onboarding_done: false
       });
       
@@ -161,7 +168,7 @@ export default function OnboardingTransition() {
       
       // Sauvegarder TOUTES les données clés sur le User
       await base44.auth.updateMe({ 
-        coreSkill: summary.who_to_teach || '',
+        coreSkill: coreSkill,
         targetAudience: summary.learner_profile || '',
         mainProblem: summary.main_learning_problem || '',
         firstResult: summary.quick_win || '',

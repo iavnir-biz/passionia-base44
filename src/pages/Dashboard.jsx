@@ -25,14 +25,49 @@ import ProgressBar from '@/components/ui/ProgressBar';
 import GlowButton from '@/components/ui/GlowButton';
 import ChatBubble from '@/components/chat/ChatBubble';
 
-const planSteps7Days = [
-  { step_number: 1, title: "Clarifier ton offre", description: "Définir précisément ton produit", locked: false },
-  { step_number: 2, title: "Créer tes avatars clients", description: "Identifier tes cibles", locked: false },
-  { step_number: 3, title: "Messages de vente", description: "Rédiger tes accroches", locked: false },
-  { step_number: 4, title: "Emails marketing", description: "Préparer ta séquence", locked: false },
-  { step_number: 5, title: "Page de vente", description: "Construire ta landing", locked: false },
-  { step_number: 6, title: "Lancer la pub", description: "Démarrer tes campagnes", locked: true },
-  { step_number: 7, title: "Premières ventes", description: "Obtenir tes clients", locked: false },
+const dailyMissions = [
+  { 
+    step: 1, 
+    title: "Envoyer 10 messages de diagnostic à des prospects", 
+    page: "SalesMessages",
+    description: "Utilise tes messages prêts pour contacter tes premiers prospects"
+  },
+  { 
+    step: 2, 
+    title: "Créer ton premier post avec ton avatar client idéal", 
+    page: "AvatarClients",
+    description: "Partage du contenu qui attire ta cible parfaite"
+  },
+  { 
+    step: 3, 
+    title: "Publier ta page de vente et partager le lien", 
+    page: "SalesPage",
+    description: "Ta page est prête, il ne reste qu'à la mettre en ligne"
+  },
+  { 
+    step: 4, 
+    title: "Envoyer ta première séquence email", 
+    page: "EmailsMarketing",
+    description: "Active ta séquence automatique pour convertir"
+  },
+  { 
+    step: 5, 
+    title: "Faire ta première vente", 
+    page: "MyOffers",
+    description: "Concentre-toi sur ton offre principale"
+  },
+  { 
+    step: 6, 
+    title: "Optimiser ton tunnel de vente", 
+    page: "MyOffers",
+    description: "Ajoute ton order bump et tes upsells"
+  },
+  { 
+    step: 7, 
+    title: "Scaler ton business", 
+    page: "PlanAction",
+    description: "Répète ce qui fonctionne, automatise le reste"
+  }
 ];
 
 export default function Dashboard() {
@@ -158,66 +193,13 @@ export default function Dashboard() {
     return 6;
   };
 
-  const dailyActions = [
-    {
-      id: 1,
-      title: "Génère ton offre complète",
-      page: "MyOffers",
-      icon: Package,
-      generated: session?.offer_generation
-    },
-    {
-      id: 2,
-      title: "Crée tes 3 avatars clients",
-      page: "AvatarClients",
-      icon: User,
-      generated: session?.generated_avatars
-    },
-    {
-      id: 3,
-      title: "Rédige tes messages de vente",
-      page: "SalesMessages",
-      icon: MessageCircle,
-      generated: session?.generated_sales_messages
-    }
-  ];
-
-  const aiResources = [
-    {
-      title: "Offre complète",
-      page: "MyOffers",
-      icon: Package,
-      color: "from-blue-500 to-cyan-500",
-      generated: session?.offer_generation
-    },
-    {
-      title: "Avatars clients",
-      page: "AvatarClients",
-      icon: User,
-      color: "from-purple-500 to-pink-500",
-      generated: session?.generated_avatars
-    },
-    {
-      title: "Messages de vente",
-      page: "SalesMessages",
-      icon: MessageCircle,
-      color: "from-green-500 to-emerald-500",
-      generated: session?.generated_sales_messages
-    },
-    {
-      title: "Emails marketing",
-      page: "EmailsMarketing",
-      icon: Send,
-      color: "from-orange-500 to-red-500",
-      generated: session?.generated_emails
-    },
-    {
-      title: "Page de vente",
-      page: "SalesPage",
-      icon: FileText,
-      color: "from-amber-500 to-yellow-500",
-      generated: session?.generated_sales_page
-    }
+  const livrables = [
+    { title: "Offres", page: "MyOffers", icon: Package },
+    { title: "Messages", page: "SalesMessages", icon: MessageCircle },
+    { title: "Emails", page: "EmailsMarketing", icon: Send },
+    { title: "Page de vente", page: "SalesPage", icon: FileText },
+    { title: "Avatars", page: "AvatarClients", icon: Users },
+    { title: "Analyse marché", page: "MarketAnalysis", icon: Target }
   ];
   
   if (authLoading || loading) {
@@ -244,233 +226,156 @@ export default function Dashboard() {
           user={user}
         />
         
-        <main className="p-8">
-          {/* Bloc d'accueil premium */}
+        <main className="p-8 max-w-6xl mx-auto">
+          {/* 1️⃣ OWNERSHIP & VALEUR */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 rounded-3xl p-8 mb-8 shadow-lg"
+            className="bg-white rounded-3xl border-2 border-gray-200 p-8 mb-8"
           >
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-white">
-                <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-                  👋 Bonjour {user?.full_name?.split(' ')[0] || ''} !
-                </h1>
-                <p className="text-xl text-purple-100 mb-2">
-                  Prêt à lancer ton activité en ligne aujourd'hui ?
-                </p>
-                <p className="text-sm text-purple-200">
-                  Tu avances étape par étape. Nous t'accompagnons jusqu'au bout.
-                </p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Ton business personnalisé est prêt
+            </h1>
+            <p className="text-lg text-gray-700 mb-6">
+              Noah a déjà construit tout ce dont tu as besoin pour vendre.
+            </p>
+            
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-sm font-medium text-gray-900">Offres</span>
               </div>
-              <button
-                onClick={() => {
-                  const element = document.getElementById('daily-actions');
-                  element?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="bg-white hover:bg-gray-50 text-gray-900 font-semibold px-6 py-3 rounded-xl transition-all shrink-0 flex items-center gap-2"
-              >
-                Commencer ma première mission
-                <ArrowRight className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-sm font-medium text-gray-900">Messages de vente</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-sm font-medium text-gray-900">Page de vente</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-sm font-medium text-gray-900">Emails marketing</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-sm font-medium text-gray-900">Plan d'action 7 jours</span>
+              </div>
             </div>
           </motion.div>
 
-          {/* Cartes de gamification */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-2xl p-5"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-sm font-medium text-purple-900">Progression</span>
-              </div>
-              <div className="text-3xl font-bold text-purple-900 mb-2">{calculateProgress()}%</div>
-              <ProgressBar value={calculateProgress()} max={100} size="sm" className="bg-purple-200" />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-2xl p-5"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-[#61f7a2] flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-sm font-medium text-green-900">Étape en cours</span>
-              </div>
-              <div className="text-xl font-bold text-green-900 mb-1">
-                {planSteps7Days[getCurrentStep() - 1]?.title}
-              </div>
-              <span className="inline-block bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-                En cours
-              </span>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-5"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-sm font-medium text-blue-900">Actions complétées</span>
-              </div>
-              <div className="text-3xl font-bold text-blue-900 mb-2">
-                {dailyActions.filter(a => a.generated).length}/{dailyActions.length}
-              </div>
-              <div className="w-full bg-blue-200 rounded-full h-1.5">
-                <div 
-                  className="bg-blue-600 h-1.5 rounded-full transition-all"
-                  style={{ width: `${(dailyActions.filter(a => a.generated).length / dailyActions.length) * 100}%` }}
-                />
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-2xl p-5"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-sm font-medium text-amber-900">Aujourd'hui</span>
-              </div>
-              <div className="text-2xl font-bold text-amber-900 mb-1">
-                {dailyActions.filter(a => !a.generated).length === 0 
-                  ? 'Tout complété !' 
-                  : `${dailyActions.filter(a => !a.generated).length} action${dailyActions.filter(a => !a.generated).length > 1 ? 's' : ''} restante${dailyActions.filter(a => !a.generated).length > 1 ? 's' : ''}`
-                }
-              </div>
-              <span className="text-xs text-amber-700">Continue comme ça ! 💪</span>
-            </motion.div>
-          </div>
-          
-          {/* Tes actions du jour */}
+          {/* 2️⃣ MISSION DU JOUR - SECTION DOMINANTE */}
           <motion.div
-            id="daily-actions"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3dd980] rounded-3xl p-10 mb-8 shadow-2xl"
+          >
+            <div className="text-center mb-6">
+              <h2 className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
+                <Target className="w-8 h-8" />
+                Ta mission aujourd'hui
+              </h2>
+              <p className="text-2xl font-bold text-white mb-2">
+                {dailyMissions[getCurrentStep() - 1]?.title}
+              </p>
+              <p className="text-white/90 text-lg">
+                {dailyMissions[getCurrentStep() - 1]?.description}
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <GlowButton
+                onClick={() => navigate(createPageUrl(dailyMissions[getCurrentStep() - 1]?.page))}
+                size="lg"
+                className="bg-white text-gray-900 hover:bg-gray-100 px-12 py-4 text-xl font-bold"
+              >
+                👉 Lancer cette mission
+              </GlowButton>
+            </div>
+          </motion.div>
+
+          {/* 3️⃣ PROGRESSION - COMPACT */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl border border-gray-200 p-6 mb-8"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Ta progression</p>
+                <p className="text-2xl font-bold text-gray-900">Jour {getCurrentStep()} / 7</p>
+              </div>
+              <div className="text-right">
+                <p className="text-3xl font-bold text-[#61f7a2]">{calculateProgress()}%</p>
+              </div>
+            </div>
+            <ProgressBar value={calculateProgress()} max={100} className="mb-3" />
+            <p className="text-center text-gray-700 font-medium">
+              Tu es exactement là où tu dois être.
+            </p>
+          </motion.div>
+
+          {/* 4️⃣ LIVRABLES PRÊTS - SECONDAIRE */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
             className="mb-8"
           >
-            <div className="flex items-center gap-2 mb-6">
-              <Sparkles className="w-6 h-6 text-[#61f7a2]" />
-              <h2 className="text-2xl font-bold text-gray-900">Tes actions du jour</h2>
-            </div>
-
-            <div className="space-y-4">
-              {dailyActions.map((action, index) => {
-                const Icon = action.icon;
-                const progressValue = action.generated ? 100 : 0;
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Tes livrables sont prêts</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {livrables.map((item) => {
+                const Icon = item.icon;
                 return (
                   <Link
-                    key={action.id}
-                    to={createPageUrl(action.page)}
-                    className="block bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-[#61f7a2] hover:shadow-lg transition-all group"
+                    key={item.page}
+                    to={createPageUrl(item.page)}
+                    className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-[#61f7a2] hover:shadow-md transition-all"
                   >
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shrink-0">
-                        <Icon className="w-7 h-7 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">{action.title}</h3>
-                        {action.generated ? (
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-                            <span className="text-[#61f7a2] text-sm font-medium">Terminé ✔</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-600 text-sm">À faire</span>
-                        )}
-                      </div>
-                      <div className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all ${
-                        action.generated 
-                          ? 'bg-[#61f7a2] text-white' 
-                          : 'bg-gray-900 text-white group-hover:bg-[#61f7a2]'
-                      }`}>
-                        {action.generated ? 'Consulter' : 'Lancer'}
-                      </div>
+                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-gray-700" />
                     </div>
-                    
-                    <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progressValue}%` }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                        className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] h-2 rounded-full"
-                      />
-                    </div>
+                    <span className="font-medium text-gray-900 text-sm">{item.title}</span>
                   </Link>
                 );
               })}
             </div>
           </motion.div>
 
-          {/* Plan d'action 7 jours */}
+          {/* 5️⃣ PLAN 7 JOURS - APERÇU */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mb-8"
+            transition={{ delay: 0.4 }}
+            className="bg-gray-50 rounded-2xl border border-gray-200 p-6"
           >
+            <p className="text-lg font-bold text-gray-900 mb-4">Tu es au jour {getCurrentStep()}</p>
+            
+            {/* Mini timeline */}
             <div className="flex items-center gap-2 mb-6">
-              <Target className="w-6 h-6 text-[#61f7a2]" />
-              <h2 className="text-2xl font-bold text-gray-900">Plan d'action 7 jours</h2>
+              {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                <div
+                  key={day}
+                  className={`flex-1 h-2 rounded-full transition-all ${
+                    day < getCurrentStep() 
+                      ? 'bg-[#61f7a2]' 
+                      : day === getCurrentStep() 
+                        ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30' 
+                        : 'bg-gray-200'
+                  }`}
+                />
+              ))}
             </div>
-
-            <div className="space-y-3">
-              {planSteps7Days.map((step, index) => {
-                const isUnlocked = !step.locked;
-                const isCurrent = index + 1 === getCurrentStep();
-                const isCompleted = index + 1 < getCurrentStep();
-
-                return (
-                  <div
-                    key={step.step_number}
-                    className={`bg-white border-2 rounded-2xl p-5 transition-all ${
-                      isUnlocked 
-                        ? isCurrent 
-                          ? 'border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20' 
-                          : 'border-gray-200 hover:border-gray-300'
-                        : 'border-gray-200 opacity-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg ${
-                        isCompleted 
-                          ? 'bg-[#61f7a2] text-white' 
-                          : isCurrent 
-                            ? 'bg-[#61f7a2]/20 text-[#61f7a2] border-2 border-[#61f7a2]' 
-                            : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        {isCompleted ? <CheckCircle className="w-6 h-6" /> : step.step_number}
-                      </div>
-                      <div className="flex-1">
-                        <p className={`font-bold text-lg mb-1 ${isUnlocked ? 'text-gray-900' : 'text-gray-500'}`}>
-                          {step.title}
-                        </p>
-                        <p className="text-gray-600 text-sm">{step.description}</p>
-                      </div>
-                      {!isUnlocked && <Lock className="w-5 h-5 text-gray-400" />}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            
+            <Link
+              to={createPageUrl('PlanAction')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 rounded-xl hover:border-[#61f7a2] hover:shadow-md transition-all font-medium text-gray-900"
+            >
+              Voir le plan complet
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </motion.div>
 
 

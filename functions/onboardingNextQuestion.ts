@@ -556,6 +556,32 @@ MISSION :
 
     const result = JSON.parse(completion.choices[0].message.content);
 
+    // 🔥 GUARDRAIL : Fallback sur QUESTION_STRUCTURE si réponse LLM malformée
+    if (!result.isDone && result.question && nextQuestionConfig) {
+      // Fallback text
+      if (!result.question.text || result.question.text.trim() === '') {
+        result.question.text = result.question.title || nextQuestionConfig.titleTemplate;
+      }
+
+      // Fallback slider
+      if (result.question.type === 'slider') {
+        if (result.question.min === undefined || result.question.max === undefined) {
+          result.question.min = nextQuestionConfig.min;
+          result.question.max = nextQuestionConfig.max;
+          result.question.step = nextQuestionConfig.step || 1;
+          console.log('⚠️ [onboardingNextQuestion] Slider fallback appliqué');
+        }
+      }
+
+      // Fallback options
+      if ((result.question.type === 'single_choice' || result.question.type === 'multiple_choice')) {
+        if (!result.question.options || result.question.options.length === 0) {
+          result.question.options = nextQuestionConfig.options || [];
+          console.log('⚠️ [onboardingNextQuestion] Options fallback appliqué');
+        }
+      }
+    }
+
     // 🔥 SAUVEGARDER EN BASE44 SESSION (plus de localStorage)
     if (userAnswer) {
       const normalizedAnswer = typeof userAnswer === 'string' 
@@ -586,9 +612,11 @@ MISSION :
 
       console.log('✅ [onboardingNextQuestion] Session updated:', { 
         sessionId, 
+        questionIndex: currentQuestionIndex,
         historyLength: updatedHistory.length,
         skill: coreSkill,
-        isDone: result.isDone
+        isDone: result.isDone,
+        nextQuestion: result.isDone ? 'TERMINÉ' : `Q${currentQuestionIndex + 1}`
       });
     }
 

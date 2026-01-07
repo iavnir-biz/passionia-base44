@@ -32,9 +32,24 @@ export default function PlanAction() {
 
   useEffect(() => {
     if (user) {
-      loadData();
+      checkAccess();
     }
   }, [user]);
+
+  const checkAccess = async () => {
+    // 🔥 P0-3: Guard paywall (réactivé en prod)
+    try {
+      const currentUser = await base44.auth.me();
+      if (!currentUser.has_purchased) {
+        navigate(createPageUrl('CTAPAYWALL'));
+        return;
+      }
+      loadData();
+    } catch (error) {
+      console.error('Error checking access:', error);
+      navigate(createPageUrl('CTAPAYWALL'));
+    }
+  };
 
   const loadData = async () => {
     try {

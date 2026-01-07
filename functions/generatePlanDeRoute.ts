@@ -26,19 +26,23 @@ Tu n'es PAS en train de vendre agressivement. Tu expliques, tu structures, tu ra
 INTERDICTIONS ABSOLUES
 - Ne JAMAIS répéter mot pour mot la passion brute
 - Ne JAMAIS utiliser un langage générique ou marketing creux
+- Ne JAMAIS utiliser de jargon marketing (funnel, lead magnet, tripwire, automation, nurture, etc.)
 - Ne JAMAIS changer la structure de la page
 - Ne JAMAIS modifier l'ordre des phases
 - Ne JAMAIS contredire les offres générées précédemment
 - Ne JAMAIS ajouter d'outils ou de concepts non introduits avant
+- Ne JAMAIS confondre l'objectif utilisateur avec le potentiel calculé
 
-RÈGLES D'ÉCRITURE
+RÈGLES D'ÉCRITURE CRITIQUES
 - Français uniquement
 - Tutoiement uniquement
 - Ton calme, clair, structurant
-- Phrases simples
-- Zéro jargon inutile
+- Phrases simples et concrètes
+- Zéro jargon technique ou marketing
 - Zéro promesse exagérée
 - Tu montres un chemin, pas un miracle
+- CHAQUE phase doit contenir AU MOINS 1 action concrète décrite en mots simples
+- CHAQUE phase doit mentionner explicitement au moins 1 produit/offre par son titre ou son rôle
 
 STRUCTURE À RESPECTER STRICTEMENT (8 SECTIONS OBLIGATOIRES)
 1. Introduction du Plan de Route (texte rassurant, logique, non technique)
@@ -112,11 +116,13 @@ Deno.serve(async (req) => {
     const passionReformulated = onboardingSummary.who_to_teach || passionRaw;
     
     const mainOffer = finalizedOffer.mainProduct || {};
-    const orderBump = finalizedOffer.petit_extra || {};
+    const orderBump = finalizedOffer.orderBump || {};
     const upsell = finalizedOffer.upsell1 || {};
     const premiumOffer = finalizedOffer.upsell3 || {};
     
-    const revenueObjective = session.potential_revenue || 0;
+    // 🔥 P0-4: Distinction objectif vs potentiel
+    const targetIncome = onboardingFull.targetIncome || onboardingFull.target_income || 0;
+    const potentialRevenue = session.potential_revenue || 0;
     
     // 🔥 P1-5: Mapping DB-first (readinessScore existe, experienceLevel absent)
     const readinessScore = onboardingFull.readinessScore || 5;
@@ -136,13 +142,16 @@ Prénom : ${name}
 Passion brute (NE PAS UTILISER TEL QUEL) : ${passionRaw}
 Passion reformulée (UTILISER CELLE-CI) : ${passionReformulated}
 
-Offres sélectionnées (utiliser les vrais titres et prix) :
+Offres sélectionnées (UTILISER les vrais titres et prix dans CHAQUE phase) :
 Produit Principal : ${mainOffer.title || '—'} à ${mainOffer.price || '—'}
 Petit Extra : ${orderBump.title || '—'} à ${orderBump.price || '—'}
 Offre Supérieure : ${upsell.title || '—'} à ${upsell.price || '—'}
 Offre Premium : ${premiumOffer.title || '—'} à ${premiumOffer.price || '—'}
 
-Objectif de revenus : ${revenueObjective}€/mois
+🔥 DISTINCTION CRITIQUE (ne pas confondre) :
+Objectif utilisateur (ce qu'il/elle veut atteindre) : ${targetIncome}€/mois
+Potentiel calculé (ce que l'écosystème permet actuellement) : ${potentialRevenue}€/mois
+
 Niveau utilisateur : ${userLevel}
 Niveau de confiance : ${confidenceLevel}
 
@@ -188,10 +197,13 @@ Format de sortie JSON STRICT :
 
 RAPPELS CRITIQUES :
 - Utilise "${passionReformulated}", JAMAIS "${passionRaw}"
-- Intègre les vrais titres et prix des offres
+- Intègre les vrais titres et prix des offres dans CHAQUE phase (au moins 1 par phase)
 - Adapte le ton à "${userLevel}" et "${confidenceLevel}"
-- Chaque phase doit mentionner concrètement les produits sélectionnés
-- Les 4 avantages doivent être spécifiques à ce parcours`;
+- Chaque phase doit contenir 1 action concrète simple (pas de jargon marketing)
+- Ne confonds JAMAIS l'objectif (${targetIncome}€) avec le potentiel (${potentialRevenue}€)
+- Si tu mentionnes des revenus, distingue clairement : "ton objectif" vs "le potentiel actuel"
+- Les 4 avantages doivent être spécifiques à ce parcours
+- Zéro jargon : pas de "funnel", "lead magnet", "nurture", "automation", etc.`;
 
     console.log('OPENAI_CALL start', { 
       fn: 'generatePlanDeRoute',
@@ -199,7 +211,14 @@ RAPPELS CRITIQUES :
       model: 'gpt-4o-mini'
     });
 
-    const completion = await openai.chat.completions.create({
+    // 🔥 P0-3: Retry logic avec validation
+    let planDeRoute = null;
+    let lastError = null;
+    const MAX_RETRIES = 2;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -281,15 +300,74 @@ RAPPELS CRITIQUES :
           }
         }
       }
-    });
+        });
 
-    console.log('OPENAI_CALL end', {
-      fn: 'generatePlanDeRoute',
-      sessionId,
-      usage: completion.usage
-    });
+        console.log('OPENAI_CALL end', {
+          fn: 'generatePlanDeRoute',
+          sessionId,
+          attempt: attempt + 1,
+          usage: completion.usage
+        });
 
-    const planDeRoute = JSON.parse(completion.choices[0].message.content);
+        planDeRoute = JSON.parse(completion.choices[0].message.content);
+
+    // 🔥 P0-3: GUARDRAILS - Validation métier du contenu
+    const validationErrors = [];
+    
+    if (!planDeRoute.introduction || planDeRoute.introduction.length < 50) {
+      validationErrors.push('introduction trop courte ou vide');
+    }
+    if (!planDeRoute.parcoursGuide || planDeRoute.parcoursGuide.length < 30) {
+      validationErrors.push('parcoursGuide trop court ou vide');
+    }
+    
+    ['phase1', 'phase2', 'phase3', 'phase4'].forEach(phaseKey => {
+      const phase = planDeRoute[phaseKey];
+      if (!phase || !phase.objective || phase.objective.length < 20) {
+        validationErrors.push(`${phaseKey}.objective trop court`);
+      }
+      if (!phase || !phase.plan || phase.plan.length < 30) {
+        validationErrors.push(`${phaseKey}.plan trop court`);
+      }
+      if (!phase || !phase.result || phase.result.length < 20) {
+        validationErrors.push(`${phaseKey}.result trop court`);
+      }
+    });
+    
+    if (!planDeRoute.advantages || planDeRoute.advantages.length !== 4) {
+      validationErrors.push(`advantages doit contenir exactement 4 éléments (reçu: ${planDeRoute.advantages?.length || 0})`);
+    }
+    
+    if (!planDeRoute.conclusion || planDeRoute.conclusion.length < 50) {
+      validationErrors.push('conclusion trop courte ou vide');
+    }
+
+        if (validationErrors.length > 0) {
+          console.warn(`⚠️ [generatePlanDeRoute] Validation failed (attempt ${attempt + 1}):`, validationErrors);
+          lastError = new Error(`Validation métier échouée: ${validationErrors.join(', ')}`);
+          
+          if (attempt < MAX_RETRIES) {
+            console.log('🔄 Retrying with corrective feedback...');
+            continue;
+          } else {
+            throw lastError;
+          }
+        }
+
+        console.log('✅ [generatePlanDeRoute] Validation passed');
+        break; // Success, exit retry loop
+
+      } catch (error) {
+        lastError = error;
+        console.error(`❌ [generatePlanDeRoute] Attempt ${attempt + 1} failed:`, error.message);
+        
+        if (attempt === MAX_RETRIES) {
+          // Fallback après tous les retries
+          console.error('🚨 All retries exhausted, using fallback plan');
+          throw error;
+        }
+      }
+    }
 
     // Save to session
     await base44.asServiceRole.entities.Session.update(sessionId, {

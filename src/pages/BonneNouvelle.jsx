@@ -106,14 +106,23 @@ export default function BonneNouvelle() {
       });
       
       if (data.success) {
+        // 🔥 Utiliser les scores dynamiques du backend
+        const scores = data.marketScores || {
+          marketSize: 70,
+          demandIntensity: 75,
+          revenueRecurrence: 65,
+          onlineAccessibility: 80,
+          easeOfImplementation: 68
+        };
+
         setMarketAnalysis({
           validationText: data.marketValidation,
           marketScores: {
-            elearningMarket: 85,
-            digitalDemand: 88,
-            recurringRevenue: 82,
-            globalAccess: 90,
-            techEase: 87
+            elearningMarket: scores.marketSize,
+            digitalDemand: scores.demandIntensity,
+            recurringRevenue: scores.revenueRecurrence,
+            globalAccess: scores.onlineAccessibility,
+            techEase: scores.easeOfImplementation
           }
         });
       }
@@ -123,11 +132,11 @@ export default function BonneNouvelle() {
       setMarketAnalysis({
         validationText: `Excellente nouvelle ! Le marché de l'enseignement en ligne pour ${user.coreSkill || 'ta compétence'} est en pleine expansion. Des milliers de personnes recherchent activement des formations pour progresser dans ce domaine. Avec ton expérience et ta méthode unique, tu as toutes les cartes en main pour réussir.`,
         marketScores: {
-          elearningMarket: 85,
-          digitalDemand: 88,
-          recurringRevenue: 82,
-          globalAccess: 90,
-          techEase: 87
+          elearningMarket: 70,
+          digitalDemand: 75,
+          recurringRevenue: 65,
+          globalAccess: 80,
+          techEase: 68
         }
       });
     } finally {
@@ -319,7 +328,7 @@ export default function BonneNouvelle() {
                   🎯 Ton Objectif de Revenus Mensuels
                 </h2>
                 <p className="text-white/80 text-sm drop-shadow-sm">
-                  Basé sur les produits sélectionnés et une hypothèse d'une vente par jour
+                  Basé sur ton offre complète • Estimations données sectorielles
                 </p>
               </div>
             </div>

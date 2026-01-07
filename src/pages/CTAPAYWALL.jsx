@@ -52,11 +52,11 @@ export default function CTAPAYWALL() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Vérification temporairement désactivée pour test
-      // if (currentUser.has_purchased) {
-      //   navigate(createPageUrl('Dashboard'));
-      //   return;
-      // }
+      // 🔥 P0-1: Guard paywall - si déjà payé → redirect
+      if (currentUser.has_purchased) {
+        navigate(createPageUrl('Dashboard'));
+        return;
+      }
 
       if (currentUser.sessionId) {
         const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });

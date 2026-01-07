@@ -9,9 +9,12 @@ Deno.serve(async (req) => {
   const startTime = Date.now();
   console.log('[generateAllAssets] START', { timestamp: new Date().toISOString() });
 
+  let user = null;
+  let sessionId = null;
+
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    user = await base44.auth.me();
 
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -19,8 +22,10 @@ Deno.serve(async (req) => {
 
     console.log('[generateAllAssets] User authenticated', { email: user.email });
 
-    // 1. Récupérer la session
-    const sessionId = user.sessionId;
+    // 🔥 P0-5: Accepter sessionId depuis payload OU user
+    const payload = await req.json().catch(() => ({}));
+    sessionId = payload.sessionId || user.sessionId;
+    
     if (!sessionId) {
       console.error('[generateAllAssets] FAIL: No sessionId');
       return Response.json({ 
@@ -184,23 +189,27 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('[generateAllAssets] FATAL ERROR', error);
     
-    // 🔓 Désactiver le lock en cas d'erreur
-    try {
-      const sessionId = user?.sessionId;
-      if (sessionId) {
-        await base44.asServiceRole.entities.Session.update(sessionId, {
-          assets_generation_in_progress: false,
-          assets_generation_error: error.message,
-          assets_generation_failed_at: new Date().toISOString()
-        });
-      }
-    } catch (unlockError) {
-      console.error('[generateAllAssets] Failed to unlock:', unlockError);
-    }
-    
     return Response.json({ 
       error: error.message,
       stack: error.stack 
     }, { status: 500 });
+  } finally {
+    // 🔒 P0-4: Unlock GARANTI même en cas d'erreur critique
+    try {
+      const sessionId = user?.sessionId;
+      if (sessionId) {
+        const currentLock = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+        if (currentLock[0]?.assets_generation_in_progress) {
+          await base44.asServiceRole.entities.Session.update(sessionId, {
+            assets_generation_in_progress: false,
+            assets_generation_error: error?.message || null,
+            assets_generation_failed_at: error ? new Date().toISOString() : null
+          });
+          console.log('[generateAllAssets] Lock released in finally');
+        }
+      }
+    } catch (unlockError) {
+      console.error('[generateAllAssets] CRITICAL: Failed to unlock in finally:', unlockError);
+    }
   }
 });

@@ -12,7 +12,9 @@ import EmailsMarketing from './pages/EmailsMarketing';
 import Home from './pages/Home';
 import MarketAnalysis from './pages/MarketAnalysis';
 import MyOffers from './pages/MyOffers';
+import NoahGeneration from './pages/NoahGeneration';
 import NovaChat from './pages/NovaChat';
+import NovaGeneration from './pages/NovaGeneration';
 import OfferConcretement from './pages/OfferConcretement';
 import OfferGenerationStart from './pages/OfferGenerationStart';
 import OfferPetitExtra from './pages/OfferPetitExtra';
@@ -60,8 +62,6 @@ import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import NovaGeneration from './pages/NovaGeneration';
-import NoahGeneration from './pages/NoahGeneration';
 
 
 export const PAGES = {
@@ -79,7 +79,9 @@ export const PAGES = {
     "Home": Home,
     "MarketAnalysis": MarketAnalysis,
     "MyOffers": MyOffers,
+    "NoahGeneration": NoahGeneration,
     "NovaChat": NovaChat,
+    "NovaGeneration": NovaGeneration,
     "OfferConcretement": OfferConcretement,
     "OfferGenerationStart": OfferGenerationStart,
     "OfferPetitExtra": OfferPetitExtra,
@@ -127,8 +129,6 @@ export const PAGES = {
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "NovaGeneration": NovaGeneration,
-    "NoahGeneration": NoahGeneration,
 }
 
 export const pagesConfig = {

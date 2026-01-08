@@ -120,8 +120,8 @@ export default function Welcome() {
             transition={{ delay: 0.3 }}
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
 
-            Construis ton activité en ligne<br />grâce à{' '}
-            <span className="text-[#61f7a2]">ton savoir-faire + l'IA</span>
+            Prêt à construire ton activité en ligne<br />grâce à{' '}
+            <span className="text-[#61f7a2]">ton savoir + l'IA ?</span>
           </motion.h1>
           
           {/* Subtitle */}
@@ -309,9 +309,12 @@ export default function Welcome() {
         className="w-full max-w-6xl mx-auto px-6 py-20">
 
         {/* Title */}
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-16">
-          4 étapes pour <span className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">démarrer</span>
-        </h2>
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            4 étapes pour <span className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">démarrer</span>
+          </h2>
+          <p className="text-gray-500 text-sm">Pour vendre ton premier produit low-ticket</p>
+        </div>
 
         {/* Steps Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -387,7 +390,7 @@ export default function Welcome() {
             </div>
             <h3 className="text-gray-900 font-bold text-lg mb-3">Passe à l'action</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Un plan d'action personnalisé pour avancer concrètement, jour après jour.
+              Un plan d'action de 7 jours personnalisé en commençant par ton produit low-ticket.
             </p>
           </motion.div>
         </div>

@@ -136,78 +136,67 @@ export default function OnboardingQuestionPage({
         // Handler personnalisé (pour Q26)
         await customHandleSave(user, value);
         navigate(createPageUrl(nextPage));
-      } else if (useLocalStorage) {
+        return;
+      }
+      
+      if (useLocalStorage) {
         // Mode localStorage
         localStorage.setItem(`onboarding_${fieldName}`, 
           inputType === 'checkbox' ? JSON.stringify(value) : value
         );
         navigate(createPageUrl(nextPage));
-      } else {
-        // Mode base44 classique
-        await base44.auth.updateMe({ [fieldName]: value });
-        
-        if (nextPage === 'OfferGenerationStart') {
-          if (user.sessionId) {
-            const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-            if (sessions.length > 0) {
-              const session = sessions[0];
-              const onboardingFull = session.onboarding_full || {};
-              const summary = session.onboarding_summary || {};
-              
-              onboardingFull[fieldName] = value;
-              
-              if (fieldName === 'deliveryPreferences') {
-                summary.format_preferences = value;
-              }
-              
-              await base44.entities.Session.update(user.sessionId, { 
-                onboarding_full: onboardingFull,
-                onboarding_summary: summary
-              });
+        return;
+      }
 
-              console.log('✅ [OnboardingQuestionPage] Q26 - Session mise à jour:', {
-                sessionId: user.sessionId,
-                fieldName,
-                fullKeys: Object.keys(onboardingFull)
-              });
-            }
+      // Mode base44 - toujours sauvegarder dans User ET Session.onboarding_full
+      await base44.auth.updateMe({ [fieldName]: value });
+      
+      // 🔥 P0 FIX : Toujours sauvegarder dans Session.onboarding_full (DB-first avec merge)
+      if (user.sessionId) {
+        const sessions = await base44.asServiceRole.entities.Session.filter({ id: user.sessionId });
+        if (sessions.length > 0) {
+          const session = sessions[0];
+          const existing = session.onboarding_full || {};
+          const updatedFull = { ...existing, [fieldName]: value };
+          
+          // Cas spécial Q26 : sync aussi dans summary
+          const updates = { onboarding_full: updatedFull };
+          if (fieldName === 'deliveryPreferences') {
+            updates.onboarding_summary = {
+              ...(session.onboarding_summary || {}),
+              format_preferences: value
+            };
+          }
+          if (nextPage === 'OfferGenerationStart') {
+            updates.is_onboarding_done = true;
           }
           
-          const currentUser = await base44.auth.me();
-          await base44.auth.updateMe({ 
-            onboarding_completed: true,
-            targetAudience: currentUser.targetAudience || '',
-            mainProblem: currentUser.mainProblem || '',
-            firstResult: currentUser.firstResult || '',
-            finalTransformation: currentUser.finalTransformation || '',
-            uniqueMethod: currentUser.uniqueMethod || '',
-            typicalMistake: currentUser.typicalMistake || '',
-            extraDetail: currentUser.extraDetail || '',
-            deliveryPreferences: currentUser.deliveryPreferences || []
+          await base44.asServiceRole.entities.Session.update(user.sessionId, updates);
+          
+          console.log('✅ [ONBOARDING_SAVE]', {
+            sessionId: user.sessionId,
+            fieldName,
+            saved: true,
+            nextPage,
+            fullKeys: Object.keys(updatedFull)
           });
         } else {
-          if (user.sessionId) {
-            const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-            if (sessions.length > 0) {
-              const session = sessions[0];
-              const onboardingFull = session.onboarding_full || {};
-              onboardingFull[fieldName] = value;
-              await base44.entities.Session.update(user.sessionId, { onboarding_full: onboardingFull });
-              
-              console.log('✅ [OnboardingQuestionPage] Field saved:', {
-                sessionId: user.sessionId,
-                fieldName,
-                valueType: typeof value,
-                fullKeys: Object.keys(onboardingFull)
-              });
-            }
-          }
+          console.warn('⚠️ [ONBOARDING_SAVE] Session not found:', user.sessionId);
         }
-        
-        navigate(createPageUrl(nextPage));
+      } else {
+        console.warn('⚠️ [ONBOARDING_SAVE] No sessionId on user');
       }
+      
+      // Marquer onboarding_completed si on va vers OfferGenerationStart
+      if (nextPage === 'OfferGenerationStart') {
+        await base44.auth.updateMe({ onboarding_completed: true });
+      }
+      
+      // 🚀 TOUJOURS naviguer après save
+      navigate(createPageUrl(nextPage));
+      
     } catch (error) {
-      console.error('Error saving:', error);
+      console.error('❌ [ONBOARDING_SAVE] Error saving:', error);
     } finally {
       setIsSaving(false);
     }

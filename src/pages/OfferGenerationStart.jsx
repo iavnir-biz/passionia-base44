@@ -93,24 +93,39 @@ export default function OfferGenerationStart() {
         return;
       }
 
-      // 🔥 Hard require : clés critiques de onboarding_full
-      const requiredFullKeys = [
-        'targetIncome',
-        'targetIncomeDelay',
-        'perceivedObstacles',
-        'readinessScore',
-        'deliveryPreferences'
-      ];
+      // 🔥 P0 FIX : Validation stricte + redirect intelligent vers la bonne question
+      const requiredFullKeys = ['targetIncome', 'perceivedObstacles', 'readinessScore'];
+      const fullData = session.onboarding_full || {};
+      const missingKeys = requiredFullKeys.filter(k => !fullData[k] && fullData[k] !== 0);
 
-      const fullKeys = Object.keys(session.onboarding_full || {});
-      const missingFullKeys = requiredFullKeys.filter(k => !fullKeys.includes(k));
+      if (missingKeys.length > 0) {
+        console.log('⚠️ [OFFER_START_GUARD]', {
+          sessionId,
+          missingKeys,
+          currentFull: Object.keys(fullData)
+        });
 
-      if (missingFullKeys.length > 0) {
-        console.error('❌ [OfferGenerationStart] Clés manquantes dans onboarding_full:', missingFullKeys);
-        alert(`⚠️ Données incomplètes : ${missingFullKeys.join(', ')}\n\nRedirection pour finaliser ton profil.`);
-        navigate(createPageUrl('OnboardingQ12AgeRange'));
+        // Redirect intelligent vers la première question manquante
+        const redirectMap = {
+          'targetIncome': 'OnboardingQ16TargetIncome',
+          'perceivedObstacles': 'OnboardingQ23Obstacles',
+          'readinessScore': 'OnboardingQ25Readiness'
+        };
+        
+        const firstMissing = missingKeys[0];
+        const redirectPage = redirectMap[firstMissing] || 'OnboardingQ16TargetIncome';
+        
+        console.log('🔄 [OFFER_START_GUARD] Redirect to:', redirectPage);
+        navigate(createPageUrl(redirectPage));
         return;
       }
+
+      console.log('✅ [OFFER_START_GUARD] All required keys present:', {
+        sessionId,
+        hasTargetIncome: !!fullData.targetIncome,
+        hasObstacles: !!fullData.perceivedObstacles,
+        hasReadiness: !!fullData.readinessScore
+      });
 
       const missingData = [];
       

@@ -21,7 +21,7 @@ export default function OnboardingQ23Obstacles() {
       prevPage="OnboardingQ22Lifestyle"
       progress={85}
       blockType="objectives"
-      useLocalStorage={true}
+      useLocalStorage={false}
     />
   );
 }

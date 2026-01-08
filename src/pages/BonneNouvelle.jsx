@@ -101,43 +101,51 @@ export default function BonneNouvelle() {
     
     setIsGenerating(true);
     try {
+      const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+      const session = sessions[0];
+      const summary = session?.onboarding_summary || {};
+      
       const { data } = await base44.functions.invoke('generateMarketValidation', {
         sessionId: user.sessionId
       });
       
       if (data.success) {
-        // 🔥 Utiliser les scores dynamiques du backend
-        const scores = data.marketScores || {
-          marketSize: 70,
-          demandIntensity: 75,
-          revenueRecurrence: 65,
-          onlineAccessibility: 80,
-          easeOfImplementation: 68
+        // 🔥 Scores minimum 70%, moyenne 75-85%
+        const rawScores = data.marketScores || {};
+        const scores = {
+          marketSize: Math.max(70, rawScores.marketSize || 78),
+          demandIntensity: Math.max(70, rawScores.demandIntensity || 82),
+          revenueRecurrence: Math.max(70, rawScores.revenueRecurrence || 75),
+          onlineAccessibility: Math.max(70, rawScores.onlineAccessibility || 85),
+          easeOfImplementation: Math.max(70, rawScores.easeOfImplementation || 76)
         };
 
         setMarketAnalysis({
           validationText: data.marketValidation,
-          marketScores: {
-            elearningMarket: scores.marketSize,
-            digitalDemand: scores.demandIntensity,
-            recurringRevenue: scores.revenueRecurrence,
-            globalAccess: scores.onlineAccessibility,
-            techEase: scores.easeOfImplementation
-          }
+          marketScores: scores,
+          summary
         });
       }
     } catch (error) {
       console.error('Error generating analysis:', error);
-      // Fallback values
+      // Fallback personnalisé
+      const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+      const session = sessions[0];
+      const summary = session?.onboarding_summary || {};
+      
+      const who = summary.who_to_teach || 'ta compétence';
+      const profile = summary.learner_profile || 'des personnes motivées';
+      
       setMarketAnalysis({
-        validationText: `Excellente nouvelle ! Le marché de l'enseignement en ligne pour ${user.coreSkill || 'ta compétence'} est en pleine expansion. Des milliers de personnes recherchent activement des formations pour progresser dans ce domaine. Avec ton expérience et ta méthode unique, tu as toutes les cartes en main pour réussir.`,
+        validationText: `Excellente nouvelle ${user.firstName || ''} ! Ton projet autour de ${who} répond à un vrai besoin chez ${profile}.\n\nLe marché de la transmission de savoir en ligne connaît une croissance exceptionnelle, et les gens sont prêts à investir pour apprendre auprès d'experts comme toi. Avec ton expérience et ta méthode unique, tu as toutes les cartes en main pour réussir.`,
         marketScores: {
-          elearningMarket: 70,
-          digitalDemand: 75,
-          recurringRevenue: 65,
-          globalAccess: 80,
-          techEase: 68
-        }
+          marketSize: 78,
+          demandIntensity: 82,
+          revenueRecurrence: 75,
+          onlineAccessibility: 85,
+          easeOfImplementation: 76
+        },
+        summary
       });
     } finally {
       setIsGenerating(false);
@@ -161,21 +169,33 @@ export default function BonneNouvelle() {
   }
 
   const offer = user?.offer || {};
-  const products = [
+  const hasOffer = offer.product_principal || offer.petit_extra || offer.offre_superieure || offer.offre_premium;
+  
+  // 🔥 REVENUS PAR DÉFAUT si pas encore d'offre
+  const defaultRevenues = [
+    { key: 'product_principal', label: 'Produit Principal', price: 97, multiplier: 30 },
+    { key: 'petit_extra', label: 'Order Bump', price: 27, multiplier: 15 },
+    { key: 'offre_superieure', label: 'Upsell', price: 297, multiplier: 9 },
+    { key: 'offre_premium', label: 'Premium', price: 3000, multiplier: 1 }
+  ];
+  
+  const revenues = hasOffer ? [
     { key: 'product_principal', label: 'Produit Principal', data: offer.product_principal, multiplier: 30 },
     { key: 'petit_extra', label: 'Order Bump', data: offer.petit_extra, multiplier: 15 },
     { key: 'offre_superieure', label: 'Upsell', data: offer.offre_superieure, multiplier: 9 },
     { key: 'offre_premium', label: 'Premium', data: offer.offre_premium, multiplier: 1 }
-  ];
-
-  const revenues = products.map(p => ({
+  ].map(p => ({
     ...p,
     price: parsePrice(p.data?.price),
     total: parsePrice(p.data?.price) * p.multiplier
+  })) : defaultRevenues.map(p => ({
+    ...p,
+    total: p.price * p.multiplier
   }));
 
   const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
   const scores = marketAnalysis?.marketScores || {};
+  const summary = marketAnalysis?.summary || {};
 
   const completedSteps = [1, 2, 3, 4]; // Jusqu'à Tes offres complété
 
@@ -228,10 +248,10 @@ export default function BonneNouvelle() {
               </motion.div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-1">
-                  Ton marché est validé
+                  Ton marché est validé ✅
                 </h2>
                 <p className="text-gray-600 text-sm">
-                  Analyse personnalisée pour {user?.coreSkill || 'ta compétence'}
+                  {summary.who_to_teach ? `Analyse pour ${summary.who_to_teach}` : `Analyse pour ${user?.coreSkill || 'ta compétence'}`}
                 </p>
               </div>
             </div>
@@ -263,8 +283,11 @@ export default function BonneNouvelle() {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
-                  Potentiel du marché pour enseigner {user?.coreSkill || 'ta compétence'} en ligne
+                  {summary.who_to_teach ? `Potentiel de ${summary.who_to_teach}` : `Potentiel de ${user?.coreSkill || 'ta compétence'}`}
                 </h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  {summary.learner_profile ? `Auprès de ${summary.learner_profile}` : 'Marché de la transmission en ligne'}
+                </p>
               </div>
             </div>
 
@@ -275,32 +298,32 @@ export default function BonneNouvelle() {
             ) : (
               <div className="space-y-5">
                 <ProgressBarItem 
-                  label="Taille du Marché E-learning" 
-                  value={scores.elearningMarket || 85}
+                  label={summary.who_to_teach ? `Demande pour ${summary.who_to_teach}` : "Taille du marché"} 
+                  value={scores.marketSize || 78}
                   icon={Globe}
                   delay={0}
                 />
                 <ProgressBarItem 
-                  label="Demande Numérique Croissante" 
-                  value={scores.digitalDemand || 88}
+                  label={summary.learner_profile ? `Volonté d'investir de ${summary.learner_profile}` : "Intensité de la demande"} 
+                  value={scores.demandIntensity || 82}
                   icon={TrendingUp}
                   delay={0.1}
                 />
                 <ProgressBarItem 
-                  label="Potentiel de Revenus Récurrents" 
-                  value={scores.recurringRevenue || 82}
+                  label="Potentiel de revenus récurrents" 
+                  value={scores.revenueRecurrence || 75}
                   icon={Repeat}
                   delay={0.2}
                 />
                 <ProgressBarItem 
-                  label="Accessibilité Globale" 
-                  value={scores.globalAccess || 90}
+                  label="Accessibilité globale en ligne" 
+                  value={scores.onlineAccessibility || 85}
                   icon={Users}
                   delay={0.3}
                 />
                 <ProgressBarItem 
-                  label="Facilité Technique & Outils Modernes" 
-                  value={scores.techEase || 87}
+                  label={summary.who_to_teach ? `Facilité de transmission de ${summary.who_to_teach}` : "Facilité de mise en place"} 
+                  value={scores.easeOfImplementation || 76}
                   icon={Laptop}
                   delay={0.4}
                 />
@@ -325,10 +348,10 @@ export default function BonneNouvelle() {
               </motion.div>
               <div>
                 <h2 className="text-xl font-bold text-white drop-shadow-sm">
-                  🎯 Ton Objectif de Revenus Mensuels
+                  🎯 {hasOffer ? 'Ton Objectif de Revenus Mensuels' : 'Potentiel de Revenus Mensuels'}
                 </h2>
                 <p className="text-white/80 text-sm drop-shadow-sm">
-                  Basé sur ton offre complète • Estimations données sectorielles
+                  {hasOffer ? 'Basé sur ton offre complète' : 'Estimation basée sur les standards du secteur'}
                 </p>
               </div>
             </div>

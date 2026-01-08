@@ -36,9 +36,18 @@ export default function WelcomeOpening() {
         return;
       }
 
+      // 🔒 Si l'utilisateur a déjà visité cette page (assets générés), redirect Dashboard
       const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
       if (sessions.length > 0) {
-        setSession(sessions[0]);
+        const session = sessions[0];
+        setSession(session);
+        
+        // Si les assets sont déjà générés → Dashboard
+        if (session.assets_generation_completed_at) {
+          console.log('✅ [WelcomeOpening] Assets déjà générés, redirect Dashboard');
+          navigate(createPageUrl('Dashboard'));
+          return;
+        }
       }
     } catch (error) {
       console.error('Error loading data:', error);

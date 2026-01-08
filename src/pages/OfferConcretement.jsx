@@ -16,7 +16,11 @@ import {
   Package,
   BarChart3,
   Sprout,
-  Map
+  Map,
+  ShoppingBag,
+  Gift,
+  TrendingUp,
+  Crown
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import OfferTransition from '@/components/offer/OfferTransition';
@@ -207,10 +211,42 @@ export default function OfferConcretement() {
   // 🔥 P0-1: Récap offres + potentiel (Source: session.finalized_offer)
   const finalizedOffer = session?.finalized_offer || {};
   const products = [
-    { label: 'Produit Principal', data: finalizedOffer.mainProduct },
-    { label: 'Order Bump', data: finalizedOffer.orderBump },
-    { label: 'Upsell', data: finalizedOffer.upsell1 },
-    { label: 'Premium', data: finalizedOffer.upsell3 }
+    { 
+      label: 'Produit Principal', 
+      data: finalizedOffer.mainProduct, 
+      icon: ShoppingBag,
+      iconColor: 'text-orange-500',
+      bgColor: 'bg-orange-50',
+      priceColor: 'text-orange-600',
+      badge: 'Low-ticket'
+    },
+    { 
+      label: 'Order Bump', 
+      data: finalizedOffer.orderBump, 
+      icon: Gift,
+      iconColor: 'text-blue-500',
+      bgColor: 'bg-blue-50',
+      priceColor: 'text-blue-600',
+      badge: 'Extra-Produit'
+    },
+    { 
+      label: 'Upsell', 
+      data: finalizedOffer.upsell1, 
+      icon: TrendingUp,
+      iconColor: 'text-purple-500',
+      bgColor: 'bg-purple-50',
+      priceColor: 'text-purple-600',
+      badge: 'Mid-ticket'
+    },
+    { 
+      label: 'Premium', 
+      data: finalizedOffer.upsell3, 
+      icon: Crown,
+      iconColor: 'text-amber-500',
+      bgColor: 'bg-amber-50',
+      priceColor: 'text-amber-600',
+      badge: 'High-ticket'
+    }
   ].filter(p => p.data);
 
   const potentialRevenue = session?.potential_revenue || 0;
@@ -225,23 +261,42 @@ export default function OfferConcretement() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 p-6 mb-6"
+            className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm"
           >
-            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
+            <h3 className="text-lg font-bold text-gray-900 mb-6 text-center">
               ✨ Ce que tu as déjà construit
             </h3>
-            <div className="space-y-2 mb-4">
-              {products.map((product, idx) => (
-                <div key={idx} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700">{product.data.title}</span>
-                  <span className="text-gray-900 font-semibold">{product.data.price}</span>
-                </div>
-              ))}
+            <div className="space-y-3 mb-6">
+              {products.map((product, idx) => {
+                const ProductIcon = product.icon;
+                return (
+                  <motion.div 
+                    key={idx} 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + idx * 0.05 }}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-all"
+                  >
+                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0", product.bgColor)}>
+                      <ProductIcon className={cn("w-5 h-5", product.iconColor)} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-gray-900 font-medium text-sm">{product.data.title}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                          {product.badge}
+                        </span>
+                      </div>
+                    </div>
+                    <span className={cn("font-bold text-base", product.priceColor)}>{product.data.price}</span>
+                  </motion.div>
+                );
+              })}
             </div>
             {potentialRevenue > 0 && (
-              <div className="pt-3 border-t border-gray-200 text-center">
+              <div className="pt-4 border-t border-gray-200 text-center">
                 <span className="text-gray-600 text-sm">Potentiel estimé : </span>
-                <span className="text-[#61f7a2] font-bold text-lg">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
+                <span className="text-[#61f7a2] font-bold text-xl">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
               </div>
             )}
           </motion.div>

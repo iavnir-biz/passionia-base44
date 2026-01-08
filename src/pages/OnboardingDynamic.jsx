@@ -86,24 +86,18 @@ export default function OnboardingDynamic() {
 
   const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
     try {
-      // 1️⃣ CHARGER LA SESSION DEPUIS BASE44
-      const sessions = await base44.entities.Session.filter({ id: sessionId });
-      if (!sessions || sessions.length === 0) {
-        console.error('❌ [fetchNextQuestion] Session introuvable');
-        return;
-      }
-
-      const currentSession = sessions[0];
-      const history = currentSession.onboarding_history || [];
-      const summary = currentSession.onboarding_summary || {};
       const firstName = localStorage.getItem('onboarding_firstName') || '';
 
-      // 2️⃣ APPELER L'API AVEC DONNÉES RÉELLES
+      console.log('📤 [fetchNextQuestion] Appel backend:', {
+        sessionId,
+        hasAnswer: !!lastAnswer,
+        answerPreview: lastAnswer ? lastAnswer.substring(0, 50) : 'N/A'
+      });
+
+      // 🔥 DB-FIRST : Le backend charge tout depuis la DB
       const { data } = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId,
         userAnswer: lastAnswer,
-        history,
-        summary,
         firstName
       });
 

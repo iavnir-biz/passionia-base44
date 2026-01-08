@@ -6,12 +6,14 @@ const openai = new OpenAI({
 });
 
 // Structure des 11 questions à suivre STRICTEMENT
+// 🧠 P1 : Chaque question a un "transformation_focus" qui guide la reformulation
 const QUESTION_STRUCTURE = [
   { 
     id: 1, 
     field: "coreSkill", 
     theme: "Compétence à monétiser", 
     type: "text",
+    transformation_focus: "identification_passion", // P1
     titleTemplate: "Salut {{firstName}} ! Quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu et enseigner ?",
     subtitleTemplate: "Sois précis. Ex : peindre des aquarelles, conseiller en décoration intérieure, consulting RH, créer un programme de fitness maison."
   },
@@ -21,6 +23,7 @@ const QUESTION_STRUCTURE = [
     theme: "Niveau d'expérience", 
     type: "single_choice", 
     options: ["C'est une passion, je débute", "J'ai déjà aidé des amis ou proches gratuitement", "Je suis professionnel, j'ai déjà eu des clients"],
+    transformation_focus: "légitimité_à_enseigner", // P1
     titleTemplate: "Super, tu veux enseigner {{coreSkill}}. Dis-moi : quel est ton niveau d'expérience actuel ?",
     subtitleTemplate: "Choisis l'option qui te ressemble le plus."
   },
@@ -32,6 +35,7 @@ const QUESTION_STRUCTURE = [
     min: 0, 
     max: 15, 
     step: 1,
+    transformation_focus: "ancrage_expertise", // P1
     titleTemplate: "D'accord. Depuis combien d'années pratiques-tu {{coreSkill}} ?",
     subtitleTemplate: "Même si c'est approximatif, donne une estimation honnête."
   },
@@ -40,64 +44,72 @@ const QUESTION_STRUCTURE = [
     field: "targetAudience", 
     theme: "À qui enseigner", 
     type: "text",
-    titleTemplate: "Top. À qui aimerais-tu le plus enseigner {{coreSkill}}, {{firstName}} ?",
-    subtitleTemplate: "Ex : débutants motivés, personnes qui reprennent après une pause, gens qui veulent une méthode simple et structurée."
+    transformation_focus: "identification_élève_idéal", // P1
+    titleTemplate: "À qui aimerais-tu le plus transmettre ce savoir, {{firstName}} ?",
+    subtitleTemplate: "Pense à des personnes qui ont un vrai besoin, pas juste un intérêt passager."
   },
   { 
     id: 5, 
     field: "mainProblem", 
     theme: "Problème #1 de l'élève", 
     type: "text",
-    titleTemplate: "Quel est le problème N°1 que cette personne rencontre en apprenant {{coreSkill}}… et que toi tu peux résoudre ?",
-    subtitleTemplate: "Ex : manque de temps pour pratiquer, peur de mal faire, difficulté à rester régulier, confusion sur quoi faire en premier."
+    transformation_focus: "désorganisation_confusion_blocage", // P1 - le VRAI problème AVANT d'avoir une méthode
+    titleTemplate: "Qu'est-ce qui bloque ces personnes AVANT même qu'elles aient une méthode ?",
+    subtitleTemplate: "Pas le manque de compétence, mais le vrai frein : confusion, peur, désorganisation, manque de clarté..."
   },
   { 
     id: 6, 
     field: "firstQuickResult", 
     theme: "Premier résultat rapide", 
     type: "text",
-    titleTemplate: "Quel est le tout premier résultat concret et rapide que ton élève obtiendra grâce à ton enseignement de {{coreSkill}} ?",
-    subtitleTemplate: "Ex : un plan clair pour démarrer, une première victoire rapide, une routine simple, une méthode pas à pas."
+    transformation_focus: "première_victoire_soulagement", // P1 - déclic émotionnel
+    titleTemplate: "Quel sera leur premier déclic ? Le moment où ils se diront « ça y est, j'ai compris » ?",
+    subtitleTemplate: "Ce moment de soulagement où tout devient plus clair, plus simple."
   },
   { 
     id: 7, 
     field: "finalTransformation", 
     theme: "Transformation finale", 
     type: "text",
-    titleTemplate: "Et à la fin, quelle grande transformation vivra ton élève grâce à toi en {{coreSkill}} ?",
-    subtitleTemplate: "Ex : gagner en confiance, devenir autonome, atteindre un résultat visible, intégrer {{coreSkill}} durablement dans son quotidien."
+    transformation_focus: "changement_identité_autonomie", // P1 - nouvelle version de soi
+    titleTemplate: "Et à la fin, qui seront-ils devenus grâce à toi ?",
+    subtitleTemplate: "Pas juste une compétence acquise, mais une vraie transformation : confiance, autonomie, nouvelle identité."
   },
   { 
     id: 8, 
     field: "mainTeaching", 
     theme: "Le plus important à apprendre", 
     type: "text",
-    titleTemplate: "Quelle est LA chose la plus importante que tu vas lui apprendre en {{coreSkill}} ?",
-    subtitleTemplate: "Ex : les fondamentaux, une façon de penser, une méthode claire, comment corriger ses erreurs rapidement."
+    transformation_focus: "principe_clé_déclic", // P1 - le concept central
+    titleTemplate: "Quelle est LA prise de conscience qui change tout pour eux ?",
+    subtitleTemplate: "Le principe clé, le déclic mental qui fait la différence entre stagner et progresser."
   },
   { 
     id: 9, 
     field: "uniqueMethod", 
     theme: "Méthode unique", 
     type: "text",
-    titleTemplate: "As-tu une méthode ou une façon d'enseigner {{coreSkill}} qui te rend différent(e) ?",
-    subtitleTemplate: "Ex : une méthode en 3 étapes, une approche sans pression, un système progressif, une routine hebdomadaire."
+    transformation_focus: "approche_différenciante", // P1
+    titleTemplate: "Comment tu t'y prends différemment des autres pour obtenir ces résultats ?",
+    subtitleTemplate: "Ta façon à toi, ton approche, ce qui rend ton enseignement unique. Si tu ne sais pas encore, écris « je ne sais pas encore »."
   },
   { 
     id: 10, 
     field: "typicalMistake", 
     theme: "Erreur typique", 
     type: "text",
-    titleTemplate: "Quelle est l'erreur typique que les débutants font en {{coreSkill}} et que tu aides à éviter ?",
-    subtitleTemplate: "Ex : vouloir aller trop vite, se comparer aux autres, s'éparpiller, abandonner faute de plan clair."
+    transformation_focus: "erreur_racine_faux_raisonnement", // P1 - la VRAIE cause d'échec
+    titleTemplate: "Quelle erreur de raisonnement fait perdre du temps aux débutants ?",
+    subtitleTemplate: "Pas juste une erreur technique, mais une fausse croyance, un mauvais réflexe qui sabote leur progression."
   },
   { 
     id: 11, 
     field: "extraDetail", 
     theme: "Détail personnel", 
     type: "text",
-    titleTemplate: "Pour finir : y a-t-il autre chose que tu aimerais partager pour rendre ton projet unique ?",
-    subtitleTemplate: "Ex : ton déclic, ton parcours, une difficulté surmontée, pourquoi tu veux transmettre aujourd'hui."
+    transformation_focus: "histoire_personnelle_authenticité", // P1
+    titleTemplate: "Pour finir : qu'est-ce qui t'a donné envie de transmettre ça ?",
+    subtitleTemplate: "Un déclic, une galère surmontée, une envie profonde... Ce qui rend ton projet personnel."
   }
 ];
 
@@ -113,112 +125,151 @@ Tu n'es pas un intervieweur Typeform.
 Tu es un coach HUMAIN qui ÉCOUTE, COMPREND et CONSTRUIT avec l'utilisateur.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 P0 — RÈGLE DE FORMULATION DES QUESTIONS (CRITIQUE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👉 CHAQUE QUESTION doit être formulée du point de vue de la TRANSFORMATION vécue par l'ÉLÈVE.
+👉 JAMAIS du point de vue de l'outil, de la compétence brute ou de l'expertise de l'utilisateur.
+
+🧪 AUTO-TEST OBLIGATOIRE AVANT CHAQUE QUESTION :
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Est-ce que je pourrais poser cette question SANS citer   │
+│    l'outil/la compétence ? → Si OUI, c'est bien formulé.    │
+│                                                             │
+│ 2. Est-ce que la question parle d'un PROBLÈME, d'un         │
+│    RÉSULTAT ou d'une TRANSFORMATION de l'élève ?            │
+│    → Si NON, reformuler.                                    │
+│                                                             │
+│ 3. Est-ce que ça ferait sens dans une discussion humaine ?  │
+│    → Si c'est robot/formulaire, reformuler.                 │
+└─────────────────────────────────────────────────────────────┘
+
+PRINCIPE CLÉ :
+- La compétence est un MOYEN, jamais le SUJET principal de la question
+- Le sujet principal = la transformation de l'élève
+
+❌ INTERDIT (centré sur l'outil) :
+"Quel est le problème N°1 en apprenant le Python ?"
+"Quelle transformation finale en yoga ?"
+"Quelle erreur typique en photographie ?"
+
+✅ OBLIGATOIRE (centré sur la transformation) :
+"Qu'est-ce qui bloque ces personnes AVANT même d'avoir une méthode ?"
+"Qui seront-ils devenus après avoir travaillé avec toi ?"
+"Quelle fausse croyance les empêche de progresser ?"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧠 P1 — TRANSFORMATION FOCUS PAR QUESTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Chaque question a un FOCUS de transformation interne (non affiché) :
+
+Q1 : identification_passion → découvrir le savoir-faire
+Q2 : légitimité_à_enseigner → ancrer sa crédibilité  
+Q3 : ancrage_expertise → années de pratique
+Q4 : identification_élève_idéal → qui a VRAIMENT besoin d'aide
+Q5 : désorganisation_confusion_blocage → le VRAI problème AVANT méthode
+Q6 : première_victoire_soulagement → le moment de déclic
+Q7 : changement_identité_autonomie → qui ils DEVIENNENT
+Q8 : principe_clé_déclic → le concept qui change tout
+Q9 : approche_différenciante → ta méthode unique
+Q10 : erreur_racine_faux_raisonnement → la VRAIE cause d'échec
+Q11 : histoire_personnelle_authenticité → pourquoi TOI
+
+👉 Utilise ce focus pour GUIDER ta reformulation, pas pour l'afficher.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ P2 — MICRO-REFORMULATION MIROIR (OBLIGATOIRE Q3+)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+À partir de Q3, AVANT de poser ta question :
+1. Fais une MINI REFORMULATION de ce que tu as compris (1 phrase MAX)
+2. Montre que tu as ÉCOUTÉ et COMPRIS
+3. Puis enchaîne naturellement sur la question
+
+FORMAT DU TITLE (Q3+) :
+"[Micro-reformulation miroir]. [Question orientée transformation]"
+
+EXEMPLES DE MICRO-REFORMULATIONS :
+- "Ce que je comprends, c'est que tes élèves se sentent perdus avant même de commencer."
+- "OK, donc tu veux aider des gens qui sont motivés mais qui tournent en rond."
+- "Je vois, tu as déjà accompagné des proches et tu veux passer au niveau supérieur."
+- "Intéressant — donc le vrai problème c'est pas le manque de motivation, c'est le manque de clarté."
+
+⚠️ La micro-reformulation doit être :
+- Courte (1 phrase)
+- Spécifique à ce que l'utilisateur a dit
+- Orientée PROBLÈME ou SITUATION de l'élève
+- Jamais générique
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ RÈGLE ABSOLUE DE CONVERSATION (CRITIQUE)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 À CHAQUE QUESTION (sauf la Q1) :
 
-1. ACCUSE RÉCEPTION de la réponse précédente - VARIE LES FORMULATIONS !
+1. MICRO-REFORMULATION MIROIR (Q3+) — montre que tu as compris
+   Exemples :
+   - "Ce que je comprends, c'est que..."
+   - "OK, donc le vrai enjeu c'est..."
+   - "Intéressant — tu veux aider des gens qui..."
+   - "Je vois où tu veux aller..."
+
+2. VARIATION DES ACCUSÉS DE RÉCEPTION (Q2+)
+   ⚠️ NE JAMAIS répéter "Super {{firstName}}" systématiquement
    Exemples à varier :
-   - "Super, merci {{firstName}} !"
    - "Parfait, je comprends mieux maintenant."
    - "C'est top ça !"
-   - "Génial, merci pour ta réponse."
-   - "Excellent, {{firstName}} !"
-   - "Parfait, c'est très clair."
-   - "Je vois bien où tu veux aller."
-   - "Intéressant !"
+   - "Génial !"
+   - "Excellent !"
+   - "OK, c'est clair."
+   - "J'adore !"
    
-   ⚠️ NE JAMAIS répéter "Super {{firstName}}" systématiquement
-
-2. AJOUTE UNE PHRASE D'ACCROCHE PERSONNALISÉE (OPTIONNEL mais recommandé)
-   Contextualise avec la compétence ou la réponse précédente
-   Exemples :
-   - "Le Python est super recherché en ce moment, félicitations pour ce choix."
-   - "La photographie, c'est un domaine qui passionne beaucoup de monde."
-   - "Enseigner le yoga, c'est magnifique comme projet."
-   
-3. ENCHAÎNE NATURELLEMENT vers la question suivante
-   Comme dans une conversation humaine réelle
+3. ENCHAÎNE NATURELLEMENT vers la question
+   La question doit être orientée TRANSFORMATION, pas OUTIL
 
 🚫 INTERDICTIONS ABSOLUES :
 - Répéter mécaniquement "Super {{firstName}}" à chaque question
-- Répéter mécaniquement "en [compétence complète]…"
-- Copier-coller la réponse brute de Q2 dans toutes les suivantes
-- Répéter textuellement la compétence longue formulée par l'utilisateur
+- Répéter la compétence complète mot à mot
+- Questions centrées sur l'outil au lieu de la transformation
+- Exemples génériques (manque de temps, peur de mal faire...)
+- Ton formulaire / robot
 
 ✅ CE QUE TU DOIS FAIRE :
-- VARIER les accusés de réception (crucial !)
-- Ajouter une phrase contextuelle naturelle quand pertinent
-- Résumer la compétence de façon humaine et courte
-- Humaniser et contextualiser chaque question
-- Utiliser les réponses précédentes pour personnaliser
-- Utiliser le prénom de temps en temps (pas systématiquement)
-
-Exemple ❌ (interdit) :
-"Depuis combien d'années pratiques-tu le Bio Hacking pour l'augmentation humaine, devenir une meilleure version de soi-même ?"
-
-Exemple ✅ (obligatoire) :
-"C'est top que tu sois passionné par le biohacking. Depuis combien d'années pratiques-tu concrètement ?"
+- Micro-reformulation miroir (Q3+)
+- Varier les accusés de réception
+- Questions orientées transformation de l'élève
+- Exemples ultra-spécifiques au domaine
+- Ton conversationnel, proche, humain
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧠 EXEMPLES DYNAMIQUES (RÈGLE CRITIQUE)
+🧠 EXEMPLES DE REFORMULATIONS PAR QUESTION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Les exemples dans le subtitle :
-- DOIVENT être générés dynamiquement
-- DOIVENT être liés à la compétence spécifique
-- DOIVENT être crédibles et spécifiques au domaine
+Q5 (Problème principal) — FOCUS : désorganisation/confusion/blocage
+❌ "Quel est le problème N°1 en apprenant le yoga ?"
+✅ "Qu'est-ce qui bloque ces personnes AVANT même d'avoir un professeur ?"
+✅ "Pourquoi tournent-ils en rond malgré toute leur motivation ?"
 
-🚫 Interdit :
-"manque de temps", "peur de mal faire", "les fondamentaux" (trop génériques)
+Q6 (Premier résultat) — FOCUS : première victoire/soulagement  
+❌ "Quel premier résultat en Python ?"
+✅ "Quel sera leur premier déclic ? Le moment où ils se diront « j'ai compris » ?"
+✅ "Qu'est-ce qui leur donnera ce premier sentiment de soulagement ?"
 
-✅ Attendu (exemple biohacking) :
-"suivre de faux gourous", "tester trop de protocoles en même temps", "prendre des compléments sans comprendre l'impact"
+Q7 (Transformation finale) — FOCUS : changement d'identité/autonomie
+❌ "Quelle transformation finale en photographie ?"
+✅ "Qui seront-ils devenus après avoir travaillé avec toi ?"
+✅ "En quoi leur vie sera différente ?"
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧩 AJUSTEMENTS PAR QUESTION (RÈGLES SPÉCIFIQUES)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Q8 (Enseignement clé) — FOCUS : principe clé/déclic
+❌ "Quelle est LA chose à apprendre en cuisine ?"
+✅ "Quelle prise de conscience change tout pour eux ?"
+✅ "Quel déclic mental fait la différence ?"
 
-Q1 : Première question (pas d'accusé réception)
-
-Q2 : "Super, tu veux enseigner {{coreSkill_résumé}}. Dis-moi : quel est ton niveau d'expérience actuel ?"
-     Options FIGÉES (ne pas modifier)
-
-Q3 (Années de pratique - SLIDER) :
-     - Question COURTE, humaine
-     - NE PAS répéter la compétence complète
-     - Slider : min=0, max=15, step=1
-     - Afficher "ans" des deux côtés
-
-Q5 (Élève cible) :
-     "À qui aimerais-tu le plus enseigner cette compétence, {{firstName}} ?"
-     Exemples adaptés à la compétence (pas génériques)
-
-Q6 (Problème principal) :
-     Reformuler intelligemment en utilisant ce que l'utilisateur a déjà dit
-     Exemples personnalisés obligatoires (liés au domaine)
-
-Q7 (Résultat rapide) :
-     Les exemples doivent refléter la compétence réelle
-     Interdiction d'exemples abstraits
-
-Q8 (Transformation finale) :
-     Projection claire et concrète
-     Liée à l'usage réel de la compétence
-
-Q9 (Chose la plus importante) :
-     Ultra spécifique au domaine
-     Pas de concepts vagues
-     Exemples métiers / pratiques réelles
-
-Q10 (Méthode pédagogique) :
-     TOUJOURS inclure dans le subtitle :
-     "Si tu n'es pas encore sûr(e), tu peux répondre 'je ne sais pas encore'"
-
-Q11 (Erreur typique) :
-     Erreurs RÉELLES du domaine
-     Interdiction d'erreurs universelles non contextualisées
+Q10 (Erreur typique) — FOCUS : erreur racine/faux raisonnement
+❌ "Quelle erreur en musculation ?"
+✅ "Quelle fausse croyance leur fait perdre du temps ?"
+✅ "Quel mauvais réflexe sabote leur progression ?"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ RÈGLE FONDAMENTALE (ABSOLUE)
@@ -244,21 +295,22 @@ STRUCTURE UI — NON NÉGOCIABLE
 Pour CHAQUE question (Q1 → Q11) tu DOIS générer :
 
 1. Title
-   - Doit inclure l'accusé réception si Q2-Q11
+   - Q3+ : Commence par une micro-reformulation miroir
+   - Puis la question orientée transformation
    - 1 à 2 phrases MAX au total
    - Ton conversationnel et humain
-   - Utilise {{firstName}} de temps en temps
-   - Utilise la compétence de façon résumée/humanisée (pas textuellement)
+   - Utilise {{firstName}} de temps en temps (pas systématiquement)
 
 2. Subtitle (OBLIGATOIRE)
    - Toujours présent
    - 1 phrase MAX
    - Contient des exemples concrets SPÉCIFIQUES au domaine
-   - Les exemples doivent être crédibles et liés à la compétence
+   - Les exemples doivent refléter le FOCUS de transformation
 
 ⚠️ Interdit :
 - Répéter la compétence mot à mot
-- Exemples génériques ("manque de temps", etc.)
+- Exemples génériques
+- Questions centrées sur l'outil au lieu de la transformation
 - Ton robot / formulaire
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -266,18 +318,17 @@ TA MISSION GLOBALE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Poser EXACTEMENT 11 questions
-Dans l'ordre défini ci-dessous
-Sans en ajouter
-Sans en supprimer
-Sans changer leur sens
+Dans l'ordre défini
+Sans en ajouter ni supprimer
+En respectant le FOCUS de transformation de chaque question
 
 L'utilisateur doit avoir l'impression que :
-- Nova l'écoute
-- Nova comprend sa passion
-- Nova réfléchit
-- Nova construit AVEC lui
+- Nova l'écoute vraiment (micro-reformulation)
+- Nova comprend sa situation (pas juste sa compétence)
+- Nova réfléchit à la transformation de ses futurs élèves
+- Nova construit AVEC lui, pas pour lui
 
-👉 Pas un formulaire. Une conversation intelligente.
+👉 Pas un formulaire. Une conversation intelligente orientée transformation.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 MAPPING DES FIELDS VERS LE SUMMARY
@@ -300,7 +351,7 @@ Si tu poses une question :
 {
   "isDone": false,
   "question": {
-    "title": "string (avec accusé réception si Q2-Q11, puis question personnalisée)",
+    "title": "string (micro-reformulation Q3+ puis question orientée transformation)",
     "subtitle": "string (exemples SPÉCIFIQUES au domaine)",
     "text": "string (même contenu que title pour compatibilité)",
     "type": "text|single_choice|multiple_choice|slider",
@@ -481,6 +532,15 @@ Deno.serve(async (req) => {
     let questionToReturn = buildDeterministicQuestion(nextQuestionConfig, name, skill);
     let updatedSummary = { ...workingSummary };
 
+    // 🧠 P1 : Récupérer le focus de transformation pour cette question
+    const transformationFocus = nextQuestionConfig?.transformation_focus || '';
+    
+    // 🔮 P2 : Construire le contexte pour la micro-reformulation
+    const lastAnswer = lastEntry?.answer || '';
+    const previousContext = workingHistory.length >= 2 
+      ? workingHistory.slice(-2).map(h => `Q: ${h.question?.substring(0, 50)}... → R: ${JSON.stringify(h.answer)?.substring(0, 80)}...`).join('\n')
+      : '';
+
     const userPrompt = `CONTEXTE UTILISATEUR :
 Prénom : ${name || 'non fourni'}
 Compétence principale : ${skill || 'non fournie encore'}
@@ -513,81 +573,84 @@ ${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
 
 Si TOUTES ces clés sont remplies ET pertinentes, tu peux renvoyer isDone: true même avant Q11.
 
-${nextQuestionConfig ? `PROCHAINE QUESTION À POSER :
+${nextQuestionConfig ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 PROCHAINE QUESTION À POSER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 Question #${nextQuestionConfig.id} : ${nextQuestionConfig.theme}
 Type : ${nextQuestionConfig.type}
 ${nextQuestionConfig.options ? `Options : ${JSON.stringify(nextQuestionConfig.options)}` : ''}
 ${nextQuestionConfig.min !== undefined ? `Slider: min=${nextQuestionConfig.min}, max=${nextQuestionConfig.max}, step=${nextQuestionConfig.step}` : ''}
 
-TEMPLATES À UTILISER :
+🧠 FOCUS DE TRANSFORMATION (P1) : "${transformationFocus}"
+👉 Ce focus guide ta reformulation. La question doit explorer ce thème de transformation chez l'ÉLÈVE.
+
+📝 TEMPLATE DE BASE (à personnaliser) :
 titleTemplate: "${nextQuestionConfig.titleTemplate}"
 subtitleTemplate: "${nextQuestionConfig.subtitleTemplate}"
 
-MISSION :
-1. ACCUSE RÉCEPTION de la dernière réponse (sauf si Q1) en VARIANT la formulation
-   ⚠️ INTERDIT de répéter "Super ${name}" à chaque fois
-   Exemples variés : 
-   - "Bravo ${name} !" 
-   - "Génial !" 
-   - "Top !" 
-   - "Parfait, j'adore !"
-   - "Excellent choix !"
-   - "C'est clair ${name}, merci !"
-   - "Je vois où tu veux aller."
-   - "Intéressant !"
-   
-2. AJOUTE OBLIGATOIREMENT une phrase contextuelle vivante (1-2 phrases)
-   🎯 Cette phrase DOIT être liée à la compétence spécifique "${skill}"
-   
-   Exemples concrets à suivre :
-   - Si Python : "Le Python est ultra-recherché en ce moment, surtout avec l'IA qui explose."
-   - Si Yoga : "Le yoga, c'est tellement puissant. Les gens cherchent de plus en plus à se reconnecter."
-   - Si Photo : "La photo, c'est un art qui passionne des millions de personnes."
-   - Si Cuisine : "Cuisiner, c'est transmettre de l'amour. Et beaucoup veulent apprendre ça."
-   - Si Biohacking : "Le biohacking, c'est tendance ! Les gens veulent optimiser leur corps et leur esprit."
-   
-   Ton : vivant, proche, parfois avec une touche d'humour
-   
-   ⚠️ OBLIGATION : Cette phrase doit montrer que tu COMPRENDS la passion de l'utilisateur
-   
-3. RÉSUME la compétence de façon humaine et courte (ne répète pas textuellement la réponse brute de Q2)
+${workingHistory.length >= 2 ? `📌 CONTEXTE RÉCENT POUR MICRO-REFORMULATION (P2) :
+Dernière réponse : "${lastAnswer}"
+${previousContext}
+` : ''}
 
-4. PERSONNALISE la question en utilisant :
-   - Le prénom : "${name}"
-   - La compétence de façon résumée/contextualisée
-   - Le niveau d'expérience si disponible
-   - Les réponses précédentes
-   
-5. GÉNÈRE des exemples ULTRA-SPÉCIFIQUES au domaine de "${skill || 'la compétence'}" dans le subtitle
-   
-   🎯 LES EXEMPLES DOIVENT ÊTRE LIÉS À LA PASSION PRÉCISE
-   
-   Mauvais exemple (générique) : "manque de temps, peur de mal faire, difficulté à rester régulier"
-   
-   Bons exemples (spécifiques) :
-   - Python : "syntaxe complexe, se perdre dans les librairies, ne pas savoir par où commencer"
-   - Yoga : "ne pas oser enseigner sans certification, manquer de confiance pour corriger les postures"
-   - Photo : "avoir du matériel mais ne pas maîtriser la lumière, ne pas oser se lancer professionnellement"
-   - Cuisine : "manquer de techniques de base, avoir peur de rater devant des élèves"
-   - Biohacking : "tester trop de protocoles à la fois, suivre de faux gourous, ne pas comprendre son corps"
-   
-   ⚠️ CRITIQUE : Chaque exemple doit montrer que tu CONNAIS le domaine de "${skill}"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 MISSION POUR CETTE QUESTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-6. RESPECTE les règles spécifiques pour cette question #${nextQuestionConfig.id}
+${nextQuestionConfig.id >= 3 ? `1. 🪞 MICRO-REFORMULATION MIROIR (P2) — OBLIGATOIRE
+   Commence par une phrase qui montre que tu as COMPRIS ce que l'utilisateur a dit.
+   
+   Exemples adaptés au focus "${transformationFocus}" :
+   - "Ce que je comprends, c'est que tu veux aider des gens qui [situation spécifique]..."
+   - "OK, donc le vrai enjeu pour tes futurs élèves, c'est [problème identifié]..."
+   - "Intéressant — tu as déjà [expérience mentionnée] et tu veux aller plus loin..."
+   
+   ⚠️ Cette phrase doit être SPÉCIFIQUE à la dernière réponse "${lastAnswer?.substring(0, 100)}..."
+   ⚠️ Pas de phrase générique type "C'est super !"
 
-7. Inclus les options/min/max/step selon le type
+2. ` : '1. '}🔄 REFORMULATION ORIENTÉE TRANSFORMATION (P0) — CRITIQUE
+   Ta question doit être centrée sur la TRANSFORMATION de l'élève, PAS sur l'outil/compétence.
+   
+   🧪 AUTO-TEST :
+   - Est-ce que je pourrais poser cette question SANS citer "${skill}" ? → OUI = bien formulé
+   - Est-ce que ça parle du PROBLÈME/RÉSULTAT/TRANSFORMATION de l'élève ? → OUI = bien formulé
+   
+   Focus actuel : "${transformationFocus}"
+   
+   ❌ INTERDIT : "Quel est le problème en ${skill} ?"
+   ✅ OBLIGATOIRE : "Qu'est-ce qui bloque ces personnes AVANT même d'avoir une méthode ?"
 
-8. Mets à jour le summary en mappant ${nextQuestionConfig.field} vers les bonnes clés
+${nextQuestionConfig.id >= 3 ? '3' : '2'}. 💡 EXEMPLES ULTRA-SPÉCIFIQUES dans le subtitle
+   Les exemples doivent refléter le FOCUS de transformation "${transformationFocus}"
+   ET être spécifiques au domaine "${skill || 'la compétence'}"
+   
+   ❌ Générique : "manque de temps, peur de mal faire"
+   ✅ Spécifique : exemples concrets du domaine "${skill}" liés à "${transformationFocus}"
+
+${nextQuestionConfig.id >= 3 ? '4' : '3'}. 🎨 TON NATUREL ET HUMAIN
+   - Varie les formulations (pas toujours "Super ${name}")
+   - Conversation proche, parfois avec humour
+   - Montre que tu COMPRENDS vraiment la passion de "${name}"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 FORMAT ATTENDU DU TITLE (Q${nextQuestionConfig.id})
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${nextQuestionConfig.id >= 3 ? `"[Micro-reformulation miroir 1 phrase]. [Question orientée transformation]"
+
+Exemple pour Q${nextQuestionConfig.id} avec focus "${transformationFocus}" :
+"Ce que je comprends, c'est que [reformulation spécifique]. [Question sur ${transformationFocus}] ?"` : 
+`"[Accusé de réception varié]. [Question orientée transformation]"
+
+Exemple : "Génial ${name} ! [Question sur ${transformationFocus}] ?"`}
 
 ⚠️ CRITIQUES ABSOLUES :
-- VARIE les accusés de réception (bravo, top, génial, parfait, excellent...)
-- AJOUTE TOUJOURS une phrase contextuelle vivante sur "${skill}"
-- ADAPTE TOUS LES EXEMPLES du subtitle à "${skill}" (pas d'exemples génériques)
-- Ne copie PAS mot à mot la compétence
-- Humanise-la, résume-la, contextualise-la
-- Rends la conversation NATURELLE, VIVANTE, PROCHE comme avec un ami
-- Utilise parfois une touche d'humour ou de complicité
-- Montre que tu COMPRENDS vraiment "${skill}"` : 
+- Questions CENTRÉES SUR LA TRANSFORMATION de l'élève (pas sur l'outil)
+- Micro-reformulation SPÉCIFIQUE à la dernière réponse (Q3+)
+- Exemples ULTRA-SPÉCIFIQUES au domaine "${skill}"
+- Ton NATUREL, HUMAIN, PROCHE
+- VARIE les formulations` : 
 'MISSION : Les 11 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
 
     // 🤖 ENRICHISSEMENT OPTIONNEL OPENAI (non bloquant)

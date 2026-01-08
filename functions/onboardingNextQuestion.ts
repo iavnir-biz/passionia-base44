@@ -453,18 +453,40 @@ Deno.serve(async (req) => {
       .map(h => h.question)
       .filter(q => q);
 
-    // Déterminer quelle question poser (basé sur l'index)
-    const nextQuestionIndex = workingHistory.length; // 0-based
-    const nextQuestionConfig = nextQuestionIndex < QUESTION_STRUCTURE.length 
-      ? QUESTION_STRUCTURE[nextQuestionIndex] 
-      : null;
+    if (nextQuestionIndex >= QUESTION_STRUCTURE.length) {
+      console.log('✅ [ONBOARDING COMPLETE]', { sessionId, totalQuestions: QUESTION_STRUCTURE.length });
+      return Response.json({
+        isDone: true,
+        summary: workingSummary
+      });
+    }
+
+    const nextQuestionConfig = QUESTION_STRUCTURE[nextQuestionIndex];
+    
+    // 🛡️ HELPER : Construire question déterministe depuis structure
+    const buildDeterministicQuestion = (config, userName, userSkill) => {
+      return {
+        title: config.titleTemplate.replace('{{firstName}}', userName || '').replace('{{coreSkill}}', userSkill || 'cette compétence'),
+        subtitle: config.subtitleTemplate.replace('{{firstName}}', userName || '').replace('{{coreSkill}}', userSkill || 'cette compétence'),
+        text: config.titleTemplate.replace('{{firstName}}', userName || '').replace('{{coreSkill}}', userSkill || 'cette compétence'),
+        type: config.type,
+        placeholder: config.placeholder || '',
+        options: config.options || [],
+        min: config.min,
+        max: config.max,
+        step: config.step
+      };
+    };
+
+    let questionToReturn = buildDeterministicQuestion(nextQuestionConfig, name, skill);
+    let updatedSummary = { ...workingSummary };
 
     const userPrompt = `CONTEXTE UTILISATEUR :
 Prénom : ${name || 'non fourni'}
 Compétence principale : ${skill || 'non fournie encore'}
 
 SUMMARY ACTUEL (à enrichir progressivement) :
-${JSON.stringify(summary, null, 2)}
+${JSON.stringify(workingSummary, null, 2)}
 
 HISTORIQUE COMPLET DES Q/R :
 ${historyText || 'Aucune question posée encore.'}
@@ -477,7 +499,7 @@ ${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
 ÉTAT :
 - Nombre de questions déjà posées : ${workingHistory.length}
 - Prochaine question à poser : ${nextQuestionConfig ? `#${nextQuestionConfig.id} - ${nextQuestionConfig.theme}` : 'TERMINÉ'}
-- Clés remplies dans summary : ${Object.keys(summary).filter(k => summary[k] && (typeof summary[k] === 'string' ? summary[k].trim() : true)).join(', ') || 'aucune'}
+- Clés remplies dans summary : ${Object.keys(workingSummary).filter(k => workingSummary[k] && (typeof workingSummary[k] === 'string' ? workingSummary[k].trim() : true)).join(', ') || 'aucune'}
 
 ⚠️ IMPORTANT : Tu peux t'arrêter AVANT la question 11 si tu as collecté TOUTES les informations nécessaires dans le summary :
 - who_to_teach (compétence)

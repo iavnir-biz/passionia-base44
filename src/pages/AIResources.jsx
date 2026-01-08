@@ -174,12 +174,11 @@ export default function AIResources() {
           missing
         });
 
-        // 🧪 DÉSACTIVÉ POUR TESTS - À RÉACTIVER EN PROD
-        // if (missing.length > 0) {
-        //   console.log('[AIResources] Redirecting to NoahGeneration - incomplete assets');
-        //   navigate(createPageUrl('NoahGeneration'));
-        //   return;
-        // }
+        if (missing.length > 0) {
+          console.log('[AIResources] Redirecting to NoahGeneration - incomplete assets');
+          navigate(createPageUrl('NoahGeneration'));
+          return;
+        }
       }
 
       // Construire état "Prêt" depuis Session

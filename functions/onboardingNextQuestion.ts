@@ -588,11 +588,17 @@ MISSION :
         ? userAnswer 
         : JSON.stringify(userAnswer);
 
+      // 🔥 FIX : récupérer la question ACTUELLE (celle à laquelle on répond)
+      const currentQuestionConfig = QUESTION_STRUCTURE[workingHistory.length];
+      const questionText = currentQuestionConfig 
+        ? currentQuestionConfig.titleTemplate.replace('{{firstName}}', name || '').replace('{{coreSkill}}', skill || 'cette compétence')
+        : `Question ${workingHistory.length + 1}`;
+
       const updatedHistory = [
         ...workingHistory,
         {
-          question: lastEntry ? lastEntry.question : `Question ${workingHistory.length + 1}`,
-          type: nextQuestionConfig?.type || 'text',
+          question: questionText,
+          type: currentQuestionConfig?.type || 'text',
           answer: normalizedAnswer,
           at: new Date().toISOString()
         }

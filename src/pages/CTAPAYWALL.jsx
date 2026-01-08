@@ -741,27 +741,37 @@ export default function CTAPAYWALL() {
             <p className="text-gray-700 mb-6 text-xl">
               Il t'attend juste derrière ces portes.
             </p>
-            <GlowButton
-              onClick={handleGetAccess}
-              disabled={isCreatingCheckout}
-              size="lg"
-              className="px-12"
-            >
-              {isCreatingCheckout ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Redirection...
-                </>
-              ) : (
-                <>
-                  Oui, je veux mon Pack Clé en Main
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
-            </GlowButton>
-            <p className="text-gray-500 text-sm mt-4">
-              Paiement sécurisé par Stripe • Satisfait ou remboursé 30 jours
-            </p>
+            <div className="flex justify-center mb-4">
+              <GlowButton
+                onClick={handleGetAccess}
+                disabled={isCreatingCheckout}
+                size="lg"
+                className="px-12"
+              >
+                {isCreatingCheckout ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Redirection...
+                  </>
+                ) : (
+                  <>
+                    Oui, je veux mon Pack Clé en Main
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
+              </GlowButton>
+            </div>
+            <div className="flex items-center justify-center gap-4 text-gray-500 text-sm mt-4">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                  <path d="M2 12C2 6.48 6.47 2 12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.47 22 2 17.52 2 12Z" fill="#635BFF"/>
+                  <path d="M10.5 14.25C10.5 13.86 10.64 13.53 10.91 13.26C11.18 12.99 11.51 12.85 11.9 12.85C12.29 12.85 12.62 12.99 12.89 13.26C13.16 13.53 13.3 13.86 13.3 14.25C13.3 14.64 13.16 14.97 12.89 15.24C12.62 15.51 12.29 15.65 11.9 15.65C11.51 15.65 11.18 15.51 10.91 15.24C10.64 14.97 10.5 14.64 10.5 14.25ZM15.5 9.75C15.5 10.49 15.27 11.13 14.81 11.66C14.35 12.19 13.78 12.55 13.1 12.75V13.15C13.1 13.43 13 13.67 12.8 13.87C12.6 14.07 12.36 14.17 12.08 14.17H11.72C11.44 14.17 11.2 14.07 11 13.87C10.8 13.67 10.7 13.43 10.7 13.15V12.35C10.7 12.07 10.8 11.83 11 11.63C11.2 11.43 11.44 11.33 11.72 11.33C12.17 11.33 12.55 11.18 12.87 10.88C13.19 10.58 13.35 10.21 13.35 9.77C13.35 9.33 13.19 8.96 12.87 8.66C12.55 8.36 12.17 8.21 11.72 8.21C11.27 8.21 10.89 8.36 10.57 8.66C10.25 8.96 10.09 9.33 10.09 9.77V9.95C10.09 10.23 9.99 10.47 9.79 10.67C9.59 10.87 9.35 10.97 9.07 10.97H8.71C8.43 10.97 8.19 10.87 7.99 10.67C7.79 10.47 7.69 10.23 7.69 9.95V9.75C7.69 9.01 7.92 8.37 8.38 7.84C8.84 7.31 9.41 6.95 10.09 6.75C10.77 6.55 11.45 6.55 12.13 6.75C12.81 6.95 13.38 7.31 13.84 7.84C14.3 8.37 14.53 9.01 14.53 9.75H15.5Z" fill="white"/>
+                </svg>
+                <span>Paiement sécurisé par Stripe</span>
+              </div>
+              <span>•</span>
+              <span>Satisfait ou remboursé 30 jours</span>
+            </div>
           </motion.div>
 
         </div>

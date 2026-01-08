@@ -378,11 +378,47 @@ SUMMARY ONBOARDING (données structurées issues des 11 questions IA) :
 HISTORIQUE COMPLET DES Q/R (brut) :
 ${historyText || 'Non disponible'}
 
-DONNÉES STATIQUES (objectifs, revenus, freins, etc.) :
-Objectif revenus : ${onboardingFull.targetIncome || 'non spécifié'}
-Freins principaux : ${JSON.stringify(onboardingFull.obstacles || [])}
-Motivation : ${onboardingFull.readiness || 'non spécifié'}
-Autres données : ${JSON.stringify(onboardingFull, null, 2)}
+DONNÉES STATIQUES ISSUES DES QUESTIONS Q12-Q26 (SIGNAUX LATENTS) :
+
+🎯 PROFIL & CONTRAINTES (Q12-Q15) :
+- Tranche d'âge : ${onboardingFull.ageRange || 'non spécifié'}
+- Genre : ${onboardingFull.gender || 'non spécifié'}
+- Situation familiale : ${onboardingFull.familySituation || 'non spécifié'}
+- Revenus actuels : ${onboardingFull.currentIncome || 'non spécifié'}
+
+💰 AMBITION & TIMING (Q16-Q17) :
+- Objectif revenus : ${onboardingFull.targetIncome || 'non spécifié'} € / mois
+- Délai souhaité : ${onboardingFull.targetIncomeDelay || 'non spécifié'} mois
+
+🔥 MOTIVATION ÉMOTIONNELLE (Q18-Q22) :
+- Projection de vie : ${onboardingFull.lifeChangeStory || 'non spécifié'}
+- Impact souhaité : ${onboardingFull.impactOnOthers || 'non spécifié'}
+- Émotions recherchées : ${onboardingFull.desiredEmotions || 'non spécifié'}
+- Regard des proches : ${onboardingFull.relativesReaction || 'non spécifié'}
+- Style de vie visé : ${onboardingFull.desiredLifestyle || 'non spécifié'}
+
+🚧 FREINS & MATURITÉ (Q23-Q25) :
+- Obstacles perçus : ${JSON.stringify(onboardingFull.perceivedObstacles || [])}
+- Scénario "si rien ne change" : ${onboardingFull.nothingChangesScenario || 'non spécifié'}
+- Niveau de préparation (1-10) : ${onboardingFull.readinessScore || 'non spécifié'}
+
+🧱 FORMATS PRÉFÉRÉS (Q26) :
+- Préférences de delivery : ${JSON.stringify(onboardingFull.deliveryPreferences || [])}
+
+⚠️ RÈGLES D'EXPLOITATION (CRITIQUE) :
+❌ NE JAMAIS répéter ces données textuellement dans les offres
+❌ NE JAMAIS lister ces réponses
+❌ NE JAMAIS créer un sentiment de "questionnaire exploité mécaniquement"
+
+✅ UTILISER CES DONNÉES COMME SIGNAUX LATENTS POUR :
+- Adapter le NIVEAU DE COMPLEXITÉ selon profil/contraintes
+- Calibrer le PRIX selon ambition financière et délai
+- Ajuster le TON et l'ANGLE selon motivation émotionnelle
+- Adapter la STRUCTURE selon freins/maturité
+- Choisir les FORMATS selon préférences delivery
+
+✅ OBJECTIF :
+L'offre doit donner l'impression d'être "faite pour moi" sans que l'utilisateur sache pourquoi.
 
 INSTRUCTIONS CRITIQUES POUR LES TITRES - NOMS DE PRODUITS BRANDÉS ET ÉLABORÉS :
 

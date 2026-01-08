@@ -54,6 +54,7 @@ export default function OnboardingQuestionPage({
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const isSavingRef = useRef(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const fileInputRef = useRef(null);
@@ -130,17 +131,23 @@ export default function OnboardingQuestionPage({
   const handleNext = async () => {
     if (!canProceed()) return;
     
+    // 🔒 Anti-double-click
+    if (isSavingRef.current) {
+      console.warn('⚠️ Already saving, ignoring click');
+      return;
+    }
+    
+    isSavingRef.current = true;
     setIsSaving(true);
+    
     try {
       if (customHandleSave) {
-        // Handler personnalisé (pour Q26)
         await customHandleSave(user, value);
         navigate(createPageUrl(nextPage));
         return;
       }
       
       if (useLocalStorage) {
-        // Mode localStorage
         localStorage.setItem(`onboarding_${fieldName}`, 
           inputType === 'checkbox' ? JSON.stringify(value) : value
         );
@@ -148,43 +155,51 @@ export default function OnboardingQuestionPage({
         return;
       }
 
-      // Mode base44 - toujours sauvegarder dans User ET Session.onboarding_full
+      // Mode base44 - sauvegarder dans User
       await base44.auth.updateMe({ [fieldName]: value });
       
-      // 🔥 P0 FIX : Toujours sauvegarder dans Session.onboarding_full (DB-first avec merge)
-      if (user.sessionId) {
-        const sessions = await base44.asServiceRole.entities.Session.filter({ id: user.sessionId });
-        if (sessions.length > 0) {
-          const session = sessions[0];
-          const existing = session.onboarding_full || {};
-          const updatedFull = { ...existing, [fieldName]: value };
-          
-          // Cas spécial Q26 : sync aussi dans summary
-          const updates = { onboarding_full: updatedFull };
-          if (fieldName === 'deliveryPreferences') {
-            updates.onboarding_summary = {
-              ...(session.onboarding_summary || {}),
-              format_preferences: value
-            };
-          }
-          if (nextPage === 'OfferGenerationStart') {
-            updates.is_onboarding_done = true;
-          }
-          
-          await base44.asServiceRole.entities.Session.update(user.sessionId, updates);
-          
-          console.log('✅ [ONBOARDING_SAVE]', {
+      // 🔥 BACKEND MERGE : appeler la fonction qui fait le merge server-side
+      if (user.sessionId && fieldName) {
+        try {
+          const response = await base44.functions.invoke('saveOnboardingAnswer', {
             sessionId: user.sessionId,
-            fieldName,
-            saved: true,
-            nextPage,
-            fullKeys: Object.keys(updatedFull)
+            field: fieldName,
+            value
           });
-        } else {
-          console.warn('⚠️ [ONBOARDING_SAVE] Session not found:', user.sessionId);
+          
+          if (response.data?.success) {
+            console.log('✅ [ONBOARDING_SAVE]', {
+              sessionId: user.sessionId,
+              fieldName,
+              saved: true,
+              nextPage,
+              totalKeys: Object.keys(response.data.onboarding_full || {}).length
+            });
+          } else {
+            console.error('❌ [ONBOARDING_SAVE] Backend returned error:', response.data);
+          }
+        } catch (backendError) {
+          console.error('❌ [ONBOARDING_SAVE] Backend call failed:', backendError);
+          // Continue anyway - User data is saved
         }
-      } else {
-        console.warn('⚠️ [ONBOARDING_SAVE] No sessionId on user');
+        
+        // Cas spécial Q26 : sync format_preferences dans summary
+        if (fieldName === 'deliveryPreferences') {
+          try {
+            const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+            if (sessions.length > 0) {
+              const session = sessions[0];
+              await base44.asServiceRole.entities.Session.update(user.sessionId, {
+                onboarding_summary: {
+                  ...(session.onboarding_summary || {}),
+                  format_preferences: value
+                }
+              });
+            }
+          } catch (e) {
+            console.warn('⚠️ Could not sync format_preferences to summary:', e);
+          }
+        }
       }
       
       // Marquer onboarding_completed si on va vers OfferGenerationStart
@@ -196,9 +211,11 @@ export default function OnboardingQuestionPage({
       navigate(createPageUrl(nextPage));
       
     } catch (error) {
-      console.error('❌ [ONBOARDING_SAVE] Error saving:', error);
+      console.error('❌ [ONBOARDING_SAVE] Error:', error);
+      alert('Erreur lors de la sauvegarde. Réessaye.');
     } finally {
       setIsSaving(false);
+      isSavingRef.current = false;
     }
   };
 

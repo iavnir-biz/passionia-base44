@@ -4,11 +4,14 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Brain, Sparkles, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function OfferGenerationStart() {
   const navigate = useNavigate();
   const [dots, setDots] = useState(0);
   const [currentMessage, setCurrentMessage] = useState(0);
+  const [error, setError] = useState(null);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const messages = [
     "J'analyse ton marché",
@@ -39,32 +42,49 @@ export default function OfferGenerationStart() {
     return () => clearInterval(messageInterval);
   }, []);
 
-  const generateOffer = async () => {
+  const generateOffer = async (retryCount = 0) => {
     try {
       const user = await base44.auth.me();
       
-      // 🔥 SOURCE OF TRUTH : user.sessionId
       if (!user.sessionId) {
-        console.error('❌ [OfferGenerationStart] Pas de sessionId sur User');
+        console.error('❌ [OFFER_START] Pas de sessionId sur User');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
-      // Charger la session via user.sessionId (source of truth)
-      const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+      // 🔥 Charger session avec retry sur 429
+      let sessions = null;
+      try {
+        sessions = await base44.entities.Session.filter({ id: user.sessionId });
+      } catch (fetchError) {
+        // Si 429 ou erreur réseau, retry 1 fois après délai
+        if (retryCount === 0 && (fetchError.message?.includes('429') || fetchError.message?.includes('Too Many'))) {
+          console.warn('⚠️ [OFFER_START] Rate limit, retry dans 1s...');
+          setIsRetrying(true);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          setIsRetrying(false);
+          return generateOffer(1); // Retry
+        }
+        
+        // Erreur persistante
+        console.error('❌ [OFFER_START] Fetch session failed:', fetchError);
+        setError({
+          type: 'fetch_error',
+          message: 'Impossible de charger tes données. Vérifie ta connexion.'
+        });
+        return;
+      }
       
       if (!sessions || sessions.length === 0) {
-        console.error('❌ [OfferGenerationStart] Session introuvable avec id:', user.sessionId);
-        // Fallback : chercher par email (debug mode)
+        console.error('❌ [OFFER_START] Session introuvable:', user.sessionId);
         const fallbackSessions = await base44.entities.Session.filter({ created_by: user.email });
         if (fallbackSessions.length > 0) {
-          console.warn('⚠️ [OfferGenerationStart] Fallback sur created_by, prendre la plus récente');
+          console.warn('⚠️ [OFFER_START] Fallback sur created_by');
           const latestSession = fallbackSessions.sort((a, b) => 
             new Date(b.created_date) - new Date(a.created_date)
           )[0];
-          // Corriger le sessionId sur User
           await base44.auth.updateMe({ sessionId: latestSession.id });
-          sessions.push(latestSession);
+          sessions = [latestSession];
         } else {
           navigate(createPageUrl('OnboardingFirstName'));
           return;
@@ -74,7 +94,7 @@ export default function OfferGenerationStart() {
       const session = sessions[0];
       const sessionId = session.id;
 
-      console.log('📊 [OfferGenerationStart] Session loaded:', {
+      console.log('✅ [OFFER_START] Session loaded:', {
         sessionId,
         historyLength: session.onboarding_history?.length || 0,
         summaryKeys: Object.keys(session.onboarding_summary || {}),
@@ -93,19 +113,19 @@ export default function OfferGenerationStart() {
         return;
       }
 
-      // 🔥 P0 FIX : Validation stricte + redirect intelligent vers la bonne question
+      // 🔥 Validation stricte + redirect intelligent
       const requiredFullKeys = ['targetIncome', 'perceivedObstacles', 'readinessScore'];
       const fullData = session.onboarding_full || {};
       const missingKeys = requiredFullKeys.filter(k => !fullData[k] && fullData[k] !== 0);
 
-      if (missingKeys.length > 0) {
-        console.log('⚠️ [OFFER_START_GUARD]', {
-          sessionId,
-          missingKeys,
-          currentFull: Object.keys(fullData)
-        });
+      console.log('🔍 [OFFER_START]', {
+        sessionId,
+        missingFields: missingKeys,
+        fullDataKeys: Object.keys(fullData),
+        status: missingKeys.length === 0 ? 'ready' : 'incomplete'
+      });
 
-        // Redirect intelligent vers la première question manquante
+      if (missingKeys.length > 0) {
         const redirectMap = {
           'targetIncome': 'OnboardingQ16TargetIncome',
           'perceivedObstacles': 'OnboardingQ23Obstacles',
@@ -115,17 +135,10 @@ export default function OfferGenerationStart() {
         const firstMissing = missingKeys[0];
         const redirectPage = redirectMap[firstMissing] || 'OnboardingQ16TargetIncome';
         
-        console.log('🔄 [OFFER_START_GUARD] Redirect to:', redirectPage);
+        console.log('🔄 [OFFER_START] Redirect:', redirectPage, 'missing:', missingKeys);
         navigate(createPageUrl(redirectPage));
         return;
       }
-
-      console.log('✅ [OFFER_START_GUARD] All required keys present:', {
-        sessionId,
-        hasTargetIncome: !!fullData.targetIncome,
-        hasObstacles: !!fullData.perceivedObstacles,
-        hasReadiness: !!fullData.readinessScore
-      });
 
       const missingData = [];
       
@@ -194,11 +207,42 @@ export default function OfferGenerationStart() {
       console.log('✅ [OfferGenerationStart] Génération réussie → Navigation');
       navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
-      console.error('❌ Error in generateOffer:', error);
-      alert(`Erreur: ${error.message}`);
-      navigate(createPageUrl('OfferProductPrincipal'));
+      console.error('❌ [OFFER_START] Error:', error);
+      setError({
+        type: 'generation_error',
+        message: error.message || 'Une erreur est survenue'
+      });
     }
   };
+  
+  const handleRetry = () => {
+    setError(null);
+    setIsRetrying(false);
+    generateOffer(0);
+  };
+
+  // Écran d'erreur avec retry
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center z-50">
+        <div className="text-center max-w-md px-6">
+          <div className="w-20 h-20 rounded-full bg-red-100 mx-auto mb-6 flex items-center justify-center">
+            <span className="text-4xl">⚠️</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            {error.type === 'fetch_error' ? 'Trop de trafic' : 'Erreur'}
+          </h2>
+          <p className="text-gray-600 mb-6">{error.message}</p>
+          <Button
+            onClick={handleRetry}
+            className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-8 py-3 rounded-xl font-semibold"
+          >
+            Réessayer
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center z-50">

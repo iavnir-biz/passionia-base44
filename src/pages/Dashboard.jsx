@@ -125,13 +125,12 @@ export default function Dashboard() {
             present: requiredFields.filter(f => userSession[f]),
             missing: missingFields
           });
-          
-          // 🧪 DÉSACTIVÉ POUR TESTS - À RÉACTIVER EN PROD
-          // if (missingFields.length > 0) {
-          //   console.log('[Dashboard] Redirecting to NoahGeneration - incomplete assets');
-          //   navigate(createPageUrl('NoahGeneration'));
-          //   return;
-          // }
+
+          if (missingFields.length > 0) {
+            console.log('[Dashboard] Redirecting to NoahGeneration - incomplete assets');
+            navigate(createPageUrl('NoahGeneration'));
+            return;
+          }
         }
       }
       

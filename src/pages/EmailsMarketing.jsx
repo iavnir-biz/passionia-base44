@@ -111,13 +111,6 @@ export default function EmailsMarketing() {
       if (isNonEmpty(userSession.generated_marketing_emails)) {
         setGeneratedEmails(userSession.generated_marketing_emails);
       }
-      
-      // 🧪 QA CHECK (temporary)
-      console.log('[DB-FIRST]', {
-        page: 'EmailsMarketing',
-        sessionId,
-        hasData: isNonEmpty(userSession.generated_marketing_emails)
-      });
 
       const profileRes = await base44.entities.UserProfile.filter({ created_by: user.email });
       if (profileRes.length > 0) {

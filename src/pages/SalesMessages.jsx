@@ -66,13 +66,6 @@ export default function SalesMessages() {
       if (isNonEmpty(userSession.generated_sales_messages)) {
         setGeneratedMessages(userSession.generated_sales_messages);
       }
-      
-      // 🧪 QA CHECK (temporary)
-      console.log('[DB-FIRST]', {
-        page: 'SalesMessages',
-        sessionId,
-        hasData: isNonEmpty(userSession.generated_sales_messages)
-      });
 
       const profiles = await base44.entities.UserProfile.filter({ 
         created_by: currentUser.email 

@@ -195,13 +195,6 @@ export default function AIResources() {
       };
       
       setGeneratedResources(resourcesState);
-      
-      // 🧪 QA CHECK (temporary)
-      console.log('[DB-FIRST]', {
-        page: 'AIResources',
-        sessionId,
-        resourcesState
-      });
 
     } catch (error) {
       console.error('[AIResources] Error loading data:', error);

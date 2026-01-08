@@ -37,13 +37,13 @@ function parsePrice(priceStr) {
   return parseInt(cleaned, 10) || 0;
 }
 
-function ProgressBarItem({ label, value, icon: Icon, delay = 0 }) {
+function ProgressBarItem({ label, value, icon: Icon, explanation, delay = 0 }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay }}
-      className="space-y-3"
+      className="space-y-2"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -54,7 +54,10 @@ function ProgressBarItem({ label, value, icon: Icon, delay = 0 }) {
         </div>
         <span className="text-sm font-bold text-[#61f7a2]">{value}%</span>
       </div>
-      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+      {explanation && (
+        <p className="text-xs text-gray-600 ml-11 leading-relaxed">{explanation}</p>
+      )}
+      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
@@ -113,6 +116,7 @@ export default function BonneNouvelle() {
         setMarketAnalysis({
           validationText: currentSession.market_validation,
           marketScores: currentSession.market_validation_scores || {},
+          scoreExplanations: currentSession.market_validation_score_explanations || {},
           sources: currentSession.market_validation_sources || {},
           summary: currentSession.onboarding_summary || {}
         });
@@ -143,6 +147,7 @@ export default function BonneNouvelle() {
         setMarketAnalysis({
           validationText: data.marketValidation,
           marketScores: data.marketScores || {},
+          scoreExplanations: data.scoreExplanations || {},
           sources: data.sources || {},
           summary
         });
@@ -154,13 +159,20 @@ export default function BonneNouvelle() {
       const profile = summary.learner_profile || 'des personnes motivées';
       
       setMarketAnalysis({
-        validationText: `Excellente nouvelle ${user?.firstName || ''} ! Ton projet autour de ${who} répond à un vrai besoin chez ${profile}.\n\nLe marché de la transmission de savoir en ligne connaît une croissance exceptionnelle, et les gens sont prêts à investir pour apprendre auprès d'experts comme toi. Avec ton expérience et ta méthode unique, tu as toutes les cartes en main pour réussir.`,
+        validationText: `${user?.firstName || ''}, les personnes que tu veux aider font face à un blocage réel. Ce problème les empêche de progresser efficacement.\n\nCe que tu proposes répond directement à ce blocage : un résultat rapide dès le départ, puis une transformation durable. Cette progression claire crée une valeur perçue forte.\n\nTon objectif de revenus est cohérent avec les formats que tu as choisis et le niveau de transformation que tu apportes. Le ratio effort/revenus est favorable.`,
         marketScores: {
-          marketSize: 78,
-          demandIntensity: 82,
-          revenueRecurrence: 75,
-          onlineAccessibility: 85,
-          easeOfImplementation: 76
+          marketSize: 68,
+          demandIntensity: 74,
+          revenueRecurrence: 70,
+          onlineAccessibility: 82,
+          easeOfImplementation: 71
+        },
+        scoreExplanations: {
+          marketSize: "Score modéré car audience ciblée spécifique.",
+          demandIntensity: "Score élevé car besoin identifié et douleur concrète.",
+          revenueRecurrence: "Score élevé car potentiel de récurrence.",
+          onlineAccessibility: "Score très élevé car formats digitaux scalables.",
+          easeOfImplementation: "Score modéré car mise en œuvre progressive requise."
         },
         summary
       });
@@ -248,6 +260,7 @@ export default function BonneNouvelle() {
   });
   
   const scores = marketAnalysis?.marketScores || {};
+  const scoreExplanations = marketAnalysis?.scoreExplanations || {};
   const summary = marketAnalysis?.summary || {};
 
   const completedSteps = [1, 2, 3, 4]; // Jusqu'à Tes offres complété
@@ -349,35 +362,40 @@ export default function BonneNouvelle() {
                 <Loader2 className="w-6 h-6 text-[#61f7a2] animate-spin" />
               </div>
             ) : (
-              <div className="space-y-5">
+              <div className="space-y-6">
                 <ProgressBarItem 
-                  label={summary.who_to_teach ? `Demande pour ${summary.who_to_teach}` : "Taille du marché"} 
-                  value={scores.marketSize || 78}
+                  label="Taille du marché"
+                  value={scores.marketSize || 68}
+                  explanation={scoreExplanations.marketSize}
                   icon={Globe}
                   delay={0}
                 />
                 <ProgressBarItem 
-                  label={summary.learner_profile ? `Volonté d'investir de ${summary.learner_profile}` : "Intensité de la demande"} 
-                  value={scores.demandIntensity || 82}
+                  label="Intensité de la demande"
+                  value={scores.demandIntensity || 74}
+                  explanation={scoreExplanations.demandIntensity}
                   icon={TrendingUp}
                   delay={0.1}
                 />
                 <ProgressBarItem 
                   label="Potentiel de revenus récurrents" 
-                  value={scores.revenueRecurrence || 75}
+                  value={scores.revenueRecurrence || 70}
+                  explanation={scoreExplanations.revenueRecurrence}
                   icon={Repeat}
                   delay={0.2}
                 />
                 <ProgressBarItem 
-                  label="Accessibilité globale en ligne" 
-                  value={scores.onlineAccessibility || 85}
-                  icon={Users}
+                  label="Accessibilité en ligne" 
+                  value={scores.onlineAccessibility || 82}
+                  explanation={scoreExplanations.onlineAccessibility}
+                  icon={Laptop}
                   delay={0.3}
                 />
                 <ProgressBarItem 
-                  label={summary.who_to_teach ? `Facilité de transmission de ${summary.who_to_teach}` : "Facilité de mise en place"} 
-                  value={scores.easeOfImplementation || 76}
-                  icon={Laptop}
+                  label="Facilité de mise en œuvre"
+                  value={scores.easeOfImplementation || 71}
+                  explanation={scoreExplanations.easeOfImplementation}
+                  icon={Users}
                   delay={0.4}
                 />
               </div>

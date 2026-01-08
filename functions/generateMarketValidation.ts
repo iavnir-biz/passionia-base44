@@ -5,31 +5,66 @@ const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
-const SYSTEM_PROMPT = `Tu es Noah, une IA analyste marché et stratège pédagogique.
+const SYSTEM_PROMPT = `RÔLE DE L'IA
+Tu es Noah, analyste stratégique senior de Passion IA.
+Tu produis des validations de marché de niveau McKinsey :
+- analytiques
+- structurées
+- basées sur des données factuelles
+- avec explications causales systématiques
 
-🌐 RECHERCHE WEB OBLIGATOIRE
-AVANT de répondre, tu DOIS effectuer une recherche web approfondie sur :
-- Le marché de la niche EXACTE de l'utilisateur (pas juste "e-learning")
-- Les statistiques sectorielles récentes (Statista, études de marché, rapports)
-- Les tendances de recherche et comportements d'achat
-- La croissance du secteur spécifique
-- Les données de demande (volume de recherches, forums, communautés)
+OBJECTIF
+Produire une validation qui fait dire à l'utilisateur :
+"Ok, là c'est du sérieux. Ils ont VRAIMENT analysé MON projet."
 
-❌ INTERDIT : 
-- Utiliser des chiffres génériques ou inventés
-- Parler uniquement du "marché e-learning global"
-- Utiliser des pourcentages ultra-précis (14,7% → arrondir à 15%)
-- Donner des chiffres sans contexte temporel
+INTERDICTIONS ABSOLUES
+❌ Ne jamais :
+- parler du "marché de la formation en ligne" de façon générique
+- répéter la compétence brute (ex: "Aider les entrepreneurs à organiser leur business avec Notion")
+- afficher un score sans explication causale précise
+- utiliser des phrases applicables à n'importe quel projet
+- faire du marketing bullshit
 
-✅ OBLIGATOIRE :
-- AU MOINS 1 statistique SPÉCIFIQUE à la niche (pas juste e-learning)
-- Arrondir les pourcentages (≈, environ, plus de, etc.)
-- Mentionner l'année ou la période (2024, ces dernières années, etc.)
-- S'appuyer sur des données réelles trouvées en ligne
+STRUCTURE OBLIGATOIRE
 
-FORMAT JSON DE SORTIE STRICT :
+1️⃣ VALIDATION STRATÉGIQUE (Paragraphe 1)
+Analyse en 3 points reliés par une logique causale :
+
+POINT A — LE PROBLÈME EST RÉEL
+"${name}, les [learner_profile] que tu cibles font face à [main_learning_problem spécifique].
+Ce blocage n'est pas anodin : il les empêche de [conséquence concrète]."
+
+POINT B — TON OFFRE RÉPOND PRÉCISÉMENT
+"Ce que tu proposes répond directement à ce blocage : [quick_win] dès le départ,
+puis [big_transformation] sur le long terme."
+
+POINT C — LA VALEUR EST ÉVIDENTE
+"Cette progression claire (problème → quick win → transformation) crée une valeur perçue forte,
+ce qui justifie un positionnement premium."
+
+2️⃣ ANALYSE COMPARATIVE (Paragraphe 2)
+Structure McKinsey obligatoire :
+
+"Comparé à d'autres niches d'enseignement en ligne :
+- [Élément différenciant 1 basé sur method_angle]
+- [Élément différenciant 2 basé sur learner_profile]
+- [Élément différenciant 3 basé sur big_transformation]
+
+Ces trois facteurs te donnent un avantage compétitif mesurable."
+
+3️⃣ PROJECTION REVENUS JUSTIFIÉE (Paragraphe 3)
+Explication causale des revenus :
+
+"[targetIncome] € / mois est un objectif cohérent car :
+→ Les formats que tu as choisis ([format_preferences]) permettent une scalabilité [élevée/moyenne]
+→ Le niveau de transformation ([big_transformation]) justifie un pricing [low/mid/high]-ticket
+→ Ton angle différenciant ([method_angle]) réduit la friction à l'achat
+
+Le ratio effort/revenus est favorable."
+
+FORMAT JSON DE SORTIE :
 {
-  "validationText": "Texte en 3 sections séparées par \\n\\n",
+  "validationText": "Texte en 3 paragraphes séparés par \\n\\n (structure McKinsey stricte)",
   "marketScores": {
     "marketSize": 75,
     "demandIntensity": 82,
@@ -37,34 +72,34 @@ FORMAT JSON DE SORTIE STRICT :
     "onlineAccessibility": 90,
     "easeOfImplementation": 70
   },
+  "scoreExplanations": {
+    "marketSize": "Explication causale précise basée sur learner_profile",
+    "demandIntensity": "Explication causale précise basée sur main_learning_problem",
+    "revenueRecurrence": "Explication causale précise basée sur big_transformation",
+    "onlineAccessibility": "Explication causale précise basée sur format_preferences",
+    "easeOfImplementation": "Explication causale précise basée sur common_mistake"
+  },
   "sources": {
     "foundNicheData": true,
     "dataQuality": "high",
-    "statsCount": 3
+    "statsCount": 0
   }
 }
 
-SCORES (0-100) :
-- marketSize : Taille du marché (petit=40-60, moyen=60-80, grand=80-100)
-- demandIntensity : Intensité de la demande actuelle
-- revenueRecurrence : Potentiel de revenus récurrents
-- onlineAccessibility : Facilité d'accès global/online
-- easeOfImplementation : Facilité de mise en œuvre
-
-SOURCES :
-- foundNicheData : true si données spécifiques à la niche trouvées
-- dataQuality : "high", "medium", "low"
-- statsCount : nombre de statistiques chiffrées utilisées
-
-⚠️ Les scores DOIVENT varier selon la niche réelle analysée
-⚠️ Si aucune donnée fiable : fallback qualitatif + scores conservateurs (50-65)
-
 TON & STYLE
-- Ton rassurant, professionnel, humain
-- Toujours spécifique à la niche EXACTE
+- Analytique, structuré, McKinsey
+- Phrases courtes, précises
+- Logique causale explicite (→, car, donc)
 - Tutoiement + prénom
-- 2-3 émojis pertinents (🎯, 💡, 🚀, 📈, ✨, 💰)
-- Paragraphes courts (3 sections distinctes)`;
+- Zéro fluff, zéro marketing
+- Crédibilité maximale
+
+⚠️ VALIDATION :
+- 3 paragraphes distincts (séparés par \\n\\n)
+- Chaque paragraphe suit SA structure obligatoire
+- Scores + explications causales (scoreExplanations)
+- Longueur minimale : 400 caractères
+- Aucun terme générique`;
 
 Deno.serve(async (req) => {
   try {
@@ -127,47 +162,126 @@ Deno.serve(async (req) => {
 
     const userPrompt = `${genderAgreement}
 
-NICHE À ANALYSER : "${skill}"
+DONNÉES D'ONBOARDING (À EXPLOITER OBLIGATOIREMENT) :
 
-CONTEXTE UTILISATEUR :
-- Prénom : ${name}
+📋 ONBOARDING SUMMARY :
+- who_to_teach : ${onboardingSummary.who_to_teach || 'non spécifié'}
+- learner_profile : ${onboardingSummary.learner_profile || 'non spécifié'}
+- main_learning_problem : ${onboardingSummary.main_learning_problem || 'non spécifié'}
+- quick_win : ${onboardingSummary.quick_win || 'non spécifié'}
+- big_transformation : ${onboardingSummary.big_transformation || 'non spécifié'}
+- method_angle : ${onboardingSummary.method_angle || 'non spécifié'}
+- common_mistake : ${onboardingSummary.common_mistake || 'non spécifié'}
+- proof_or_story : ${onboardingSummary.proof_or_story || 'non spécifié'}
+- format_preferences : ${JSON.stringify(onboardingSummary.format_preferences || [])}
+
+🎯 OBJECTIFS & CONTRAINTES :
+- Objectif revenu : ${onboardingFull.targetIncome || 'non spécifié'} € / mois
+- Délai souhaité : ${onboardingFull.targetIncomeDelay || 'non spécifié'} mois
+- Freins perçus : ${JSON.stringify(onboardingFull.perceivedObstacles || [])}
+- Niveau de préparation : ${onboardingFull.readinessScore || 'non spécifié'}/10
+
+📦 OFFRES SÉLECTIONNÉES :
 - Produit Principal : "${mainProductTitle}"
-- Description : ${mainProductDescription}
 - Offre Supérieure : "${upsell1Title}"
 - Offre Premium : "${premiumTitle}"
 
-🔍 ÉTAPE 1 (OBLIGATOIRE) : RECHERCHE WEB
-Effectue une recherche approfondie sur :
-- Le marché SPÉCIFIQUE de "${skill}" (pas juste "e-learning global")
-- Les statistiques sectorielles RÉCENTES (avec année/période)
-- La demande en ligne (volume de recherches, forums, communautés)
-- Les frustrations réelles des apprenants dans ce domaine
-- Les comportements d'achat dans cette niche
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🎯 ÉTAPE 2 : RÉDACTION
-Basé sur les données trouvées, rédige :
-- Une analyse en 3 sections (séparées par \\n\\n)
-- AU MOINS 1 statistique SPÉCIFIQUE à "${skill}" (pas juste e-learning)
-- Chiffres arrondis avec contexte temporel (≈, environ, 2024, etc.)
-- Des douleurs concrètes identifiées via ta recherche
-- 2-3 émojis bien placés
+GÉNÈRE UN TEXTE DE VALIDATION EN 3 PARAGRAPHES :
 
-📊 ÉTAPE 3 : CALCUL DES SCORES + METADATA
-Évalue 5 dimensions sur 100 selon les données trouvées :
-- marketSize : taille réelle du marché
-- demandIntensity : intensité actuelle de la demande
-- revenueRecurrence : potentiel de revenus récurrents
-- onlineAccessibility : accessibilité globale/online
-- easeOfImplementation : facilité de mise en œuvre
+1️⃣ PARAGRAPHE 1 — POURQUOI ÇA FONCTIONNE
+Relie :
+- La douleur (main_learning_problem)
+- Le résultat rapide (quick_win)
+- La transformation (big_transformation)
 
-AJOUTE LES METADATA SOURCES :
-- foundNicheData : true si tu as trouvé des données spécifiques à "${skill}"
-- dataQuality : "high" si plusieurs sources fiables, "medium" si partiel, "low" si peu de données
-- statsCount : nombre de statistiques chiffrées dans ton texte
+Exemple de structure :
+"${name}, ce que tu proposes répond à un vrai blocage : [main_learning_problem]. 
+Ce que tu leur apportes, c'est d'abord [quick_win], puis la capacité de [big_transformation]."
 
-⚠️ Si données insuffisantes : analyse qualitative + scores conservateurs (50-65) + foundNicheData=false
+❌ Ne PAS répéter "enseigner ${skill}"
+✅ Parler de la TRANSFORMATION vécue par l'élève
 
-RETOURNE UN JSON STRICT avec validationText + marketScores + sources`;
+2️⃣ PARAGRAPHE 2 — POURQUOI LE MARCHÉ EST SOLIDE
+Base tes explications sur :
+- learner_profile (qui est prêt à payer)
+- main_learning_problem (intensité de la douleur)
+- method_angle (différenciation)
+
+❌ Ne PAS parler du "marché de la formation en ligne" de façon générique
+✅ Expliquer pourquoi CES personnes avec CE problème sont prêtes à investir
+
+3️⃣ PARAGRAPHE 3 — POURQUOI LES REVENUS SONT ATTEIGNABLES
+Relier :
+- format_preferences (vidéos, PDFs, 1-on-1, etc.)
+- targetIncome et targetDelay
+- big_transformation (valeur perçue)
+
+Expliquer :
+"[targetIncome] € / mois est atteignable car [raisons basées sur formats + transformation]"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 CALCUL DES SCORES + EXPLICATIONS CAUSALES (OBLIGATOIRE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pour CHAQUE score, tu DOIS générer :
+1. Un score numérique (0-100)
+2. Une explication causale précise (scoreExplanations)
+
+STRUCTURE DES EXPLICATIONS (TYPE MCKINSEY) :
+"Score [élevé/modéré/faible] car [raison factuelle basée sur données onboarding]"
+
+EXEMPLES DE BONNES EXPLICATIONS :
+
+marketSize (basé sur learner_profile) :
+✅ "Score modéré (68) car tu cibles une niche spécifique : les [learner_profile]. Population ciblée estimée à quelques milliers en France, mais demande concentrée."
+❌ "Score élevé car grand marché"
+
+demandIntensity (basé sur main_learning_problem) :
+✅ "Score élevé (84) car le problème '[main_learning_problem]' crée une friction quotidienne pour ton audience. Besoin ressenti immédiat."
+❌ "Score élevé car forte demande"
+
+revenueRecurrence (basé sur big_transformation) :
+✅ "Score élevé (79) car la transformation '[big_transformation]' nécessite un accompagnement dans la durée. Potentiel de renouvellement fort (coaching, communauté)."
+❌ "Score élevé car récurrent"
+
+onlineAccessibility (basé sur format_preferences) :
+✅ "Score très élevé (92) car tes formats privilégiés ([format_preferences]) sont 100% digitaux et scalables sans limite géographique."
+❌ "Score élevé car en ligne"
+
+easeOfImplementation (basé sur method_angle + common_mistake) :
+✅ "Score modéré (71) car ton angle '[method_angle]' nécessite un cadrage initial, mais évite l'erreur '[common_mistake]' qui ralentit habituellement la mise en œuvre."
+❌ "Score moyen"
+
+RÈGLES DES SCORES :
+- marketSize : niche spécifique = 50-68, marché moyen = 69-79, large = 80-95
+- demandIntensity : douleur faible = 50-65, moyenne = 66-79, forte = 80-95
+- revenueRecurrence : ponctuel = 50-65, significatif = 66-79, profond = 80-95
+- onlineAccessibility : présentiel = 40-55, mix = 60-75, 100% online = 80-95
+- easeOfImplementation : complexe = 50-65, moyen = 66-79, simple = 80-95
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ CONTRAINTES STRICTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ OBLIGATOIRE :
+- 3 paragraphes distincts (séparés par \\n\\n)
+- Longueur minimale : 350 caractères
+- Scores justifiés par les données d'onboarding
+- Aucun terme générique du type "marché de la formation en ligne"
+- Tutoiement + prénom (${name})
+- Ton rassurant, intelligent, crédible
+
+❌ INTERDIT :
+- Répéter la compétence brute
+- Parler du "marché e-learning global"
+- Scores sans justification
+- Phrases applicables à n'importe quel projet
+
+RETOURNE UN JSON avec validationText + marketScores + sources`;
 
     console.log('🔍 [generateMarketValidation] Démarrage recherche web', { 
       fn: 'generateMarketValidation',
@@ -185,16 +299,16 @@ RETOURNE UN JSON STRICT avec validationText + marketScores + sources`;
       
       console.log(`🔄 [generateMarketValidation] Tentative ${attempt}/${maxRetries + 1}`);
 
-      // 🌐 Utiliser InvokeLLM avec recherche web
+      // 🧠 Utiliser InvokeLLM SANS recherche web (données onboarding suffisent)
       const llmResponse = await base44.integrations.Core.InvokeLLM({
         prompt: `${SYSTEM_PROMPT}\n\n---\n\n${userPrompt}`,
-        add_context_from_internet: true,
+        add_context_from_internet: false,
         response_json_schema: {
           type: "object",
           properties: {
             validationText: {
               type: "string",
-              description: "Texte de validation en 3 sections séparées par \\n\\n"
+              description: "Texte de validation en 3 paragraphes séparés par \\n\\n (structure McKinsey)"
             },
             marketScores: {
               type: "object",
@@ -204,6 +318,17 @@ RETOURNE UN JSON STRICT avec validationText + marketScores + sources`;
                 revenueRecurrence: { type: "number", minimum: 0, maximum: 100 },
                 onlineAccessibility: { type: "number", minimum: 0, maximum: 100 },
                 easeOfImplementation: { type: "number", minimum: 0, maximum: 100 }
+              },
+              required: ["marketSize", "demandIntensity", "revenueRecurrence", "onlineAccessibility", "easeOfImplementation"]
+            },
+            scoreExplanations: {
+              type: "object",
+              properties: {
+                marketSize: { type: "string" },
+                demandIntensity: { type: "string" },
+                revenueRecurrence: { type: "string" },
+                onlineAccessibility: { type: "string" },
+                easeOfImplementation: { type: "string" }
               },
               required: ["marketSize", "demandIntensity", "revenueRecurrence", "onlineAccessibility", "easeOfImplementation"]
             },
@@ -217,17 +342,20 @@ RETOURNE UN JSON STRICT avec validationText + marketScores + sources`;
               required: ["foundNicheData", "dataQuality", "statsCount"]
             }
           },
-          required: ["validationText", "marketScores", "sources"]
+          required: ["validationText", "marketScores", "scoreExplanations", "sources"]
         }
       });
 
       const sources = llmResponse?.sources || { foundNicheData: false, dataQuality: 'low', statsCount: 0 };
+      const scoreExplanations = llmResponse?.scoreExplanations || {};
       
       console.log('✅ [generateMarketValidation] LLM response reçu', {
         attempt,
         skill,
         hasText: !!llmResponse?.validationText,
         hasScores: !!llmResponse?.marketScores,
+        hasExplanations: !!llmResponse?.scoreExplanations,
+        explanationsCount: Object.keys(scoreExplanations).length,
         foundNicheData: sources.foundNicheData,
         dataQuality: sources.dataQuality,
         statsCount: sources.statsCount
@@ -238,38 +366,40 @@ RETOURNE UN JSON STRICT avec validationText + marketScores + sources`;
 
       // 🔥 VALIDATION GUARDRAILS RENFORCÉS
       const sections = generatedText.split('\n\n');
-      const numberCount = (generatedText.match(/\d+/g) || []).length;
-      const isLongEnough = generatedText.length > 350;
+      const isLongEnough = generatedText.length > 400;
       const hasValidScores = marketScores && 
         Object.keys(marketScores).length === 5 &&
         Object.values(marketScores).every(v => typeof v === 'number' && v >= 0 && v <= 100);
       
-      // 🔥 VALIDATION SOURCES : au moins 2 stats + qualité medium minimum
-      const hasGoodData = sources.foundNicheData && sources.statsCount >= 2 && sources.dataQuality !== 'low';
-
-      const isValid = sections.length === 3 && numberCount >= 2 && isLongEnough && hasValidScores && hasGoodData;
+      const hasValidExplanations = scoreExplanations &&
+        Object.keys(scoreExplanations).length === 5 &&
+        Object.values(scoreExplanations).every(v => typeof v === 'string' && v.length > 30);
+      
+      // 🔥 VALIDATION : structure + longueur + scores + explications
+      const isValid = sections.length === 3 && isLongEnough && hasValidScores && hasValidExplanations;
 
       if (isValid) {
         result = {
           validationText: generatedText,
           marketScores,
+          scoreExplanations,
           sources
         };
         console.log('✅ [generateMarketValidation] Validation réussie:', {
           sections: sections.length,
-          numbers: numberCount,
           length: generatedText.length,
           scores: marketScores,
+          explanations: Object.keys(scoreExplanations).length,
           foundNicheData: sources.foundNicheData,
           dataQuality: sources.dataQuality
         });
       } else {
         console.warn('⚠️ [generateMarketValidation] Format invalide:', {
           sections: sections.length,
-          numbers: numberCount,
           length: generatedText.length,
           hasValidScores,
-          hasGoodData,
+          hasValidExplanations,
+          explanationsCount: Object.keys(scoreExplanations).length,
           foundNicheData: sources.foundNicheData,
           dataQuality: sources.dataQuality,
           statsCount: sources.statsCount,
@@ -279,23 +409,30 @@ RETOURNE UN JSON STRICT avec validationText + marketScores + sources`;
         // Dernier essai échoué ? Fallback safe avec scores conservateurs
         if (attempt > maxRetries) {
           console.error('❌ [generateMarketValidation] Max retries atteint, fallback conservateur', {
-            reason: !hasGoodData ? 'données_insuffisantes' : 'format_invalide',
+            reason: !hasValidExplanations ? 'explications_manquantes' : 'format_invalide',
             foundNicheData: sources.foundNicheData,
             dataQuality: sources.dataQuality,
             statsCount: sources.statsCount
           });
           result = {
-            validationText: `${name}, ton projet dans "${skill}" répond à un vrai besoin. 🎯
+            validationText: `${name}, les personnes que tu veux aider font face à un blocage réel. Ce problème les empêche de progresser efficacement.
 
-Le marché de la formation en ligne connaît une croissance significative, et de nombreuses personnes cherchent des solutions pour progresser dans ce domaine. 📈
+Ce que tu proposes répond directement à ce blocage : un résultat rapide dès le départ, puis une transformation durable. Cette progression claire crée une valeur perçue forte.
 
-Ta proposition arrive au bon moment : les personnes que tu veux aider sont prêtes à investir dans leur apprentissage. 💡`,
+Ton objectif de revenus est cohérent avec les formats que tu as choisis et le niveau de transformation que tu apportes. Le ratio effort/revenus est favorable.`,
             marketScores: {
               marketSize: 55,
               demandIntensity: 60,
               revenueRecurrence: 52,
               onlineAccessibility: 70,
               easeOfImplementation: 58
+            },
+            scoreExplanations: {
+              marketSize: "Score modéré car audience ciblée spécifique.",
+              demandIntensity: "Score modéré car besoin identifié.",
+              revenueRecurrence: "Score modéré car potentiel de récurrence.",
+              onlineAccessibility: "Score élevé car formats digitaux.",
+              easeOfImplementation: "Score modéré car mise en œuvre progressive."
             },
             sources: {
               foundNicheData: false,
@@ -307,10 +444,11 @@ Ta proposition arrive au bon moment : les personnes que tu veux aider sont prêt
       }
     }
 
-    // Save to session avec metadata sources
+    // Save to session avec metadata sources + explications
     await base44.asServiceRole.entities.Session.update(sessionId, {
       market_validation: result.validationText,
       market_validation_scores: result.marketScores,
+      market_validation_score_explanations: result.scoreExplanations,
       market_validation_sources: result.sources
     });
 
@@ -320,13 +458,15 @@ Ta proposition arrive au bon moment : les personnes que tu veux aider sont prêt
       foundNicheData: result.sources.foundNicheData,
       dataQuality: result.sources.dataQuality,
       statsCount: result.sources.statsCount,
-      avgScore: Math.round(Object.values(result.marketScores).reduce((a, b) => a + b, 0) / 5)
+      avgScore: Math.round(Object.values(result.marketScores).reduce((a, b) => a + b, 0) / 5),
+      hasExplanations: !!result.scoreExplanations
     });
 
     return Response.json({
       success: true,
       marketValidation: result.validationText,
       marketScores: result.marketScores,
+      scoreExplanations: result.scoreExplanations,
       sources: result.sources
     });
 

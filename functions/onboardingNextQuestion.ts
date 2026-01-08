@@ -341,7 +341,56 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // 🔥 DB-FIRST : Toujours charger depuis la DB, jamais depuis les params
+    // 🔥 ÉTAPE 1 : Sauvegarder d'abord la réponse si présente
+    if (userAnswer) {
+      const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+      if (!sessions || sessions.length === 0) {
+        return Response.json({ error: 'Session not found' }, { status: 404 });
+      }
+
+      const currentSession = sessions[0];
+      const workingHistory = currentSession.onboarding_history || [];
+      const workingSummary = currentSession.onboarding_summary || {};
+
+      const normalizedAnswer = typeof userAnswer === 'string' ? userAnswer : JSON.stringify(userAnswer);
+      
+      const currentQuestionConfig = QUESTION_STRUCTURE[workingHistory.length];
+      const questionText = currentQuestionConfig 
+        ? currentQuestionConfig.titleTemplate.replace('{{firstName}}', firstName || '').replace('{{coreSkill}}', workingSummary.who_to_teach || 'cette compétence')
+        : `Question ${workingHistory.length + 1}`;
+
+      const updatedHistory = [
+        ...workingHistory,
+        {
+          question: questionText,
+          type: currentQuestionConfig?.type || 'text',
+          answer: normalizedAnswer,
+          at: new Date().toISOString()
+        }
+      ];
+
+      const coreSkill = workingHistory.length === 0 ? normalizedAnswer : (workingSummary.who_to_teach || '');
+      
+      const updatePayload = {
+        onboarding_history: updatedHistory,
+        skill: coreSkill
+      };
+      
+      if (workingHistory.length === 0) {
+        updatePayload.onboarding_full = { coreSkill: normalizedAnswer };
+      }
+
+      await base44.asServiceRole.entities.Session.update(sessionId, updatePayload);
+
+      console.log('💾 [SAVE FIRST]', {
+        sessionId,
+        questionIndex: workingHistory.length,
+        newHistoryLength: updatedHistory.length,
+        skill: coreSkill
+      });
+    }
+
+    // 🔥 ÉTAPE 2 : Recharger la session APRÈS sauvegarde
     const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (!sessions || sessions.length === 0) {
       return Response.json({ error: 'Session not found' }, { status: 404 });
@@ -354,10 +403,9 @@ Deno.serve(async (req) => {
     const name = firstName || '';
     const skill = workingSummary.who_to_teach || '';
 
-    console.log('🔍 [DB-FIRST]', {
+    console.log('🔍 [RELOAD AFTER SAVE]', {
       sessionId,
       historyLength: workingHistory.length,
-      hasAnswer: !!userAnswer,
       nextQuestionIndex: workingHistory.length
     });
 

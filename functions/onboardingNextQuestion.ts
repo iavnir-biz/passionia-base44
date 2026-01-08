@@ -403,11 +403,37 @@ Deno.serve(async (req) => {
     const name = firstName || '';
     const skill = workingSummary.who_to_teach || '';
 
+    const nextQuestionIndex = workingHistory.length;
+
     console.log('🔍 [RELOAD AFTER SAVE]', {
       sessionId,
       historyLength: workingHistory.length,
-      nextQuestionIndex: workingHistory.length
+      nextQuestionIndex,
+      hasUserAnswer: !!userAnswer
     });
+
+    // 🚀 P0 FIX : Q1 instantané SANS OpenAI (déterministe)
+    if (!userAnswer && nextQuestionIndex === 0) {
+      const q1 = QUESTION_STRUCTURE[0];
+      console.log('✅ [P0 INSTANT Q1] Retour Q1 sans OpenAI', {
+        sessionId,
+        questionType: q1.type,
+        noOpenAI: true
+      });
+      
+      return Response.json({
+        isDone: false,
+        question: {
+          title: q1.titleTemplate.replace('{{firstName}}', name || ''),
+          subtitle: q1.subtitleTemplate,
+          text: q1.titleTemplate.replace('{{firstName}}', name || ''),
+          type: q1.type,
+          placeholder: q1.placeholder || '',
+          options: q1.options || []
+        },
+        summary: workingSummary
+      });
+    }
 
     // Note: l'ajout de l'answer à l'historique est géré côté frontend
     
@@ -542,10 +568,13 @@ MISSION :
 - Montre que tu COMPRENDS vraiment "${skill}"` : 
 'MISSION : Les 11 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
 
-    console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini" });
-    
-    // Appel OpenAI avec structured output
-    const completion = await openai.chat.completions.create({
+    // 🤖 ENRICHISSEMENT OPTIONNEL OPENAI (non bloquant)
+    let openaiUsed = false;
+    try {
+      console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini", questionIndex: nextQuestionIndex });
+      
+      // Appel OpenAI avec structured output
+      const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
@@ -607,60 +636,93 @@ MISSION :
       }
     });
 
-    console.log("OPENAI_CALL end", { 
-      fn: "onboardingNextQuestion", 
-      sessionId, 
-      usage: completion.usage 
-    });
+      console.log("OPENAI_CALL end", { 
+        fn: "onboardingNextQuestion", 
+        sessionId, 
+        usage: completion.usage 
+      });
 
-    const result = JSON.parse(completion.choices[0].message.content);
+      const result = JSON.parse(completion.choices[0].message.content);
+      openaiUsed = true;
 
-    // 🔥 GUARDRAIL : Fallback sur QUESTION_STRUCTURE si réponse LLM malformée
-    if (!result.isDone && result.question && nextQuestionConfig) {
-      // Fallback text
-      if (!result.question.text || result.question.text.trim() === '') {
-        result.question.text = result.question.title || nextQuestionConfig.titleTemplate;
+      // Enrichir avec les données OpenAI
+      if (result.summary) {
+        updatedSummary = { ...updatedSummary, ...result.summary };
       }
 
-      // Fallback slider
-      if (result.question.type === 'slider') {
-        if (result.question.min === undefined || result.question.max === undefined) {
-          result.question.min = nextQuestionConfig.min;
-          result.question.max = nextQuestionConfig.max;
-          result.question.step = nextQuestionConfig.step || 1;
-          console.log('⚠️ [onboardingNextQuestion] Slider fallback appliqué');
+      // Enrichir la question avec le texte OpenAI (optionnel)
+      if (result.question && result.question.text) {
+        questionToReturn.text = result.question.text;
+        questionToReturn.title = result.question.title || result.question.text;
+      }
+      if (result.question && result.question.subtitle) {
+        questionToReturn.subtitle = result.question.subtitle;
+      }
+
+      console.log('✅ [OPENAI ENRICHMENT] Success', { sessionId, questionIndex: nextQuestionIndex });
+
+    } catch (aiError) {
+      console.warn('⚠️ [OPENAI FALLBACK] Using deterministic question', {
+        sessionId,
+        questionIndex: nextQuestionIndex,
+        error: aiError?.message,
+        fallbackUsed: true
+      });
+      // Continue avec questionToReturn déterministe déjà construit
+    }
+
+    // 🔥 GUARDRAIL : Fallback sur QUESTION_STRUCTURE si réponse malformée
+    if (openaiUsed) {
+      // Ces guardrails ne s'appliquent que si OpenAI a été utilisé
+      const needsGuardrail = !questionToReturn.text || 
+                             (questionToReturn.type === 'slider' && (questionToReturn.min === undefined || questionToReturn.max === undefined)) ||
+                             ((questionToReturn.type === 'single_choice' || questionToReturn.type === 'multiple_choice') && (!questionToReturn.options || questionToReturn.options.length === 0));
+      
+      if (needsGuardrail) {
+        // Fallback text
+        if (!questionToReturn.text || questionToReturn.text.trim() === '') {
+          questionToReturn = buildDeterministicQuestion(nextQuestionConfig, name, skill);
+          console.log('⚠️ [GUARDRAIL] Text fallback appliqué');
         }
-      }
 
-      // Fallback options
-      if ((result.question.type === 'single_choice' || result.question.type === 'multiple_choice')) {
-        if (!result.question.options || result.question.options.length === 0) {
-          result.question.options = nextQuestionConfig.options || [];
-          console.log('⚠️ [onboardingNextQuestion] Options fallback appliqué');
+        // Fallback slider
+        if (questionToReturn.type === 'slider' && (questionToReturn.min === undefined || questionToReturn.max === undefined)) {
+          questionToReturn.min = nextQuestionConfig.min;
+          questionToReturn.max = nextQuestionConfig.max;
+          questionToReturn.step = nextQuestionConfig.step || 1;
+          console.log('⚠️ [GUARDRAIL] Slider fallback appliqué');
+        }
+
+        // Fallback options
+        if ((questionToReturn.type === 'single_choice' || questionToReturn.type === 'multiple_choice') && 
+            (!questionToReturn.options || questionToReturn.options.length === 0)) {
+          questionToReturn.options = nextQuestionConfig.options || [];
+          console.log('⚠️ [GUARDRAIL] Options fallback appliqué');
         }
       }
     }
 
-    // 🔥 METTRE À JOUR LE SUMMARY + isDone
+    // 🔥 METTRE À JOUR LE SUMMARY
     await base44.asServiceRole.entities.Session.update(sessionId, {
-      onboarding_summary: result.summary,
-      is_onboarding_done: result.isDone
+      onboarding_summary: updatedSummary,
+      is_onboarding_done: false
     });
 
     console.log('✅ [UPDATE SUMMARY]', { 
       sessionId, 
-      isDone: result.isDone,
-      summaryKeys: Object.keys(result.summary)
+      questionIndex: nextQuestionIndex,
+      summaryKeys: Object.keys(updatedSummary),
+      openaiUsed
     });
 
     return Response.json({
-      isDone: result.isDone,
-      question: result.isDone ? null : result.question,
-      summary: result.summary,
-      debug: {
-        model: "gpt-4o-mini",
-        requestId: completion.id || null,
-        usage: completion.usage || null
+      isDone: false,
+      question: questionToReturn,
+      summary: updatedSummary,
+      _debug: {
+        questionIndex: nextQuestionIndex,
+        openaiUsed,
+        deterministic: !openaiUsed
       }
     });
 

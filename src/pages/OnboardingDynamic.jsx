@@ -104,7 +104,9 @@ export default function OnboardingDynamic() {
       console.log('📨 [fetchNextQuestion] Réponse API:', {
         isDone: data.isDone,
         hasQuestion: !!data.question,
-        summaryUpdated: !!data.summary
+        questionType: data.question?.type,
+        summaryUpdated: !!data.summary,
+        debug: data._debug
       });
 
       if (data.isDone) {

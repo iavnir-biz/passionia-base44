@@ -647,11 +647,11 @@ MISSION :
 
       console.log('✅ [onboardingNextQuestion] Session updated:', { 
         sessionId, 
-        questionIndex: currentQuestionIndex,
+        questionIndex: workingHistory.length,
         historyLength: updatedHistory.length,
         skill: coreSkill,
         isDone: result.isDone,
-        nextQuestion: result.isDone ? 'TERMINÉ' : `Q${currentQuestionIndex + 1}`
+        nextQuestion: result.isDone ? 'TERMINÉ' : `Q${workingHistory.length + 1}`
       });
     }
 

@@ -95,6 +95,8 @@ Deno.serve(async (req) => {
       return Response.json({
         success: true,
         marketValidation: session.market_validation,
+        marketScores: session.market_validation_scores || {},
+        sources: session.market_validation_sources || {},
         fromCache: true
       });
     }

@@ -69,6 +69,7 @@ function ProgressBarItem({ label, value, icon: Icon, delay = 0 }) {
 export default function BonneNouvelle() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showDetail, setShowDetail] = useState(false);
   const [marketAnalysis, setMarketAnalysis] = useState(null);
@@ -76,68 +77,84 @@ export default function BonneNouvelle() {
   const [showTransition, setShowTransition] = useState(false);
 
   useEffect(() => {
-    loadUser();
+    loadSession();
   }, []);
 
-  useEffect(() => {
-    if (user && !marketAnalysis) {
-      generateMarketAnalysis();
-    }
-  }, [user]);
-
-  const loadUser = async () => {
+  const loadSession = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      if (!currentUser.sessionId) {
+        console.error('❌ [BONNENOUVELLE] Pas de sessionId');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      if (!sessions || sessions.length === 0) {
+        console.error('❌ [BONNENOUVELLE] Session introuvable');
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      const currentSession = sessions[0];
+      setSession(currentSession);
+
+      console.log('[BONNENOUVELLE][SESSION]', {
+        hasMarket: !!currentSession.market_validation,
+        hasScores: !!currentSession.market_validation_scores,
+        hasFinalized: !!currentSession.finalized_offer,
+        hasMyOffers: !!currentSession.my_generated_offers
+      });
+
+      // Si cache existe, utiliser immédiatement
+      if (currentSession.market_validation) {
+        setMarketAnalysis({
+          validationText: currentSession.market_validation,
+          marketScores: currentSession.market_validation_scores || {},
+          sources: currentSession.market_validation_sources || {},
+          summary: currentSession.onboarding_summary || {}
+        });
+        setIsLoading(false);
+      } else {
+        // Sinon générer
+        setIsLoading(false);
+        generateMarketAnalysis(currentUser.sessionId, currentSession);
+      }
     } catch (error) {
-      console.error('Error loading user:', error);
-    } finally {
+      console.error('Error loading session:', error);
       setIsLoading(false);
     }
   };
 
-  const generateMarketAnalysis = async () => {
-    if (!user?.sessionId) return;
+  const generateMarketAnalysis = async (sessionId, currentSession) => {
+    if (!sessionId) return;
     
     setIsGenerating(true);
     try {
-      const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-      const session = sessions[0];
-      const summary = session?.onboarding_summary || {};
+      const summary = currentSession?.onboarding_summary || {};
       
       const { data } = await base44.functions.invoke('generateMarketValidation', {
-        sessionId: user.sessionId
+        sessionId
       });
       
       if (data.success) {
-        // 🔥 Scores minimum 70%, moyenne 75-85%
-        const rawScores = data.marketScores || {};
-        const scores = {
-          marketSize: Math.max(70, rawScores.marketSize || 78),
-          demandIntensity: Math.max(70, rawScores.demandIntensity || 82),
-          revenueRecurrence: Math.max(70, rawScores.revenueRecurrence || 75),
-          onlineAccessibility: Math.max(70, rawScores.onlineAccessibility || 85),
-          easeOfImplementation: Math.max(70, rawScores.easeOfImplementation || 76)
-        };
-
         setMarketAnalysis({
           validationText: data.marketValidation,
-          marketScores: scores,
+          marketScores: data.marketScores || {},
+          sources: data.sources || {},
           summary
         });
       }
     } catch (error) {
       console.error('Error generating analysis:', error);
-      // Fallback personnalisé
-      const sessions = await base44.entities.Session.filter({ id: user.sessionId });
-      const session = sessions[0];
-      const summary = session?.onboarding_summary || {};
-      
+      const summary = currentSession?.onboarding_summary || {};
       const who = summary.who_to_teach || 'ta compétence';
       const profile = summary.learner_profile || 'des personnes motivées';
       
       setMarketAnalysis({
-        validationText: `Excellente nouvelle ${user.firstName || ''} ! Ton projet autour de ${who} répond à un vrai besoin chez ${profile}.\n\nLe marché de la transmission de savoir en ligne connaît une croissance exceptionnelle, et les gens sont prêts à investir pour apprendre auprès d'experts comme toi. Avec ton expérience et ta méthode unique, tu as toutes les cartes en main pour réussir.`,
+        validationText: `Excellente nouvelle ${user?.firstName || ''} ! Ton projet autour de ${who} répond à un vrai besoin chez ${profile}.\n\nLe marché de la transmission de savoir en ligne connaît une croissance exceptionnelle, et les gens sont prêts à investir pour apprendre auprès d'experts comme toi. Avec ton expérience et ta méthode unique, tu as toutes les cartes en main pour réussir.`,
         marketScores: {
           marketSize: 78,
           demandIntensity: 82,
@@ -161,39 +178,75 @@ export default function BonneNouvelle() {
   };
 
   if (isLoading || isGenerating) {
-    return <OfferTransition message={isGenerating ? "Nova analyse le marché..." : "Chargement..."} />;
+    return <OfferTransition message={isGenerating ? "Noah analyse le marché..." : "Chargement..."} />;
   }
 
   if (showTransition) {
-    return <OfferTransition message="Nova prépare ta vision future..." onComplete={handleTransitionComplete} />;
+    return <OfferTransition message="Noah prépare ta vision future..." onComplete={handleTransitionComplete} />;
   }
 
-  const offer = user?.offer || {};
-  const hasOffer = offer.product_principal || offer.petit_extra || offer.offre_superieure || offer.offre_premium;
+  // 🔥 REVENUE depuis Session (pas User)
+  const finalized = session?.finalized_offer || null;
+  const myOffers = session?.my_generated_offers || null;
   
-  // 🔥 REVENUS PAR DÉFAUT si pas encore d'offre
   const defaultRevenues = [
-    { key: 'product_principal', label: 'Produit Principal', price: 97, multiplier: 30 },
-    { key: 'petit_extra', label: 'Order Bump', price: 27, multiplier: 15 },
-    { key: 'offre_superieure', label: 'Upsell', price: 297, multiplier: 9 },
-    { key: 'offre_premium', label: 'Premium', price: 3000, multiplier: 1 }
+    { key: 'low', label: 'Produit Principal', price: 97, multiplier: 30 },
+    { key: 'bump', label: 'Order Bump', price: 27, multiplier: 15 },
+    { key: 'mid', label: 'Upsell', price: 297, multiplier: 9 },
+    { key: 'high', label: 'Premium', price: 3000, multiplier: 1 }
   ];
   
-  const revenues = hasOffer ? [
-    { key: 'product_principal', label: 'Produit Principal', data: offer.product_principal, multiplier: 30 },
-    { key: 'petit_extra', label: 'Order Bump', data: offer.petit_extra, multiplier: 15 },
-    { key: 'offre_superieure', label: 'Upsell', data: offer.offre_superieure, multiplier: 9 },
-    { key: 'offre_premium', label: 'Premium', data: offer.offre_premium, multiplier: 1 }
-  ].map(p => ({
-    ...p,
-    price: parsePrice(p.data?.price),
-    total: parsePrice(p.data?.price) * p.multiplier
-  })) : defaultRevenues.map(p => ({
-    ...p,
-    total: p.price * p.multiplier
-  }));
+  let revenues = [];
+  let revenueSource = 'defaults';
+  
+  // Priorité 1: my_generated_offers
+  if (myOffers?.low || myOffers?.bump || myOffers?.mid || myOffers?.high) {
+    revenueSource = 'my_generated_offers';
+    revenues = [
+      { key: 'low', label: 'Produit Principal', data: myOffers.low, multiplier: 30 },
+      { key: 'bump', label: 'Order Bump', data: myOffers.bump, multiplier: 15 },
+      { key: 'mid', label: 'Upsell', data: myOffers.mid, multiplier: 9 },
+      { key: 'high', label: 'Premium', data: myOffers.high, multiplier: 1 }
+    ].map((p, idx) => {
+      const price = parsePrice(p.data?.price);
+      return {
+        ...p,
+        price: price > 0 ? price : defaultRevenues[idx].price,
+        total: (price > 0 ? price : defaultRevenues[idx].price) * p.multiplier
+      };
+    });
+  }
+  // Priorité 2: finalized_offer
+  else if (finalized?.mainProduct || finalized?.upsell1 || finalized?.upsell2 || finalized?.upsell3) {
+    revenueSource = 'finalized_offer';
+    revenues = [
+      { key: 'main', label: 'Produit Principal', data: finalized.mainProduct, multiplier: 30 },
+      { key: 'upsell1', label: 'Order Bump', data: finalized.orderBump, multiplier: 15 },
+      { key: 'upsell2', label: 'Upsell', data: finalized.upsell1, multiplier: 9 },
+      { key: 'upsell3', label: 'Premium', data: finalized.upsell3, multiplier: 1 }
+    ].map((p, idx) => {
+      const price = parsePrice(p.data?.price);
+      return {
+        ...p,
+        price: price > 0 ? price : defaultRevenues[idx].price,
+        total: (price > 0 ? price : defaultRevenues[idx].price) * p.multiplier
+      };
+    });
+  }
+  // Fallback: defaults
+  else {
+    revenues = defaultRevenues.map(p => ({ ...p, total: p.price * p.multiplier }));
+  }
 
   const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
+  
+  console.log('[BONNENOUVELLE][REVENUE]', {
+    source: revenueSource,
+    totalMonthly,
+    hasFinalized: !!finalized,
+    hasMyOffers: !!myOffers
+  });
+  
   const scores = marketAnalysis?.marketScores || {};
   const summary = marketAnalysis?.summary || {};
 
@@ -348,10 +401,10 @@ export default function BonneNouvelle() {
               </motion.div>
               <div>
                 <h2 className="text-xl font-bold text-white drop-shadow-sm">
-                  🎯 {hasOffer ? 'Ton Objectif de Revenus Mensuels' : 'Potentiel de Revenus Mensuels'}
+                  🎯 {revenueSource !== 'defaults' ? 'Ton Objectif de Revenus Mensuels' : 'Potentiel de Revenus Mensuels'}
                 </h2>
                 <p className="text-white/80 text-sm drop-shadow-sm">
-                  {hasOffer ? 'Basé sur ton offre complète' : 'Estimation basée sur les standards du secteur'}
+                  {revenueSource !== 'defaults' ? 'Basé sur ton offre complète' : 'Estimation basée sur les standards du secteur'}
                 </p>
               </div>
             </div>

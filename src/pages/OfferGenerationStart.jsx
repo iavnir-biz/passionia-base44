@@ -328,7 +328,7 @@ export default function OfferGenerationStart() {
           className="mb-6"
         >
           <p className="text-xl font-semibold text-gray-800">
-            Nova construit ton offre…
+            Noah construit ton offre…
           </p>
         </motion.div>
         

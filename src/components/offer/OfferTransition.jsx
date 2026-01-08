@@ -10,7 +10,7 @@ export default function OfferTransition({ onComplete, message = "Nova analyse to
   ];
 
   const planActionSteps = [
-    { text: "Nova analyse ton profil...", icon: Brain },
+    { text: "Noah analyse ton profil...", icon: Brain },
     { text: "Création de ton plan personnalisé...", icon: Lightbulb },
     { text: "Adaptation à tes objectifs...", icon: Target },
     { text: "Finalisation de ta stratégie...", icon: Rocket }

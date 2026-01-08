@@ -14,6 +14,7 @@ export default function OnboardingTransition() {
   const [visibleItems, setVisibleItems] = useState(0);
   const [progress, setProgress] = useState(78);
   const [statusText, setStatusText] = useState('Analyse de ton positionnement…');
+  const [transitionMessage, setTransitionMessage] = useState('Ta passion vaut de l\'or');
 
   const items = [
     { icon: CheckCircle2, title: 'Validation complète de ton idée' },
@@ -147,6 +148,20 @@ export default function OnboardingTransition() {
       });
 
       console.log('✅ [OnboardingTransition] User enrichi avec summary');
+
+      // Générer la phrase de transition personnalisée
+      try {
+        const { data } = await base44.functions.invoke('generateTransitionMessage', {
+          sessionId: session.id,
+          firstName: firstName
+        });
+        if (data?.message) {
+          setTransitionMessage(data.message);
+        }
+      } catch (err) {
+        console.warn('⚠️ [OnboardingTransition] Fallback message used:', err);
+        // Garder le message par défaut
+      }
       
       setIsLoading(false);
     } catch (error) {
@@ -209,7 +224,7 @@ export default function OnboardingTransition() {
             className="text-2xl font-bold text-gray-900 mb-3 text-center leading-tight"
           >
             Merci pour toutes ces réponses, {user?.firstName} !<br />
-            Je peux déjà te dire que ta passion vaut de l'or 💎
+            {transitionMessage}
           </motion.h1>
 
           {/* Sous-titre */}

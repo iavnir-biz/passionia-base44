@@ -641,67 +641,17 @@ MISSION :
       }
     }
 
-    // 🔥 SAUVEGARDER EN BASE44 SESSION (plus de localStorage)
-    if (userAnswer) {
-      const normalizedAnswer = typeof userAnswer === 'string' 
-        ? userAnswer 
-        : JSON.stringify(userAnswer);
+    // 🔥 METTRE À JOUR LE SUMMARY + isDone
+    await base44.asServiceRole.entities.Session.update(sessionId, {
+      onboarding_summary: result.summary,
+      is_onboarding_done: result.isDone
+    });
 
-      // 🔥 FIX : récupérer la question ACTUELLE (celle à laquelle on répond)
-      const currentQuestionConfig = QUESTION_STRUCTURE[workingHistory.length];
-      const questionText = currentQuestionConfig 
-        ? currentQuestionConfig.titleTemplate.replace('{{firstName}}', name || '').replace('{{coreSkill}}', skill || 'cette compétence')
-        : `Question ${workingHistory.length + 1}`;
-
-      const updatedHistory = [
-        ...workingHistory,
-        {
-          question: questionText,
-          type: currentQuestionConfig?.type || 'text',
-          answer: normalizedAnswer,
-          at: new Date().toISOString()
-        }
-      ];
-
-      // Extraire le coreSkill de la Q1 si c'est la première réponse
-      const coreSkill = workingHistory.length === 0 
-        ? normalizedAnswer 
-        : (result.summary.who_to_teach || workingSummary.who_to_teach || '');
-
-      // 🔥 DB-FIRST : construire onboarding_full progressivement
-      const currentOnboardingFull = workingHistory.length === 0
-        ? { coreSkill: normalizedAnswer }
-        : {}; // ne pas écraser les données existantes
-      
-      const updatePayload = {
-        onboarding_history: updatedHistory,
-        onboarding_summary: result.summary,
-        skill: coreSkill || result.summary.who_to_teach || '',
-        is_onboarding_done: result.isDone
-      };
-      
-      // Ajouter onboarding_full seulement si c'est Q1
-      if (workingHistory.length === 0) {
-        updatePayload.onboarding_full = currentOnboardingFull;
-      }
-
-      await base44.asServiceRole.entities.Session.update(sessionId, updatePayload);
-
-      console.log('[ONBOARDING]', {
-        step: 'coreSkill',
-        sessionId,
-        value: workingHistory.length === 0 ? normalizedAnswer : 'N/A'
-      });
-
-      console.log('✅ [onboardingNextQuestion] Session updated:', { 
-        sessionId, 
-        questionIndex: workingHistory.length,
-        historyLength: updatedHistory.length,
-        skill: coreSkill,
-        isDone: result.isDone,
-        nextQuestion: result.isDone ? 'TERMINÉ' : `Q${workingHistory.length + 1}`
-      });
-    }
+    console.log('✅ [UPDATE SUMMARY]', { 
+      sessionId, 
+      isDone: result.isDone,
+      summaryKeys: Object.keys(result.summary)
+    });
 
     return Response.json({
       isDone: result.isDone,

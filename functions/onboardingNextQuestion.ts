@@ -335,20 +335,31 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    const { sessionId, userAnswer, history, summary, firstName } = await req.json();
+    const { sessionId, userAnswer, firstName } = await req.json();
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // Utiliser les données passées en paramètre
-    const workingHistory = history || [];
-    const workingSummary = summary || {};
+    // 🔥 DB-FIRST : Toujours charger depuis la DB, jamais depuis les params
+    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+    if (!sessions || sessions.length === 0) {
+      return Response.json({ error: 'Session not found' }, { status: 404 });
+    }
+
+    const currentSession = sessions[0];
+    const workingHistory = currentSession.onboarding_history || [];
+    const workingSummary = currentSession.onboarding_summary || {};
     
-    // Utiliser le prénom passé en paramètre
     const name = firstName || '';
-    
     const skill = workingSummary.who_to_teach || '';
+
+    console.log('🔍 [DB-FIRST]', {
+      sessionId,
+      historyLength: workingHistory.length,
+      hasAnswer: !!userAnswer,
+      nextQuestionIndex: workingHistory.length
+    });
 
     // Note: l'ajout de l'answer à l'historique est géré côté frontend
     

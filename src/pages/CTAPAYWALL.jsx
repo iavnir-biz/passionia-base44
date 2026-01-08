@@ -24,7 +24,9 @@ import {
   Star,
   Gift,
   Video,
-  Package
+  Package,
+  ShoppingBag,
+  Crown
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
@@ -117,10 +119,42 @@ export default function CTAPAYWALL() {
   const offrePremium = finalizedOffer.upsell3;
 
   const products = [
-    { label: 'Produit Principal', data: productPrincipal, multiplier: 30 },
-    { label: 'Order Bump', data: petitExtra, multiplier: 15 },
-    { label: 'Upsell', data: offreSuperieure, multiplier: 9 },
-    { label: 'Premium', data: offrePremium, multiplier: 1 }
+    { 
+      label: 'Produit Principal', 
+      data: productPrincipal, 
+      multiplier: 30,
+      icon: ShoppingBag,
+      iconColor: 'text-orange-500',
+      bgColor: 'bg-orange-50',
+      priceColor: 'text-orange-600'
+    },
+    { 
+      label: 'Order Bump', 
+      data: petitExtra, 
+      multiplier: 15,
+      icon: Gift,
+      iconColor: 'text-blue-500',
+      bgColor: 'bg-blue-50',
+      priceColor: 'text-blue-600'
+    },
+    { 
+      label: 'Upsell', 
+      data: offreSuperieure, 
+      multiplier: 9,
+      icon: TrendingUp,
+      iconColor: 'text-purple-500',
+      bgColor: 'bg-purple-50',
+      priceColor: 'text-purple-600'
+    },
+    { 
+      label: 'Premium', 
+      data: offrePremium, 
+      multiplier: 1,
+      icon: Crown,
+      iconColor: 'text-amber-500',
+      bgColor: 'bg-amber-50',
+      priceColor: 'text-amber-600'
+    }
   ].filter(p => p.data);
 
   // 🔥 P0-2: Utiliser potential_revenue (pas recalcul)
@@ -140,9 +174,9 @@ export default function CTAPAYWALL() {
             className="text-center mb-12"
           >
             <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-full mb-6">
-              <Sparkles className="w-4 h-4 text-[#61f7a2]" />
+              <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
               <span className="text-[#61f7a2] font-semibold text-sm">
-                ✨ Propulsé par l'IA de Passion IA
+                ✅ Ton plan d'action validé
               </span>
             </div>
 
@@ -155,58 +189,7 @@ export default function CTAPAYWALL() {
             </p>
           </motion.div>
 
-          {/* 🔥 A) RÉCAP OFFRES - Compact, ancrage cohérence */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 p-6 mb-8"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
-              📋 Ton écosystème d'offres
-            </h3>
-            <div className="space-y-2 mb-4">
-              {products.map((product, idx) => (
-                <div key={idx} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700">{product.data.title}</span>
-                  <span className="text-gray-900 font-semibold">{product.data.price}</span>
-                </div>
-              ))}
-            </div>
-            {potentialRevenue > 0 && (
-              <div className="pt-3 border-t border-gray-200 text-center">
-                <span className="text-gray-600 text-sm">Potentiel estimé : </span>
-                <span className="text-[#61f7a2] font-bold text-lg">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
-              </div>
-            )}
-          </motion.div>
 
-          {/* CTA Top */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="flex justify-center mb-12"
-          >
-            <GlowButton
-              onClick={handleGetAccess}
-              disabled={isCreatingCheckout}
-              size="lg"
-              className="px-12"
-            >
-              {isCreatingCheckout ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Redirection...
-                </>
-              ) : (
-                <>
-                  ✨ Je veux lancer mon activité maintenant
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
-            </GlowButton>
-          </motion.div>
 
           {/* Tu as maintenant */}
           <motion.div
@@ -220,12 +203,24 @@ export default function CTAPAYWALL() {
             </h2>
             
             <div className="space-y-3 mb-6">
-              {products.map((product, idx) => (
-                <div key={idx} className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-xl">
-                  <span className="text-gray-900 font-semibold">{product.data.title}</span>
-                  <span className="text-[#61f7a2] font-bold">{product.data.price}</span>
-                </div>
-              ))}
+              {products.map((product, idx) => {
+                const ProductIcon = product.icon;
+                return (
+                  <motion.div 
+                    key={idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.25 + idx * 0.05 }}
+                    className="flex items-center gap-3 py-3 px-4 bg-gray-50 rounded-xl border border-gray-200"
+                  >
+                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0", product.bgColor)}>
+                      <ProductIcon className={cn("w-5 h-5", product.iconColor)} />
+                    </div>
+                    <span className="text-gray-900 font-semibold flex-1">{product.data.title}</span>
+                    <span className={cn("font-bold", product.priceColor)}>{product.data.price}</span>
+                  </motion.div>
+                );
+              })}
             </div>
 
             {potentialRevenue > 0 && (
@@ -676,24 +671,26 @@ export default function CTAPAYWALL() {
               <p className="text-white/80 mt-2">Accès immédiat</p>
             </div>
 
-            <GlowButton
-              onClick={handleGetAccess}
-              disabled={isCreatingCheckout}
-              size="lg"
-              className="w-full md:w-auto px-12 bg-white text-yellow-600 hover:bg-gray-100 font-bold"
-            >
-              {isCreatingCheckout ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Redirection...
-                </>
-              ) : (
-                <>
-                  ✨ Je veux lancer mon activité maintenant
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
-            </GlowButton>
+            <div className="flex justify-center">
+              <GlowButton
+                onClick={handleGetAccess}
+                disabled={isCreatingCheckout}
+                size="lg"
+                className="px-12 bg-white text-yellow-600 hover:bg-gray-100 font-bold"
+              >
+                {isCreatingCheckout ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Redirection...
+                  </>
+                ) : (
+                  <>
+                    ✨ Je veux lancer mon activité maintenant
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
+              </GlowButton>
+            </div>
 
             <p className="text-white/70 text-sm mt-4">
               Accès immédiat après paiement sécurisé

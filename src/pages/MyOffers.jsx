@@ -193,6 +193,43 @@ ${offer.benefits.join('\n')}
               </p>
             </motion.div>
 
+            {/* Purpose Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Package className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    📌 À quoi servent ces offres ?
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-3 text-sm text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#61f7a2]">✓</span>
+                      <span>Structurer ton écosystème de revenus</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#61f7a2]">✓</span>
+                      <span>Clarifier quoi vendre et à qui</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#61f7a2]">✓</span>
+                      <span>Guider ton futur élève étape par étape</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#61f7a2]">✓</span>
+                      <span>Faciliter tes pages de vente et messages</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Offer Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {offerTypes.map((offerType, index) => {
@@ -280,7 +317,7 @@ ${offer.benefits.join('\n')}
                         icon={Sparkles}
                         className="w-full"
                       >
-                        {isLoading ? 'Nova génère...' : 'Générer avec l\'IA'}
+                        {isLoading ? 'Nova structure ton offre...' : 'Structurer cette offre'}
                       </GlowButton>
                     )}
                   </motion.div>

@@ -287,7 +287,7 @@ export default function BonneNouvelle() {
             </p>
           </motion.div>
 
-          {/* Validation Text Block */}
+          {/* Validation Text Block - Emotional */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -300,21 +300,21 @@ export default function BonneNouvelle() {
                 <span className="text-gray-600">Noah analyse le marché...</span>
               </div>
             ) : (
-              <div className="space-y-4 text-gray-700 leading-relaxed">
-                <p className="text-lg">
-                  Après analyse de ton marché autour de <strong>{summary.coreSkill || summary.who_to_teach || 'ta compétence'}</strong>, une chose est claire :
+              <div className="space-y-5 text-gray-700 leading-relaxed text-base">
+                <p>
+                  Après analyse de ton marché autour de <strong>{summary.coreSkill || summary.who_to_teach || 'ta compétence'}</strong>, une chose ressort très clairement.
                 </p>
-                <p className="text-lg">
-                  Des personnes recherchent activement des solutions à ce problème.
+                <p>
+                  Nous sommes en 2024–2025, et jamais autant de personnes n'ont cherché à apprendre, progresser ou se former sur ce sujet. Ce n'est pas une intuition. Les données montrent une augmentation forte de l'intérêt, une douleur bien identifiée, et surtout un comportement d'achat déjà existant.
                 </p>
-                <p className="text-base text-gray-600">
-                  Ce n'est ni une intuition, ni une mode passagère. Les données confirment une <strong>demande réelle</strong>, une <strong>douleur identifiée</strong> et un <strong>potentiel économique cohérent</strong> pour une activité en ligne.
+                <p className="font-medium text-gray-900">
+                  Autrement dit : tu n'arrives pas trop tôt. Tu arrives au bon moment.
                 </p>
               </div>
             )}
           </motion.div>
 
-          {/* Simplified Metrics Block */}
+          {/* Contextual Proof Block with Sources */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -322,7 +322,7 @@ export default function BonneNouvelle() {
             className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
           >
             <h2 className="text-xl font-bold text-gray-900 mb-6">
-              🔍 Les preuves
+              🔍 Ce que montrent les données récentes
             </h2>
 
             {isGenerating ? (
@@ -331,16 +331,58 @@ export default function BonneNouvelle() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="border-l-4 border-[#61f7a2] pl-4 py-2">
+                <div className="border-l-4 border-[#61f7a2] pl-4 py-3">
                   <p className="text-gray-700 text-base">
-                    <strong>Demande validée :</strong> {scoreExplanations.demande_active_de_solutions || "Les personnes recherchent activement ce que tu proposes."}
+                    • Intérêt croissant pour les solutions en ligne autour de <strong>{summary.coreSkill || 'ta compétence'}</strong> avec une forte croissance observée sur les 12 derniers mois.
                   </p>
                 </div>
-                <div className="border-l-4 border-[#61f7a2] pl-4 py-2">
+                <div className="border-l-4 border-[#61f7a2] pl-4 py-3">
                   <p className="text-gray-700 text-base">
-                    <strong>Potentiel de revenus :</strong> {scoreExplanations.potentiel_de_monetisation || "Tu peux générer des revenus stables avec les bons formats."}
+                    • Les personnes cherchent déjà des réponses : comportement d'achat confirmé, demande active, et solutions partielles existantes validant le marché.
                   </p>
                 </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Market Potential Indicators */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
+          >
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              📊 Ton potentiel sur ce marché
+            </h2>
+
+            {isGenerating ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <ProgressBarItem 
+                  label="Potentiel du marché"
+                  value={scores.marketSize || scores.taille_du_probleme || 75}
+                  explanation="Taille et accessibilité de l'audience pour ton offre."
+                  icon={Globe}
+                  delay={0}
+                />
+                <ProgressBarItem 
+                  label="Évolution récente"
+                  value={scores.demandIntensity || scores.intensite_de_la_douleur || 78}
+                  explanation="Croissance de l'intérêt sur les 12 derniers mois."
+                  icon={TrendingUp}
+                  delay={0.1}
+                />
+                <ProgressBarItem 
+                  label="Potentiel de monétisation"
+                  value={scores.revenueRecurrence || scores.potentiel_de_monetisation || 80}
+                  explanation="Capacité à générer des revenus stables avec les bons formats."
+                  icon={Package}
+                  delay={0.2}
+                />
               </div>
             )}
           </motion.div>

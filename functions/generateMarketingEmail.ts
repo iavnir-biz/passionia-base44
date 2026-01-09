@@ -7,29 +7,24 @@ const openai = new OpenAI({
 
 const EMAIL_PROMPTS = {
     contraste: {
-        title: "Email 1 : Le Contraste (Aujourd'hui vs Demain)",
-        subject: "Une décision pour tes {incomeGoal}€ par mois...",
-        instruction: "Rappelle la douleur {painPoints}. Compare la situation actuelle avec le rêve {lifeChanges}. Présente le produit {mainProductTitle} comme le pont pour traverser. Ton : Empathique, direct."
+        title: "Le Contraste",
+        objective: "Faire prendre conscience de l'écart entre aujourd'hui et demain"
     },
     validation: {
-        title: "Email 2 : La Validation Sociale (Le Regard des autres)",
-        subject: "Ce que tes proches vont enfin dire de toi.",
-        instruction: "Utilise la donnée {socialValidation}. Décris la scène où l'expert est enfin reconnu pour son succès. C'est l'email 'Émotionnel'. Lien : Présente l'offre comme le moyen d'obtenir cette reconnaissance."
+        title: "La Validation",
+        objective: "Créer la connexion émotionnelle"
     },
     calcul: {
-        title: "Email 3 : Le Calcul de Faisabilité (La Logique)",
-        subject: "Juste 1 vente par jour...",
-        instruction: "Décompose mathématiquement comment atteindre {incomeGoal}€ en vendant {mainProductTitle}. Montre que c'est simple et accessible. Ton : Rationnel, rassurant."
+        title: "Le Calcul",
+        objective: "Rassurer le cerveau logique"
     },
     impact: {
-        title: "Email 4 : L'Impact et la Fierté (Le Sens)",
-        subject: "Imaginer les visages de ceux que tu vas aider.",
-        instruction: "Utilise {impact} et {pride}. Parle de la sensation d'être utile. Mentionne l'Offre Premium {premiumTitle} comme l'expérience ultime de transformation. Ton : Inspirant."
+        title: "L'Impact",
+        objective: "Donner du sens à l'action"
     },
     urgence: {
-        title: "Email 5 : L'Urgence de l'Inaction (Le Regret)",
-        subject: "Où seras-tu dans 6 mois si rien ne change ?",
-        instruction: "Rappelle le coût émotionnel de ne pas se lancer. Reprends le rêve {lifeChanges} et montre qu'il s'éloigne si l'action n'est pas prise maintenant."
+        title: "L'Urgence",
+        objective: "Déclencher la décision"
     }
 };
 
@@ -42,21 +37,10 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { emailType, sessionId } = await req.json();
-
-        if (!emailType) {
-            return Response.json({ error: 'emailType required' }, { status: 400 });
-        }
+        const { sessionId, generateAll } = await req.json();
 
         if (!sessionId) {
             return Response.json({ error: 'sessionId required' }, { status: 400 });
-        }
-
-        const emailConfig = EMAIL_PROMPTS[emailType];
-        if (!emailConfig) {
-            return Response.json({ 
-                error: 'Invalid email type' 
-            }, { status: 400 });
         }
 
         // 🔥 P0-5: DB-first
@@ -68,106 +52,169 @@ Deno.serve(async (req) => {
         const session = sessions[0];
 
         // Check cache
-        if (session.generated_marketing_emails?.[emailType]) {
+        if (session.generated_marketing_emails && Object.keys(session.generated_marketing_emails).length === 5) {
             return Response.json({
-                ...session.generated_marketing_emails[emailType],
+                success: true,
+                emails: session.generated_marketing_emails,
                 fromCache: true
             });
         }
 
-        const finalizedOffer = session.finalized_offer || {};
+        // 🔥 EXTRACTION DONNÉES (LOW TICKET UNIQUEMENT)
+        const lowTicketOffer = session.my_generated_offers?.low || {};
+        const avatars = session.generated_avatars || {};
         const onboardingSummary = session.onboarding_summary || {};
         const onboardingFull = session.onboarding_full || {};
 
-        // Extraire les données pour personnalisation
-        const skill = session.skill || onboardingSummary.who_to_teach || 'ta compétence';
-        const name = user.full_name || 'l\'expert';
-        const incomeGoal = onboardingFull.target_income || onboardingFull.targetIncome || 5000;
-        const lifeChanges = onboardingFull.life_change || 'vivre de ta passion';
-        const impact = onboardingFull.impact || 'aider les autres';
-        const pride = onboardingFull.emotions || 'fierté';
-        const socialValidation = onboardingFull.relatives || 'reconnaissance de tes proches';
-        const painPoints = onboardingSummary.main_learning_problem || 'tes blocages actuels';
-        
-        const mainProductTitle = finalizedOffer.mainProduct?.title || 'ton produit';
-        const mainProductPrice = finalizedOffer.mainProduct?.price || '97€';
-        const premiumTitle = finalizedOffer.upsell3?.title || 'ton offre premium';
-        const premiumPrice = finalizedOffer.upsell3?.price || '997€';
+        // Vérification critique
+        if (!lowTicketOffer.title) {
+            return Response.json({ 
+                error: 'Offre LOW TICKET non trouvée. Complète d\'abord la génération des offres.' 
+            }, { status: 400 });
+        }
 
-        // Construire le contexte utilisateur
-        const userContext = `
-DONNÉES À UTILISER POUR PERSONNALISATION :
-- Savoir-faire : ${skill}
-- Prénom de l'expert : ${name}
-- Objectif de revenu : ${incomeGoal}€
-- Ce que l'argent va changer (Rêve) : ${lifeChanges}
-- Impact désiré : ${impact}
-- Fierté ressentie : ${pride}
-- Validation des proches attendue : ${socialValidation}
-- Frein principal actuel (Douleur) : ${painPoints}
-- Nom du Produit Principal : ${mainProductTitle} (Prix : ${mainProductPrice}€)
-- Nom de l'Offre Premium : ${premiumTitle} (Prix : ${premiumPrice}€)
-`;
+        // PROMPT SYSTÈME COMPLET (3 prompts fusionnés)
+        const systemMessage = `TU ES UN EXPERT EN EMAIL MARKETING CONVERSATIONNEL ET COPYWRITING HUMAIN.
 
-        // Générer l'email avec OpenAI - Méthode PASSION IA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Générer une SÉQUENCE DE 5 EMAILS MARKETING destinés à vendre UN SEUL PRODUIT :
+→ le PRODUIT LOW TICKET validé par l'utilisateur.
+
+IMPORTANT :
+- Ces emails ne vendent PAS une marque
+- Ils ne vendent PAS une offre premium
+- Ils vendent UN PRODUIT SIMPLE, ACCESSIBLE, D'ENTRÉE DE GAMME
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎨 STYLE & TON
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Tutoiement obligatoire
+- Ton humain, simple, direct
+- Langage parlé, naturel
+- Pas de jargon marketing
+- Pas de promesses exagérées
+- Pas de storytelling bullshit
+
+FORMAT STRICT :
+- TEXTE BRUT (plain text)
+- AUCUN Markdown
+- Paragraphes courts (2 lignes max)
+- Copiable tel quel dans Gmail/Notion/Mailchimp
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 STRUCTURE GLOBALE DE LA SÉQUENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EMAIL 1 — LE CONTRASTE
+Objectif : Faire prendre conscience de l'écart entre aujourd'hui et demain
+- Situation actuelle frustrante
+- Ce qui pourrait changer
+- Aucune vente directe
+- Invitation à réfléchir
+
+EMAIL 2 — LA VALIDATION
+Objectif : Créer la connexion émotionnelle
+- "Tu n'es pas seul"
+- Situation vécue/observée
+- Normalisation du problème
+- Toujours pas de pression commerciale
+
+EMAIL 3 — LE CALCUL
+Objectif : Rassurer le cerveau logique
+- Montrer que c'est faisable
+- Montrer que ce produit est simple
+- Expliquer pourquoi c'est une bonne première étape
+- Introduction douce du produit LOW TICKET
+
+EMAIL 4 — L'IMPACT
+Objectif : Donner du sens à l'action
+- Fierté
+- Impact personnel
+- Sentiment d'avancer enfin
+- Le produit est présenté comme un levier, pas une fin
+
+EMAIL 5 — L'URGENCE
+Objectif : Déclencher la décision
+- Coût de l'inaction
+- Rappel du bénéfice
+- Invitation claire à passer à l'action
+- CTA simple, sans pression
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚫 INTERDICTIONS ABSOLUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Ne JAMAIS mentionner offre premium, upsell, coaching, programme avancé
+- Ne PAS dire "plus tard"
+- Ne PAS vendre autre chose que le produit LOW TICKET
+- Ne jamais inventer une nouvelle offre
+- Ne jamais changer le prix
+- Ne jamais modifier la promesse
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 SORTIE ATTENDUE (JSON)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{
+  "contraste": "...",
+  "validation": "...",
+  "calcul": "...",
+  "impact": "...",
+  "urgence": "..."
+}
+
+Chaque email doit contenir :
+- Objet (ligne 1 : "Objet: ...")
+- Corps de texte (texte brut, paragraphes courts)
+- CTA clair`;
+
+        const userContext = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 DONNÉES PRODUIT (SOURCE DE VÉRITÉ)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OFFRE LOW TICKET (OBLIGATOIRE) :
+${JSON.stringify(lowTicketOffer, null, 2)}
+
+AVATARS CLIENTS :
+${JSON.stringify(avatars, null, 2)}
+
+ONBOARDING SUMMARY :
+${JSON.stringify(onboardingSummary, null, 2)}
+
+ONBOARDING FULL :
+- Prénom créateur : ${user.full_name || user.firstName || 'Non renseigné'}
+- Compétence : ${session.skill || 'Non renseigné'}
+- Problème principal : ${onboardingSummary.main_learning_problem || 'Non renseigné'}
+- Transformation : ${onboardingSummary.big_transformation || 'Non renseigné'}
+- Coût de l'inaction : ${onboardingFull.if_nothing_changes || 'Non renseigné'}
+- Vie future souhaitée : ${onboardingFull.life_change || 'Non renseigné'}
+- Obstacles : ${JSON.stringify(onboardingFull.obstacles || [])}`;
+
+        // Générer les 5 emails en une fois
         const completion = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
-                {
-                    role: "system",
-                    content: `Tu es un expert en Copywriting Émotionnel et en Storytelling de Transformation. Ta mission est de rédiger un email de séquence marketing pour un expert qui vend son savoir-faire.
-
-${emailConfig.title}
-
-Sujet suggéré : ${emailConfig.subject}
-
-Angle et ton : ${emailConfig.instruction}
-
-RÈGLES DE STYLE STRICTES :
-- Utilise exclusivement le 'Tu'
-- Paragraphes courts (2 lignes max)
-- Langage "Terre-à-terre", pas de jargon marketing
-- Intègre les variables naturellement dans le texte
-- Émojis utilisés avec parcimonie
-- Entre 200 et 400 mots maximum
-
-Structure de l'email :
-- Objet : ${emailConfig.subject} (commence par "📧 Objet: ")
-- Corps de l'email avec storytelling émotionnel
-- Call-to-action clair et motivant
-- Signature personnalisée
-
-Remplace les variables entre accolades par les données réelles du client fournies ci-dessous.`
-                },
-                {
-                    role: "user",
-                    content: userContext
-                }
+                { role: "system", content: systemMessage },
+                { role: "user", content: userContext }
             ],
             temperature: 0.8,
+            response_format: { type: "json_object" }
         });
 
-        const emailContent = completion.choices[0].message.content;
+        const generatedEmails = JSON.parse(completion.choices[0].message.content);
 
-        const result = {
-            success: true,
-            email: emailContent,
-            type: emailType,
-            title: emailConfig.title,
-            generatedAt: new Date().toISOString()
-        };
-
-        // 🔥 Save to Session (merge avec existant)
-        const currentEmails = session.generated_marketing_emails || {};
+        // 🔥 Save to Session
         await base44.asServiceRole.entities.Session.update(sessionId, {
-            generated_marketing_emails: {
-                ...currentEmails,
-                [emailType]: result
-            }
+            generated_marketing_emails: generatedEmails
         });
 
         return Response.json({
-            ...result,
+            success: true,
+            emails: generatedEmails,
             fromCache: false
         });
 

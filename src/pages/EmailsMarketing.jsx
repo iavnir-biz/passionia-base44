@@ -15,48 +15,43 @@ import ChatBubble from '@/components/chat/ChatBubble';
 const emailTypes = [
   {
     id: 'contraste',
-    title: 'Email 1 : Le Contraste',
-    subtitle: 'Aujourd\'hui vs Demain',
-    description: 'Rappelle la douleur et le rêve',
+    title: 'Le Contraste',
+    subtitle: 'Email 1',
+    objective: 'Faire prendre conscience de l\'écart entre aujourd\'hui et demain',
     icon: Send,
-    color: 'from-blue-500 to-cyan-500',
-    locked: false
+    color: 'from-blue-500 to-cyan-500'
   },
   {
     id: 'validation',
-    title: 'Email 2 : La Validation Sociale',
-    subtitle: 'Le Regard des autres',
-    description: 'Reconnaissance et succès',
+    title: 'La Validation',
+    subtitle: 'Email 2',
+    objective: 'Créer la connexion émotionnelle ("Tu n\'es pas seul")',
     icon: Send,
-    color: 'from-purple-500 to-pink-500',
-    locked: false
+    color: 'from-purple-500 to-pink-500'
   },
   {
     id: 'calcul',
-    title: 'Email 3 : Le Calcul de Faisabilité',
-    subtitle: 'La Logique',
-    description: 'Montre que c\'est accessible',
+    title: 'Le Calcul',
+    subtitle: 'Email 3',
+    objective: 'Rassurer le cerveau logique (c\'est faisable)',
     icon: Send,
-    color: 'from-orange-500 to-red-500',
-    locked: false
+    color: 'from-orange-500 to-red-500'
   },
   {
     id: 'impact',
-    title: 'Email 4 : L\'Impact et la Fierté',
-    subtitle: 'Le Sens',
-    description: 'Inspire à aider les autres',
+    title: 'L\'Impact',
+    subtitle: 'Email 4',
+    objective: 'Donner du sens à l\'action (fierté, avancer enfin)',
     icon: Send,
-    color: 'from-amber-500 to-yellow-500',
-    locked: false
+    color: 'from-amber-500 to-yellow-500'
   },
   {
     id: 'urgence',
-    title: 'Email 5 : L\'Urgence de l\'Inaction',
-    subtitle: 'Le Regret',
-    description: 'Coût émotionnel de ne rien faire',
+    title: 'L\'Urgence',
+    subtitle: 'Email 5',
+    objective: 'Déclencher la décision (coût de l\'inaction)',
     icon: Send,
-    color: 'from-green-500 to-emerald-500',
-    locked: false
+    color: 'from-green-500 to-emerald-500'
   }
 ];
 
@@ -122,42 +117,32 @@ export default function EmailsMarketing() {
     }
   };
 
-  const handleGenerate = async (emailType, isRegenerate = false) => {
-    if (isRegenerate && !hasPremium) {
-      setShowUpgradeModal(true);
+  const handleGenerateAll = async () => {
+    if (!session) {
+      toast.error('Session non trouvée');
       return;
     }
 
-    if (!profile || !session) {
-      toast.error('Profil incomplet');
-      return;
-    }
-
-    setLoading(emailType);
+    setLoading('all');
     try {
       const response = await base44.functions.invoke('generateMarketingEmail', {
-        emailType,
-        profile,
-        session
+        sessionId: session.id,
+        generateAll: true
       });
 
-      const updatedEmails = {
-        ...generatedEmails,
-        [emailType]: response.data.email
-      };
-      setGeneratedEmails(updatedEmails);
+      setGeneratedEmails(response.data.emails);
 
       // Save to session
       await base44.entities.Session.update(session.id, {
-        generated_marketing_emails: updatedEmails
+        generated_marketing_emails: response.data.emails
       });
 
       // Recharger pour confirmer
       await loadUserData();
 
-      toast.success('Email généré avec succès !');
+      toast.success('Séquence complète générée !');
     } catch (error) {
-      console.error('Error generating email:', error);
+      console.error('Error generating emails:', error);
       toast.error('Erreur lors de la génération');
     } finally {
       setLoading(null);
@@ -215,9 +200,56 @@ export default function EmailsMarketing() {
                 Tes emails marketing
               </h1>
               <p className="text-gray-600 text-lg">
-                Crée des emails personnalisés pour ton audience
+                Une séquence prête à envoyer pour vendre ton produit d'entrée de gamme, sans forcer.
               </p>
             </motion.div>
+
+            {/* Context Block */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 rounded-2xl p-6"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    📧 Comment utiliser cette séquence ?
+                  </h3>
+                  <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                    Cette séquence d'emails est pensée comme une conversation naturelle, pas un tunnel agressif. 
+                    Utilise-les après tes messages privés ou DM pour nourrir la relation et transformer l'intérêt en vente.
+                  </p>
+                  <p className="text-xs text-gray-600 font-medium">
+                    ⚠️ Ces emails sont liés à ton produit low ticket : ils ne peuvent pas être modifiés ni régénérés.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Global Generate Button */}
+            {Object.keys(generatedEmails).length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex justify-center"
+              >
+                <GlowButton
+                  onClick={handleGenerateAll}
+                  variant="primary"
+                  size="lg"
+                  loading={loading === 'all'}
+                  icon={Sparkles}
+                  className="px-8 py-4"
+                >
+                  {loading === 'all' ? 'Nova écrit tes emails...' : 'Générer mes emails'}
+                </GlowButton>
+              </motion.div>
+            )}
 
             {/* Email Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -245,83 +277,37 @@ export default function EmailsMarketing() {
                     <p className="text-[#61f7a2] text-xs font-semibold uppercase tracking-wide mb-1">
                       {email.subtitle}
                     </p>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
                       {email.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-6">{email.description}</p>
+                    <p className="text-gray-600 text-sm mb-6">
+                      <span className="font-medium">Objectif :</span> {email.objective}
+                    </p>
 
                     {/* Actions */}
-                    {!email.locked ? (
-                      generated ? (
-                        <div className="space-y-3">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => setPreviewEmail({ type: email.id, content: generated, title: email.title })}
-                              className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
-                            >
-                              <Eye className="w-4 h-4" />
-                              <span className="text-sm font-medium">Voir</span>
-                            </button>
-                            <button
-                              onClick={() => handleCopy(generated)}
-                              className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDownload(generated, email.id)}
-                              className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
-                            >
-                              <Download className="w-4 h-4" />
-                            </button>
-                          </div>
-                          <button
-                            onClick={() => {
-                              if (!hasPremium) {
-                                setShowUpgradeModal(true);
-                                return;
-                              }
-                              handleGenerate(email.id, true);
-                            }}
-                            disabled={isGenerating}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-700 disabled:opacity-50"
-                          >
-                            {isGenerating ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <>
-                                <Lock className="w-4 h-4" />
-                                <span className="text-sm font-medium">
-                                  Régénération non disponible pour le plan actuel
-                                </span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      ) : (
-                        <GlowButton
-                          onClick={() => handleGenerate(email.id)}
-                          variant="primary"
-                          size="default"
-                          className="w-full"
-                          loading={isGenerating}
-                          disabled={loading !== null && loading !== email.id}
-                          icon={Sparkles}
+                    {generated ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setPreviewEmail({ type: email.id, content: generated, title: email.title })}
+                          className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
                         >
-                          {isGenerating ? 'Génération...' : 'Générer'}
-                        </GlowButton>
-                      )
-                    ) : null}
-
-                    {/* Lock Overlay */}
-                    {email.locked && (
-                      <div className="absolute inset-0 bg-white/40 backdrop-blur-md flex items-center justify-center rounded-2xl">
-                        <div className="text-center">
-                          <Lock className="w-10 h-10 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm font-semibold text-gray-600">Premium</p>
-                        </div>
+                          <Eye className="w-4 h-4" />
+                          <span className="text-sm font-medium">Voir</span>
+                        </button>
+                        <button
+                          onClick={() => handleCopy(generated)}
+                          className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDownload(generated, email.id)}
+                          className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
                       </div>
-                    )}
+                    ) : null}
                   </motion.div>
                 );
               })}
@@ -361,18 +347,9 @@ export default function EmailsMarketing() {
             </div>
             <div className="p-8 overflow-y-auto max-h-[calc(85vh-100px)] bg-white">
               <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
-                <ReactMarkdown
-                  components={{
-                    p: ({ children }) => <p className="mb-4">{children}</p>,
-                    h1: ({ children }) => <h1 className="mb-4 mt-6">{children}</h1>,
-                    h2: ({ children }) => <h2 className="mb-3 mt-5">{children}</h2>,
-                    h3: ({ children }) => <h3 className="mb-3 mt-4">{children}</h3>,
-                    ul: ({ children }) => <ul className="mb-4 space-y-2">{children}</ul>,
-                    ol: ({ children }) => <ol className="mb-4 space-y-2">{children}</ol>,
-                  }}
-                >
+                <pre className="whitespace-pre-wrap font-sans">
                   {previewEmail.content}
-                </ReactMarkdown>
+                </pre>
               </div>
             </div>
           </motion.div>

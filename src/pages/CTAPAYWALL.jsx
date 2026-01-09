@@ -44,6 +44,7 @@ export default function CTAPAYWALL() {
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
 
   useEffect(() => {
     loadUser();

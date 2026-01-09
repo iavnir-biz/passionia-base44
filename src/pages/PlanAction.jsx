@@ -90,9 +90,9 @@ export default function PlanAction() {
   };
 
   const handleChecklistChange = async (day, itemIndex) => {
-    const dayData = dayProgress[day] || { checklist: getDayChecklist(day).map(() => ({ checked: false })) };
+    const dayData = dayProgress[day] || { checklist: getDayChecklist(day).map(item => ({ ...item, checked: false })) };
     const newChecklist = [...dayData.checklist];
-    newChecklist[itemIndex] = { checked: !newChecklist[itemIndex].checked };
+    newChecklist[itemIndex] = { ...newChecklist[itemIndex], checked: !newChecklist[itemIndex].checked };
     
     await saveDayProgress(day, {
       ...dayData,

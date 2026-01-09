@@ -125,24 +125,14 @@ export default function Dashboard() {
   };
   
   const calculateProgress = () => {
-    // 🔥 LECTURE SEULE : basé sur présence des contenus générés (DB-first)
-    if (!session) return 0;
+    // 🔥 Progression basée sur les TÂCHES réellement cochées du Plan d'action
+    if (!profile?.plan_7days_progress) return 0;
     
-    const generatedFields = [
-      'generated_avatars',
-      'generated_sales_messages',
-      'generated_marketing_emails',
-      'generated_sales_pages',
-      'plan_de_route',
-      'market_validation',
-      'future_vision'
-    ];
-    
-    const completed = generatedFields.filter(field => 
-      session[field] !== null && session[field] !== undefined
+    const completedDays = Object.keys(profile.plan_7days_progress).filter(
+      key => profile.plan_7days_progress[key]?.completed
     ).length;
     
-    return Math.round((completed / generatedFields.length) * 100);
+    return Math.round((completedDays / 7) * 100);
   };
   
   const getCurrentStep = () => {
@@ -157,15 +147,15 @@ export default function Dashboard() {
   };
   
   const getNextIncompleteTask = () => {
-    // 🔥 Trouver la PREMIÈRE tâche incomplète du plan 7 jours
+    // 🔥 Retourner la VRAIE première tâche incomplète du jour courant
     if (!profile?.plan_7days_progress) return dailyMissions[0];
     
     const completedDays = Object.keys(profile.plan_7days_progress).filter(
       key => profile.plan_7days_progress[key]?.completed
     ).length;
     
-    const nextDay = Math.min(completedDays + 1, 7);
-    return dailyMissions[nextDay - 1] || dailyMissions[0];
+    const currentDayNum = Math.min(completedDays + 1, 7);
+    return dailyMissions[currentDayNum - 1] || dailyMissions[6];
   };
 
   const livrables = [

@@ -136,16 +136,18 @@ export default function OnboardingTransition() {
       setUser({ firstName: firstName, full_name: firstName });
 
       // Enrichir le User avec les données du summary (une seule fois)
+      const fullData = session.onboarding_full || {};
+      
       await base44.auth.updateMe({ 
         firstName: firstName,
-        coreSkill: session.skill || summary.who_to_teach || '',
-        targetAudience: summary.learner_profile || '',
-        mainProblem: summary.main_learning_problem || '',
-        firstResult: summary.quick_win || '',
-        finalTransformation: summary.big_transformation || '',
-        uniqueMethod: summary.method_angle || '',
-        typicalMistake: summary.common_mistake || '',
-        extraDetail: summary.proof_or_story || ''
+        coreSkill: session.skill || fullData.coreSkill || '',
+        targetAudience: fullData.targetAudience || '',
+        mainProblem: fullData.mainProblem || '',
+        firstResult: fullData.firstQuickResult || '',
+        finalTransformation: fullData.finalTransformation || '',
+        uniqueMethod: fullData.uniqueMethod || '',
+        typicalMistake: fullData.typicalMistake || '',
+        extraDetail: fullData.extraDetail || ''
       });
 
       console.log('✅ [OnboardingTransition] User enrichi avec summary');

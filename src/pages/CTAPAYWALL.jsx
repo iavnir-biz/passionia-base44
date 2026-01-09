@@ -102,6 +102,21 @@ export default function CTAPAYWALL() {
     }
   };
 
+  const handleSimulatePurchase = async () => {
+    if (!user) return;
+
+    setIsSimulating(true);
+    try {
+      await base44.functions.invoke('simulatePurchase');
+      navigate(createPageUrl('Dashboard'));
+    } catch (error) {
+      console.error('Error simulating purchase:', error);
+      alert('Erreur lors de la simulation.');
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">

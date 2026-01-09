@@ -101,9 +101,8 @@ export default function Sidebar({ currentPage, progress = 0, user }) {
       </div>
 
       {/* User Profile - Nouveau bloc */}
-            <div className="p-6 border-b border-gray-200">
-              <UserProfileBlock user={user} progress={progress} calculateDay={calculateDay} />
-            </div>
+      <div className="p-6 border-b border-gray-200">
+        <UserProfileBlock user={user} progress={progress} calculateDay={calculateDay} />
         <div>
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-gray-600">Progression</span>

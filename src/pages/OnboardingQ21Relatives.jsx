@@ -67,7 +67,7 @@ export default function OnboardingQ21Relatives() {
   return (
     <OnboardingQuestionPage
       questionId="relativesThoughts"
-      title="Quand tes proches verront que tu vis en aidant les autres avec ce que tu sais, qu'est-ce qu'ils penseront ? (plusieurs choix possibles)"
+      title="Quand tes proches verront que tu vis en aidant les autres avec ce que tu sais… qu'est-ce qu'ils penseront ? (plusieurs choix possibles)"
       inputType="checkbox"
       options={getGenderedOptions()}
       fieldName="relativesThoughts"

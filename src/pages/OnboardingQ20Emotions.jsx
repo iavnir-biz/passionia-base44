@@ -67,7 +67,7 @@ export default function OnboardingQ20Emotions() {
   return (
     <OnboardingQuestionPage
       questionId="emotionalBenefits"
-      title="Imagine que tu aides des dizaines de personnes grâce à ton savoir-faire… Qu'est-ce que ça te ferait ressentir ? (plusieurs choix possibles)"
+      title="Imagine que tu aides des dizaines de personnes grâce à ton savoir-faire… qu'est-ce que ça te ferait ressentir ? (plusieurs choix possibles)"
       inputType="checkbox"
       options={getGenderedOptions()}
       fieldName="emotionalBenefits"

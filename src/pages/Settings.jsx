@@ -29,7 +29,9 @@ export default function Settings() {
   const [progress, setProgress] = useState(0);
   
   const [formData, setFormData] = useState({
-    full_name: '',
+    first_name: '',
+    last_name: '',
+    avatar_url: '',
     passion: '',
     target_audience: '',
     revenue_goal: ''
@@ -51,7 +53,9 @@ export default function Settings() {
       if (profiles.length > 0) {
         setProfile(profiles[0]);
         setFormData({
-          full_name: currentUser.full_name || '',
+          first_name: profiles[0].first_name || currentUser.firstName || '',
+          last_name: profiles[0].last_name || '',
+          avatar_url: profiles[0].avatar_url || currentUser.profile_picture || '',
           passion: profiles[0].passion || '',
           target_audience: profiles[0].target_audience || '',
           revenue_goal: profiles[0].revenue_goal?.toString() || ''
@@ -72,14 +76,19 @@ export default function Settings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Update user name
-      if (formData.full_name !== user.full_name) {
-        await base44.auth.updateMe({ full_name: formData.full_name });
-      }
+      // Update user full_name
+      const fullName = `${formData.first_name} ${formData.last_name}`.trim();
+      await base44.auth.updateMe({ 
+        full_name: fullName,
+        profile_picture: formData.avatar_url 
+      });
       
       // Update profile
       if (profile) {
         await base44.entities.UserProfile.update(profile.id, {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          avatar_url: formData.avatar_url,
           passion: formData.passion,
           target_audience: formData.target_audience,
           revenue_goal: parseInt(formData.revenue_goal) || 0
@@ -129,10 +138,10 @@ export default function Settings() {
           <div>
             <label className="block text-sm text-gray-400 mb-2">Photo de profil</label>
             <div className="flex items-center gap-4">
-              {user?.profile_picture ? (
+              {formData.avatar_url ? (
                 <img
-                  src={user.profile_picture}
-                  alt={user.full_name}
+                  src={formData.avatar_url}
+                  alt="Avatar"
                   className="w-16 h-16 rounded-full object-cover border-2 border-[#2a2a45]"
                 />
               ) : (
@@ -148,8 +157,7 @@ export default function Settings() {
                   if (file) {
                     try {
                       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                      await base44.auth.updateMe({ profile_picture: file_url });
-                      await loadData();
+                      setFormData({ ...formData, avatar_url: file_url });
                     } catch (error) {
                       console.error('Error uploading photo:', error);
                     }
@@ -160,11 +168,20 @@ export default function Settings() {
             </div>
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Nom complet</label>
+            <label className="block text-sm text-gray-400 mb-2">Prénom</label>
             <input
               type="text"
-              value={formData.full_name}
-              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+              value={formData.first_name}
+              onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+              className="w-full bg-[#11112b] border border-[#2a2a45] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#61f7a2]"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-400 mb-2">Nom</label>
+            <input
+              type="text"
+              value={formData.last_name}
+              onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
               className="w-full bg-[#11112b] border border-[#2a2a45] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#61f7a2]"
             />
           </div>

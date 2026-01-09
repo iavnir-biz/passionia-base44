@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -23,6 +24,53 @@ import {
   Users
 } from "lucide-react";
 import ProgressBar from '@/components/ui/ProgressBar';
+
+function UserProfileBlock({ user, progress, calculateDay }) {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+    }
+  }, [user]);
+
+  const loadProfile = async () => {
+    try {
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      if (profiles.length > 0) {
+        setProfile(profiles[0]);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const displayName = profile?.first_name || user?.firstName || user?.full_name?.split(' ')[0] || 'Créateur';
+  const avatarUrl = profile?.avatar_url || user?.profile_picture;
+
+  return (
+    <div className="flex items-center gap-3 mb-3">
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={displayName}
+          className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+        />
+      ) : (
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+          <User className="w-6 h-6 text-white" />
+        </div>
+      )}
+      <div className="flex-1">
+        <p className="font-bold text-gray-900">{displayName}</p>
+        <p className="text-xs text-gray-600">Jour {calculateDay(progress)}</p>
+      </div>
+    </div>
+  );
+}
 
 const menuStructure = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
@@ -53,24 +101,9 @@ export default function Sidebar({ currentPage, progress = 0, user }) {
       </div>
 
       {/* User Profile - Nouveau bloc */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center gap-3 mb-3">
-          {user?.profile_picture ? (
-            <img
-              src={user.profile_picture}
-              alt={user.full_name}
-              className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
-              <User className="w-6 h-6 text-white" />
+            <div className="p-6 border-b border-gray-200">
+              <UserProfileBlock user={user} progress={progress} calculateDay={calculateDay} />
             </div>
-          )}
-          <div className="flex-1">
-            <p className="font-bold text-gray-900">{user?.full_name || 'Utilisateur'}</p>
-            <p className="text-xs text-gray-600">Jour {calculateDay(progress)}</p>
-          </div>
-        </div>
         <div>
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-gray-600">Progression</span>

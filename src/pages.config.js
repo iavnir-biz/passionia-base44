@@ -62,6 +62,7 @@ import Settings from './pages/Settings';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
+import SetupProfile from './pages/SetupProfile';
 
 
 export const PAGES = {
@@ -129,6 +130,7 @@ export const PAGES = {
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
+    "SetupProfile": SetupProfile,
 }
 
 export const pagesConfig = {

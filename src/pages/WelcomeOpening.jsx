@@ -56,8 +56,22 @@ export default function WelcomeOpening() {
     }
   };
 
-  const handleStart = () => {
-    navigate(createPageUrl('NoahGeneration'));
+  const handleStart = async () => {
+    // Vérifier si profil minimal existe
+    const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+    if (profiles.length > 0) {
+      const profile = profiles[0];
+      if (!profile.first_name || !profile.avatar_url) {
+        navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
+        return;
+      }
+    } else {
+      navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
+      return;
+    }
+
+    // Profil complet → Dashboard direct
+    navigate(createPageUrl('Dashboard'));
   };
 
   if (isLoading) {
@@ -105,7 +119,7 @@ export default function WelcomeOpening() {
               Ton accès est activé.
             </p>
             <p className="text-lg text-gray-600 mb-8">
-              Noah est en train de construire ton business personnalisé : offres, messages, emails, page de vente et plan d'action.
+              Nova a préparé tous les outils pour transformer ton savoir-faire en business rentable.
             </p>
 
             <motion.div
@@ -119,7 +133,7 @@ export default function WelcomeOpening() {
                 size="lg"
                 className="px-12"
               >
-                Démarrer mon aventure
+                Accéder au dashboard
               </GlowButton>
             </motion.div>
           </motion.div>

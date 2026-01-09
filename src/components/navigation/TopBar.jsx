@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
@@ -8,6 +8,30 @@ import { cn } from "@/lib/utils";
 export default function TopBar({ user }) {
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      loadProfile();
+    }
+  }, [user]);
+
+  const loadProfile = async () => {
+    try {
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      if (profiles.length > 0) {
+        setProfile(profiles[0]);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  };
+
+  const displayName = profile?.first_name || user?.firstName || user?.full_name?.split(' ')[0] || 'Créateur';
+  const fullDisplayName = profile?.first_name && profile?.last_name 
+    ? `${profile.first_name} ${profile.last_name}`
+    : user?.full_name || displayName;
+  const avatarUrl = profile?.avatar_url || user?.profile_picture;
 
   return (
     <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-40">
@@ -36,11 +60,11 @@ export default function TopBar({ user }) {
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-50 transition-colors"
-          >
-            {user?.profile_picture ? (
+            >
+            {avatarUrl ? (
               <img
-                src={user.profile_picture}
-                alt={user.full_name}
+                src={avatarUrl}
+                alt={displayName}
                 className="w-9 h-9 rounded-full object-cover border-2 border-gray-200"
               />
             ) : (
@@ -64,7 +88,7 @@ export default function TopBar({ user }) {
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                 {/* User Info */}
                 <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-semibold text-gray-900">{user?.full_name || 'Utilisateur'}</p>
+                  <p className="text-sm font-semibold text-gray-900">{fullDisplayName}</p>
                   <p className="text-xs text-gray-600 mt-0.5">{user?.email || ''}</p>
                 </div>
 

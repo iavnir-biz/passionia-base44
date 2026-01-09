@@ -154,32 +154,8 @@ export default function AIResources() {
         return;
       }
 
-      // Guard: Si payé + assets incomplets → redirect NoahGeneration
-      if (currentUser.has_purchased) {
-        const required = [
-          'market_validation',
-          'generated_avatars',
-          'my_generated_offers',
-          'generated_sales_messages',
-          'generated_marketing_emails',
-          'generated_sales_pages',
-          'plan_de_route'
-        ];
-
-        const missing = required.filter(f => !isNonEmpty(userSession[f]));
-        
-        console.log('[AIResources] Generation check', {
-          sessionId,
-          allGenerated: missing.length === 0,
-          missing
-        });
-
-        if (missing.length > 0) {
-          console.log('[AIResources] Redirecting to NoahGeneration - incomplete assets');
-          navigate(createPageUrl('NoahGeneration'));
-          return;
-        }
-      }
+      // ✅ ACCÈS LIBRE pour diagnostiquer
+      console.log('[AIResources] Access granted for diagnostics');
 
       // Construire état "Prêt" depuis Session
       const resourcesState = {

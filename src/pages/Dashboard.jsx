@@ -88,51 +88,8 @@ export default function Dashboard() {
     try {
       const currentUser = await base44.auth.me();
       
-      // 🔥 GUARD : Si payé, vérifier que tout est généré (DB-first)
-      if (currentUser.has_purchased) {
-        const sessionId = currentUser.sessionId;
-        if (!sessionId) {
-          console.warn('[Dashboard] No sessionId, allowing access');
-          loadData();
-          return;
-        }
-
-        const sessions = await base44.entities.Session.filter({ id: sessionId });
-        if (sessions.length > 0) {
-          const userSession = sessions[0];
-          
-          const requiredFields = [
-            'market_validation',
-            'generated_avatars',
-            'my_generated_offers',
-            'generated_sales_messages',
-            'generated_marketing_emails',
-            'generated_sales_pages',
-            'plan_de_route'
-          ];
-
-          // P1-8: Vérifier non-vide
-          const missingFields = requiredFields.filter(field => {
-            const value = userSession[field];
-            return !value || value === null || 
-                   (typeof value === 'object' && Object.keys(value).length === 0) ||
-                   (typeof value === 'string' && value.trim() === '');
-          });
-
-          console.log('[Dashboard] Generation check', {
-            sessionId,
-            allGenerated: missingFields.length === 0,
-            present: requiredFields.filter(f => userSession[f]),
-            missing: missingFields
-          });
-
-          if (missingFields.length > 0) {
-            console.log('[Dashboard] Redirecting to NoahGeneration - incomplete assets');
-            navigate(createPageUrl('NoahGeneration'));
-            return;
-          }
-        }
-      }
+      // ✅ ACCÈS LIBRE pour diagnostiquer
+      console.log('[Dashboard] Access granted for diagnostics');
       
       loadData();
     } catch (error) {

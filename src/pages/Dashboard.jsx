@@ -252,10 +252,10 @@ export default function Dashboard() {
                 Ta mission aujourd'hui
               </h2>
               <p className="text-2xl font-bold text-white mb-2">
-                {dailyMissions[getCurrentStep() - 1]?.title}
+                {getNextIncompleteTask()?.title}
               </p>
               <p className="text-white/90 text-lg">
-                {dailyMissions[getCurrentStep() - 1]?.description}
+                {getNextIncompleteTask()?.description}
               </p>
             </div>
             

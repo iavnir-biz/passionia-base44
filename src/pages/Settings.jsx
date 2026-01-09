@@ -50,17 +50,28 @@ export default function Settings() {
       
       // Load profile
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
-      if (profiles.length > 0) {
-        setProfile(profiles[0]);
-        setFormData({
-          first_name: profiles[0].first_name || currentUser.firstName || '',
-          last_name: profiles[0].last_name || '',
-          avatar_url: profiles[0].avatar_url || currentUser.profile_picture || '',
-          passion: profiles[0].passion || '',
-          target_audience: profiles[0].target_audience || '',
-          revenue_goal: profiles[0].revenue_goal?.toString() || ''
-        });
+      let profileData = profiles.length > 0 ? profiles[0] : null;
+      
+      // Load session for onboarding data
+      let sessionData = null;
+      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+      if (sessions.length > 0) {
+        sessionData = sessions[0];
       }
+      
+      if (profileData) {
+        setProfile(profileData);
+      }
+      
+      // Merge data: Profile data + Session onboarding data
+      setFormData({
+        first_name: profileData?.first_name || currentUser.firstName || '',
+        last_name: profileData?.last_name || '',
+        avatar_url: profileData?.avatar_url || currentUser.profile_picture || '',
+        passion: profileData?.passion || sessionData?.onboarding_summary?.who_to_teach || '',
+        target_audience: profileData?.target_audience || sessionData?.onboarding_summary?.learner_profile || '',
+        revenue_goal: profileData?.revenue_goal?.toString() || sessionData?.potential_revenue?.toString() || ''
+      });
       
       // Load plan steps for progress
       const steps = await base44.entities.PlanStep.filter({ created_by: currentUser.email });

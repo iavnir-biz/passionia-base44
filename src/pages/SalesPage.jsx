@@ -546,7 +546,8 @@ export default function SalesPage() {
               </div>
               <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
                 <iframe
-                  srcDoc={showPreview.html}
+                  srcDoc={showPreview.html || ''}
+                  sandbox="allow-same-origin allow-popups allow-forms allow-scripts"
                   className="w-full h-[800px] border-0 bg-white"
                   title="Sales Page Preview"
                 />

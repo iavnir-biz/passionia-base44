@@ -41,18 +41,33 @@ export default function MyOffers() {
         setHasPremium(profiles[0].has_paid === true);
       }
 
-      const sessions = await base44.entities.Session.filter({ 
-        created_by: currentUser.email 
-      });
+      const sessionId = currentUser.sessionId;
+      if (!sessionId) {
+        console.error('[MyOffers] No sessionId');
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ id: sessionId });
       
       if (sessions.length > 0) {
         const userSession = sessions[0];
         setSession(userSession);
-        console.log('Session loaded:', userSession);
-        console.log('My generated offers:', userSession.my_generated_offers);
+        console.log('[MyOffers] Session loaded:', userSession);
+        console.log('[MyOffers] My generated offers:', userSession.my_generated_offers);
+        console.log('[MyOffers] Finalized offer (base):', userSession.finalized_offer);
         
+        // 🔥 DB-first: use enriched offers if available, fallback to finalized_offer
         if (userSession.my_generated_offers) {
           setGeneratedOffers(userSession.my_generated_offers);
+        } else if (userSession.finalized_offer) {
+          // Fallback to base offers from finalized_offer
+          const baseOffers = {
+            low: userSession.finalized_offer.mainProduct,
+            bump: userSession.finalized_offer.orderBump,
+            mid: userSession.finalized_offer.upsell1,
+            high: userSession.finalized_offer.upsell3
+          };
+          setGeneratedOffers(baseOffers);
         }
       } else {
         console.error('No session found for user');
@@ -63,23 +78,27 @@ export default function MyOffers() {
   };
 
   const handleGenerateSingle = async (offerType) => {
-    const offer = generatedOffers?.[offerType];
-    if (offer) {
-      return;
+    // Check if already enriched (not base offer)
+    const isFromFinalized = session?.finalized_offer && 
+      !session?.my_generated_offers?.[offerType];
+    
+    if (!isFromFinalized && generatedOffers?.[offerType]) {
+      return; // Already enriched
     }
 
     setLoadingOffers(prev => ({ ...prev, [offerType]: true }));
 
     try {
+      console.log('[MyOffers] Invoking generateMyOffers:', { sessionId: session.id, offerType });
       const response = await base44.functions.invoke('generateMyOffers', {
-        profile,
-        session,
+        sessionId: session.id,
         offerType
       });
 
+      const enrichedOffer = response.data;
       const updatedOffers = {
         ...generatedOffers,
-        [offerType]: response.data[offerType]
+        [offerType]: enrichedOffer
       };
       
       setGeneratedOffers(updatedOffers);
@@ -88,13 +107,13 @@ export default function MyOffers() {
         my_generated_offers: updatedOffers
       });
 
-      // Recharger pour confirmer
+      // Reload for confirmation
       await loadData();
 
-      toast.success('Offre générée !');
+      toast.success('Offre enrichie !');
     } catch (error) {
-      console.error('Error generating offer:', error);
-      toast.error('Erreur lors de la génération');
+      console.error('Error enriching offer:', error);
+      toast.error('Erreur lors de l\'enrichissement');
     } finally {
       setLoadingOffers(prev => ({ ...prev, [offerType]: false }));
     }
@@ -309,17 +328,17 @@ ${offer.benefits.join('\n')}
                         </div>
                       </>
                     ) : (
-                      <GlowButton
-                        onClick={() => handleGenerateSingle(offerType.id)}
-                        variant="primary"
-                        size="default"
-                        loading={isLoading}
-                        icon={Sparkles}
-                        className="w-full"
-                      >
-                        {isLoading ? 'Nova structure ton offre...' : 'Structurer cette offre'}
-                      </GlowButton>
-                    )}
+                       <GlowButton
+                         onClick={() => handleGenerateSingle(offerType.id)}
+                         variant="primary"
+                         size="default"
+                         loading={isLoading}
+                         icon={Sparkles}
+                         className="w-full"
+                       >
+                         {isLoading ? 'Nova enrichit ton offre...' : 'Détailler avec l\'IA'}
+                       </GlowButton>
+                     )}
                   </motion.div>
                 );
               })}

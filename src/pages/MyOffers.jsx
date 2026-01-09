@@ -296,7 +296,7 @@ ${offer.benefits.join('\n')}
                           <div className="bg-white rounded-lg p-3 border border-gray-200">
                             <h4 className="text-gray-900 font-semibold text-xs mb-2">📦 Livrables</h4>
                             <ul className="space-y-1">
-                              {offer.deliverables.slice(0, 3).map((item, i) => (
+                              {(offer.deliverables || []).slice(0, 3).map((item, i) => (
                                 <li key={i} className="text-gray-600 text-xs flex items-start gap-2">
                                   <span className="text-[#61f7a2] mt-0.5">✓</span>
                                   <span>{item}</span>

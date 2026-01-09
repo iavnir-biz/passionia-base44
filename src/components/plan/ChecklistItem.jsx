@@ -42,7 +42,7 @@ export default function ChecklistItem({ item, checked, onChange, disabled }) {
         />
         
         <div className="flex-1">
-          <span className={checked ? "font-medium line-through text-green-700" : "font-medium text-gray-900"}>
+          <span className={checked ? "font-medium line-through text-gray-900" : "font-medium text-gray-900"}>
             {item.text}
           </span>
         </div>

@@ -30,7 +30,7 @@ export default function OnboardingQ16TargetIncome() {
       prevPage="OnboardingQ15CurrentIncome"
       progress={35}
       blockType="objectives"
-      useLocalStorage={false}
+      useLocalStorage={true}
       completedSteps={[1, 2]}
     />
   );

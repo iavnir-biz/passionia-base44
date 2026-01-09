@@ -59,10 +59,10 @@ import Results from './pages/Results';
 import SalesMessages from './pages/SalesMessages';
 import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
+import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import SetupProfile from './pages/SetupProfile';
 
 
 export const PAGES = {
@@ -127,10 +127,10 @@ export const PAGES = {
     "SalesMessages": SalesMessages,
     "SalesPage": SalesPage,
     "Settings": Settings,
+    "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "SetupProfile": SetupProfile,
 }
 
 export const pagesConfig = {

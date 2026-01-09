@@ -74,9 +74,9 @@ function UserProfileBlock({ user, progress, calculateDay }) {
 
 const menuStructure = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
-  { name: 'Ressources IA', icon: Sparkles, page: 'AIResources' },
   { name: 'Plan d\'action', icon: Target, page: 'PlanAction' },
-  { name: 'Discuter avec Noah', icon: MessageCircle, page: 'NovaChat', locked: true },
+  { name: 'Ressources IA', icon: Sparkles, page: 'AIResources' },
+  { name: 'Discuter avec nous', icon: MessageCircle, page: 'NovaChat', locked: true },
 ];
 
 export default function Sidebar({ currentPage, progress = 0, user }) {

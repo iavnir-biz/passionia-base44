@@ -188,8 +188,12 @@ Deno.serve(async (req) => {
         }
       ];
 
-      const coreSkill = workingHistory.length === 0 ? normalizedAnswer : (workingSummary.who_to_teach || '');
-      
+      // 🔥 SKILL PROPAGATION FIX: toujours récupérer depuis onboarding_full.coreSkill ou la réponse actuelle
+      const fullData = currentSession.onboarding_full || {};
+      const coreSkill = workingHistory.length === 0 
+        ? normalizedAnswer 
+        : (fullData.coreSkill || workingSummary.who_to_teach || '');
+
       const updatePayload = {
         onboarding_history: updatedHistory,
         skill: coreSkill

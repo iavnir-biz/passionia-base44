@@ -146,7 +146,6 @@ export default function OfferGenerationStart() {
         missingData.push('firstName');
       }
       
-      const fullData = session.onboarding_full || {};
       if (!session.skill && !fullData.coreSkill && !session.onboarding_summary?.who_to_teach) {
         missingData.push('skill');
       }

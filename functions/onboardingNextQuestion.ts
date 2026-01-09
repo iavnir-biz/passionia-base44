@@ -196,7 +196,56 @@ Deno.serve(async (req) => {
       };
       
       if (workingHistory.length === 0) {
-        updatePayload.onboarding_full = { coreSkill: normalizedAnswer };
+        updatePayload.onboarding_full = { 
+          ...(currentSession.onboarding_full || {}),
+          coreSkill: normalizedAnswer 
+        };
+        updatePayload.onboarding_summary = {
+          ...(currentSession.onboarding_summary || {}),
+          who_to_teach: normalizedAnswer
+        };
+      } else if (workingHistory.length === 3) {
+        // Q4 targetAudience
+        updatePayload.onboarding_full = {
+          ...(currentSession.onboarding_full || {}),
+          targetAudience: normalizedAnswer
+        };
+      } else if (workingHistory.length === 4) {
+        // Q5 mainProblem
+        updatePayload.onboarding_full = {
+          ...(currentSession.onboarding_full || {}),
+          mainProblem: normalizedAnswer
+        };
+      } else if (workingHistory.length === 5) {
+        // Q6 firstQuickResult
+        updatePayload.onboarding_full = {
+          ...(currentSession.onboarding_full || {}),
+          firstQuickResult: normalizedAnswer
+        };
+      } else if (workingHistory.length === 6) {
+        // Q7 finalTransformation
+        updatePayload.onboarding_full = {
+          ...(currentSession.onboarding_full || {}),
+          finalTransformation: normalizedAnswer
+        };
+      } else if (workingHistory.length === 8) {
+        // Q9 uniqueMethod
+        updatePayload.onboarding_full = {
+          ...(currentSession.onboarding_full || {}),
+          uniqueMethod: normalizedAnswer
+        };
+      } else if (workingHistory.length === 9) {
+        // Q10 typicalMistake
+        updatePayload.onboarding_full = {
+          ...(currentSession.onboarding_full || {}),
+          typicalMistake: normalizedAnswer
+        };
+      } else if (workingHistory.length === 10) {
+        // Q11 extraDetail
+        updatePayload.onboarding_full = {
+          ...(currentSession.onboarding_full || {}),
+          extraDetail: normalizedAnswer
+        };
       }
 
       await base44.asServiceRole.entities.Session.update(sessionId, updatePayload);

@@ -273,6 +273,18 @@ export default function BonneNouvelle() {
       <div className="flex-1 flex flex-col lg:ml-80">
         <div className="py-12">
         <div className="max-w-3xl mx-auto px-4">
+          {/* Top CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex justify-center mb-8"
+          >
+            <GlowButton onClick={handleContinue} size="lg" className="px-12">
+              Voir ma vie future
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </GlowButton>
+          </motion.div>
+
           {/* Title */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

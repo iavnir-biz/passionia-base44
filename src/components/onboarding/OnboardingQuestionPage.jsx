@@ -148,9 +148,34 @@ export default function OnboardingQuestionPage({
       }
       
       if (useLocalStorage) {
+        // 🔥 DOUBLE SAUVEGARDE : localStorage + Session.onboarding_full
         localStorage.setItem(`onboarding_${fieldName}`, 
           inputType === 'checkbox' ? JSON.stringify(value) : value
         );
+
+        // Sauvegarder en DB si l'utilisateur est authentifié
+        try {
+          const currentUser = await base44.auth.me();
+          if (currentUser?.sessionId) {
+            const response = await base44.functions.invoke('saveOnboardingAnswer', {
+              sessionId: currentUser.sessionId,
+              field: fieldName,
+              value: inputType === 'checkbox' ? value : value
+            });
+
+            if (response.data?.success) {
+              console.log('✅ [ONBOARDING_SAVE_LOCAL]', {
+                sessionId: currentUser.sessionId,
+                fieldName,
+                saved: true
+              });
+            }
+          }
+        } catch (backendError) {
+          console.warn('⚠️ [ONBOARDING_SAVE_LOCAL] Backend save failed:', backendError);
+          // Continue anyway - localStorage is saved
+        }
+
         navigate(createPageUrl(nextPage));
         return;
       }

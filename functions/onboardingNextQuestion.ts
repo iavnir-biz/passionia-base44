@@ -214,6 +214,12 @@ Deno.serve(async (req) => {
           ...(currentSession.onboarding_full || {}),
           targetAudience: normalizedAnswer
         };
+        // 🔥 Mapper aussi dans summary.learner_profile
+        const existingSummary = currentSession.onboarding_summary || {};
+        updatePayload.onboarding_summary = {
+          ...existingSummary,
+          learner_profile: `${existingSummary.learner_profile || ''} ${normalizedAnswer}`.trim()
+        };
       } else if (workingHistory.length === 4) {
         // Q5 mainProblem
         updatePayload.onboarding_full = {
@@ -231,6 +237,17 @@ Deno.serve(async (req) => {
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           finalTransformation: normalizedAnswer
+        };
+      } else if (workingHistory.length === 7) {
+        // Q8 mainTeaching
+        updatePayload.onboarding_full = {
+          ...(currentSession.onboarding_full || {}),
+          mainTeaching: normalizedAnswer
+        };
+        // 🔥 Mapper dans summary.main_teaching
+        updatePayload.onboarding_summary = {
+          ...(currentSession.onboarding_summary || {}),
+          main_teaching: normalizedAnswer
         };
       } else if (workingHistory.length === 8) {
         // Q9 uniqueMethod

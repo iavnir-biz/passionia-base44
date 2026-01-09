@@ -3,7 +3,7 @@ import OnboardingQuestionPage from '@/components/onboarding/OnboardingQuestionPa
 
 export default function OnboardingQ18LifeChange() {
   // Récupérer les valeurs de localStorage
-  const targetIncome = localStorage.getItem('onboarding_targetIncome') || '3000';
+  const targetIncome = localStorage.getItem('onboarding_targetIncome') || localStorage.getItem('onboarding_targetIncome') || '3000';
   const targetDelay = localStorage.getItem('onboarding_targetIncomeDelay') || '6';
   
   return (

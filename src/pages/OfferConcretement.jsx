@@ -177,7 +177,7 @@ export default function OfferConcretement() {
   };
 
   if (isLoading || isGenerating) {
-    return <OfferTransition message={isGenerating ? "Nova prépare ton plan de route..." : "Chargement..."} />;
+    return <OfferTransition message={isGenerating ? "Noah prépare ton plan de route..." : "Chargement..."} />;
   }
 
   if (!planDeRoute) {
@@ -257,49 +257,7 @@ export default function OfferConcretement() {
 
       <div className="flex-1 flex flex-col lg:ml-80">
         <div className="max-w-4xl mx-auto px-6 py-12">
-          {/* 🔥 P0-1: RÉCAP OFFRES TOUT EN HAUT */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-6 text-center">
-              ✨ Ce que tu as déjà construit
-            </h3>
-            <div className="space-y-3 mb-6">
-              {products.map((product, idx) => {
-                const ProductIcon = product.icon;
-                return (
-                  <motion.div 
-                    key={idx} 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 + idx * 0.05 }}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-all"
-                  >
-                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0", product.bgColor)}>
-                      <ProductIcon className={cn("w-5 h-5", product.iconColor)} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-gray-900 font-medium text-sm">{product.data.title}</span>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                          {product.badge}
-                        </span>
-                      </div>
-                    </div>
-                    <span className={cn("font-bold text-base", product.priceColor)}>{product.data.price}</span>
-                  </motion.div>
-                );
-              })}
-            </div>
-            {potentialRevenue > 0 && (
-              <div className="pt-4 border-t border-gray-200 text-center">
-                <span className="text-gray-600 text-sm">Potentiel estimé : </span>
-                <span className="text-[#61f7a2] font-bold text-xl">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
-              </div>
-            )}
-          </motion.div>
+
 
           {/* Hero Section avec visuel */}
           <motion.div

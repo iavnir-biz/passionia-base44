@@ -137,6 +137,7 @@ export default function OnboardingTransition() {
 
       // Enrichir le User avec les données du summary (une seule fois)
       await base44.auth.updateMe({ 
+        firstName: firstName,
         coreSkill: session.skill || summary.who_to_teach || '',
         targetAudience: summary.learner_profile || '',
         mainProblem: summary.main_learning_problem || '',

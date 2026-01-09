@@ -364,39 +364,32 @@ export default function BonneNouvelle() {
             ) : (
               <div className="space-y-6">
                 <ProgressBarItem 
-                  label="Taille du marché"
-                  value={scores.marketSize || 68}
-                  explanation={scoreExplanations.marketSize}
+                  label="Taille du problème"
+                  value={scores.taille_du_probleme || 72}
+                  explanation={scoreExplanations.taille_du_probleme}
                   icon={Globe}
                   delay={0}
                 />
                 <ProgressBarItem 
-                  label="Intensité de la demande"
-                  value={scores.demandIntensity || 74}
-                  explanation={scoreExplanations.demandIntensity}
+                  label="Intensité de la douleur"
+                  value={scores.intensite_de_la_douleur || 78}
+                  explanation={scoreExplanations.intensite_de_la_douleur}
                   icon={TrendingUp}
                   delay={0.1}
                 />
                 <ProgressBarItem 
-                  label="Potentiel de revenus récurrents" 
-                  value={scores.revenueRecurrence || 70}
-                  explanation={scoreExplanations.revenueRecurrence}
-                  icon={Repeat}
+                  label="Demande active de solutions" 
+                  value={scores.demande_active_de_solutions || 75}
+                  explanation={scoreExplanations.demande_active_de_solutions}
+                  icon={Users}
                   delay={0.2}
                 />
                 <ProgressBarItem 
-                  label="Accessibilité en ligne" 
-                  value={scores.onlineAccessibility || 82}
-                  explanation={scoreExplanations.onlineAccessibility}
-                  icon={Laptop}
+                  label="Potentiel de monétisation" 
+                  value={scores.potentiel_de_monetisation || 80}
+                  explanation={scoreExplanations.potentiel_de_monetisation}
+                  icon={TrendingUp}
                   delay={0.3}
-                />
-                <ProgressBarItem 
-                  label="Facilité de mise en œuvre"
-                  value={scores.easeOfImplementation || 71}
-                  explanation={scoreExplanations.easeOfImplementation}
-                  icon={Users}
-                  delay={0.4}
                 />
               </div>
             )}

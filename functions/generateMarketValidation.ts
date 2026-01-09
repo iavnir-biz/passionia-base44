@@ -29,6 +29,78 @@ OBJECTIF FINAL :
 À la fin de la lecture, l'utilisateur doit se dire :
 "Ok. Ce projet est cohérent, utile, et il y a de vraies personnes qui attendent ça."`;
 
+const MARKET_ANALYSIS_GRAPH_SYSTEM_PROMPT = `Tu es un analyste de marché senior spécialisé dans les produits d'information, la formation en ligne et le coaching.
+
+Ta mission est de générer des INDICATEURS DE MARCHÉ SIMPLES ET CONCRETS
+pour visualiser le POTENTIEL ÉCONOMIQUE d'un projet de TRANSMISSION DE SAVOIR.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 CONTEXTE OBLIGATOIRE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+L'utilisateur ne vend PAS un outil.
+Il transmet une TRANSFORMATION à des élèves.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ RÈGLES ABSOLUES (CRITIQUES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣ Tu analyses le MARCHÉ DU PROBLÈME,
+PAS le marché de l'outil, PAS le marché générique de la formation.
+
+❌ Interdit :
+- "marché de l'e-learning"
+- "formation en ligne en général"
+- "learning", "éducation" sans contexte
+
+✅ Obligatoire :
+- surcharge mentale
+- désorganisation
+- manque de clarté
+- perte de temps
+- frustration récurrente
+- incapacité à passer à l'action
+(ou toute douleur directement liée au problème réel)
+
+2️⃣ Tous les indicateurs doivent être :
+- compréhensibles par un non-expert
+- directement reliés au PROBLÈME et au PUBLIC
+- utiles pour rassurer un futur créateur d'offre
+
+3️⃣ Les valeurs sont RELATIVES (0–100),
+mais doivent être COHÉRENTES :
+❌ Pas de 30–40% faibles sans raison
+✅ En général : 65–90 si le marché est valide
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 INDICATEURS À PRODUIRE (OBLIGATOIRES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tu dois produire EXACTEMENT 4 indicateurs :
+
+1. Taille du problème
+→ À quel point ce problème touche beaucoup de personnes
+
+2. Intensité de la douleur
+→ À quel point ce problème est frustrant / bloquant / coûteux
+
+3. Demande active de solutions
+→ Est-ce que les gens cherchent déjà des solutions par eux-mêmes
+
+4. Potentiel de monétisation
+→ Est-ce que les gens sont prêts à payer pour résoudre ce problème
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧠 LOGIQUE DE RAISONNEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tu dois raisonner ainsi :
+- Le problème existe AVANT la méthode
+- La transformation est désirable
+- Le public est identifiable
+- Les gens cherchent déjà une solution
+→ donc il existe une opportunité économique réelle`;
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -53,11 +125,13 @@ Deno.serve(async (req) => {
     const session = sessions[0];
     
     // Check if already generated
-    if (session.market_validation) {
+    if (session.market_validation && session.market_validation_scores) {
       console.log("Market validation already generated, returning existing");
       return Response.json({
         success: true,
         validationText: session.market_validation,
+        marketScores: session.market_validation_scores,
+        scoreExplanations: session.market_validation_score_explanations || {},
         fromCache: true
       });
     }
@@ -68,7 +142,8 @@ Deno.serve(async (req) => {
     const name = user.firstName || onboardingFull.firstName || 'l\'entrepreneur';
     const skill = session.skill || onboardingSummary.who_to_teach || onboardingFull.coreSkill || 'cette compétence';
 
-    const userPrompt = `IMPORTANT :
+    // 🔥 PART 1: Texte de validation
+    const textPrompt = `IMPORTANT :
 Tu dois utiliser UNIQUEMENT les données fournies ci-dessous.
 N'INVENTE AUCUN champ.
 N'UTILISE PAS d'autres noms de variables.
@@ -158,7 +233,49 @@ Le ton doit rester :
 - crédible
 - sans promesse irréaliste`;
 
-    console.log('🔍 [generateMarketValidation] Appel LLM avec recherche web', { 
+    // 🔥 PART 2: Indicateurs de marché
+    const indicatorsPrompt = `DONNÉES DE RÉFÉRENCE (ne jamais les ignorer) :
+- Compétence enseignée : ${skill}
+- Public cible : ${onboardingSummary.learner_profile || 'non précisé'}
+- Problème principal AVANT accompagnement : "${onboardingSummary.main_learning_problem || 'non précisé'}"
+- Transformation recherchée : "${onboardingSummary.big_transformation || 'non précisée'}"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 FORMAT DE SORTIE STRICT (JSON)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Retourne UNIQUEMENT ce JSON valide :
+
+{
+  "indicators": [
+    {
+      "label": "Taille du problème",
+      "value": number,
+      "description": "Pourquoi ce problème concerne beaucoup de personnes aujourd'hui."
+    },
+    {
+      "label": "Intensité de la douleur",
+      "value": number,
+      "description": "Pourquoi ce problème est vécu comme bloquant ou frustrant."
+    },
+    {
+      "label": "Demande active de solutions",
+      "value": number,
+      "description": "Comment on observe que les gens cherchent déjà une solution."
+    },
+    {
+      "label": "Potentiel de monétisation",
+      "value": number,
+      "description": "Pourquoi des personnes sont prêtes à payer pour résoudre ce problème."
+    }
+  ]
+}
+
+❌ Aucun texte en dehors du JSON.
+❌ Aucun jargon marketing.
+❌ Aucune référence générique à 'la formation en ligne'.`;
+
+    console.log('🔍 [generateMarketValidation] Génération texte + indicateurs', { 
       fn: 'generateMarketValidation',
       sessionId,
       skill,
@@ -166,17 +283,44 @@ Le ton doit rester :
       temp: 0.55
     });
 
-    // 🔥 Appel InvokeLLM AVEC recherche web activée
-    const llmResponse = await base44.integrations.Core.InvokeLLM({
-      prompt: `${SYSTEM_PROMPT}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${userPrompt}`,
-      add_context_from_internet: true // ✅ RECHERCHE WEB ACTIVÉE
+    // 🔥 Appel 1: Texte de validation (avec recherche web)
+    const textResponse = await base44.integrations.Core.InvokeLLM({
+      prompt: `${SYSTEM_PROMPT}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${textPrompt}`,
+      add_context_from_internet: true
     });
 
-    const validationText = (typeof llmResponse === 'string' ? llmResponse : llmResponse?.validationText || llmResponse?.text || '').trim();
+    const validationText = (typeof textResponse === 'string' ? textResponse : textResponse?.validationText || textResponse?.text || '').trim();
 
-    console.log('✅ [generateMarketValidation] LLM response reçu', {
+    // 🔥 Appel 2: Indicateurs (avec recherche web pour données de marché)
+    const indicatorsResponse = await base44.integrations.Core.InvokeLLM({
+      prompt: `${MARKET_ANALYSIS_GRAPH_SYSTEM_PROMPT}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${indicatorsPrompt}`,
+      add_context_from_internet: true,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          indicators: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                label: { type: "string" },
+                value: { type: "number" },
+                description: { type: "string" }
+              },
+              required: ["label", "value", "description"]
+            }
+          }
+        },
+        required: ["indicators"]
+      }
+    });
+
+    const indicators = indicatorsResponse?.indicators || [];
+
+    console.log('✅ [generateMarketValidation] Réponse reçue', {
       skill,
       textLength: validationText.length,
+      indicatorsCount: indicators.length,
       hasText: !!validationText
     });
 
@@ -192,30 +336,54 @@ Ce que tu proposes répond directement à ce blocage : un résultat rapide dès 
 Ton projet est aligné avec une demande réelle. Des personnes cherchent déjà ce type de solution.`;
 
       await base44.asServiceRole.entities.Session.update(sessionId, {
-        market_validation: fallbackText
+        market_validation: fallbackText,
+        market_validation_scores: {},
+        market_validation_score_explanations: {}
       });
 
       return Response.json({
         success: true,
         validationText: fallbackText,
+        marketScores: {},
+        scoreExplanations: {},
         fromCache: false
       });
     }
 
+    // Transform indicators to legacy format (marketScores + scoreExplanations)
+    const marketScores = {};
+    const scoreExplanations = {};
+    
+    indicators.forEach(ind => {
+      const key = ind.label.toLowerCase()
+        .replace(/é/g, 'e')
+        .replace(/è/g, 'e')
+        .replace(/'/g, '')
+        .replace(/ /g, '_')
+        .replace(/[^\w_]/g, '');
+      marketScores[key] = ind.value;
+      scoreExplanations[key] = ind.description;
+    });
+
     // Save to session
     await base44.asServiceRole.entities.Session.update(sessionId, {
-      market_validation: validationText
+      market_validation: validationText,
+      market_validation_scores: marketScores,
+      market_validation_score_explanations: scoreExplanations
     });
 
     console.log('💾 [generateMarketValidation] Sauvegardé en session:', {
       sessionId,
       skill,
-      textLength: validationText.length
+      textLength: validationText.length,
+      scoresCount: Object.keys(marketScores).length
     });
 
     return Response.json({
       success: true,
-      validationText
+      validationText,
+      marketScores,
+      scoreExplanations
     });
 
   } catch (error) {

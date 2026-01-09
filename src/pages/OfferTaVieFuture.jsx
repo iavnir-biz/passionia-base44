@@ -137,11 +137,11 @@ export default function OfferTaVieFuture() {
   };
 
   if (isLoading || isGenerating) {
-    return <OfferTransition message={isGenerating ? "Noah écrit ta vision future..." : "Chargement..."} />;
+    return <OfferTransition message={isGenerating ? "Nova écrit ta vision future..." : "Chargement..."} />;
   }
 
   if (showTransition) {
-    return <OfferTransition message="Noah prépare ton plan de route..." onComplete={handleTransitionComplete} />;
+    return <OfferTransition message="Nova prépare ton plan de route..." onComplete={handleTransitionComplete} />;
   }
 
   // 🔥 P0-1: Source of truth = session.finalized_offer

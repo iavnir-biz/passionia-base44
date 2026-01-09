@@ -546,11 +546,8 @@ export default function OnboardingDynamic() {
                     transition={{ duration: 0.2 }}
                   >
                     <span className="text-5xl font-bold text-[#61f7a2]">
-                      {value >= (currentQuestion.max || 10) ? `${value}+` : value}
+                      {value >= (currentQuestion.max || 10) ? `${value}+` : value} {value === 1 ? 'AN' : 'ANS'}
                     </span>
-                    <p className="text-lg text-gray-600 mt-2">
-                      {value === 1 ? 'an' : 'ans'} d'expérience
-                    </p>
                   </motion.div>
                   <Slider
                     value={[value]}

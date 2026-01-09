@@ -210,7 +210,7 @@ RAPPELS CRITIQUES :
     console.log('OPENAI_CALL start', { 
       fn: 'generatePlanDeRoute',
       sessionId,
-      model: 'gpt-4o-mini'
+      model: 'gpt-4o'
     });
 
     // 🔥 P0-3: Retry logic avec validation
@@ -221,7 +221,7 @@ RAPPELS CRITIQUES :
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
         const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userPrompt }

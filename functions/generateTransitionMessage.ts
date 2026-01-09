@@ -93,10 +93,10 @@ La phrase doit parler de TRANSFORMATION et de CLARTÉ, jamais de l'outil.
 
 Retourne uniquement le texte de la phrase, rien d'autre.`;
 
-    console.log("OPENAI_CALL start", { fn: "generateTransitionMessage", sessionId, model: "gpt-4o-mini" });
+    console.log("OPENAI_CALL start", { fn: "generateTransitionMessage", sessionId, model: "gpt-4o" });
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }

@@ -261,7 +261,7 @@ export default function Dashboard() {
             
             <div className="flex justify-center">
               <GlowButton
-                onClick={() => navigate(createPageUrl(dailyMissions[getCurrentStep() - 1]?.page))}
+                onClick={() => navigate(createPageUrl(getNextIncompleteTask()?.page))}
                 size="lg"
                 className="bg-white text-gray-900 hover:bg-gray-100 px-12 py-4 text-xl font-bold"
               >

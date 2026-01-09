@@ -128,8 +128,7 @@ export default function SalesPage() {
 
     try {
       const response = await base44.functions.invoke('generateSalesPage', {
-        profile,
-        session,
+        sessionId: session.id,
         offerType: selectedType,
         color: selectedColor,
         tone: selectedTone

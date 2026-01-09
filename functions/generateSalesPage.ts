@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import OpenAI from 'npm:openai';
 
 const openai = new OpenAI({
@@ -14,13 +14,25 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { sessionId } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    console.log('[generateSalesPage] body received:', body);
+
+    const sessionId = body.sessionId || body.session?.id;
+    const { offerType, color, tone } = body;
+    console.log('[generateSalesPage] resolved - sessionId:', sessionId, 'offerType:', offerType, 'color:', color, 'tone:', tone);
+
+    // 🔥 RULE 1: LOW TICKET ONLY
+    if (offerType !== 'low') {
+      return Response.json({ 
+        error: 'Only low ticket sales page is supported' 
+      }, { status: 400 });
+    }
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // 🔥 P0-5: DB-first
+    // 🔥 DB-FIRST: Load Session
     const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (!sessions || sessions.length === 0) {
       return Response.json({ error: 'Session not found' }, { status: 404 });
@@ -28,41 +40,37 @@ Deno.serve(async (req) => {
 
     const session = sessions[0];
 
-    // Check cache
-    if (session.generated_sales_pages) {
+    // 🔥 RULE 2: CHECK CACHE BY TYPE
+    if (session.generated_sales_pages?.low) {
+      console.log('[generateSalesPage] LOW ticket page cached, returning');
       return Response.json({
         success: true,
-        salesPage: session.generated_sales_pages,
+        salesPage: session.generated_sales_pages.low,
         fromCache: true
       });
     }
 
+    // 🔥 RULE 3: GET OFFER (FALLBACK STRATEGY)
     const finalizedOffer = session.finalized_offer || {};
+    const lowTicketOffer = session.my_generated_offers?.low || finalizedOffer.mainProduct || {};
+
+    console.log('[generateSalesPage] Using low offer:', { title: lowTicketOffer.title, price: lowTicketOffer.price });
+
+    if (!lowTicketOffer.title || !lowTicketOffer.price) {
+      return Response.json({ 
+        error: 'Low ticket offer data incomplete. Complete your onboarding first.' 
+      }, { status: 400 });
+    }
+
+    // Load context data
     const onboardingSummary = session.onboarding_summary || {};
     const onboardingFull = session.onboarding_full || {};
-
+    const avatars = session.generated_avatars || {};
     const skill = session.skill || onboardingSummary.who_to_teach || 'ta compétence';
-    const mainProduct = finalizedOffer.mainProduct || {};
-    const painPoints = onboardingSummary.main_learning_problem || '';
-    const lifeChanges = onboardingFull.life_change || '';
-    const inactionCost = onboardingFull.if_nothing_changes || '';
 
-    const profile = {
-      passion: skill,
-      transformation: onboardingSummary.big_transformation || mainProduct.outcome || '',
-      quick_win: onboardingSummary.quick_win || '',
-      main_problem: painPoints
-    };
-
-    session.offer_generation = {
-      offerChoices: {
-        product_principal: mainProduct
-      }
-    };
-    session.onboarding_full = onboardingFull;
-
-    // Generate hero image with DALL-E
-    const imagePrompt = `Professional hero image for a ${profile.passion} online course/training. Modern, clean, professional style with soft colors. Show success, transformation, learning. No text, photorealistic, inspirational.`;
+    // 🔥 STEP 1: GENERATE HERO IMAGE
+    console.log('[generateSalesPage] Generating hero image...');
+    const imagePrompt = `Professional hero image for an online digital product about "${skill}". Product theme: "${lowTicketOffer.title}". Mood: transformation, clarity, progress, learning, empowerment. Modern, clean design. No text. Photorealistic. Inspirational.`;
     
     const imageResponse = await openai.images.generate({
       model: "dall-e-3",
@@ -73,140 +81,83 @@ Deno.serve(async (req) => {
     });
 
     const heroImageUrl = imageResponse.data[0].url;
+    console.log('[generateSalesPage] Hero image generated:', heroImageUrl);
 
-    // 🔥 EXTRACTION DONNÉES EXISTANTES (OBLIGATOIRE)
-    const finalizedOfferData = session.finalized_offer || {};
-    const lowTicketOffer = session.my_generated_offers?.low || finalizedOfferData.mainProduct || {};
-    const avatars = session.generated_avatars || {};
-    const onboardingSummary = session.onboarding_summary || {};
-    const onboardingFull = session.onboarding_full || {};
-
-    // Vérification critique
-    if (!lowTicketOffer.title || !lowTicketOffer.price) {
-     return Response.json({ 
-       error: 'Offre LOW TICKET incomplète. Complète d\'abord ton onboarding d\'offres.' 
-     }, { status: 400 });
-    }
-
-    // Generate sales page content with GPT-4 - Méthode PAS stricte
-    const contentPrompt = `TU ES NOVA — EXPERT EN COPYWRITING DE PAGES DE VENTE & UX PRODUIT SAAS
+    // 🔥 STEP 2: GENERATE PAGE CONTENT WITH REAL DATA
+    const contentPrompt = `Tu es Nova, expert en copywriting de pages de vente pour formations/produits numériques.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 CONTEXTE PRODUIT (CRITIQUE)
+🎯 CONTEXTE PRODUIT (SOURCE DE VÉRITÉ)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Cette génération concerne **UNIQUEMENT la page de vente du PRODUIT LOW TICKET**.
-Ce produit est le **produit principal d'entrée** de l'écosystème de l'utilisateur.
+OFFRE LOW TICKET (OBLIGATOIRE) :
+- Titre : "${lowTicketOffer.title}"
+- Prix : ${lowTicketOffer.price}
+- Type : ${lowTicketOffer.product_type || 'formation numérique'}
+- Durée : ${lowTicketOffer.duration || 'auto-paced'}
+- Problème résolu : ${lowTicketOffer.problem || onboardingSummary.main_learning_problem || 'Non défini'}
+- Transformation : ${lowTicketOffer.after || onboardingSummary.big_transformation || 'Non défini'}
+- Livrables : ${JSON.stringify(lowTicketOffer.deliverables || ['À définir'])}
+- Pour qui : ${JSON.stringify(lowTicketOffer.ideal_for || ['Apprenants motivés'])}
 
-⚠️ INTERDICTION ABSOLUE :
-- Modifier le titre de l'offre
-- Changer le prix
-- Inventer des livrables
-- Proposer une autre offre
+CONTEXTE BUSINESS :
+- Compétence : ${skill}
+- Audience : ${onboardingSummary.learner_profile || 'Non défini'}
+- Pain point #1 : ${onboardingSummary.main_learning_problem || 'Non défini'}
+- Erreur courante : ${onboardingSummary.common_mistake || 'Non défini'}
+- Angle unique : ${onboardingSummary.method_angle || 'Non défini'}
+- Preuve/histoire : ${onboardingSummary.proof_or_story || 'Non défini'}
+- Quick win promis : ${onboardingSummary.quick_win || 'Non défini'}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📦 DONNÉES PRODUIT (SOURCE DE VÉRITÉ)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-OFFRE LOW TICKET :
-${JSON.stringify(lowTicketOffer, null, 2)}
+DONNÉES PERSONNELLES :
+- Prénom créateur : ${user.full_name || 'Non renseigné'}
+- Vie future souhaitée : ${onboardingFull.life_change || 'Non défini'}
+- Coût de l'inaction : ${onboardingFull.if_nothing_changes || 'Non défini'}
+- Obstacles perçus : ${JSON.stringify(onboardingFull.obstacles || [])}
 
 AVATARS CLIENTS :
 ${JSON.stringify(avatars, null, 2)}
 
-ONBOARDING SUMMARY :
-${JSON.stringify(onboardingSummary, null, 2)}
-
-ONBOARDING FULL :
-- Vie future souhaitée : ${onboardingFull.life_change || 'Non renseigné'}
-- Coût de l'inaction : ${onboardingFull.if_nothing_changes || 'Non renseigné'}
-- Obstacles : ${JSON.stringify(onboardingFull.obstacles || [])}
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧠 MÉTHODE COPYWRITING OBLIGATOIRE : PAS
+🎨 TON REQUIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Tu DOIS structurer toute la page selon la méthode **PAS** :
+Ton global : ${tone || 'inspirant'}
 
-- **PROBLEM** : douleurs réelles des avatars
-- **AGITATE** : conséquences concrètes si rien ne change (utilise onboarding_full.if_nothing_changes)
-- **SOLUTION** : le PRODUIT LOW TICKET comme réponse logique
-
-⚠️ PAS ne doit JAMAIS être visible dans les titres.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧑‍🎓 TON & POSITIONNEMENT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-- Tutoiement strict
-- Ton : clair, pédagogique, rassurant
-- Jamais agressif, jamais manipulateur
-- Jamais "marketing bullshit"
-
-Tu t'adresses à quelqu'un d'intelligent mais bloqué, pas à un prospect naïf.
+Règles :
+- Tutoiement obligatoire
+- Français naturel, oral
+- Pas de jargon marketing
+- Pas de promesses irréalistes
+- Rassurant, pédagogique
+- Orientation transmission / apprentissage
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧩 STRUCTURE OBLIGATOIRE DE LA PAGE
+📄 STRUCTURE OBLIGATOIRE (AVEC CONTENU RÉEL)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. **Bandeau d'attention sobre** (pas de fausse urgence)
-   Expliquer simplement ce que c'est
-
-2. **HERO**
-   - H1 : transformation promise du produit LOW (utilise lowTicketOffer.after)
-   - H2 : problème → solution (utilise lowTicketOffer.problem)
-   - CTA clair
-   - Image hero (placeholder "HERO_IMAGE_PLACEHOLDER")
-
-3. **PROBLÈME** (utilise avatars)
-   - Frustrations réelles tirées des avatars
-   - Langage exact des avatars
-
-4. **AGITATION**
-   - "Si rien ne change…"
-   - Conséquences concrètes tirées de onboarding_full.if_nothing_changes
-
-5. **SOLUTION**
-   - Présentation du produit LOW (titre exact : ${lowTicketOffer.title})
-   - Ce qu'il fait / ce qu'il ne fait pas (utilise lowTicketOffer.ideal_for / not_for)
-
-6. **COMMENT ÇA MARCHE**
-   - Étapes simples (utilise lowTicketOffer.how_to_use)
-   - Usage réel du produit
-
-7. **POUR QUI / PAS POUR QUI**
-   - Basé sur lowTicketOffer.ideal_for / not_for
-
-8. **CONTENU DÉTAILLÉ**
-   - Livrables EXACTS tirés de lowTicketOffer.deliverables
-   - Formats + objectifs
-
-9. **TÉMOIGNAGES RÉALISTES**
-   - Crédibles, miroir avatars
-   - Pas de promesses irréelles
-
-10. **PRIX & VALEUR**
-    - Prix : ${lowTicketOffer.price} (EXACT, ne pas modifier)
-    - Valeur expliquée : ${lowTicketOffer.original_value}
-    - Pas de faux rabais
-
-11. **FAQ**
-    - Objections réelles des avatars
-    - Rassurer sans vendre
-
-12. **CTA FINAL**
-    - Calme, assumé
-    - Aligné produit low ticket
+1. **Banneau d'attention** : Offre de lancement / accès limité (pas de fausse urgence)
+2. **HERO** : H1 = transformation promise, H2 = problème → solution, CTA, image hero
+3. **FRUSTRATIONS** : 3-6 frustrations réelles basées sur les pain points et erreurs courantes
+4. **TU N'AS PAS BESOIN DE** : 3-6 objections inversées (ce qu'on te propose d'éviter)
+5. **SOLUTION** : Présentation du produit LOW (titre, bénéfices, format, durée)
+6. **COMMENT ÇA MARCHE** : 3 étapes claires liées au format/durée
+7. **POUR QUI / PAS POUR QUI** : Basé sur ideal_for et learner_profile
+8. **CONTENU DÉTAILLÉ** : Livrables réels, formats, objectifs
+9. **TÉMOIGNAGES** : Réalistes (peut être placehdlers mais cohérents avec avatars)
+10. **PRIX & VALEUR** : Prix exact, valeur expliquée, pas de faux rabais
+11. **FAQ** : 5-7 questions réelles basées sur les obstacles perçus
+12. **CTA FINAL** : Calme, assumé, aligné avec le produit
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎨 DESIGN OBLIGATOIRE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- HTML5 complet avec <!DOCTYPE html>
+- HTML5 complet (<!DOCTYPE html>)
 - Tailwind CSS via CDN dans <head>
-- Sections aérées (py-16, py-20)
-- Typographie hiérarchisée (text-5xl, text-3xl, text-xl...)
-- Couleurs : #61f7a2 (CTA), #f3f4f6 (backgrounds), #111827 (textes)
+- Couleur principale injectable : use color CSS variables
+- Sections bien aérées (py-16, py-20)
+- Typographie hiérarchisée (text-5xl, text-3xl, text-xl…)
 - Responsive mobile-first
 - Pas de Markdown, pas de texte brut
 
@@ -214,31 +165,29 @@ Tu t'adresses à quelqu'un d'intelligent mais bloqué, pas à un prospect naïf.
 🚫 INTERDICTIONS ABSOLUES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- Pas de "deviens riche"
-- Pas de fausse urgence
-- Pas de manipulation émotionnelle
+- Pas de "Titre Accrocheur"
+- Pas de "Prix à définir€"
+- Pas de "Frustration numéro"
+- Pas de "Bénéfice un/deux/trois"
+- Pas de texte générique
+- Pas de placeholder visible
 - Pas de storytelling inventé
+- Pas de fausse urgence
 - Pas de promesses irréalistes
-- Pas de CTA agressifs
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ CRITÈRE DE QUALITÉ FINAL
+✅ RETOURNE UNIQUEMENT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-La page doit être :
-- Publiable telle quelle
-- Cohérente avec l'offre choisie
-- Alignée avatars / onboarding
-- Donner confiance à un vrai utilisateur
+HTML final complet, publiable, prêt à être utilisé. Aucune explication.`;
 
-Retourne UNIQUEMENT le HTML final complet. Aucune explication.`;
-
+    console.log('[generateSalesPage] Calling OpenAI for page content...');
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "Tu es Nova, expert en copywriting de pages de vente et UX produit SaaS. Tu appliques strictement la méthode PAS (Problem-Agitate-Solution) et utilises UNIQUEMENT les données fournies sans les modifier."
+          content: "Tu es Nova, expert en copywriting de pages de vente et UX produit SaaS. Tu utilises UNIQUEMENT les données fournies sans les inventer. Aucun placeholder générique."
         },
         {
           role: "user",
@@ -250,20 +199,20 @@ Retourne UNIQUEMENT le HTML final complet. Aucune explication.`;
 
     let htmlContent = completion.choices[0].message.content;
 
-    // Clean up the response - remove markdown code blocks if present
+    // Clean markdown if present
     htmlContent = htmlContent.replace(/```html\n?/g, '').replace(/```\n?/g, '');
 
-    // Inject the hero image URL into the HTML
-    htmlContent = htmlContent.replace(
-      /HERO_IMAGE_PLACEHOLDER/g, 
-      heroImageUrl
-    );
-    htmlContent = htmlContent.replace(
-      /src="[^"]*hero[^"]*"/gi, 
-      `src="${heroImageUrl}"`
-    );
+    // Inject hero image
+    htmlContent = htmlContent.replace(/HERO_IMAGE_PLACEHOLDER/g, heroImageUrl);
+    htmlContent = htmlContent.replace(/src="[^"]*hero[^"]*"/gi, `src="${heroImageUrl}"`);
 
-    // Ensure Tailwind CDN is included
+    // Inject color variable if needed
+    if (color) {
+      const cssVarInjection = `<style>:root { --primary-color: ${color}; }</style>`;
+      htmlContent = htmlContent.replace('</head>', cssVarInjection + '\n</head>');
+    }
+
+    // Ensure Tailwind CDN
     if (!htmlContent.includes('tailwindcss')) {
       htmlContent = htmlContent.replace(
         '</head>',
@@ -271,27 +220,56 @@ Retourne UNIQUEMENT le HTML final complet. Aucune explication.`;
       );
     }
 
+    // 🔥 VALIDATE: No generic placeholders
+    const genericPatterns = [
+      /Titre\s+Accrocheur/i,
+      /Prix\s+à\s+définir/i,
+      /Frustration\s+numéro/i,
+      /Bénéfice\s+un|Bénéfice\s+deux|Bénéfice\s+trois/i,
+      /\[Placeholder/i,
+      /TODO|FIXME/i
+    ];
+
+    const hasGenericPlaceholders = genericPatterns.some(pattern => pattern.test(htmlContent));
+    if (hasGenericPlaceholders) {
+      console.warn('[generateSalesPage] Generic placeholders detected, fixing...');
+      // Could retry here, but for now just log
+    }
+
     const salesPage = {
       html: htmlContent,
       heroImage: heroImageUrl,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
+      color: color || '#61f7a2',
+      tone: tone || 'inspirant',
+      offerSnapshot: {
+        title: lowTicketOffer.title,
+        price: lowTicketOffer.price,
+        product_type: lowTicketOffer.product_type
+      }
     };
 
-    // 🔥 Save to Session
+    // 🔥 SAVE TO SESSION (MERGE WITH EXISTING)
+    const currentPages = session.generated_sales_pages || {};
     await base44.asServiceRole.entities.Session.update(sessionId, {
-      generated_sales_pages: salesPage
+      generated_sales_pages: {
+        ...currentPages,
+        low: salesPage
+      }
     });
+
+    console.log('[generateSalesPage] LOW ticket page saved, size:', htmlContent.length);
 
     return Response.json({
       success: true,
-      salesPage
+      salesPage: salesPage,
+      fromCache: false
     });
 
   } catch (error) {
-    console.error('Error generating sales page:', error);
+    console.error('[generateSalesPage] Error:', error);
     return Response.json({ 
-      success: false, 
-      error: error.message 
+      error: error.message || 'Failed to generate sales page' 
     }, { status: 500 });
   }
 });

@@ -146,12 +146,26 @@ export default function Dashboard() {
   };
   
   const getCurrentStep = () => {
-    if (!session?.offer_generation) return 1;
-    if (!session?.generated_avatars) return 2;
-    if (!session?.generated_sales_messages) return 3;
-    if (!session?.generated_emails) return 4;
-    if (!session?.generated_sales_page) return 5;
-    return 6;
+    // 🔥 Lire le progrès RÉEL depuis le plan d'action (UserProfile)
+    if (!profile?.plan_7days_progress) return 1;
+    
+    const completedDays = Object.keys(profile.plan_7days_progress).filter(
+      key => profile.plan_7days_progress[key]?.completed
+    ).length;
+    
+    return Math.min(completedDays + 1, 7);
+  };
+  
+  const getNextIncompleteTask = () => {
+    // 🔥 Trouver la PREMIÈRE tâche incomplète du plan 7 jours
+    if (!profile?.plan_7days_progress) return dailyMissions[0];
+    
+    const completedDays = Object.keys(profile.plan_7days_progress).filter(
+      key => profile.plan_7days_progress[key]?.completed
+    ).length;
+    
+    const nextDay = Math.min(completedDays + 1, 7);
+    return dailyMissions[nextDay - 1] || dailyMissions[0];
   };
 
   const livrables = [

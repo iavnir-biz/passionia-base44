@@ -84,6 +84,16 @@ export default function Dashboard() {
     }
   }, [isAuthenticated]);
 
+  // 🔥 Recharger la progression depuis la base tous les 1000ms (sync live)
+  useEffect(() => {
+    if (profile?.id) {
+      const interval = setInterval(() => {
+        loadData();
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [profile?.id]);
+
   const checkGenerationComplete = async () => {
     try {
       const currentUser = await base44.auth.me();
@@ -147,14 +157,17 @@ export default function Dashboard() {
   };
   
   const getNextIncompleteTask = () => {
-    // 🔥 Retourner la VRAIE première tâche incomplète du jour courant
+    // 🔥 Calculer la VRAIE première tâche incomplète
     if (!profile?.plan_7days_progress) return dailyMissions[0];
     
+    // Trouver le jour courant basé sur les jours complétés
     const completedDays = Object.keys(profile.plan_7days_progress).filter(
       key => profile.plan_7days_progress[key]?.completed
     ).length;
     
     const currentDayNum = Math.min(completedDays + 1, 7);
+    
+    // ✅ Retourner la mission du jour courant
     return dailyMissions[currentDayNum - 1] || dailyMissions[6];
   };
 

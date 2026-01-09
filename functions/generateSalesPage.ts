@@ -74,117 +74,170 @@ Deno.serve(async (req) => {
 
     const heroImageUrl = imageResponse.data[0].url;
 
-    // Extract product data from session
-    const mainProduct = session.offer_generation?.offerChoices?.product_principal || {};
-    const mainProductTitle = mainProduct.title || profile.passion;
-    const mainProductPrice = mainProduct.price || 'Prix à définir';
-    const mainProductType = mainProduct.delivery_type || 'Formation digitale';
-    const mainProductDescription = mainProduct.description || mainProduct.full_description || '';
-    const mainProductOutcome = profile.transformation || profile.quick_win || '';
-    
-    const painPoints = profile.main_problem || '';
-    const lifeChanges = session.onboarding_full?.life_change || '';
-    const inactionCost = session.onboarding_full?.if_nothing_changes || '';
-    const skill = profile.passion || '';
+    // 🔥 EXTRACTION DONNÉES EXISTANTES (OBLIGATOIRE)
+    const lowTicketOffer = session.my_generated_offers?.low || {};
+    const avatars = session.generated_avatars || {};
+    const onboardingSummary = session.onboarding_summary || {};
+    const onboardingFull = session.onboarding_full || {};
 
-    // Generate sales page content with GPT-4 - Structure complète et visuelle
-    const contentPrompt = `Tu es un expert en Copywriting et Web Design. Tu dois créer une PAGE DE VENTE HTML COMPLÈTE, VISUELLE et PRÊTE À L'EMPLOI.
+    // Vérification critique
+    if (!lowTicketOffer.title) {
+      return Response.json({ 
+        error: 'Offre LOW TICKET non trouvée. Complète d\'abord la génération des offres.' 
+      }, { status: 400 });
+    }
 
-DONNÉES CLIENT :
-- Expert : ${user.full_name}
-- Compétence : ${skill}
-- Produit : ${mainProductTitle}
-- Prix : ${mainProductPrice}€
-- Format : ${mainProductType}
-- Description : ${mainProductDescription}
-- Transformation : ${mainProductOutcome}
-- Douleurs : ${painPoints}
-- Rêves : ${lifeChanges}
-- Coût inaction : ${inactionCost}
+    // Generate sales page content with GPT-4 - Méthode PAS stricte
+    const contentPrompt = `TU ES NOVA — EXPERT EN COPYWRITING DE PAGES DE VENTE & UX PRODUIT SAAS
 
-STRUCTURE OBLIGATOIRE (HTML complet) :
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 CONTEXTE PRODUIT (CRITIQUE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. **Bandeau urgence** (sticky top, fond vert #61f7a2)
-   "🔥 Offre de lancement - Accès anticipé avec bonus inclus"
+Cette génération concerne **UNIQUEMENT la page de vente du PRODUIT LOW TICKET**.
+Ce produit est le **produit principal d'entrée** de l'écosystème de l'utilisateur.
 
-2. **Hero Section** (bg-gradient, padding généreux)
-   - Titre H1 GRAND et accrocheur avec ${skill} + ${mainProductOutcome}
-   - Sous-titre H2 clair (problème → solution)
-   - CTA bouton XXL vert #61f7a2 "Je veux accéder maintenant"
+⚠️ INTERDICTION ABSOLUE :
+- Modifier le titre de l'offre
+- Changer le prix
+- Inventer des livrables
+- Proposer une autre offre
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 DONNÉES PRODUIT (SOURCE DE VÉRITÉ)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OFFRE LOW TICKET :
+${JSON.stringify(lowTicketOffer, null, 2)}
+
+AVATARS CLIENTS :
+${JSON.stringify(avatars, null, 2)}
+
+ONBOARDING SUMMARY :
+${JSON.stringify(onboardingSummary, null, 2)}
+
+ONBOARDING FULL :
+- Vie future souhaitée : ${onboardingFull.life_change || 'Non renseigné'}
+- Coût de l'inaction : ${onboardingFull.if_nothing_changes || 'Non renseigné'}
+- Obstacles : ${JSON.stringify(onboardingFull.obstacles || [])}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧠 MÉTHODE COPYWRITING OBLIGATOIRE : PAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tu DOIS structurer toute la page selon la méthode **PAS** :
+
+- **PROBLEM** : douleurs réelles des avatars
+- **AGITATE** : conséquences concrètes si rien ne change (utilise onboarding_full.if_nothing_changes)
+- **SOLUTION** : le PRODUIT LOW TICKET comme réponse logique
+
+⚠️ PAS ne doit JAMAIS être visible dans les titres.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧑‍🎓 TON & POSITIONNEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Tutoiement strict
+- Ton : clair, pédagogique, rassurant
+- Jamais agressif, jamais manipulateur
+- Jamais "marketing bullshit"
+
+Tu t'adresses à quelqu'un d'intelligent mais bloqué, pas à un prospect naïf.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧩 STRUCTURE OBLIGATOIRE DE LA PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. **Bandeau d'attention sobre** (pas de fausse urgence)
+   Expliquer simplement ce que c'est
+
+2. **HERO**
+   - H1 : transformation promise du produit LOW (utilise lowTicketOffer.after)
+   - H2 : problème → solution (utilise lowTicketOffer.problem)
+   - CTA clair
    - Image hero (placeholder "HERO_IMAGE_PLACEHOLDER")
 
-3. **Section Frustrations** (fond blanc, 3 colonnes)
-   "Tu en as marre de..."
-   - 3-5 frustrations en cards avec icônes 😤
+3. **PROBLÈME** (utilise avatars)
+   - Frustrations réelles tirées des avatars
+   - Langage exact des avatars
 
-4. **Section Pas besoin** (fond gris très clair)
-   "Le meilleur ? Tu n'as PAS besoin de..."
-   - 3 éléments avec croix rouge ❌
+4. **AGITATION**
+   - "Si rien ne change…"
+   - Conséquences concrètes tirées de onboarding_full.if_nothing_changes
 
-5. **Solution** (fond blanc, centré)
-   Présenter ${mainProductTitle} avec conviction
-   - Box centrale avec ombre
-   - Liste bénéfices avec checkmarks verts ✓
+5. **SOLUTION**
+   - Présentation du produit LOW (titre exact : ${lowTicketOffer.title})
+   - Ce qu'il fait / ce qu'il ne fait pas (utilise lowTicketOffer.ideal_for / not_for)
 
-6. **Comment ça marche** (3 étapes visuelles)
-   - 3 cards numérotées (1, 2, 3)
-   - Icônes illustratives
-   - Texte court et clair
+6. **COMMENT ÇA MARCHE**
+   - Étapes simples (utilise lowTicketOffer.how_to_use)
+   - Usage réel du produit
 
-7. **Pour qui** (2 colonnes)
-   - Colonne verte : "✅ C'est pour toi si..."
-   - Colonne rouge (optionnelle) : "❌ Pas pour toi si..."
+7. **POUR QUI / PAS POUR QUI**
+   - Basé sur lowTicketOffer.ideal_for / not_for
 
-8. **Contenu détaillé** (liste enrichie)
-   "Ce que tu vas obtenir :"
-   - Modules/ressources détaillés
-   - Bonus visuels
-   - Transformation finale en gras
+8. **CONTENU DÉTAILLÉ**
+   - Livrables EXACTS tirés de lowTicketOffer.deliverables
+   - Formats + objectifs
 
-9. **Témoignages** (cards avec photos placeholder)
-   - 3 témoignages réalistes
-   - Avatars ronds
-   - Résultats concrets
+9. **TÉMOIGNAGES RÉALISTES**
+   - Crédibles, miroir avatars
+   - Pas de promesses irréelles
 
-10. **Prix & Offre** (section centrale, fond clair)
-    - Ancien prix barré
-    - Prix actuel GRAND ${mainProductPrice}€
-    - Garantie 30 jours avec badge
-    - CTA bouton XXL
+10. **PRIX & VALEUR**
+    - Prix : ${lowTicketOffer.price} (EXACT, ne pas modifier)
+    - Valeur expliquée : ${lowTicketOffer.original_value}
+    - Pas de faux rabais
 
-11. **FAQ** (accordéon visuel)
-    - 5-6 questions pertinentes
-    - Réponses rassurantes
+11. **FAQ**
+    - Objections réelles des avatars
+    - Rassurer sans vendre
 
-12. **CTA Final** (section sombre, contraste fort)
-    - Rappel promesse
-    - Urgence
-    - Bouton CTA final ÉNORME
+12. **CTA FINAL**
+    - Calme, assumé
+    - Aligné produit low ticket
 
-DESIGN OBLIGATOIRE :
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎨 DESIGN OBLIGATOIRE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 - HTML5 complet avec <!DOCTYPE html>
-- Tailwind CDN dans <head>
-- Sections bien espacées (py-16, py-20)
+- Tailwind CSS via CDN dans <head>
+- Sections aérées (py-16, py-20)
 - Typographie hiérarchisée (text-5xl, text-3xl, text-xl...)
 - Couleurs : #61f7a2 (CTA), #f3f4f6 (backgrounds), #111827 (textes)
-- Boutons avec hover et ombres
 - Responsive mobile-first
-- Icônes émojis pour illustrations
-- Espacements généreux entre sections
+- Pas de Markdown, pas de texte brut
 
-CRITÈRE DE QUALITÉ :
-La page DOIT ressembler à une vraie landing page professionnelle.
-Chaque section doit avoir du contenu riche et personnalisé.
-Le HTML doit être COMPLET et directement utilisable.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚫 INTERDICTIONS ABSOLUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Retourne UNIQUEMENT le code HTML complet (pas de \`\`\`html, pas d'explication).`;
+- Pas de "deviens riche"
+- Pas de fausse urgence
+- Pas de manipulation émotionnelle
+- Pas de storytelling inventé
+- Pas de promesses irréalistes
+- Pas de CTA agressifs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ CRITÈRE DE QUALITÉ FINAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+La page doit être :
+- Publiable telle quelle
+- Cohérente avec l'offre choisie
+- Alignée avatars / onboarding
+- Donner confiance à un vrai utilisateur
+
+Retourne UNIQUEMENT le HTML final complet. Aucune explication.`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "Tu es un expert en copywriting et web design. Tu génères des pages de vente HTML optimisées avec Tailwind CSS."
+          content: "Tu es Nova, expert en copywriting de pages de vente et UX produit SaaS. Tu appliques strictement la méthode PAS (Problem-Agitate-Solution) et utilises UNIQUEMENT les données fournies sans les modifier."
         },
         {
           role: "user",

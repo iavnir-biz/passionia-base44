@@ -5,6 +5,13 @@ const openai = new OpenAI({
     apiKey: Deno.env.get("OPENAI_API_KEY"),
 });
 
+const OFFER_TYPES = {
+  low: 'mainProduct',
+  bump: 'orderBump',
+  mid: 'upsell1',
+  high: 'upsell3'
+};
+
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
@@ -14,13 +21,22 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { sessionId } = await req.json();
+        const body = await req.json().catch(() => ({}));
+        console.log('[generateMyOffers] body received:', body);
+
+        const sessionId = body.sessionId || body.session?.id || user.sessionId;
+        const { offerType } = body;
+        console.log('[generateMyOffers] resolved sessionId:', sessionId, 'offerType:', offerType);
 
         if (!sessionId) {
             return Response.json({ error: 'sessionId required' }, { status: 400 });
         }
 
-        // 🔥 P0-5: DB-first
+        if (!offerType || !OFFER_TYPES[offerType]) {
+            return Response.json({ error: 'Valid offerType required (low, bump, mid, high)' }, { status: 400 });
+        }
+
+        // 🔥 DB-first: load Session
         const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
         if (!sessions || sessions.length === 0) {
             return Response.json({ error: 'Session not found' }, { status: 404 });
@@ -28,149 +44,124 @@ Deno.serve(async (req) => {
 
         const session = sessions[0];
 
-        // Check cache
-        if (session.my_generated_offers) {
+        // Check cache: if this specific offer is already enriched
+        if (session.my_generated_offers?.[offerType]) {
+            console.log(`[generateMyOffers] ${offerType} already enriched, returning from cache`);
             return Response.json({
-                ...session.my_generated_offers,
+                ...session.my_generated_offers[offerType],
                 fromCache: true
             });
         }
 
+        // 🔥 GET BASE OFFER (source of truth: finalized_offer)
         const finalizedOffer = session.finalized_offer || {};
-        const onboardingSummary = session.onboarding_summary || {};
+        const baseOfferKey = OFFER_TYPES[offerType];
+        const baseOffer = finalizedOffer[baseOfferKey] || {};
 
-        // Construct user context
+        console.log(`[generateMyOffers] Base offer (${baseOfferKey}):`, baseOffer);
+
+        if (!baseOffer.title || !baseOffer.price) {
+            return Response.json({
+                error: `Offre ${offerType} incomplète. Complète d'abord les choix en onboarding.`
+            }, { status: 400 });
+        }
+
+        const onboardingSummary = session.onboarding_summary || {};
+        const avatars = session.generated_avatars || {};
+
+        // SYSTEM PROMPT: ENRICHIR UNIQUEMENT
+        const systemMessage = `Tu es Nova, expert en structuration d'offres pédagogiques.
+
+⚠️ RÈGLE CRITIQUE : Tu DOIS GARDER EXACTEMENT :
+- title: "${baseOffer.title}" (inchangé)
+- price: "${baseOffer.price}" (inchangé)
+- product_type: "${baseOffer.product_type || 'non spécifié'}" (inchangé si présent)
+- level: "${baseOffer.level || 'non spécifié'}" (inchangé si présent)
+- duration: "${baseOffer.duration || 'non spécifié'}" (inchangé si présent)
+
+Ta SEULE mission : ENRICHIR les champs manquants avec :
+- subtitle: "Pour qui + résultat attendu"
+- problem: "Problème précis que cette offre résout"
+- before: "Situation actuelle (2-3 phrases)"
+- after: "Situation après (2-3 phrases)"
+- deliverables: [liste détaillée des livrables avec format et durée]
+- how_to_use: "Quand et comment utiliser cette offre"
+- ideal_for: [liste de personas/situations idéales]
+- not_for: [cas où ce produit n'est pas adapté]
+- ecosystem_role: "Rôle de cette offre dans le funnel"
+
+STYLE : Coach pédagogique, tutoiement, français naturel, zero marketing bullshit.
+
+SORTIE ATTENDUE (JSON strict, une seule offre) :
+{
+  "title": "${baseOffer.title}",
+  "price": "${baseOffer.price}",
+  "product_type": "${baseOffer.product_type || ''}",
+  "level": "${baseOffer.level || ''}",
+  "duration": "${baseOffer.duration || ''}",
+  "subtitle": "...",
+  "problem": "...",
+  "before": "...",
+  "after": "...",
+  "deliverables": [...],
+  "how_to_use": "...",
+  "ideal_for": [...],
+  "not_for": [...],
+  "ecosystem_role": "..."
+}`;
+
         const userContext = `
-PROFIL UTILISATEUR:
+CONTEXTE UTILISATEUR:
 - Prénom: ${user.full_name || 'Non défini'}
 - Email: ${user.email}
 
-PROFIL BUSINESS:
-- Passion/Expertise: ${session.skill || onboardingSummary.who_to_teach || 'Non défini'}
+OFFRE À ENRICHIR (${offerType.toUpperCase()}):
+${JSON.stringify(baseOffer, null, 2)}
+
+CONTEXTE BUSINESS:
+- Compétence: ${session.skill || onboardingSummary.who_to_teach || 'Non défini'}
 - Audience cible: ${onboardingSummary.learner_profile || 'Non défini'}
 - Problème principal: ${onboardingSummary.main_learning_problem || 'Non défini'}
-- Quick win promis: ${onboardingSummary.quick_win || 'Non défini'}
 - Transformation promise: ${onboardingSummary.big_transformation || 'Non défini'}
-- Angle de méthode: ${onboardingSummary.method_angle || 'Non défini'}
 
-OFFRE FINALISÉE:
-${JSON.stringify(finalizedOffer, null, 2)}
-        `.trim();
+AVATARS CLIENTS (référence):
+${JSON.stringify(avatars, null, 2)}`;
 
-        const systemMessage = `Tu es Nova, expert senior en structuration d'offres pédagogiques, monétisation de savoir-faire, funnels simples et éthiques, et clarté produit (anti-blabla marketing).
-
-Tu aides des CRÉATEURS QUI ENSEIGNENT. Pas des freelances. Pas des startups.
-
-⚠️ RÈGLE CRITIQUE — OFFRES DÉJÀ VALIDÉES
-Les offres fournies en entrée ont été choisies par l'utilisateur et validées pendant l'onboarding.
-Tu n'as PAS le droit de modifier les titres, changer les prix, ou proposer d'autres formats.
-
-Ta mission est UNIQUEMENT de :
-- STRUCTURER
-- CLARIFIER
-- DÉTAILLER
-- RENDRE COMPRÉHENSIBLES les offres EXISTANTES
-
-⚠️ TON : Coach pédagogique, pas vendeur
-⚠️ INTERDIT : Storytelling émotionnel forcé, promesses marketing, vocabulaire startup/growth/hustle
-
-LANGUE : Français, tutoiement strict
-STYLE : Clair, factuel, pédagogique, orienté compréhension
-
-STRUCTURE EXACTEMENT 4 OFFRES selon le funnel classique:
-1. LOW TICKET (Produit d'appel) - 27-97€
-2. ORDER BUMP (Vente additionnelle) - 17-47€
-3. MID TICKET (Offre intermédiaire) - 197-497€
-4. HIGH TICKET (Offre premium) - 997-2997€
-
-STRUCTURE OBLIGATOIRE pour chaque offre :
-
-{
-  "title": "Nom du produit brandé (clair, concret, orienté résultat)",
-  "subtitle": "Pour qui + en combien de temps",
-  "product_type": "Type de produit (PDF / mini-formation / accompagnement / template / etc.)",
-  "level": "Niveau (débutant / intermédiaire / avancé)",
-  "duration": "Durée estimée pour consommer le produit (ex: 2h, 3 semaines, 30 jours)",
-  "price": "Prix conseillé (ex: 47€)",
-  "original_value": "Prix de référence ou valeur perçue (ex: 297€)",
-  
-  "problem": "Le problème précis que ce produit aide à résoudre. Pourquoi ce problème bloque. Ce qui se passe si pas résolu. 3-4 phrases factuelles.",
-  
-  "before": "Situation typique AVANT d'avoir ce produit. 2-3 phrases concrètes.",
-  "after": "Situation typique APRÈS l'avoir appliqué. Ce qui change concrètement (compétences, clarté, actions). 2-3 phrases.",
-  
-  "deliverables": [
-    "Nom du livrable + Format + Objectif + Comment l'utiliser",
-    "Ex: Module 1 'Les fondamentaux' (3 vidéos, 45 min) - Comprendre X pour pouvoir Y"
-  ],
-  
-  "how_to_use": "Quand utiliser ce produit. À quel moment du parcours. Combien de temps par jour/semaine. Ce que la personne doit FAIRE. 3-4 phrases pratiques.",
-  
-  "ideal_for": [
-    "Niveau précis",
-    "Situation précise",
-    "Objectif actuel précis"
-  ],
-  
-  "not_for": [
-    "Cas précis où ce produit n'est pas adapté",
-    "Ex: Si tu cherches du 100% sur-mesure"
-  ],
-  
-  "ecosystem_role": "Rôle de cette offre (produit d'appel / complément / produit principal). Ce qu'elle prépare. Vers quoi elle peut amener. 2-3 phrases stratégiques."
-}
-
-RÈGLES CRITIQUES:
-- Prix réalistes et adaptés au marché français
-- Livrables CONCRETS, PRÉCIS, MESURABLES, RÉALISTES avec format et durée
-- Orientation enseignement / transmission (jamais freelance)
-- Progression logique LOW → ORDER BUMP → MID → HIGH
-- Tutoiement strict
-- Ton : coach pédagogique, pas vendeur
-- Tout doit aider à COMPRENDRE l'offre, l'expliquer simplement, l'améliorer et la vendre sans gêne
-- Zéro promesse marketing ou storytelling émotionnel forcé
-- Cohérence ABSOLUE avec l'onboarding (problème, transformation, niveau élève)
-
-Format JSON strict:
-{
-  "low": { offre low ticket complète },
-  "bump": { offre order bump complète },
-  "mid": { offre mid ticket complète },
-  "high": { offre high ticket complète }
-}`;
-
-        console.log('Generating offers...');
+        console.log(`[generateMyOffers] Enriching ${offerType}...`);
         const completion = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
                 { role: "system", content: systemMessage },
                 { role: "user", content: userContext }
             ],
-            temperature: 0.8,
+            temperature: 0.7,
             response_format: { type: "json_object" }
         });
 
-        const offers = JSON.parse(completion.choices[0].message.content);
+        const enrichedOffer = JSON.parse(completion.choices[0].message.content);
 
-        const result = {
-            ...offers,
-            generatedAt: new Date().toISOString()
+        // 🔥 MERGE & SAVE to Session
+        const currentOffers = session.my_generated_offers || {};
+        const updatedOffers = {
+            ...currentOffers,
+            [offerType]: enrichedOffer
         };
 
-        // 🔥 Save to Session
         await base44.asServiceRole.entities.Session.update(sessionId, {
-            my_generated_offers: result
+            my_generated_offers: updatedOffers
         });
+
+        console.log(`[generateMyOffers] ${offerType} enriched and saved`);
 
         return Response.json({
             success: true,
-            ...result
+            ...enrichedOffer
         });
 
     } catch (error) {
-        console.error('Error generating offers:', error);
+        console.error('[generateMyOffers] Error:', error);
         return Response.json(
-            { error: error.message || 'Failed to generate offers' },
+            { error: error.message || 'Failed to enrich offer' },
             { status: 500 }
         );
     }

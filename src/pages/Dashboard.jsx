@@ -88,8 +88,12 @@ export default function Dashboard() {
     try {
       const currentUser = await base44.auth.me();
       
-      // ✅ ACCÈS LIBRE pour diagnostiquer
-      console.log('[Dashboard] Access granted for diagnostics');
+      // ✅ Vérifier si profil complet
+      const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
+      if (profiles.length === 0 || !profiles[0].first_name) {
+        navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
+        return;
+      }
       
       loadData();
     } catch (error) {

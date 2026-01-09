@@ -122,6 +122,7 @@ export default function SalesMessages() {
     setLoading({ ...loading, [messageType]: true });
 
     try {
+      console.log('[SalesMessages] Invoking generateSalesMessage:', { messageType, sessionId: session.id });
       const response = await base44.functions.invoke('generateSalesMessage', {
         messageType,
         sessionId: session.id

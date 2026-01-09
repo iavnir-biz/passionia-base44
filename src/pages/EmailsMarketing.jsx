@@ -125,6 +125,7 @@ export default function EmailsMarketing() {
 
     setLoading('all');
     try {
+      console.log('[EmailsMarketing] Invoking generateMarketingEmail:', { sessionId: session.id, generateAll: true });
       const response = await base44.functions.invoke('generateMarketingEmail', {
         sessionId: session.id,
         generateAll: true

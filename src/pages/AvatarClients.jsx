@@ -107,8 +107,7 @@ export default function AvatarClients() {
 
     try {
       const response = await base44.functions.invoke('generateAvatars', {
-        profile,
-        session
+        sessionId: session.id
       });
 
       const generatedAvatars = response.data.avatars;

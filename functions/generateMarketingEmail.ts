@@ -37,7 +37,12 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { sessionId, generateAll } = await req.json();
+        const body = await req.json().catch(() => ({}));
+        console.log('[generateMarketingEmail] body received:', body);
+
+        const sessionId = body.sessionId || body.session?.id || user.sessionId;
+        const { generateAll } = body;
+        console.log('[generateMarketingEmail] resolved sessionId:', sessionId, 'generateAll:', generateAll);
 
         if (!sessionId) {
             return Response.json({ error: 'sessionId required' }, { status: 400 });

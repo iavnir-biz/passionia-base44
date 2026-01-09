@@ -37,7 +37,12 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { messageType, sessionId } = await req.json();
+        const body = await req.json().catch(() => ({}));
+        console.log('[generateSalesMessage] body received:', body);
+
+        const { messageType } = body;
+        const sessionId = body.sessionId || body.session?.id || user.sessionId;
+        console.log('[generateSalesMessage] resolved sessionId:', sessionId, 'messageType:', messageType);
 
         if (!messageType || !MESSAGE_PROMPTS[messageType]) {
             return Response.json({ error: 'Invalid message type' }, { status: 400 });

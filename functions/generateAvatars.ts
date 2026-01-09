@@ -14,7 +14,11 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { sessionId } = await req.json();
+        const body = await req.json().catch(() => ({}));
+        console.log('[generateAvatars] body received:', body);
+
+        const sessionId = body.sessionId || body.session?.id || user.sessionId;
+        console.log('[generateAvatars] resolved sessionId:', sessionId);
 
         if (!sessionId) {
             return Response.json({ error: 'sessionId required' }, { status: 400 });

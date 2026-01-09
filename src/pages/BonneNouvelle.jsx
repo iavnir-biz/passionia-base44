@@ -277,120 +277,70 @@ export default function BonneNouvelle() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
+            className="text-center mb-12"
           >
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">
-              🎉 Étape 2 : Bonne nouvelle !
+            <h1 className="text-5xl font-bold text-gray-900 mb-2">
+              🎉 Bonne nouvelle
             </h1>
+            <p className="text-xl text-gray-600">
+              Ton marché est réel et viable
+            </p>
           </motion.div>
 
-          {/* Top CTA */}
+          {/* Validation Text Block */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="flex justify-center mb-8"
+            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
           >
-            <GlowButton onClick={handleContinue} size="lg" className="px-10">
-              Voir ma vie future
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
-          </motion.div>
-
-          {/* Validation Text */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6"
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <motion.div 
-                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-lg"
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Sparkles className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">
-                  Ton marché est validé ✅
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  {summary.who_to_teach ? `Analyse pour ${summary.who_to_teach}` : `Analyse pour ${user?.coreSkill || 'ta compétence'}`}
-                </p>
-              </div>
-            </div>
-            
             {isGenerating ? (
-              <div className="flex items-center gap-3 py-4">
+              <div className="flex items-center justify-center gap-3 py-12">
                 <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                <span className="text-gray-600">Analyse en cours...</span>
+                <span className="text-gray-600">Noah analyse le marché...</span>
               </div>
             ) : (
-              <div className="space-y-6 text-gray-700 leading-relaxed text-base">
-                {marketAnalysis?.validationText?.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx} className="text-base">{paragraph}</p>
-                ))}
+              <div className="space-y-4 text-gray-700 leading-relaxed">
+                <p className="text-lg">
+                  Après analyse de ton marché autour de <strong>{summary.coreSkill || summary.who_to_teach || 'ta compétence'}</strong>, une chose est claire :
+                </p>
+                <p className="text-lg">
+                  Des personnes recherchent activement des solutions à ce problème.
+                </p>
+                <p className="text-base text-gray-600">
+                  Ce n'est ni une intuition, ni une mode passagère. Les données confirment une <strong>demande réelle</strong>, une <strong>douleur identifiée</strong> et un <strong>potentiel économique cohérent</strong> pour une activité en ligne.
+                </p>
               </div>
             )}
           </motion.div>
 
-          {/* Market Potential Bars */}
+          {/* Simplified Metrics Block */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6"
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
           >
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">
-                  {summary.who_to_teach ? `Potentiel de ${summary.who_to_teach}` : `Potentiel de ${user?.coreSkill || 'ta compétence'}`}
-                </h2>
-                <p className="text-gray-600 text-sm mt-1">
-                  {summary.learner_profile ? `Auprès de ${summary.learner_profile}` : 'Marché de la transmission en ligne'}
-                </p>
-              </div>
-            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              🔍 Les preuves
+            </h2>
 
             {isGenerating ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 text-[#61f7a2] animate-spin" />
+                <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
               </div>
             ) : (
-              <div className="space-y-6">
-                <ProgressBarItem 
-                  label="Taille du problème"
-                  value={scores.taille_du_probleme || 72}
-                  explanation={scoreExplanations.taille_du_probleme}
-                  icon={Globe}
-                  delay={0}
-                />
-                <ProgressBarItem 
-                  label="Intensité de la douleur"
-                  value={scores.intensite_de_la_douleur || 78}
-                  explanation={scoreExplanations.intensite_de_la_douleur}
-                  icon={TrendingUp}
-                  delay={0.1}
-                />
-                <ProgressBarItem 
-                  label="Demande active de solutions" 
-                  value={scores.demande_active_de_solutions || 75}
-                  explanation={scoreExplanations.demande_active_de_solutions}
-                  icon={Users}
-                  delay={0.2}
-                />
-                <ProgressBarItem 
-                  label="Potentiel de monétisation" 
-                  value={scores.potentiel_de_monetisation || 80}
-                  explanation={scoreExplanations.potentiel_de_monetisation}
-                  icon={TrendingUp}
-                  delay={0.3}
-                />
+              <div className="space-y-4">
+                <div className="border-l-4 border-[#61f7a2] pl-4 py-2">
+                  <p className="text-gray-700 text-base">
+                    <strong>Demande validée :</strong> {scoreExplanations.demande_active_de_solutions || "Les personnes recherchent activement ce que tu proposes."}
+                  </p>
+                </div>
+                <div className="border-l-4 border-[#61f7a2] pl-4 py-2">
+                  <p className="text-gray-700 text-base">
+                    <strong>Potentiel de revenus :</strong> {scoreExplanations.potentiel_de_monetisation || "Tu peux générer des revenus stables avec les bons formats."}
+                  </p>
+                </div>
               </div>
             )}
           </motion.div>
@@ -482,11 +432,23 @@ export default function BonneNouvelle() {
             )}
           </motion.div>
 
+          {/* Conclusion Block */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gradient-to-r from-[#61f7a2]/10 to-[#4de88f]/10 rounded-2xl border border-[#61f7a2]/20 p-6 mb-8 text-center"
+          >
+            <p className="text-gray-700 text-lg font-medium">
+              👉 Tu n'essaies pas de créer un marché. Tu arrives sur un marché qui existe déjà.
+            </p>
+          </motion.div>
+
           {/* Bottom CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.4 }}
             className="flex justify-center"
           >
             <GlowButton onClick={handleContinue} size="lg" className="px-12">

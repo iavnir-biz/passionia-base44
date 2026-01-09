@@ -15,13 +15,16 @@ import MyOffers from './pages/MyOffers';
 import NoahGeneration from './pages/NoahGeneration';
 import NovaChat from './pages/NovaChat';
 import NovaGeneration from './pages/NovaGeneration';
+import OfferConcretement from './pages/OfferConcretement';
 import OfferGenerationStart from './pages/OfferGenerationStart';
 import OfferPetitExtra from './pages/OfferPetitExtra';
 import OfferPremium from './pages/OfferPremium';
 import OfferProductPrincipal from './pages/OfferProductPrincipal';
 import OfferResume from './pages/OfferResume';
 import OfferSuperieure from './pages/OfferSuperieure';
+import OfferTaVieFuture from './pages/OfferTaVieFuture';
 import Onboarding from './pages/Onboarding';
+import OnboardingDynamic from './pages/OnboardingDynamic';
 import OnboardingFirstName from './pages/OnboardingFirstName';
 import OnboardingQ10TypicalMistake from './pages/OnboardingQ10TypicalMistake';
 import OnboardingQ11ExtraDetail from './pages/OnboardingQ11ExtraDetail';
@@ -60,9 +63,6 @@ import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import OfferConcretement from './pages/OfferConcretement';
-import OfferTaVieFuture from './pages/OfferTaVieFuture';
-import OnboardingDynamic from './pages/OnboardingDynamic';
 
 
 export const PAGES = {
@@ -83,13 +83,16 @@ export const PAGES = {
     "NoahGeneration": NoahGeneration,
     "NovaChat": NovaChat,
     "NovaGeneration": NovaGeneration,
+    "OfferConcretement": OfferConcretement,
     "OfferGenerationStart": OfferGenerationStart,
     "OfferPetitExtra": OfferPetitExtra,
     "OfferPremium": OfferPremium,
     "OfferProductPrincipal": OfferProductPrincipal,
     "OfferResume": OfferResume,
     "OfferSuperieure": OfferSuperieure,
+    "OfferTaVieFuture": OfferTaVieFuture,
     "Onboarding": Onboarding,
+    "OnboardingDynamic": OnboardingDynamic,
     "OnboardingFirstName": OnboardingFirstName,
     "OnboardingQ10TypicalMistake": OnboardingQ10TypicalMistake,
     "OnboardingQ11ExtraDetail": OnboardingQ11ExtraDetail,
@@ -128,9 +131,6 @@ export const PAGES = {
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "OfferConcretement": OfferConcretement,
-    "OfferTaVieFuture": OfferTaVieFuture,
-    "OnboardingDynamic": OnboardingDynamic,
 }
 
 export const pagesConfig = {

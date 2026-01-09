@@ -72,17 +72,13 @@ export default function DayCard({
           {/* Title & Objective */}
           <div className="text-left">
             <h3 className={cn(
-              "text-xl font-bold mb-1",
-              isCompleted && "text-green-700",
-              isActive && "text-gray-900",
+              "text-xl font-bold mb-1 text-gray-900",
               isLocked && "text-gray-500"
             )}>
               Jour {day.number} — {day.title}
             </h3>
             <p className={cn(
-              "text-sm",
-              isCompleted && "text-green-600",
-              isActive && "text-gray-600",
+              "text-sm text-gray-600",
               isLocked && "text-gray-400"
             )}>
               {day.objective}

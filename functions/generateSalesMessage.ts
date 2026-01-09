@@ -8,52 +8,23 @@ const openai = new OpenAI({
 const MESSAGE_PROMPTS = {
     diagnostic: {
         title: "Le Diagnostic",
-        instruction: `Crée un message de vente qui identifie et diagnostique le problème principal du prospect. 
-        Le message doit :
-        - Commencer par une accroche qui capte l'attention
-        - Décrire précisément le problème/la douleur
-        - Montrer que tu comprends leur situation
-        - Poser des questions qui les font réfléchir
-        - Les amener à reconnaître qu'ils ont ce problème
-        - Ton empathique mais direct
-        - 150-200 mots maximum`
+        objective: "Ouvrir la conversation sans vendre",
+        tone: "Curiosité professionnelle"
     },
     empathy: {
         title: "L'Empathie",
-        instruction: `Crée un message de vente qui crée une connexion émotionnelle forte avec le prospect.
-        Le message doit :
-        - Montrer que tu as vécu la même chose
-        - Partager une histoire personnelle courte et authentique
-        - Exprimer de la compréhension profonde
-        - Normaliser leurs difficultés
-        - Créer un sentiment de "tu n'es pas seul"
-        - Ton chaleureux et humain
-        - 150-200 mots maximum`
+        objective: "Créer un lien humain et de confiance",
+        tone: "Chaleureux, vécu réel"
     },
     solution: {
         title: "La Solution",
-        instruction: `Crée un message de vente qui présente ta solution de manière irrésistible.
-        Le message doit :
-        - Introduire ta méthode/approche unique
-        - Expliquer comment elle résout le problème
-        - Présenter les bénéfices concrets et spécifiques
-        - Montrer pourquoi c'est différent des autres solutions
-        - Inclure un élément de preuve sociale ou résultat
-        - Ton confiant et expert
-        - 200-250 mots maximum`
+        objective: "Introduire le produit comme une évidence",
+        tone: "Calme, sûr, sans push"
     },
     purchase: {
         title: "L'Achat",
-        instruction: `Crée un message de vente qui pousse à l'action d'achat maintenant.
-        Le message doit :
-        - Rappeler brièvement le problème et la solution
-        - Créer l'urgence avec une raison valide
-        - Présenter l'offre de manière claire et attractive
-        - Anticiper et lever les objections principales
-        - Call-to-action fort et direct
-        - Bonus ou garantie pour rassurer
-        - Ton persuasif et décisif
-        - 200-250 mots maximum`
+        objective: "Transformer l'échange en opportunité concrète",
+        tone: "Clair, assumé, simple"
     }
 };
 
@@ -93,43 +64,122 @@ Deno.serve(async (req) => {
         }
 
         const promptConfig = MESSAGE_PROMPTS[messageType];
-        const finalizedOffer = session.finalized_offer || {};
+        const lowTicketOffer = session.my_generated_offers?.low || {};
+        const avatars = session.generated_avatars || {};
         const onboardingSummary = session.onboarding_summary || {};
+        const onboardingFull = session.onboarding_full || {};
 
-        // Construct user context
-        const userContext = `
-PROFIL UTILISATEUR:
-- Prénom: ${user.full_name || 'Non défini'}
-- Email: ${user.email}
+        // Vérification critique
+        if (!lowTicketOffer.title) {
+            return Response.json({ 
+                error: 'Offre LOW TICKET non trouvée. Complète d\'abord la génération des offres.' 
+            }, { status: 400 });
+        }
 
-PROFIL BUSINESS:
-- Passion/Expertise: ${session.skill || onboardingSummary.who_to_teach || 'Non défini'}
-- Audience cible: ${onboardingSummary.learner_profile || 'Non défini'}
-- Problème principal: ${onboardingSummary.main_learning_problem || 'Non défini'}
-- Quick win promis: ${onboardingSummary.quick_win || 'Non défini'}
-- Transformation promise: ${onboardingSummary.big_transformation || 'Non défini'}
-- Angle de méthode: ${onboardingSummary.method_angle || 'Non défini'}
-- Erreur commune: ${onboardingSummary.common_mistake || 'Non défini'}
-- Preuve/Histoire: ${onboardingSummary.proof_or_story || 'Non défini'}
+        // PROMPT SYSTÈME COMPLET (3 prompts fusionnés)
+        const systemMessage = `TU ES UN EXPERT EN COPYWRITING CONVERSATIONNEL POUR CRÉATEURS QUI VENDENT LEUR SAVOIR.
 
-OFFRE FINALISÉE:
-${JSON.stringify(finalizedOffer, null, 2)}
-        `.trim();
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 CONTEXTE PRODUIT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        const systemMessage = `Tu es un expert en copywriting et messages de vente pour produits d'enseignement digitaux.
+Tu écris des messages utilisés en DM, email ou vocal pour vendre un PRODUIT LOW TICKET.
+Ce n'est PAS du marketing agressif. Ce sont de vraies conversations humaines.
 
-${promptConfig.instruction}
+Inspiration : webinaires de vente, messages Instagram/LinkedIn, ton naturel, oral, fluide.
 
-RÈGLES IMPORTANTES:
-- Utilise le tutoiement
-- Style conversationnel et naturel
-- Pas de formule de politesse finale
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 MESSAGE ${messageType.toUpperCase()} — ${promptConfig.title}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Objectif : ${promptConfig.objective}
+Ton : ${promptConfig.tone}
+
+${messageType === 'diagnostic' ? `
+- Question intelligente
+- Curiosité sincère
+- Aucune mention d'offre
+- Fait parler la personne
+- Longueur : 120-180 mots
+` : ''}${messageType === 'empathy' ? `
+- Validation de la douleur
+- "Je comprends"
+- Vécu personnel ou accompagnement client
+- Ton humain, calme
+- Longueur : 120-180 mots
+` : ''}${messageType === 'solution' ? `
+- Pivot doux vers la solution
+- Présentation courte du produit LOW TICKET
+- Positionné comme un "coup de main"
+- Pas de pitch agressif
+- Longueur : 150-220 mots
+` : ''}${messageType === 'purchase' ? `
+- Offre claire avec prix exact
+- Cadre simple (beta / test / accès limité)
+- Garantie ou réassurance
+- Question finale ouverte
+- Longueur : 150-220 mots
+` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚫 INTERDICTIONS ABSOLUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Ne jamais inventer une nouvelle offre
+- Ne jamais changer le prix
+- Ne jamais changer la promesse
+- Ne jamais utiliser de jargon marketing
+- Ne jamais survendre
+- Pas de CTA agressif
+- Pas de pression
+- Pas de storytelling émotionnel forcé
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 RÈGLES DE FORMAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Tutoiement strict
+- Langue : Français
+- Pas de markdown
+- Pas de titres visibles
 - Pas de signature
-- Formatage simple (sauts de lignes pour aérer)
-- Émojis uniquement si pertinent (max 2-3)
-- Message prêt à envoyer tel quel
+- Ton calme, posé, sûr
+- Texte brut, paragraphes aérés
+- Message prêt à être envoyé tel quel
 
-Génère un message de vente puissant basé sur le contexte utilisateur fourni.`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 GARDE-FOU PRODUIT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ce message doit vendre EXACTEMENT la même chose que la page de vente.
+1 offre = 1 discours
+1 produit = 1 message
+1 promesse = répétée partout
+
+Tu utilises UNIQUEMENT l'offre LOW TICKET validée lors de l'onboarding.
+AUCUNE dérive créative autorisée.`;
+
+        const userContext = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 DONNÉES PRODUIT (SOURCE DE VÉRITÉ)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OFFRE LOW TICKET (OBLIGATOIRE) :
+${JSON.stringify(lowTicketOffer, null, 2)}
+
+AVATARS CLIENTS :
+${JSON.stringify(avatars, null, 2)}
+
+ONBOARDING SUMMARY :
+${JSON.stringify(onboardingSummary, null, 2)}
+
+ONBOARDING FULL :
+- Prénom créateur : ${user.full_name || user.firstName || 'Non renseigné'}
+- Compétence : ${session.skill || 'Non renseigné'}
+- Problème principal : ${onboardingSummary.main_learning_problem || 'Non renseigné'}
+- Transformation : ${onboardingSummary.big_transformation || 'Non renseigné'}
+- Coût de l'inaction : ${onboardingFull.if_nothing_changes || 'Non renseigné'}
+- Obstacles : ${JSON.stringify(onboardingFull.obstacles || [])}`;
+
 
         const completion = await openai.chat.completions.create({
             model: "gpt-4o",
@@ -144,7 +194,7 @@ Génère un message de vente puissant basé sur le contexte utilisateur fourni.`
         const messageContent = completion.choices[0].message.content;
 
         const result = {
-            type: messageType,
+            messageType: messageType,
             title: promptConfig.title,
             content: messageContent,
             generatedAt: new Date().toISOString()

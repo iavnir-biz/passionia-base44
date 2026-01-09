@@ -84,7 +84,8 @@ export default function SalesMessages() {
       id: 'diagnostic',
       title: 'Le Diagnostic',
       subtitle: 'Message 1',
-      description: 'Identifie le problème de ton prospect',
+      objective: 'Ouvrir la conversation sans vendre',
+      tone: 'Curiosité professionnelle',
       icon: MessageSquare,
       color: 'from-blue-500 to-cyan-500'
     },
@@ -92,7 +93,8 @@ export default function SalesMessages() {
       id: 'empathy',
       title: 'L\'Empathie',
       subtitle: 'Message 2',
-      description: 'Crée une connexion émotionnelle',
+      objective: 'Créer un lien humain et de confiance',
+      tone: 'Chaleureux, vécu réel',
       icon: Heart,
       color: 'from-pink-500 to-rose-500'
     },
@@ -100,7 +102,8 @@ export default function SalesMessages() {
       id: 'solution',
       title: 'La Solution',
       subtitle: 'Message 3',
-      description: 'Présente ta solution unique',
+      objective: 'Introduire le produit comme une évidence',
+      tone: 'Calme, sûr, sans push',
       icon: Lightbulb,
       color: 'from-amber-500 to-orange-500'
     },
@@ -108,25 +111,20 @@ export default function SalesMessages() {
       id: 'purchase',
       title: 'L\'Achat',
       subtitle: 'Message 4',
-      description: 'Pousse à l\'action d\'achat',
+      objective: 'Transformer l\'échange en opportunité concrète',
+      tone: 'Clair, assumé, simple',
       icon: ShoppingBag,
       color: 'from-green-500 to-emerald-500'
     }
   ];
 
-  const handleGenerate = async (messageType, isRegenerate = false) => {
-    if (isRegenerate && !hasPremium) {
-      setShowUpgradeModal(true);
-      return;
-    }
-    
+  const handleGenerate = async (messageType) => {
     setLoading({ ...loading, [messageType]: true });
 
     try {
       const response = await base44.functions.invoke('generateSalesMessage', {
         messageType,
-        profile,
-        session
+        sessionId: session.id
       });
 
       const updatedMessages = {
@@ -197,14 +195,37 @@ export default function SalesMessages() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
                 <Brain className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-xs font-medium text-gray-700">Messages générés par IA</span>
+                <span className="text-xs font-medium text-gray-700">Messages de vente</span>
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                Tes messages de vente
+                Tes messages pour vendre sans forcer
               </h1>
               <p className="text-gray-600 text-lg">
-                Génère une séquence complète de 4 messages pour convertir tes prospects
+                Ces messages t'aident à engager une vraie conversation et vendre ton premier produit, même sans audience.
               </p>
+            </motion.div>
+
+            {/* Context Block */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-gradient-to-br from-green-50 to-blue-50 border border-green-200 rounded-2xl p-6"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <MessageSquare className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    💬 Comment utiliser ces messages ?
+                  </h3>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Si tu envoies ces messages aux bonnes personnes, ils peuvent accélérer tes premières ventes sans pression ni manipulation. 
+                    Utilise-les en DM Instagram/LinkedIn, par email, ou adapte-les en vocal.
+                  </p>
+                </div>
+              </div>
             </motion.div>
 
             {/* Message Cards Grid */}
@@ -231,56 +252,39 @@ export default function SalesMessages() {
                     <p className="text-[#61f7a2] text-xs font-semibold uppercase tracking-wide mb-1">
                       {msgType.subtitle}
                     </p>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
                       {msgType.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-6">{msgType.description}</p>
+                    <div className="space-y-1.5 mb-6">
+                      <p className="text-gray-600 text-sm">
+                        <span className="font-medium">Objectif :</span> {msgType.objective}
+                      </p>
+                      <p className="text-gray-600 text-sm">
+                        <span className="font-medium">Ton :</span> {msgType.tone}
+                      </p>
+                    </div>
 
                     {/* Actions */}
                     {isGenerated ? (
-                      <div className="space-y-3">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => setShowPreview(isGenerated)}
-                            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
-                          >
-                            <Eye className="w-4 h-4" />
-                            <span className="text-sm font-medium">Voir</span>
-                          </button>
-                          <button
-                            onClick={() => handleCopy(isGenerated)}
-                            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDownload(isGenerated, `message-${msgType.id}.txt`)}
-                            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
-                        </div>
+                      <div className="flex gap-2">
                         <button
-                          onClick={() => {
-                            if (!hasPremium) {
-                              setShowUpgradeModal(true);
-                              return;
-                            }
-                            handleGenerate(msgType.id);
-                          }}
-                          disabled={isLoading}
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-700 disabled:opacity-50"
+                          onClick={() => setShowPreview(isGenerated)}
+                          className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
                         >
-                          {isLoading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <>
-                              <Lock className="w-4 h-4" />
-                              <span className="text-sm font-medium">
-                                {hasPremium ? 'Régénérer' : 'Régénérer (Premium)'}
-                              </span>
-                            </>
-                          )}
+                          <Eye className="w-4 h-4" />
+                          <span className="text-sm font-medium">Voir</span>
+                        </button>
+                        <button
+                          onClick={() => handleCopy(isGenerated)}
+                          className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDownload(isGenerated, `message-${msgType.id}.txt`)}
+                          className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
+                        >
+                          <Download className="w-4 h-4" />
                         </button>
                       </div>
                     ) : (
@@ -292,7 +296,7 @@ export default function SalesMessages() {
                         loading={isLoading}
                         icon={Sparkles}
                       >
-                        {isLoading ? 'Génération...' : 'Générer'}
+                        {isLoading ? 'Nova écrit ton message...' : 'Générer'}
                       </GlowButton>
                     )}
                   </motion.div>

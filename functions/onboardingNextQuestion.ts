@@ -36,8 +36,8 @@ const QUESTION_STRUCTURE = [
     max: 15, 
     step: 1,
     transformation_focus: "ancrage_expertise", // P1
-    titleTemplate: "D'accord. Depuis combien d'années pratiques-tu {{coreSkill}} ?",
-    subtitleTemplate: "Même si c'est approximatif, donne une estimation honnête."
+    titleTemplate: "Depuis combien d'années pratiques-tu {{coreSkill}} ?",
+    subtitleTemplate: "Même si tu débutes, ton parcours a de la valeur. Indique simplement ton niveau réel."
   },
   { 
     id: 4, 

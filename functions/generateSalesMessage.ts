@@ -69,15 +69,16 @@ Deno.serve(async (req) => {
         }
 
         const promptConfig = MESSAGE_PROMPTS[messageType];
-        const lowTicketOffer = session.my_generated_offers?.low || {};
+        const finalizedOffer = session.finalized_offer || {};
+        const lowTicketOffer = session.my_generated_offers?.low || finalizedOffer.mainProduct || {};
         const avatars = session.generated_avatars || {};
         const onboardingSummary = session.onboarding_summary || {};
         const onboardingFull = session.onboarding_full || {};
 
         // Vérification critique
-        if (!lowTicketOffer.title) {
+        if (!lowTicketOffer.title || !lowTicketOffer.price) {
             return Response.json({ 
-                error: 'Offre LOW TICKET non trouvée. Complète d\'abord la génération des offres.' 
+                error: 'Offre LOW TICKET incomplète. Complète d\'abord ton onboarding d\'offres.' 
             }, { status: 400 });
         }
 

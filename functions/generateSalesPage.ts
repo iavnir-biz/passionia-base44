@@ -75,16 +75,17 @@ Deno.serve(async (req) => {
     const heroImageUrl = imageResponse.data[0].url;
 
     // 🔥 EXTRACTION DONNÉES EXISTANTES (OBLIGATOIRE)
-    const lowTicketOffer = session.my_generated_offers?.low || {};
+    const finalizedOfferData = session.finalized_offer || {};
+    const lowTicketOffer = session.my_generated_offers?.low || finalizedOfferData.mainProduct || {};
     const avatars = session.generated_avatars || {};
     const onboardingSummary = session.onboarding_summary || {};
     const onboardingFull = session.onboarding_full || {};
 
     // Vérification critique
-    if (!lowTicketOffer.title) {
-      return Response.json({ 
-        error: 'Offre LOW TICKET non trouvée. Complète d\'abord la génération des offres.' 
-      }, { status: 400 });
+    if (!lowTicketOffer.title || !lowTicketOffer.price) {
+     return Response.json({ 
+       error: 'Offre LOW TICKET incomplète. Complète d\'abord ton onboarding d\'offres.' 
+     }, { status: 400 });
     }
 
     // Generate sales page content with GPT-4 - Méthode PAS stricte

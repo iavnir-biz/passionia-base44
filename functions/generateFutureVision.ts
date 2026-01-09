@@ -192,6 +192,9 @@ DONNÉES UTILISATEUR (À EXPLOITER OBLIGATOIREMENT)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Prénom : ${name}
+Âge : ${onboardingFull.ageRange || 'non spécifié'}
+Situation familiale : ${onboardingFull.familyStatus || 'non spécifié'}
+Revenus actuels : ${onboardingFull.currentIncome || 'non spécifié'}€/mois
 
 📋 ONBOARDING SUMMARY (données structurées Q1-Q11) :
 - Compétence : ${onboardingSummary.who_to_teach || skill}

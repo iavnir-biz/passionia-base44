@@ -111,17 +111,22 @@ export default function AvatarClients() {
       });
 
       const generatedAvatars = response.data.avatars;
-      setAvatars(generatedAvatars);
 
-      // Save to session
+      // 🔥 Sauvegarder IMMÉDIATEMENT en base
       await base44.entities.Session.update(session.id, {
         generated_avatars: generatedAvatars
       });
 
-      // Recharger pour confirmer
-      await loadData();
+      // 🔥 Mettre à jour l'état local pour affichage immédiat
+      setAvatars(generatedAvatars);
 
-      toast.success('Avatars générés avec succès !');
+      // 🔥 Recharger la session complète depuis la base
+      const sessions = await base44.entities.Session.filter({ id: session.id });
+      if (sessions.length > 0) {
+        setSession(sessions[0]);
+      }
+
+      toast.success('Avatars générés avec succès et sauvegardés !');
     } catch (error) {
       console.error('Error generating avatars:', error);
       toast.error('Erreur lors de la génération');

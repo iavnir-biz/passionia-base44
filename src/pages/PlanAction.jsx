@@ -36,6 +36,16 @@ export default function PlanAction() {
     }
   }, [user]);
 
+  // 🔥 Recharger la progression depuis la base régulièrement
+  useEffect(() => {
+    if (profile?.id) {
+      const interval = setInterval(() => {
+        loadData();
+      }, 1000); // Recharger chaque seconde pour sync cross-tab
+      return () => clearInterval(interval);
+    }
+  }, [profile?.id]);
+
   const checkAccess = async () => {
     // 🔥 P0-3: Guard paywall (réactivé en prod)
     try {
@@ -94,10 +104,28 @@ export default function PlanAction() {
     const newChecklist = [...dayData.checklist];
     newChecklist[itemIndex] = { ...newChecklist[itemIndex], checked: !newChecklist[itemIndex].checked };
     
-    await saveDayProgress(day, {
-      ...dayData,
-      checklist: newChecklist
-    });
+    // 🔥 Sauvegarder IMMÉDIATEMENT sans attendre
+    const updatedProgress = {
+      ...dayProgress,
+      [day]: {
+        ...dayData,
+        checklist: newChecklist,
+        updatedAt: new Date().toISOString()
+      }
+    };
+    
+    setDayProgress(updatedProgress);
+    
+    if (profile) {
+      try {
+        await base44.entities.UserProfile.update(profile.id, {
+          plan_7days_progress: updatedProgress
+        });
+        console.log('✅ Task persisted:', { day, taskIndex: itemIndex });
+      } catch (error) {
+        console.error('❌ Failed to persist task:', error);
+      }
+    }
   };
 
   const handleDayComplete = async (day) => {

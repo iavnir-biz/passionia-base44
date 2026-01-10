@@ -36,15 +36,13 @@ export default function PlanAction() {
     }
   }, [user]);
 
-  // 🔥 Recharger la progression depuis la base régulièrement
-  useEffect(() => {
-    if (profile?.id) {
-      const interval = setInterval(() => {
-        loadData();
-      }, 1000); // Recharger chaque seconde pour sync cross-tab
-      return () => clearInterval(interval);
-    }
-  }, [profile?.id]);
+useEffect(() => {
+  const onFocus = () => {
+    if (user) loadData();
+  };
+  window.addEventListener("focus", onFocus);
+  return () => window.removeEventListener("focus", onFocus);
+}, [user, profile?.id]);
 
   const checkAccess = async () => {
     // 🔥 P0-3: Guard paywall (réactivé en prod)

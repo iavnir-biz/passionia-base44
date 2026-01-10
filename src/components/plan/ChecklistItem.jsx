@@ -22,43 +22,56 @@ export default function ChecklistItem({ item, checked, onChange, disabled }) {
 
   const hasDetails = item.details || item.action;
 
-  return (
-    <div
-      className={cn(
-        "rounded-xl border-2 transition-all",
-        checked 
-          ? "bg-green-50 border-green-300" 
-          : "bg-white border-gray-200"
-      )}
-    >
-      {/* Main checkbox row */}
-      <div className="flex items-start gap-3 p-4">
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={onChange}
-          disabled={disabled}
-          className="mt-0.5 w-5 h-5 text-[#61f7a2] rounded focus:ring-[#61f7a2] cursor-pointer flex-shrink-0"
-        />
-        
-        <div className="flex-1">
-          <span className={checked ? "font-medium line-through text-gray-900" : "font-medium text-gray-900"}>
-            {item.text}
-          </span>
-        </div>
+return (
+  <div
+    className={cn(
+      // ✅ force une couleur de texte pour éviter tout héritage "text-white"
+      "rounded-xl border-2 transition-all text-gray-900",
+      checked
+        ? "bg-green-50 border-green-300"
+        : "bg-white border-gray-200"
+    )}
+  >
+    {/* Main checkbox row */}
+    <div className="flex items-start gap-3 p-4">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => {
+          e.stopPropagation();      // ✅ évite effets secondaires sur parent
+          onChange(e);
+        }}
+        onClick={(e) => e.stopPropagation()} // ✅ idem
+        disabled={disabled}
+        className="mt-0.5 w-5 h-5 text-[#61f7a2] rounded focus:ring-[#61f7a2] cursor-pointer flex-shrink-0"
+      />
 
-        {hasDetails && !checked && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
-          >
-            <ChevronDown className={cn(
-              "w-5 h-5 transition-transform",
-              isExpanded && "rotate-180"
-            )} />
-          </button>
-        )}
+      <div className="flex-1">
+        <span
+          className={cn(
+            "font-medium text-gray-900", // ✅ fixe
+            checked && "line-through opacity-70"
+          )}
+        >
+          {item.text}
+        </span>
       </div>
+
+      {hasDetails && !checked && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation(); // ✅ évite toggle parent
+            setIsExpanded(!isExpanded);
+          }}
+          className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+        >
+          <ChevronDown
+            className={cn("w-5 h-5 transition-transform", isExpanded && "rotate-180")}
+          />
+        </button>
+      )}
+    </div>
 
       {/* Expandable details */}
       <AnimatePresence>

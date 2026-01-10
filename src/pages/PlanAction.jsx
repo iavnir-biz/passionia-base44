@@ -98,33 +98,34 @@ useEffect(() => {
   };
 
   const handleChecklistChange = async (day, itemIndex) => {
-    const dayData = dayProgress[day] || { checklist: getDayChecklist(day).map(item => ({ ...item, checked: false })) };
-    const newChecklist = [...dayData.checklist];
-    newChecklist[itemIndex] = { ...newChecklist[itemIndex], checked: !newChecklist[itemIndex].checked };
-    
-    // 🔥 Sauvegarder IMMÉDIATEMENT sans attendre
+  if (!profile?.id) return;
+
+  setDayProgress((prev) => {
+    const currentChecklist = (prev?.[day]?.checklist && prev[day].checklist.length)
+      ? prev[day].checklist
+      : getDayChecklist(day); // base complète
+
+    const newChecklist = currentChecklist.map((it, idx) =>
+      idx === itemIndex ? { ...it, checked: !it.checked } : it
+    );
+
     const updatedProgress = {
-      ...dayProgress,
+      ...prev,
       [day]: {
-        ...dayData,
+        ...(prev[day] || {}),
         checklist: newChecklist,
         updatedAt: new Date().toISOString()
       }
     };
-    
-    setDayProgress(updatedProgress);
-    
-    if (profile) {
-      try {
-        await base44.entities.UserProfile.update(profile.id, {
-          plan_7days_progress: updatedProgress
-        });
-        console.log('✅ Task persisted:', { day, taskIndex: itemIndex });
-      } catch (error) {
-        console.error('❌ Failed to persist task:', error);
-      }
-    }
-  };
+
+    // Fire & forget (mais solide)
+    base44.entities.UserProfile.update(profile.id, {
+      plan_7days_progress: updatedProgress
+    }).catch((e) => console.error("❌ Failed to persist task:", e));
+
+    return updatedProgress;
+  });
+};
 
   const handleDayComplete = async (day) => {
     await saveDayProgress(day, {
@@ -306,11 +307,22 @@ const getDayChecklist = (day) => {
   ];
 
   const calculateProgress = () => {
-    const completedDays = Object.keys(dayProgress).filter(
-      key => dayProgress[key].completed
-    ).length;
-    return Math.round((completedDays / 7) * 100);
-  };
+  // total tâches = somme des tâches de tous les jours
+  const totalTasks = [1, 2, 3, 4, 5, 6, 7].reduce(
+    (acc, day) => acc + getDayChecklist(day).length,
+    0
+  );
+
+  if (totalTasks === 0) return 0;
+
+  // tâches cochées = somme des checked true
+  const checkedTasks = [1, 2, 3, 4, 5, 6, 7].reduce((acc, day) => {
+    const list = getDayChecklist(day);
+    return acc + list.filter((i) => i.checked).length;
+  }, 0);
+
+  return Math.round((checkedTasks / totalTasks) * 100);
+};
 
   if (authLoading || isLoading) {
     return (

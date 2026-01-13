@@ -36,14 +36,6 @@ export default function PlanAction() {
     }
   }, [user]);
 
-useEffect(() => {
-  const onFocus = () => {
-    if (user) loadData();
-  };
-  window.addEventListener("focus", onFocus);
-  return () => window.removeEventListener("focus", onFocus);
-}, [user, profile?.id]);
-
   const checkAccess = async () => {
     // 🔥 P0-3: Guard paywall (réactivé en prod)
     try {
@@ -97,35 +89,42 @@ useEffect(() => {
     }
   };
 
-  const handleChecklistChange = async (day, itemIndex) => {
-  if (!profile?.id) return;
+const handleChecklistChange = async (day, itemIndex) => {
+    if (!profile?.id) return;
 
-  setDayProgress((prev) => {
-    const currentChecklist = (prev?.[day]?.checklist && prev[day].checklist.length)
-      ? prev[day].checklist
-      : getDayChecklist(day); // base complète
+    // 1. On récupère la checklist actuelle (mélange défaut + sauvegardé)
+    // On s'assure de travailler sur la version visible à l'écran
+    const currentList = dayProgress?.[day]?.checklist || getDayChecklist(day);
 
-    const newChecklist = currentChecklist.map((it, idx) =>
-      idx === itemIndex ? { ...it, checked: !it.checked } : it
+    // 2. On crée la nouvelle version avec l'élément inversé
+    const newChecklist = currentList.map((item, idx) => 
+      idx === itemIndex ? { ...item, checked: !item.checked } : item
     );
 
-    const updatedProgress = {
-      ...prev,
+    // 3. On prépare le nouvel objet de progression complet
+    const newProgress = {
+      ...dayProgress,
       [day]: {
-        ...(prev[day] || {}),
+        ...(dayProgress[day] || {}),
         checklist: newChecklist,
         updatedAt: new Date().toISOString()
       }
     };
+    
+    // 4. On met à jour l'affichage IMMÉDIATEMENT (Optimistic UI)
+    // C'est ça qui empêche la case de se décocher visuellement
+    setDayProgress(newProgress);
 
-    // Fire & forget (mais solide)
-    base44.entities.UserProfile.update(profile.id, {
-      plan_7days_progress: updatedProgress
-    }).catch((e) => console.error("❌ Failed to persist task:", e));
-
-    return updatedProgress;
-  });
-};
+    // 5. On sauvegarde en base silencieusement
+    try {
+      await base44.entities.UserProfile.update(profile.id, {
+        plan_7days_progress: newProgress
+      });
+      console.log("✅ Progression sauvegardée");
+    } catch (error) {
+      console.error("❌ Erreur sauvegarde:", error);
+    }
+  };
 
   const handleDayComplete = async (day) => {
     await saveDayProgress(day, {

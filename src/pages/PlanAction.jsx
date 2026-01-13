@@ -30,7 +30,6 @@ export default function PlanAction() {
   const [dayProgress, setDayProgress] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
-// ✅ NOUVEAU CODE (À COLLER À LA PLACE)
   useEffect(() => {
     if (user && user.email) {
       // Petit délai pour être sûr que Base44 est prêt

@@ -30,9 +30,14 @@ export default function PlanAction() {
   const [dayProgress, setDayProgress] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
+// ✅ NOUVEAU CODE (À COLLER À LA PLACE)
   useEffect(() => {
-    if (user) {
-      checkAccess();
+    if (user && user.email) {
+      // Petit délai pour être sûr que Base44 est prêt
+      const timer = setTimeout(() => {
+        checkAccess();
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [user]);
 
@@ -52,42 +57,49 @@ export default function PlanAction() {
   };
 
   const loadData = async () => {
-    try {
-      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-      if (profiles.length > 0) {
-        const userProfile = profiles[0];
-        setProfile(userProfile);
-        
-        // Load saved progress
-        const savedProgress = userProfile.plan_7days_progress || {};
-        setDayProgress(savedProgress);
-        
-        // Calculate current day
-        const completedDays = Object.keys(savedProgress).filter(
-          key => savedProgress[key].completed
-        ).length;
-        setCurrentDay(Math.min(completedDays + 1, 7));
-      }
-    } catch (error) {
-      console.error('Error loading data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const saveDayProgress = async (day, data) => {
-    const newProgress = {
-      ...dayProgress,
-      [day]: data
-    };
-    setDayProgress(newProgress);
+  setIsLoading(true); // On affiche le chargement
+  try {
+    // On récupère le profil
+    const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
     
-    if (profile) {
-      await base44.entities.UserProfile.update(profile.id, {
-        plan_7days_progress: newProgress
-      });
+    if (profiles.length > 0) {
+      const userProfile = profiles[0];
+      setProfile(userProfile);
+      
+      // --- FIX ICI : Gestion robuste du JSON ---
+      let savedProgress = userProfile.plan_7days_progress;
+
+      // Si la base renvoie une string (ex: "{...}"), on la convertit en Objet
+      if (typeof savedProgress === "string") {
+        try {
+          savedProgress = JSON.parse(savedProgress);
+        } catch (e) {
+          console.error("Erreur de parsing JSON", e);
+          savedProgress = {};
+        }
+      }
+      
+      // Si c'est vide ou null, on met un objet vide
+      if (!savedProgress) savedProgress = {};
+
+      console.log("📥 Progression chargée :", savedProgress); // Pour vérifier dans la console IDX
+
+      setDayProgress(savedProgress);
+      
+      // Recalcul du jour actuel basé sur la sauvegarde
+      const completedDays = Object.keys(savedProgress).filter(
+        key => savedProgress[key].completed
+      ).length;
+      
+      // On force au moins le jour 1, ou le jour suivant
+      setCurrentDay(Math.min(completedDays + 1, 7));
     }
-  };
+  } catch (error) {
+    console.error('Error loading data:', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
 const handleChecklistChange = async (day, itemIndex) => {
     if (!profile?.id) return;

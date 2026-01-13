@@ -101,41 +101,47 @@ export default function PlanAction() {
 };
 
 const handleChecklistChange = async (day, itemIndex) => {
-    if (!profile?.id) return;
+  // 1. SÉCURITÉ : Vérifions qu'on a bien l'ID
+  if (!profile?.id) {
+    console.error("⛔ ERREUR GRAVE : Aucun profil chargé, impossible de sauvegarder");
+    return;
+  }
 
-    // 1. On récupère la checklist actuelle (mélange défaut + sauvegardé)
-    // On s'assure de travailler sur la version visible à l'écran
-    const currentList = dayProgress?.[day]?.checklist || getDayChecklist(day);
+  console.log("💾 Tentative de sauvegarde pour le profil ID:", profile.id);
 
-    // 2. On crée la nouvelle version avec l'élément inversé
-    const newChecklist = currentList.map((item, idx) => 
-      idx === itemIndex ? { ...item, checked: !item.checked } : item
-    );
+  // 2. On met à jour l'état local (UI)
+  const currentList = dayProgress?.[day]?.checklist || getDayChecklist(day);
 
-    // 3. On prépare le nouvel objet de progression complet
-    const newProgress = {
-      ...dayProgress,
-      [day]: {
-        ...(dayProgress[day] || {}),
-        checklist: newChecklist,
-        updatedAt: new Date().toISOString()
-      }
-    };
-    
-    // 4. On met à jour l'affichage IMMÉDIATEMENT (Optimistic UI)
-    // C'est ça qui empêche la case de se décocher visuellement
-    setDayProgress(newProgress);
+  const newChecklist = currentList.map((item, idx) => 
+    idx === itemIndex ? { ...item, checked: !item.checked } : item
+  );
 
-    // 5. On sauvegarde en base silencieusement
-    try {
-      await base44.entities.UserProfile.update(profile.id, {
-        plan_7days_progress: newProgress
-      });
-      console.log("✅ Progression sauvegardée");
-    } catch (error) {
-      console.error("❌ Erreur sauvegarde:", error);
+  const newProgress = {
+    ...dayProgress,
+    [day]: {
+      ...(dayProgress[day] || {}),
+      checklist: newChecklist,
+      updatedAt: new Date().toISOString()
     }
   };
+  
+  setDayProgress(newProgress);
+
+  // 3. SAUVEGARDE : On convertit l'objet en Texte (JSON.stringify)
+  try {
+    // ⚠️ LE CHANGEMENT EST ICI : JSON.stringify()
+    // On s'assure que la base reçoit une string, pas un objet JS complexe
+    const dataToSave = JSON.stringify(newProgress);
+    
+    await base44.entities.UserProfile.update(profile.id, {
+      plan_7days_progress: dataToSave
+    });
+    console.log("✅ Sauvegardé en base avec succès !");
+  } catch (error) {
+    console.error("❌ ÉCHEC de la sauvegarde Base44 :", error);
+    alert("Attention : Votre progression n'a pas pu être sauvegardée. Vérifiez votre connexion.");
+  }
+};
 
   const handleDayComplete = async (day) => {
     await saveDayProgress(day, {

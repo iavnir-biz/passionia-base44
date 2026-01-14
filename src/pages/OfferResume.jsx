@@ -319,15 +319,14 @@ export default function OfferResume() {
             transition={{ delay: 0.05 }}
             className="flex justify-center mb-12">
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <GlowButton
               onClick={handleContinue}
-              className="px-8 py-3 rounded-xl font-bold text-base bg-gradient-to-br from-[#1a1a1a] to-black text-white shadow-lg border border-white/10 hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] transition-all flex items-center gap-2 mx-auto"
-            >
+              size="lg"
+              className="px-12">
+
               Découvrir si mon marché est validé
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </motion.button>
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </GlowButton>
           </motion.div>
 
           {/* Products Summary - Vertical */}
@@ -494,15 +493,14 @@ export default function OfferResume() {
             transition={{ delay: 0.3 }}
             className="flex justify-center">
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <GlowButton
               onClick={handleContinue}
-              className="px-8 py-3 rounded-xl font-bold text-base bg-gradient-to-br from-[#1a1a1a] to-black text-white shadow-lg border border-white/10 hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] transition-all flex items-center gap-2"
-            >
+              size="lg"
+              className="px-12">
+
               Voir si mon marché est validé
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </motion.button>
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </GlowButton>
           </motion.div>
         </div>
       </div>

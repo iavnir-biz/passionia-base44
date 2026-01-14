@@ -239,7 +239,6 @@ export default function OnboardingTransition() {
           >
             J'analyse tes réponses pour construire une stratégie claire, simple et rentable, totalement personnalisée pour toi.
             <br />
-            <span className="font-medium text-gray-700">Encore quelques questions, et je te montre tout.</span>
           </motion.p>
 
           {/* Barre de progression intelligente */}

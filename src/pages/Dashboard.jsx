@@ -4,10 +4,10 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
-import { 
-  Target, 
-  Calendar, 
-  FileText, 
+import {
+  Target,
+  Calendar,
+  FileText,
   Sparkles,
   ArrowRight,
   CheckCircle,
@@ -26,45 +26,45 @@ import GlowButton from '@/components/ui/GlowButton';
 import ChatBubble from '@/components/chat/ChatBubble';
 
 const dailyMissions = [
-  { 
-    step: 1, 
-    title: "Envoyer 10 messages de diagnostic à des prospects", 
+  {
+    step: 1,
+    title: "Envoyer 10 messages de diagnostic à des prospects",
     page: "SalesMessages",
     description: "Utilise tes messages prêts pour contacter tes premiers prospects"
   },
-  { 
-    step: 2, 
-    title: "Créer ton premier post avec ton avatar client idéal", 
+  {
+    step: 2,
+    title: "Créer ton premier post avec ton avatar client idéal",
     page: "AvatarClients",
     description: "Partage du contenu qui attire ta cible parfaite"
   },
-  { 
-    step: 3, 
-    title: "Publier ta page de vente et partager le lien", 
+  {
+    step: 3,
+    title: "Publier ta page de vente et partager le lien",
     page: "SalesPage",
     description: "Ta page est prête, il ne reste qu'à la mettre en ligne"
   },
-  { 
-    step: 4, 
-    title: "Envoyer ta première séquence email", 
+  {
+    step: 4,
+    title: "Envoyer ta première séquence email",
     page: "EmailsMarketing",
     description: "Active ta séquence automatique pour convertir"
   },
-  { 
-    step: 5, 
-    title: "Faire ta première vente", 
+  {
+    step: 5,
+    title: "Faire ta première vente",
     page: "MyOffers",
     description: "Concentre-toi sur ton offre principale"
   },
-  { 
-    step: 6, 
-    title: "Optimiser ton tunnel de vente", 
+  {
+    step: 6,
+    title: "Optimiser ton tunnel de vente",
     page: "MyOffers",
     description: "Ajoute ton order bump et tes upsells"
   },
-  { 
-    step: 7, 
-    title: "Scaler ton business", 
+  {
+    step: 7,
+    title: "Scaler ton business",
     page: "PlanAction",
     description: "Répète ce qui fonctionne, automatise le reste"
   }
@@ -77,7 +77,8 @@ export default function Dashboard() {
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   useEffect(() => {
     if (isAuthenticated) {
       checkGenerationComplete();
@@ -97,26 +98,26 @@ export default function Dashboard() {
   const checkGenerationComplete = async () => {
     try {
       const currentUser = await base44.auth.me();
-      
+
       // ✅ Vérifier si profil complet
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       if (profiles.length === 0 || !profiles[0].first_name) {
         navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
         return;
       }
-      
+
       loadData();
     } catch (error) {
       console.error('[Dashboard] Error checking generation:', error);
       loadData();
     }
   };
-  
+
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      
+
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
@@ -126,47 +127,47 @@ export default function Dashboard() {
       if (sessions.length > 0) {
         setSession(sessions[0]);
       }
-      
+
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const calculateProgress = () => {
     // 🔥 Progression basée sur les TÂCHES réellement cochées du Plan d'action
     if (!profile?.plan_7days_progress) return 0;
-    
+
     const completedDays = Object.keys(profile.plan_7days_progress).filter(
       key => profile.plan_7days_progress[key]?.completed
     ).length;
-    
+
     return Math.round((completedDays / 7) * 100);
   };
-  
+
   const getCurrentStep = () => {
     // 🔥 Lire le progrès RÉEL depuis le plan d'action (UserProfile)
     if (!profile?.plan_7days_progress) return 1;
-    
+
     const completedDays = Object.keys(profile.plan_7days_progress).filter(
       key => profile.plan_7days_progress[key]?.completed
     ).length;
-    
+
     return Math.min(completedDays + 1, 7);
   };
-  
+
   const getNextIncompleteTask = () => {
     // 🔥 Calculer la VRAIE première tâche incomplète
     if (!profile?.plan_7days_progress) return dailyMissions[0];
-    
+
     // Trouver le jour courant basé sur les jours complétés
     const completedDays = Object.keys(profile.plan_7days_progress).filter(
       key => profile.plan_7days_progress[key]?.completed
     ).length;
-    
+
     const currentDayNum = Math.min(completedDays + 1, 7);
-    
+
     // ✅ Retourner la mission du jour courant
     return dailyMissions[currentDayNum - 1] || dailyMissions[6];
   };
@@ -179,12 +180,12 @@ export default function Dashboard() {
     { title: "Avatars", page: "AvatarClients", icon: Users },
     { title: "Analyse marché", page: "MarketAnalysis", icon: Target }
   ];
-  
+
   if (authLoading || loading) {
     return (
       <div className="flex min-h-screen bg-white">
         <Sidebar currentPage="Dashboard" progress={0} />
-        <div className="flex-1 ml-72">
+        <div className="flex-1 ml-0 lg:ml-72">
           <div className="flex items-center justify-center h-screen">
             <div className="animate-spin w-8 h-8 border-2 border-[#61f7a2] border-t-transparent rounded-full" />
           </div>
@@ -192,18 +193,25 @@ export default function Dashboard() {
       </div>
     );
   }
-  
+
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="Dashboard" progress={calculateProgress()} user={user} />
-      
-      <div className="flex-1 ml-72">
-        <TopBar 
-          title="Dashboard" 
+      <Sidebar
+        currentPage="Dashboard"
+        progress={calculateProgress()}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <div className="flex-1 w-full ml-0 lg:ml-72">
+        <TopBar
+          title="Dashboard"
           subtitle={`Bienvenue ${user?.full_name?.split(' ')[0] || ''} !`}
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
-        
+
         <main className="p-8 max-w-6xl mx-auto">
           {/* 1️⃣ OWNERSHIP & VALEUR */}
           <motion.div
@@ -217,7 +225,7 @@ export default function Dashboard() {
             <p className="text-lg text-gray-700 mb-6">
               Noah a déjà construit tout ce dont tu as besoin pour vendre.
             </p>
-            
+
             <div className="flex flex-wrap gap-3">
               <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
                 <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
@@ -261,7 +269,7 @@ export default function Dashboard() {
                 {getNextIncompleteTask()?.description}
               </p>
             </div>
-            
+
             <div className="flex justify-center">
               <GlowButton
                 onClick={() => navigate(createPageUrl(getNextIncompleteTask()?.page))}
@@ -330,23 +338,22 @@ export default function Dashboard() {
             className="bg-gray-50 rounded-2xl border border-gray-200 p-6"
           >
             <p className="text-lg font-bold text-gray-900 mb-4">Tu es au jour {getCurrentStep()}</p>
-            
+
             {/* Mini timeline */}
             <div className="flex items-center gap-2 mb-6">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <div
                   key={day}
-                  className={`flex-1 h-2 rounded-full transition-all ${
-                    day < getCurrentStep() 
-                      ? 'bg-[#61f7a2]' 
-                      : day === getCurrentStep() 
-                        ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30' 
+                  className={`flex-1 h-2 rounded-full transition-all ${day < getCurrentStep()
+                      ? 'bg-[#61f7a2]'
+                      : day === getCurrentStep()
+                        ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30'
                         : 'bg-gray-200'
-                  }`}
+                    }`}
                 />
               ))}
             </div>
-            
+
             <Link
               to={createPageUrl('PlanAction')}
               className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 rounded-xl hover:border-[#61f7a2] hover:shadow-md transition-all font-medium text-gray-900"

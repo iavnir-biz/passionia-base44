@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { 
-  Loader2, 
+import {
+  Loader2,
   ArrowRight,
   Target,
   CheckCircle,
@@ -211,36 +211,36 @@ export default function OfferConcretement() {
   // 🔥 P0-1: Récap offres + potentiel (Source: session.finalized_offer)
   const finalizedOffer = session?.finalized_offer || {};
   const products = [
-    { 
-      label: 'Produit Principal', 
-      data: finalizedOffer.mainProduct, 
+    {
+      label: 'Produit Principal',
+      data: finalizedOffer.mainProduct,
       icon: ShoppingBag,
       iconColor: 'text-orange-500',
       bgColor: 'bg-orange-50',
       priceColor: 'text-orange-600',
       badge: 'Low-ticket'
     },
-    { 
-      label: 'Order Bump', 
-      data: finalizedOffer.orderBump, 
+    {
+      label: 'Order Bump',
+      data: finalizedOffer.orderBump,
       icon: Gift,
       iconColor: 'text-blue-500',
       bgColor: 'bg-blue-50',
       priceColor: 'text-blue-600',
       badge: 'Extra-Produit'
     },
-    { 
-      label: 'Upsell', 
-      data: finalizedOffer.upsell1, 
+    {
+      label: 'Upsell',
+      data: finalizedOffer.upsell1,
       icon: TrendingUp,
       iconColor: 'text-purple-500',
       bgColor: 'bg-purple-50',
       priceColor: 'text-purple-600',
       badge: 'Mid-ticket'
     },
-    { 
-      label: 'Premium', 
-      data: finalizedOffer.upsell3, 
+    {
+      label: 'Premium',
+      data: finalizedOffer.upsell3,
       icon: Crown,
       iconColor: 'text-amber-500',
       bgColor: 'bg-amber-50',
@@ -256,7 +256,7 @@ export default function OfferConcretement() {
       <OnboardingSidebar currentPage="OfferConcretement" completedSteps={completedSteps} progressInStep={0} />
 
       <div className="flex-1 flex flex-col lg:ml-80">
-        <div className="max-w-4xl mx-auto px-6 py-12">
+        <div className="max-w-4xl mx-auto px-6 pt-52 pb-12 lg:py-12">
           {/* Hero Section avec visuel */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -266,11 +266,11 @@ export default function OfferConcretement() {
             <div className="bg-gradient-to-br from-[#61f7a2]/20 via-blue-50 to-purple-50 rounded-3xl border-2 border-[#61f7a2]/40 p-10 relative overflow-hidden shadow-lg">
               {/* Éléments décoratifs flottants */}
               <motion.div
-                animate={{ 
+                animate={{
                   y: [0, -20, 0],
                   rotate: [0, 10, 0]
                 }}
-                transition={{ 
+                transition={{
                   duration: 4,
                   repeat: Infinity,
                   ease: "easeInOut"
@@ -278,11 +278,11 @@ export default function OfferConcretement() {
                 className="absolute top-8 right-8 w-24 h-24 bg-gradient-to-br from-[#61f7a2]/30 to-blue-300/30 rounded-2xl"
               />
               <motion.div
-                animate={{ 
+                animate={{
                   y: [0, 20, 0],
                   rotate: [0, -10, 0]
                 }}
-                transition={{ 
+                transition={{
                   duration: 5,
                   repeat: Infinity,
                   ease: "easeInOut",
@@ -448,8 +448,8 @@ export default function OfferConcretement() {
 
       {/* Transition Animation */}
       {showTransition && (
-        <OfferTransition 
-          onComplete={handleTransitionComplete} 
+        <OfferTransition
+          onComplete={handleTransitionComplete}
           isPlanAction={true}
         />
       )}

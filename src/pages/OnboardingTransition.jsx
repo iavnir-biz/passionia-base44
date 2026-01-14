@@ -35,7 +35,7 @@ export default function OnboardingTransition() {
 
   useEffect(() => {
     loadUser();
-    
+
     // Déclencher les confettis au chargement de la page
     const hasShownConfetti = sessionStorage.getItem('talents_confetti_shown');
     if (!hasShownConfetti) {
@@ -100,7 +100,7 @@ export default function OnboardingTransition() {
     try {
       const currentUser = await base44.auth.me();
       const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
-      
+
       // Vérifier que la Session existe et contient les données
       if (!currentUser.sessionId) {
         console.error('❌ [OnboardingTransition] Pas de sessionId');
@@ -118,7 +118,7 @@ export default function OnboardingTransition() {
 
       const session = sessions[0];
       const summary = session.onboarding_summary || {};
-      
+
       console.log('✅ [OnboardingTransition] Session chargée:', {
         sessionId: session.id,
         historyLength: session.onboarding_history?.length || 0,
@@ -137,8 +137,8 @@ export default function OnboardingTransition() {
 
       // Enrichir le User avec les données du summary (une seule fois)
       const fullData = session.onboarding_full || {};
-      
-      await base44.auth.updateMe({ 
+
+      await base44.auth.updateMe({
         firstName: firstName,
         coreSkill: session.skill || fullData.coreSkill || '',
         targetAudience: fullData.targetAudience || '',
@@ -165,7 +165,7 @@ export default function OnboardingTransition() {
         console.warn('⚠️ [OnboardingTransition] Fallback message used:', err);
         // Garder le message par défaut
       }
-      
+
       setIsLoading(false);
     } catch (error) {
       console.error('❌ [OnboardingTransition] Error:', error);
@@ -187,17 +187,17 @@ export default function OnboardingTransition() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-2xl"
+        className="w-full max-w-lg"
       >
         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
           {/* Cerveau IA animé au centre */}
           <div className="flex justify-center mb-6">
             <motion.div
-              animate={{ 
+              animate={{
                 scale: [1, 1.05, 1],
                 rotate: [0, 5, -5, 0]
               }}
-              transition={{ 
+              transition={{
                 duration: 3,
                 repeat: Infinity,
                 ease: "easeInOut"
@@ -220,7 +220,7 @@ export default function OnboardingTransition() {
           </div>
 
           {/* Titre principal */}
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -230,19 +230,10 @@ export default function OnboardingTransition() {
             {transitionMessage}
           </motion.h1>
 
-          {/* Sous-titre */}
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-gray-600 text-center mb-6 leading-relaxed text-sm"
-          >
-            J'analyse tes réponses pour construire une stratégie claire, simple et rentable, totalement personnalisée pour toi.
-            <br />
-          </motion.p>
+
 
           {/* Barre de progression intelligente */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
@@ -280,7 +271,7 @@ export default function OnboardingTransition() {
             <h2 className="text-lg font-bold text-gray-900 mb-4 text-center">
               🎁 Ce que je construis pour toi
             </h2>
-            
+
             <div className="space-y-3">
               <AnimatePresence>
                 {items.slice(0, visibleItems).map((item, index) => (
@@ -289,10 +280,10 @@ export default function OnboardingTransition() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200"
+                    className="flex items-center gap-3 p-2.5 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200"
                   >
-                    <div className="flex-shrink-0 w-10 h-10 bg-[#61f7a2] rounded-lg flex items-center justify-center">
-                      <item.icon className="w-5 h-5 text-white" />
+                    <div className="flex-shrink-0 w-8 h-8 bg-[#61f7a2] rounded-lg flex items-center justify-center">
+                      <item.icon className="w-4 h-4 text-white" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 text-base">{item.title}</h3>

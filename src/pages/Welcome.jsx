@@ -339,7 +339,7 @@ export default function Welcome() {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             4 étapes pour <span className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">démarrer</span>
           </h2>
-          <p className="text-gray-500 text-sm">Pour vendre ton premier produit low-ticket</p>
+          <p className="text-gray-500 text-sm">Qui te guide du début à ta première vente.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -355,9 +355,9 @@ export default function Welcome() {
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">01</span>
             </div>
-            <h3 className="text-gray-900 font-bold text-lg mb-3">Crée ton profil</h3>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">On comprend ton potentiel</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Présente ta passion, ton expérience ou ton savoir-faire. L'IA s'adapte à ton parcours.
+              Tu nous parles de ta passion, de ton parcours ou de ce que tu sais faire. L’IA s’adapte à ton niveau, même si tu débutes.
             </p>
           </motion.div>
 
@@ -373,9 +373,9 @@ export default function Welcome() {
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">02</span>
             </div>
-            <h3 className="text-gray-900 font-bold text-lg mb-3">Discute avec l'IA</h3>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">L’IA fait le travail stratégique</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Notre IA t'aide à transformer ta passion en activité viable en quelques minutes.
+              Notre IA sur-entraînée analyse ton idée, ton marché et ce que tu peux vendre. Tu n’as rien à deviner.
             </p>
           </motion.div>
 
@@ -391,9 +391,9 @@ export default function Welcome() {
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">03</span>
             </div>
-            <h3 className="text-gray-900 font-bold text-lg mb-3">Récupère tes documents IA</h3>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Tout est prêt pour vendre</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Offre, avatars, messages de vente, emails et page de vente prêts à l'emploi.
+              Offres, messages de vente, emails et page de vente sont générés pour toi. Prêts à être utilisés, pas à compléter.
             </p>
           </motion.div>
 
@@ -409,9 +409,9 @@ export default function Welcome() {
               </div>
               <span className="text-6xl font-bold text-gray-200 group-hover:text-gray-300 transition-colors">04</span>
             </div>
-            <h3 className="text-gray-900 font-bold text-lg mb-3">Passe à l'action</h3>
+            <h3 className="text-gray-900 font-bold text-lg mb-3">Suis ton plan personnalisé</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Un plan d'action de 7 jours personnalisé en commençant par ton produit low-ticket.
+              Un plan d’action clair sur 7 jours, basé sur ton produit low-ticket. Une action par jour. Pas plus.
             </p>
           </motion.div>
         </div>
@@ -427,10 +427,10 @@ export default function Welcome() {
           <div className="bg-white rounded-3xl shadow-xl p-12">
             <div className="text-center">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
-                Prêt à transformer tes <span className="text-[#61f7a2]">compétences</span> en véritable activité en ligne ?
+                Tu n’as rien à perdre. Tout à construire.
               </h2>
               <p className="text-lg text-gray-600 mb-8">
-                Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA. <span className="text-gray-900 font-semibold">Commence dès maintenant !</span>
+              Tu ne t’engages pas dans un projet compliqué. Tu commences simplement par comprendre ton potentiel — le reste est guidé.
               </p>
 
               {/* Two badges */}
@@ -439,7 +439,7 @@ export default function Welcome() {
                   <span className="text-gray-700 text-sm font-medium">✓ Inscription 100% gratuite</span>
                 </div>
                 <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
-                  <span className="text-gray-700 text-sm font-medium">✓ Communauté vérifiée</span>
+                  <span className="text-gray-700 text-sm font-medium">✓ Sans expértise technique</span>
                 </div>
               </div>
 

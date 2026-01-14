@@ -176,7 +176,7 @@ export default function Welcome() {
               <Input
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="Quelle compétence voudrais-tu enseigner ?"
+                placeholder="Quel talent veux-tu transformer en revenus ?"
                 className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base h-12" />
               
               {/* Bouton Démarrer - Noir avec Glow Vert */}

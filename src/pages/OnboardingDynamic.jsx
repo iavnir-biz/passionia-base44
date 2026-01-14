@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
+import { cn } from "@/lib/utils";
 
 export default function OnboardingDynamic() {
   const navigate = useNavigate();

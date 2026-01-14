@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { 
+import {
   Sparkles,
   CheckCircle,
   ArrowRight,
@@ -135,36 +135,36 @@ export default function CTAPAYWALL() {
   const offrePremium = finalizedOffer.upsell3;
 
   const products = [
-    { 
-      label: 'Produit Principal', 
-      data: productPrincipal, 
+    {
+      label: 'Produit Principal',
+      data: productPrincipal,
       multiplier: 30,
       icon: ShoppingBag,
       iconColor: 'text-orange-500',
       bgColor: 'bg-orange-50',
       priceColor: 'text-orange-600'
     },
-    { 
-      label: 'Order Bump', 
-      data: petitExtra, 
+    {
+      label: 'Order Bump',
+      data: petitExtra,
       multiplier: 15,
       icon: Gift,
       iconColor: 'text-blue-500',
       bgColor: 'bg-blue-50',
       priceColor: 'text-blue-600'
     },
-    { 
-      label: 'Upsell', 
-      data: offreSuperieure, 
+    {
+      label: 'Upsell',
+      data: offreSuperieure,
       multiplier: 9,
       icon: TrendingUp,
       iconColor: 'text-purple-500',
       bgColor: 'bg-purple-50',
       priceColor: 'text-purple-600'
     },
-    { 
-      label: 'Premium', 
-      data: offrePremium, 
+    {
+      label: 'Premium',
+      data: offrePremium,
       multiplier: 1,
       icon: Crown,
       iconColor: 'text-amber-500',
@@ -182,7 +182,7 @@ export default function CTAPAYWALL() {
 
       <div className="flex-1 flex flex-col lg:ml-80">
         <div className="max-w-4xl mx-auto px-6 py-12">
-          
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -217,19 +217,19 @@ export default function CTAPAYWALL() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               ✅ Tu as maintenant
             </h2>
-            
+
             <div className="space-y-3 mb-6">
               {products.map((product, idx) => {
                 const ProductIcon = product.icon;
                 return (
-                  <motion.div 
+                  <motion.div
                     key={idx}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.25 + idx * 0.05 }}
-                    className="flex items-center gap-3 py-3 px-4 bg-gray-50 rounded-xl border border-gray-200"
+                    className={cn("flex items-center gap-3 py-3 px-4 rounded-xl border transition-all", product.bgColor, product.bgColor.replace('bg-', 'border-').replace('50', '200'))}
                   >
-                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0", product.bgColor)}>
+                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm")}>
                       <ProductIcon className={cn("w-5 h-5", product.iconColor)} />
                     </div>
                     <span className="text-gray-900 font-semibold flex-1">{product.data.title}</span>
@@ -353,7 +353,7 @@ export default function CTAPAYWALL() {
             {/* 🔥 P0-2: Ce qui t'attend après paiement */}
             <div className="bg-[#61f7a2]/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#61f7a2]/30">
               <p className="text-white text-lg text-center leading-relaxed">
-                <strong className="text-[#61f7a2]">Dès ton accès,</strong> tu arrives dans un dashboard où tout est déjà prêt pour toi :<br/>
+                <strong className="text-[#61f7a2]">Dès ton accès,</strong> tu arrives dans un dashboard où tout est déjà prêt pour toi :<br />
                 ✅ Offres prêtes • ✅ Messages prêts • ✅ Plan d'action personnalisé • ✅ Checklist quotidienne
               </p>
               <p className="text-[#61f7a2] text-center mt-3 font-bold">
@@ -495,7 +495,7 @@ export default function CTAPAYWALL() {
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
               Imagine dans quelques jours…
             </h2>
-            
+
             <div className="space-y-6 mb-8">
               <p className="text-gray-700 leading-relaxed text-lg">
                 Aujourd'hui, tu as :
@@ -595,7 +595,7 @@ export default function CTAPAYWALL() {
             <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
               💡 Soyons clairs
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-6">
               {/* Tu achètes */}
               <div>
@@ -680,7 +680,7 @@ export default function CTAPAYWALL() {
               <span className="text-white/90 text-lg block mb-2">Prix normal</span>
               <span className="text-white text-3xl line-through opacity-60">297€</span>
             </div>
-            
+
             <div className="mb-6">
               <span className="text-white/90 text-xl block mb-2">Offre de lancement</span>
               <span className="text-white text-7xl font-black">67€</span>
@@ -750,7 +750,7 @@ export default function CTAPAYWALL() {
             className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-200 p-6 mb-8 text-center"
           >
             <p className="text-gray-700 text-lg">
-              <strong className="text-gray-900">Après le paiement,</strong> tu accèdes immédiatement à ton dashboard.<br/>
+              <strong className="text-gray-900">Après le paiement,</strong> tu accèdes immédiatement à ton dashboard.<br />
               Tout ce que tu as créé ici t'y attend, prêt à être utilisé.
             </p>
           </motion.div>
@@ -789,15 +789,13 @@ export default function CTAPAYWALL() {
               </GlowButton>
             </div>
             <div className="flex items-center justify-center gap-4 text-gray-500 text-sm mt-4">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                  <path d="M2 12C2 6.48 6.47 2 12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.47 22 2 17.52 2 12Z" fill="#635BFF"/>
-                  <path d="M10.5 14.25C10.5 13.86 10.64 13.53 10.91 13.26C11.18 12.99 11.51 12.85 11.9 12.85C12.29 12.85 12.62 12.99 12.89 13.26C13.16 13.53 13.3 13.86 13.3 14.25C13.3 14.64 13.16 14.97 12.89 15.24C12.62 15.51 12.29 15.65 11.9 15.65C11.51 15.65 11.18 15.51 10.91 15.24C10.64 14.97 10.5 14.64 10.5 14.25ZM15.5 9.75C15.5 10.49 15.27 11.13 14.81 11.66C14.35 12.19 13.78 12.55 13.1 12.75V13.15C13.1 13.43 13 13.67 12.8 13.87C12.6 14.07 12.36 14.17 12.08 14.17H11.72C11.44 14.17 11.2 14.07 11 13.87C10.8 13.67 10.7 13.43 10.7 13.15V12.35C10.7 12.07 10.8 11.83 11 11.63C11.2 11.43 11.44 11.33 11.72 11.33C12.17 11.33 12.55 11.18 12.87 10.88C13.19 10.58 13.35 10.21 13.35 9.77C13.35 9.33 13.19 8.96 12.87 8.66C12.55 8.36 12.17 8.21 11.72 8.21C11.27 8.21 10.89 8.36 10.57 8.66C10.25 8.96 10.09 9.33 10.09 9.77V9.95C10.09 10.23 9.99 10.47 9.79 10.67C9.59 10.87 9.35 10.97 9.07 10.97H8.71C8.43 10.97 8.19 10.87 7.99 10.67C7.79 10.47 7.69 10.23 7.69 9.95V9.75C7.69 9.01 7.92 8.37 8.38 7.84C8.84 7.31 9.41 6.95 10.09 6.75C10.77 6.55 11.45 6.55 12.13 6.75C12.81 6.95 13.38 7.31 13.84 7.84C14.3 8.37 14.53 9.01 14.53 9.75H15.5Z" fill="white"/>
+              <div className="flex items-center gap-2 bg-[#635BFF]/10 px-3 py-1.5 rounded-lg border border-[#635BFF]/20">
+                <svg className="w-12 h-6" viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="#635BFF" d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a8.33 8.33 0 0 1-4.55 1.1c-4.85 0-6.83-2.5-6.83-6.35 0-4.8 2.3-7.11 5.78-7.11 3.39 0 5.24 2.33 5.24 6.3 0 .44-.04.9-.11 1.14zM55.8 11.72c.11-1.42-.82-2.12-2.34-2.12-1.9 0-2.8 1.1-2.9 2.12h5.24zm-14.85 2.12h-3.4v6.17h-4.04v-9.1c0-2.3.94-3.5 2.85-3.5 1.35 0 2.36.42 2.89.87l-1.46 3.01c-.34-.23-.74-.4-1.23-.4-.73 0-1.02.48-1.02 1.3v1.65h2.4v6.17h4.01v-6.17zm-14.7 6.17h-4.04V7.27h4.05v10.78zm-2.02-12.7c-1.35 0-2.3.92-2.3 2.15 0 1.25.96 2.15 2.3 2.15 1.35 0 2.3-.9 2.3-2.15 0-1.22-.95-2.15-2.3-2.15zm-10.42 12.7h-3.11v-1.63c-1.05 1.4-2.6 1.9-4.32 1.9-2.8 0-4.9-2.3-4.9-5.73 0-3.3 2.1-5.63 4.98-5.63 1.63 0 3.19.64 4.07 1.76v-5h4.28v14.33zm-4.04-5.59c0-1.87-1-3-2.56-3-1.6 0-2.67 1.2-2.67 3s1.08 3 2.67 3c1.55 0 2.56-1.12 2.56-3z" />
                 </svg>
-                <span>Paiement sécurisé par Stripe</span>
               </div>
               <span>•</span>
-              <span>Satisfait ou remboursé 30 jours</span>
+              <span className="text-gray-600 font-medium">Satisfait ou remboursé 30 jours</span>
             </div>
           </motion.div>
 

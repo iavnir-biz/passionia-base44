@@ -206,11 +206,7 @@ export default function OnboardingDynamic() {
       <div className="flex-1 flex flex-col lg:ml-80 h-screen relative">
         {/* Header Parcours */}
         <div className="sticky top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
-          <div className="px-6 py-4 flex items-center justify-between max-w-4xl mx-auto w-full">
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-900">Parcours de création</span>
-              <span className="text-xs text-gray-500">Noah t'accompagne pas à pas</span>
-            </div>
+          <div className="px-6 py-4 flex items-center justify-end max-w-4xl mx-auto w-full">
             <div className="flex flex-col items-end">
               <span className="text-xs font-bold text-[#61f7a2] mb-1">
                 {Math.min(session?.onboarding_history?.length || 0, 11)}/11

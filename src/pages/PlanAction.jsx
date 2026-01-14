@@ -8,8 +8,8 @@ import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import DayCard from '@/components/plan/DayCard';
 import ChatBubble from '@/components/chat/ChatBubble';
-import { 
-  Loader2, 
+import {
+  Loader2,
   Target,
   Sparkles,
   Users,
@@ -56,203 +56,224 @@ export default function PlanAction() {
   };
 
   const loadData = async () => {
-  setIsLoading(true); // On affiche le chargement
-  try {
-    // On récupère le profil
-    const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-    
-    if (profiles.length > 0) {
-      const userProfile = profiles[0];
-      setProfile(userProfile);
-      
-      // --- FIX ICI : Gestion robuste du JSON ---
-      let savedProgress = userProfile.plan_7days_progress;
+    setIsLoading(true); // On affiche le chargement
+    try {
+      // On récupère le profil
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
 
-      // Si la base renvoie une string (ex: "{...}"), on la convertit en Objet
-      if (typeof savedProgress === "string") {
-        try {
-          savedProgress = JSON.parse(savedProgress);
-        } catch (e) {
-          console.error("Erreur de parsing JSON", e);
-          savedProgress = {};
+      if (profiles.length > 0) {
+        const userProfile = profiles[0];
+        setProfile(userProfile);
+
+        // --- FIX ICI : Gestion robuste du JSON ---
+        let savedProgress = userProfile.plan_7days_progress;
+
+        // Si la base renvoie une string (ex: "{...}"), on la convertit en Objet
+        if (typeof savedProgress === "string") {
+          try {
+            savedProgress = JSON.parse(savedProgress);
+          } catch (e) {
+            console.error("Erreur de parsing JSON", e);
+            savedProgress = {};
+          }
         }
+
+        // Si c'est vide ou null, on met un objet vide
+        if (!savedProgress) savedProgress = {};
+
+        console.log("📥 Progression chargée :", savedProgress); // Pour vérifier dans la console IDX
+
+        setDayProgress(savedProgress);
+
+        // Recalcul du jour actuel basé sur la sauvegarde
+        const completedDays = Object.keys(savedProgress).filter(
+          key => savedProgress[key].completed
+        ).length;
+
+        // On force au moins le jour 1, ou le jour suivant
+        setCurrentDay(Math.min(completedDays + 1, 7));
       }
-      
-      // Si c'est vide ou null, on met un objet vide
-      if (!savedProgress) savedProgress = {};
-
-      console.log("📥 Progression chargée :", savedProgress); // Pour vérifier dans la console IDX
-
-      setDayProgress(savedProgress);
-      
-      // Recalcul du jour actuel basé sur la sauvegarde
-      const completedDays = Object.keys(savedProgress).filter(
-        key => savedProgress[key].completed
-      ).length;
-      
-      // On force au moins le jour 1, ou le jour suivant
-      setCurrentDay(Math.min(completedDays + 1, 7));
-    }
-  } catch (error) {
-    console.error('Error loading data:', error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-const handleChecklistChange = async (day, itemIndex) => {
-  // 1. SÉCURITÉ : Vérifions qu'on a bien l'ID
-  if (!profile?.id) {
-    console.error("⛔ ERREUR GRAVE : Aucun profil chargé, impossible de sauvegarder");
-    return;
-  }
-
-  console.log("💾 Tentative de sauvegarde pour le profil ID:", profile.id);
-
-  // 2. On met à jour l'état local (UI)
-  const currentList = dayProgress?.[day]?.checklist || getDayChecklist(day);
-
-  const newChecklist = currentList.map((item, idx) => 
-    idx === itemIndex ? { ...item, checked: !item.checked } : item
-  );
-
-  const newProgress = {
-    ...dayProgress,
-    [day]: {
-      ...(dayProgress[day] || {}),
-      checklist: newChecklist,
-      updatedAt: new Date().toISOString()
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  setDayProgress(newProgress);
 
-  // 3. SAUVEGARDE : On convertit l'objet en Texte (JSON.stringify)
-  try {
-    // ⚠️ LE CHANGEMENT EST ICI : JSON.stringify()
-    // On s'assure que la base reçoit une string, pas un objet JS complexe
-    const dataToSave = JSON.stringify(newProgress);
-    
-    await base44.entities.UserProfile.update(profile.id, {
-      plan_7days_progress: dataToSave
-    });
-    console.log("✅ Sauvegardé en base avec succès !");
-  } catch (error) {
-    console.error("❌ ÉCHEC de la sauvegarde Base44 :", error);
-    alert("Attention : Votre progression n'a pas pu être sauvegardée. Vérifiez votre connexion.");
-  }
-};
+  const handleChecklistChange = async (day, itemIndex) => {
+    // 1. SÉCURITÉ : Vérifions qu'on a bien l'ID
+    if (!profile?.id) {
+      console.error("⛔ ERREUR GRAVE : Aucun profil chargé, impossible de sauvegarder");
+      return;
+    }
+
+    console.log("💾 Tentative de sauvegarde pour le profil ID:", profile.id);
+
+    // 2. On met à jour l'état local (UI)
+    // ✅ FIX: Toujours utiliser getDayChecklist qui merge correctement les données sauvegardées
+    const currentList = getDayChecklist(day);
+
+    const newChecklist = currentList.map((item, idx) =>
+      idx === itemIndex ? { ...item, checked: !item.checked } : item
+    );
+
+    const newProgress = {
+      ...dayProgress,
+      [day]: {
+        ...(dayProgress[day] || {}),
+        checklist: newChecklist,
+        updatedAt: new Date().toISOString()
+      }
+    };
+
+    setDayProgress(newProgress);
+
+    // 3. SAUVEGARDE : On convertit l'objet en Texte (JSON.stringify)
+    try {
+      // ⚠️ LE CHANGEMENT EST ICI : JSON.stringify()
+      // On s'assure que la base reçoit une string, pas un objet JS complexe
+      const dataToSave = JSON.stringify(newProgress);
+
+      await base44.entities.UserProfile.update(profile.id, {
+        plan_7days_progress: dataToSave
+      });
+      console.log("✅ Sauvegardé en base avec succès !");
+    } catch (error) {
+      console.error("❌ ÉCHEC de la sauvegarde Base44 :", error);
+      alert("Attention : Votre progression n'a pas pu être sauvegardée. Vérifiez votre connexion.");
+    }
+  };
 
   const handleDayComplete = async (day) => {
-    await saveDayProgress(day, {
-      ...dayProgress[day],
-      completed: true,
-      completedAt: new Date().toISOString()
-    });
-    setCurrentDay(Math.min(day + 1, 7));
-  };
+    if (!profile?.id) {
+      console.error("⛔ ERREUR : Aucun profil chargé");
+      return;
+    }
 
-const getDayChecklist = (day) => {
-  // Default checklists
-  const defaults = {
-    1: [
-      { 
-        text: "Ajouter ma photo de profil dans Passion IA", 
-        checked: false,
-        details: "Vous retrouverez cela dans les paramètres de l'application.",
-        action: { type: "link", label: "Aller aux paramètres", page: "Settings" }
-      },
-      { 
-        text: "Rejoindre la communauté Skool", 
-        checked: false,
-        details: "Rejoignez notre communauté pour échanger avec d'autres membres et obtenir du soutien.",
-        action: { type: "external", label: "Cliquer ici pour rejoindre", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
-      },
-      { 
-        text: "Me présenter dans la communauté", 
-        checked: false,
-        details: "Présentez-vous aux autres membres : qui vous êtes, ce que vous voulez vendre, quels sont vos objectifs. N'hésitez pas à faire une vidéo dans la communauté !"
-      },
-      { 
-        text: "Générer mon analyse de marché", 
-        checked: false,
-        details: "L'analyse de marché vous aide à comprendre votre positionnement et valider la demande.",
-        action: { type: "link", label: "Cliquer ici pour générer votre analyse de marché", page: "MarketAnalysis" }
-      },
-      { 
-        text: "Générer mes avatars clients", 
-        checked: false,
-        details: "Définissez précisément qui sont vos clients idéaux pour mieux les adresser.",
-        action: { type: "link", label: "Cliquer ici pour générer vos avatars clients", page: "AvatarClients" }
-      },
-      { 
-        text: "Générer mes offres (produits & prix)", 
-        checked: false,
-        details: "Créez votre gamme d'offres avec des prix cohérents et attractifs.",
-        action: { type: "link", label: "Cliquer ici pour générer vos offres", page: "MyOffers" }
-      },
-      { 
-        text: "Générer ma page de vente", 
-        checked: false,
-        details: "Une page de vente professionnelle pour présenter votre offre de manière convaincante.",
-        action: { type: "link", label: "Cliquer ici pour générer votre page de vente", page: "SalesPage" }
-      },
-      { 
-        text: "Générer mes messages de vente", 
-        checked: false,
-        details: "Des messages prêts à l'emploi pour approcher vos prospects avec confiance.",
-        action: { type: "link", label: "Cliquer ici pour générer vos messages de vente", page: "SalesMessages" }
-      },
-      { 
-        text: "Générer mes emails marketing", 
-        checked: false,
-        details: "Une séquence d'emails automatiques pour nurture vos prospects.",
-        action: { type: "link", label: "Cliquer ici pour générer vos emails marketing", page: "EmailsMarketing" }
+    const newProgress = {
+      ...dayProgress,
+      [day]: {
+        ...(dayProgress[day] || {}),
+        completed: true,
+        completedAt: new Date().toISOString()
       }
-    ],
-    2: [
-      { text: "Identifier où se trouve mon avatar (réseaux / groupes)", checked: false },
-      { text: "Envoyer 10 messages de diagnostic", checked: false },
-      { text: "Poser des questions, écouter, comprendre", checked: false }
-    ],
-    3: [
-      { text: "Identifier les conversations avec une vraie douleur", checked: false },
-      { text: "Proposer le petit produit comme une aide / un test", checked: false },
-      { text: "Répondre calmement aux objections simples", checked: false },
-      { text: "Obtenir au moins un \"oui\" ou un intérêt clair", checked: false }
-    ],
-    4: [
-      { text: "Créer le produit (PDF simple ou vidéo Loom)", checked: false },
-      { text: "Livrer au client", checked: false },
-      { text: "Envoyer un message de suivi bienveillant", checked: false }
-    ],
-    5: [
-      { text: "Demander un feedback honnête", checked: false },
-      { text: "Comprendre ce qui a le plus aidé", checked: false },
-      { text: "Identifier les besoins suivants", checked: false }
-    ],
-    6: [
-      { text: "Contacter 30 nouvelles personnes", checked: false },
-      { text: "Utiliser les messages améliorés", checked: false },
-      { text: "Demander un témoignage aux premiers clients", checked: false }
-    ],
-    7: [
-      { text: "Finaliser la page de vente", checked: false },
-      { text: "Activer les emails automatiques", checked: false },
-      { text: "Identifier une suite possible (order bump / accompagnement)", checked: false }
-    ]
+    };
+
+    setDayProgress(newProgress);
+    setCurrentDay(Math.min(day + 1, 7));
+
+    // Sauvegarder en base
+    try {
+      await base44.entities.UserProfile.update(profile.id, {
+        plan_7days_progress: JSON.stringify(newProgress)
+      });
+      console.log("✅ Jour complété et sauvegardé !");
+    } catch (error) {
+      console.error("❌ Erreur lors de la sauvegarde de la complétion du jour:", error);
+    }
   };
 
-  const base = defaults[day] || [];
-  const saved = dayProgress?.[day]?.checklist || [];
+  const getDayChecklist = (day) => {
+    // Default checklists
+    const defaults = {
+      1: [
+        {
+          text: "Ajouter ma photo de profil dans Passion IA",
+          checked: false,
+          details: "Vous retrouverez cela dans les paramètres de l'application.",
+          action: { type: "link", label: "Aller aux paramètres", page: "Settings" }
+        },
+        {
+          text: "Rejoindre la communauté Skool",
+          checked: false,
+          details: "Rejoignez notre communauté pour échanger avec d'autres membres et obtenir du soutien.",
+          action: { type: "external", label: "Cliquer ici pour rejoindre", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
+        },
+        {
+          text: "Me présenter dans la communauté",
+          checked: false,
+          details: "Présentez-vous aux autres membres : qui vous êtes, ce que vous voulez vendre, quels sont vos objectifs. N'hésitez pas à faire une vidéo dans la communauté !"
+        },
+        {
+          text: "Générer mon analyse de marché",
+          checked: false,
+          details: "L'analyse de marché vous aide à comprendre votre positionnement et valider la demande.",
+          action: { type: "link", label: "Cliquer ici pour générer votre analyse de marché", page: "MarketAnalysis" }
+        },
+        {
+          text: "Générer mes avatars clients",
+          checked: false,
+          details: "Définissez précisément qui sont vos clients idéaux pour mieux les adresser.",
+          action: { type: "link", label: "Cliquer ici pour générer vos avatars clients", page: "AvatarClients" }
+        },
+        {
+          text: "Générer mes offres (produits & prix)",
+          checked: false,
+          details: "Créez votre gamme d'offres avec des prix cohérents et attractifs.",
+          action: { type: "link", label: "Cliquer ici pour générer vos offres", page: "MyOffers" }
+        },
+        {
+          text: "Générer ma page de vente",
+          checked: false,
+          details: "Une page de vente professionnelle pour présenter votre offre de manière convaincante.",
+          action: { type: "link", label: "Cliquer ici pour générer votre page de vente", page: "SalesPage" }
+        },
+        {
+          text: "Générer mes messages de vente",
+          checked: false,
+          details: "Des messages prêts à l'emploi pour approcher vos prospects avec confiance.",
+          action: { type: "link", label: "Cliquer ici pour générer vos messages de vente", page: "SalesMessages" }
+        },
+        {
+          text: "Générer mes emails marketing",
+          checked: false,
+          details: "Une séquence d'emails automatiques pour nurture vos prospects.",
+          action: { type: "link", label: "Cliquer ici pour générer vos emails marketing", page: "EmailsMarketing" }
+        }
+      ],
+      2: [
+        { text: "Identifier où se trouve mon avatar (réseaux / groupes)", checked: false },
+        { text: "Envoyer 10 messages de diagnostic", checked: false },
+        { text: "Poser des questions, écouter, comprendre", checked: false }
+      ],
+      3: [
+        { text: "Identifier les conversations avec une vraie douleur", checked: false },
+        { text: "Proposer le petit produit comme une aide / un test", checked: false },
+        { text: "Répondre calmement aux objections simples", checked: false },
+        { text: "Obtenir au moins un \"oui\" ou un intérêt clair", checked: false }
+      ],
+      4: [
+        { text: "Créer le produit (PDF simple ou vidéo Loom)", checked: false },
+        { text: "Livrer au client", checked: false },
+        { text: "Envoyer un message de suivi bienveillant", checked: false }
+      ],
+      5: [
+        { text: "Demander un feedback honnête", checked: false },
+        { text: "Comprendre ce qui a le plus aidé", checked: false },
+        { text: "Identifier les besoins suivants", checked: false }
+      ],
+      6: [
+        { text: "Contacter 30 nouvelles personnes", checked: false },
+        { text: "Utiliser les messages améliorés", checked: false },
+        { text: "Demander un témoignage aux premiers clients", checked: false }
+      ],
+      7: [
+        { text: "Finaliser la page de vente", checked: false },
+        { text: "Activer les emails automatiques", checked: false },
+        { text: "Identifier une suite possible (order bump / accompagnement)", checked: false }
+      ]
+    };
 
-  // Merge par index : on garde le texte/details/action du default,
-  // et on applique le checked sauvegardé si présent
-  return base.map((item, idx) => ({
-    ...item,
-    checked: typeof saved?.[idx]?.checked === "boolean" ? saved[idx].checked : (item.checked ?? false),
-  }));
-};
+    const base = defaults[day] || [];
+    const saved = dayProgress?.[day]?.checklist || [];
+
+    // Merge par index : on garde le texte/details/action du default,
+    // et on applique le checked sauvegardé si présent
+    return base.map((item, idx) => ({
+      ...item,
+      checked: typeof saved?.[idx]?.checked === "boolean" ? saved[idx].checked : (item.checked ?? false),
+    }));
+  };
 
   const days = [
     {
@@ -323,22 +344,22 @@ const getDayChecklist = (day) => {
   ];
 
   const calculateProgress = () => {
-  // total tâches = somme des tâches de tous les jours
-  const totalTasks = [1, 2, 3, 4, 5, 6, 7].reduce(
-    (acc, day) => acc + getDayChecklist(day).length,
-    0
-  );
+    // total tâches = somme des tâches de tous les jours
+    const totalTasks = [1, 2, 3, 4, 5, 6, 7].reduce(
+      (acc, day) => acc + getDayChecklist(day).length,
+      0
+    );
 
-  if (totalTasks === 0) return 0;
+    if (totalTasks === 0) return 0;
 
-  // tâches cochées = somme des checked true
-  const checkedTasks = [1, 2, 3, 4, 5, 6, 7].reduce((acc, day) => {
-    const list = getDayChecklist(day);
-    return acc + list.filter((i) => i.checked).length;
-  }, 0);
+    // tâches cochées = somme des checked true
+    const checkedTasks = [1, 2, 3, 4, 5, 6, 7].reduce((acc, day) => {
+      const list = getDayChecklist(day);
+      return acc + list.filter((i) => i.checked).length;
+    }, 0);
 
-  return Math.round((checkedTasks / totalTasks) * 100);
-};
+    return Math.round((checkedTasks / totalTasks) * 100);
+  };
 
   if (authLoading || isLoading) {
     return (
@@ -361,10 +382,10 @@ const getDayChecklist = (day) => {
   return (
     <div className="flex h-screen bg-white">
       <Sidebar currentPage="PlanAction" progress={progress} user={user} />
-      
+
       <div className="flex-1 ml-72 overflow-y-auto">
         <TopBar user={user} />
-        
+
         <div className="max-w-5xl mx-auto px-6 py-12">
           {/* Header */}
           <motion.div
@@ -378,15 +399,15 @@ const getDayChecklist = (day) => {
                 Jour {currentDay} / 7
               </span>
             </div>
-            
+
             <h1 className="text-5xl font-bold text-gray-900 mb-4">
               Plan d'action
             </h1>
-            
+
             <h2 className="text-3xl font-bold text-gray-900 mb-3">
               Ta première vente en 7 jours
             </h2>
-            
+
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Une action par jour. Pas plus. Pas moins.
             </p>

@@ -100,15 +100,18 @@ export default function Welcome() {
           <Sparkles className="w-6 h-6 text-white" />
         </div>
         <div className="flex items-center gap-3">
+          {/* Bouton Connexion - Blanc */}
           <Button
             onClick={handleLogin}
             variant="outline"
-            className="bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-900 px-8 py-2 rounded-full font-medium">
+            className="bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-900 px-8 py-2 rounded-full font-medium transition-all duration-300 ease-out">
             Connexion
           </Button>
+          
+          {/* Bouton Démarrer - Noir avec Glow Vert */}
           <Button
             onClick={handleStart}
-            className="bg-gray-900 hover:bg-gray-800 text-white border-2 border-gray-900 px-8 py-2 rounded-full font-medium shadow-sm">
+            className="bg-gradient-to-br from-[#1a1a1a] to-black text-white border border-transparent px-8 py-2 rounded-full font-medium transition-all duration-300 ease-out hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] hover:border-[#61f7a2]/30 hover:-translate-y-0.5">
             Démarrer gratuitement
           </Button>
         </div>
@@ -127,7 +130,7 @@ export default function Welcome() {
             <span className="text-gray-700 text-sm font-medium">Propulsé par l'Intelligence Artificielle</span>
           </motion.div>
 
-          {/* Title - ANIMATION MODIFIÉE ICI */}
+          {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -175,16 +178,18 @@ export default function Welcome() {
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Quelle compétence voudrais-tu enseigner ?"
                 className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base h-12" />
+              
+              {/* Bouton Démarrer - Noir avec Glow Vert */}
               <Button
                 onClick={handleStart}
-                className="bg-gray-900 hover:bg-gray-800 text-white border-2 border-gray-900 px-6 h-12 rounded-full font-semibold shadow-md transition-all">
+                className="bg-gradient-to-br from-[#1a1a1a] to-black text-white border border-transparent px-6 h-12 rounded-full font-semibold transition-all duration-300 ease-out hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] hover:border-[#61f7a2]/30 hover:-translate-y-0.5">
                 Démarrer
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </motion.div>
 
-          {/* Category Tags */}
+          {/* Category Tags - SANS GLOW */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -202,7 +207,7 @@ export default function Welcome() {
           </motion.div>
         </div>
 
-        {/* Floating Cards around Hero - Smaller */}
+        {/* Floating Cards around Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{
@@ -330,7 +335,6 @@ export default function Welcome() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.4 }}
         className="w-full max-w-6xl mx-auto px-6 py-20">
-        {/* Title */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             4 étapes pour <span className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] bg-clip-text text-transparent">démarrer</span>
@@ -338,7 +342,6 @@ export default function Welcome() {
           <p className="text-gray-500 text-sm">Pour vendre ton premier produit low-ticket</p>
         </div>
 
-        {/* Steps Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Step 01 */}
           <motion.div
@@ -440,11 +443,11 @@ export default function Welcome() {
                 </div>
               </div>
 
-              {/* Main CTA Button */}
+              {/* CTA Button - Vert avec Glow Intense */}
               <div className="flex justify-center mb-4">
                 <Button
                   onClick={handleStart}
-                  className="bg-gray-900 hover:bg-gray-800 text-white border-2 border-gray-900 px-10 py-6 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all">
+                  className="bg-gradient-to-br from-[#61f7a2] to-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-full transition-all duration-300 ease-out hover:shadow-[0_0_25px_rgba(97,247,162,0.6)] hover:brightness-110 hover:-translate-y-0.5">
                   <Sparkles className="w-5 h-5 mr-2" />
                   Commencer gratuitement
                 </Button>
@@ -454,11 +457,10 @@ export default function Welcome() {
         </div>
       </motion.div>
 
-      {/* Footer - Institutional & Legal */}
+      {/* Footer */}
       <footer className="w-full border-t border-gray-200 bg-gray-50/50 py-8">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-row justify-between items-center gap-6 overflow-x-auto">
-            {/* Left - Brand & Technology */}
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
@@ -469,7 +471,6 @@ export default function Welcome() {
               </div>
             </div>
 
-            {/* Right - Legal Links */}
             <div className="flex items-center justify-center gap-4 text-xs text-gray-600 whitespace-nowrap overflow-x-auto">
               <a href="#" className="hover:text-gray-900 transition-colors">Réglementation AI Act</a>
               <span className="text-gray-300">•</span>

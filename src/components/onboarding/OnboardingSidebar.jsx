@@ -68,7 +68,7 @@ const ONBOARDING_STEPS = [
     id: 8,
     title: 'Bienvenue',
     icon: PartyPopper,
-    pages: ['Dashboard'],
+    pages: ['CTAPAYWALL', 'Dashboard'],
     color: 'from-[#61f7a2] to-[#4de88f]'
   }
 ];

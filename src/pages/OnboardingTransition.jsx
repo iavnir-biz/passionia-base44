@@ -224,7 +224,7 @@ export default function OnboardingTransition() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-2xl font-bold text-gray-900 mb-3 text-center leading-tight"
+            className="text-lg font-bold text-gray-900 mb-3 text-center leading-tight"
           >
             Merci pour toutes ces réponses, {user?.firstName} !<br />
             {transitionMessage}

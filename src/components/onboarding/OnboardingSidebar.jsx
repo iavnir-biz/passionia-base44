@@ -186,126 +186,129 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   )}
                 >
                   {/* Icon */}
-                  isCompleted
-                  ? "bg-gray-100"
-                  : isActive ? `bg-gradient-to-br ${step.color}` : "bg-gray-100"
-                  {isCompleted ? (
-                    <>
-                      <Icon className="w-5 h-5 text-gray-500" />
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all relative",
+                    isCompleted ? "bg-gray-100" : isActive ? `bg-gradient-to-br ${step.color}` : "bg-gray-100"
+                  )}>
+                    {isCompleted ? (
+                      <>
+                        <Icon className="w-5 h-5 text-gray-500" />
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-[#61f7a2] rounded-full flex items-center justify-center border-2 border-white shadow-sm z-10"
+                        >
+                          <CheckCircle2 className="w-3 h-3 text-white" />
+                        </motion.div>
+                      </>
+                    ) : (
+                      <Icon className={cn("w-5 h-5 text-white")} />
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1">
+                    <p className={cn(
+                      "text-sm font-semibold transition-colors",
+                      isActive ? "text-white" : "text-gray-500",
+                      isCompleted && "line-through text-gray-400 decoration-gray-300"
+                    )}>
+                      {step.title}
+                    </p>
+                  </div>
+
+                  {/* Active indicator */}
+                  {
+                    isActive && (
                       <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 w-5 h-5 bg-[#61f7a2] rounded-full flex items-center justify-center border-2 border-white shadow-sm z-10"
-                      >
-                        <CheckCircle2 className="w-3 h-3 text-white" />
-                      </motion.div>
-                    </>
-                  ) : (
-                    <Icon className={cn("w-5 h-5 text-white")} />
-                  )}
-              </div>
-
-                  {/* Content */ }
-            <div className="flex-1">
-              <p className={cn(
-                "text-sm font-semibold transition-colors",
-                isActive ? "text-white" : "text-gray-500",
-                isCompleted && "line-through text-gray-400 decoration-gray-300"
-              )}>
-                {step.title}
-              </p>
-            </div>
-
-            {/* Active indicator */ }
-            {
-              isActive && (
-                <motion.div
-                  layoutId="activeIndicator"
-                  className="absolute right-3 w-2 h-2 rounded-full bg-[#61f7a2]"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              )
-            }
+                        layoutId="activeIndicator"
+                        className="absolute right-3 w-2 h-2 rounded-full bg-[#61f7a2]"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )
+                  }
                 </motion.div>
-      </div>
-      );
-          })}
-    </nav >
-      </aside >
-
-    {/* Mobile - Top bar improved */ }
-    < div className = "lg:hidden fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-gray-200 z-50 transition-all" >
-      <div className="px-4 py-3">
-        {/* Header Compact */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-gray-900">PASSION IA</h1>
-              <p className="text-[10px] text-gray-500 font-medium">Étape {activeStepId}/8</p>
-            </div>
-          </div>
-
-          {/* Mini Progress Bar Global */}
-          <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-[#61f7a2]"
-              initial={{ width: 0 }}
-              animate={{ width: `${(activeStepId / 8) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Horizontal Scrollable Steps - Auto Centering */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory"
-        >
-          {ONBOARDING_STEPS.map((step) => {
-            const Icon = step.icon;
-            const state = getStepState(step.id);
-            const isActive = state === 'active';
-            const isCompleted = state === 'completed';
-            const isFuture = state === 'future';
-
-            return (
-              <div
-                key={step.id}
-                data-step-id={step.id}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-xl flex-shrink-0 transition-all snap-center border",
-                  isActive
-                    ? "bg-gray-900 border-gray-900 shadow-md transform scale-105"
-                    : "bg-white border-gray-100",
-                  isCompleted && "opacity-50 border-transparent bg-gray-50",
-                  isFuture && "opacity-30 border-transparent"
-                )}
-              >
-                <div className={cn(
-                  "w-6 h-6 rounded-lg flex items-center justify-center relative",
-                  isCompleted
-                    ? "bg-gray-200"
-                    : isActive ? `bg-gradient-to-br ${step.color}` : "bg-gray-100"
-                )}>
-                  {isCompleted ? (
-                    <CheckCircle2 className="w-4 h-4 text-gray-500" />
-                  ) : (
-                    <Icon className={cn("w-3 h-3", isActive ? "text-white" : "text-gray-400")} />
-                  )}
-                </div>
-                <span className={cn(
-                  "text-xs font-bold whitespace-nowrap",
-                  isActive ? "text-white" : "text-gray-500",
-                  isCompleted && "line-through font-normal"
-                )}>
-                  {step.title}
-                </span>
               </div>
             );
           })}
+        </nav >
+      </aside >
+
+      {/* Mobile - Top bar improved */}
+      < div className="lg:hidden fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-gray-200 z-50 transition-all" >
+        <div className="px-4 py-3">
+          {/* Header Compact */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h1 className="text-sm font-bold text-gray-900">PASSION IA</h1>
+                <p className="text-[10px] text-gray-500 font-medium">Étape {activeStepId}/8</p>
+              </div>
+            </div>
+
+            {/* Mini Progress Bar Global */}
+            <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-[#61f7a2]"
+                initial={{ width: 0 }}
+                animate={{ width: `${(activeStepId / 8) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Horizontal Scrollable Steps - Auto Centering */}
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory"
+          >
+            {ONBOARDING_STEPS.map((step) => {
+              const Icon = step.icon;
+              const state = getStepState(step.id);
+              const isActive = state === 'active';
+              const isCompleted = state === 'completed';
+              const isFuture = state === 'future';
+
+              return (
+                <div
+                  key={step.id}
+                  data-step-id={step.id}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-xl flex-shrink-0 transition-all snap-center border",
+                    isActive
+                      ? "bg-gray-900 border-gray-900 shadow-md transform scale-105"
+                      : "bg-white border-gray-100",
+                    isCompleted && "opacity-50 border-transparent bg-gray-50",
+                    isFuture && "opacity-30 border-transparent"
+                  )}
+                >
+                  <div className={cn(
+                    "w-6 h-6 rounded-lg flex items-center justify-center relative",
+                    isCompleted
+                      ? "bg-gray-200"
+                      : isActive ? `bg-gradient-to-br ${step.color}` : "bg-gray-100"
+                  )}>
+                    {isCompleted ? (
+                      <CheckCircle2 className="w-4 h-4 text-gray-500" />
+                    ) : (
+                      <Icon className={cn("w-3 h-3", isActive ? "text-white" : "text-gray-400")} />
+                    )}
+                  </div>
+                  <span className={cn(
+                    "text-xs font-bold whitespace-nowrap",
+                    isActive ? "text-white" : "text-gray-500",
+                    isCompleted && "line-through font-normal"
+                  )}>
+                    {step.title}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
       </div >
     </>
+  );
+}

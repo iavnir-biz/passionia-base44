@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Bell, User, Search, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Bell, User, Search, Settings, LogOut, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function TopBar({ user }) {
+export default function TopBar({ user, onMenuClick }) {
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [profile, setProfile] = useState(null);
@@ -28,7 +28,7 @@ export default function TopBar({ user }) {
   };
 
   const displayName = profile?.first_name || user?.firstName || user?.full_name?.split(' ')[0] || 'Créateur';
-  const fullDisplayName = profile?.first_name && profile?.last_name 
+  const fullDisplayName = profile?.first_name && profile?.last_name
     ? `${profile.first_name} ${profile.last_name}`
     : user?.full_name || displayName;
   const avatarUrl = profile?.avatar_url || user?.profile_picture;
@@ -36,8 +36,15 @@ export default function TopBar({ user }) {
   return (
     <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-40">
       {/* Search Bar */}
-      <div className="flex-1 max-w-xl">
-        <div className="relative">
+      <div className="flex-1 max-w-xl flex items-center gap-4">
+        <button
+          onClick={onMenuClick}
+          className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100 lg:hidden"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
@@ -46,7 +53,7 @@ export default function TopBar({ user }) {
           />
         </div>
       </div>
-      
+
       {/* Right Section */}
       <div className="flex items-center gap-3 ml-6">
         {/* Notifications */}
@@ -54,13 +61,13 @@ export default function TopBar({ user }) {
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-[#61f7a2] rounded-full" />
         </button>
-        
+
         {/* User Avatar with Dropdown */}
         <div className="relative">
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-50 transition-colors"
-            >
+          >
             {avatarUrl ? (
               <img
                 src={avatarUrl}

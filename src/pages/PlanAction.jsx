@@ -29,6 +29,7 @@ export default function PlanAction() {
   const [currentDay, setCurrentDay] = useState(1);
   const [dayProgress, setDayProgress] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user && user.email) {
@@ -365,7 +366,7 @@ export default function PlanAction() {
     return (
       <div className="flex h-screen bg-white">
         <Sidebar currentPage="PlanAction" progress={0} user={user} />
-        <div className="flex-1 ml-72">
+        <div className="flex-1 ml-0 lg:ml-72">
           <TopBar user={user} />
           <div className="flex items-center justify-center h-[calc(100vh-5rem)]">
             <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
@@ -381,10 +382,19 @@ export default function PlanAction() {
 
   return (
     <div className="flex h-screen bg-white">
-      <Sidebar currentPage="PlanAction" progress={progress} user={user} />
+      <Sidebar
+        currentPage="PlanAction"
+        progress={progress}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
-      <div className="flex-1 ml-72 overflow-y-auto">
-        <TopBar user={user} />
+      <div className="flex-1 ml-0 lg:ml-72 overflow-y-auto">
+        <TopBar
+          user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
+        />
 
         <div className="max-w-5xl mx-auto px-6 py-12">
           {/* Header */}

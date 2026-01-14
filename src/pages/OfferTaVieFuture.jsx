@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { 
-  Loader2, 
+import {
+  Loader2,
   TrendingUp,
   ArrowRight,
   ChevronDown,
@@ -105,13 +105,13 @@ export default function OfferTaVieFuture() {
 
   const generateFutureVision = async () => {
     if (!session?.id) return;
-    
+
     setIsGenerating(true);
     try {
       const { data } = await base44.functions.invoke('generateFutureVision', {
         sessionId: session.id
       });
-      
+
       if (data.success) {
         setFutureVision({
           narrativeText: data.narrativeText
@@ -160,28 +160,28 @@ export default function OfferTaVieFuture() {
     price: parsePrice(p.data?.price),
     total: parsePrice(p.data?.price) * p.multiplier
   }));
-  
+
   // 🔥 P0-5: Clé correcte targetIncome
   const revenueGoal = parseInt(session?.onboarding_full?.targetIncome) || 500;
-  
+
   // Calculate the multiplier to reach the goal from potential_revenue
   const multiplier = potentialRevenue > 0 ? revenueGoal / potentialRevenue : 1;
-  
+
   // Apply the multiplier to each product's sales count to maintain proportions
   const salesNeeded = revenues.map(r => {
     if (r.price === 0) return { ...r, salesNeeded: 0, projectedRevenue: 0 };
-    
+
     // Scale up the current multiplier by the goal ratio
     const targetSales = Math.ceil(r.multiplier * multiplier);
     const projectedRevenue = targetSales * r.price;
-    
-    return { 
-      ...r, 
+
+    return {
+      ...r,
       salesNeeded: targetSales,
-      projectedRevenue 
+      projectedRevenue
     };
   });
-  
+
   // Calculate total projected revenue to verify
   const totalProjected = salesNeeded.reduce((sum, item) => sum + item.projectedRevenue, 0);
 
@@ -193,248 +193,248 @@ export default function OfferTaVieFuture() {
 
       {/* Content */}
       <div className="flex-1 flex flex-col lg:ml-80">
-        <div className="py-12">
-        <div className="max-w-3xl mx-auto px-4">
-          {/* Title */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">
-              ✨ Voici ce que ta vie future te réserve…
-            </h1>
-          </motion.div>
-
-          {/* Top CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="flex justify-center mb-8"
-          >
-            <GlowButton onClick={handleContinue} size="lg" className="px-10">
-              Voir le Plan de mise en place CONCRÈTE
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
-          </motion.div>
-
-          {/* Narrative Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6"
-          >
-            <div className="flex items-start gap-4 mb-6">
-              <motion.div 
-                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-lg"
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Sparkles className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">
-                  Ta vision personnalisée
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  Une projection inspirante basée sur ton parcours
-                </p>
-              </div>
-            </div>
-            
-            {isGenerating ? (
-              <div className="flex items-center gap-3 py-8">
-                <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                <span className="text-gray-600">Génération de ta vision en cours...</span>
-              </div>
-            ) : (
-              <div className="space-y-5">
-                {futureVision?.narrativeText.split('\n\n').map((paragraph, idx) => (
-                  <motion.p 
-                    key={idx} 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="text-gray-700 leading-relaxed text-base"
-                  >
-                    {paragraph}
-                  </motion.p>
-                ))}
-              </div>
-            )}
-          </motion.div>
-
-          {/* Revenue Calculation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-[#1b1b33] rounded-3xl border border-[#2a2a45] p-8 mb-6 shadow-lg"
-          >
-            <div className="flex items-center gap-4 mb-6">
-              <motion.div 
-                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <TrendingUp className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <h2 className="text-xl font-bold text-white">
-                  Ton Potentiel de Revenus Mensuels
-                </h2>
-                <p className="text-gray-400 text-sm">
-                  Basé sur les produits sélectionnés et une hypothèse d'une vente par jour
-                </p>
-              </div>
-            </div>
-
-            {/* Big Number */}
-            <motion.div 
-              className="text-center py-8"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4 }}
+        <div className="pt-40 pb-12 lg:py-12">
+          <div className="max-w-3xl mx-auto px-4">
+            {/* Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-8"
             >
-              <span className="text-5xl md:text-7xl font-bold text-[#61f7a2]">
-                {potentialRevenue.toLocaleString('fr-FR')} €
-              </span>
-              <p className="text-gray-400 mt-3 text-lg font-medium">par mois</p>
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                ✨ Voici ce que ta vie future te réserve…
+              </h1>
             </motion.div>
 
-            {/* Toggle Detail */}
-            <button
-              onClick={() => setShowDetail(!showDetail)}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[#61f7a2] hover:bg-[#2a2a45] transition-all font-medium"
+            {/* Top CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex justify-center mb-8"
             >
-              {showDetail ? (
-                <>
-                  Cacher le détail <ChevronUp className="w-4 h-4" />
-                </>
-              ) : (
-                <>
-                  Voir le détail <ChevronDown className="w-4 h-4" />
-                </>
-              )}
-            </button>
+              <GlowButton onClick={handleContinue} size="lg" className="px-10">
+                Voir le Plan de mise en place CONCRÈTE
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </GlowButton>
+            </motion.div>
 
-            {/* Detail Breakdown */}
-            {showDetail && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="border-t border-[#2a2a45] pt-4 mt-2 space-y-3"
-              >
-                {revenues.map((rev) => (
-                  <div 
-                    key={rev.key}
-                    className="flex items-center justify-between py-3 px-4 bg-[#11112b] rounded-2xl border border-[#2a2a45]"
-                  >
-                    <div>
-                      <span className="text-white text-sm font-semibold">{rev.label}</span>
-                      <p className="text-gray-400 text-xs">×{rev.multiplier} ventes/mois</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[#61f7a2] font-bold">{rev.total.toLocaleString('fr-FR')} €</span>
-                      <p className="text-gray-400 text-xs">{rev.price} € × {rev.multiplier}</p>
-                    </div>
-                  </div>
-                ))}
-                
-                <div className="flex items-center justify-between py-4 px-4 bg-[#2a2a45] rounded-2xl border-2 border-[#61f7a2]/30">
-                  <span className="text-white font-bold">Total Mensuel</span>
-                  <span className="text-[#61f7a2] font-bold text-xl">
-                    {potentialRevenue.toLocaleString('fr-FR')} €
-                  </span>
-                </div>
-              </motion.div>
-            )}
-          </motion.div>
-
-          {/* Roadmap to Goal */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-gradient-to-br from-yellow-50 to-white rounded-3xl border-2 border-yellow-300/50 p-8 mb-8 shadow-lg"
-          >
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg">
-                <Target className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">
-                  Ton Plan de Route pour Atteindre ton Objectif
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  Scénario indicatif pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
-                  {totalProjected > 0 && (
-                    <span className="block mt-1 text-[#61f7a2] font-semibold">
-                      → Projection totale : {totalProjected.toLocaleString('fr-FR')}€/mois
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {salesNeeded.map((item, idx) => (
-                <motion.div 
-                  key={item.key}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + idx * 0.1 }}
-                  className="flex items-center justify-between py-4 px-5 bg-white rounded-2xl border border-gray-200 shadow-sm"
+            {/* Narrative Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6"
+            >
+              <div className="flex items-start gap-4 mb-6">
+                <motion.div
+                  className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-lg"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <div>
-                    <span className="text-gray-900 text-sm font-semibold">{item.label}</span>
-                    <p className="text-gray-500 text-xs">{item.price} € par vente</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-500" />
-                    <span className="text-yellow-600 font-bold text-lg">
-                      {item.salesNeeded} ventes
+                  <Sparkles className="w-6 h-6 text-white" />
+                </motion.div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-1">
+                    Ta vision personnalisée
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    Une projection inspirante basée sur ton parcours
+                  </p>
+                </div>
+              </div>
+
+              {isGenerating ? (
+                <div className="flex items-center gap-3 py-8">
+                  <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
+                  <span className="text-gray-600">Génération de ta vision en cours...</span>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  {futureVision?.narrativeText.split('\n\n').map((paragraph, idx) => (
+                    <motion.p
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="text-gray-700 leading-relaxed text-base"
+                    >
+                      {paragraph}
+                    </motion.p>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+
+            {/* Revenue Calculation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-[#1b1b33] rounded-3xl border border-[#2a2a45] p-8 mb-6 shadow-lg"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <motion.div
+                  className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </motion.div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Ton Potentiel de Revenus Mensuels
+                  </h2>
+                  <p className="text-gray-400 text-sm">
+                    Basé sur les produits sélectionnés et une hypothèse d'une vente par jour
+                  </p>
+                </div>
+              </div>
+
+              {/* Big Number */}
+              <motion.div
+                className="text-center py-8"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                <span className="text-5xl md:text-7xl font-bold text-[#61f7a2]">
+                  {potentialRevenue.toLocaleString('fr-FR')} €
+                </span>
+                <p className="text-gray-400 mt-3 text-lg font-medium">par mois</p>
+              </motion.div>
+
+              {/* Toggle Detail */}
+              <button
+                onClick={() => setShowDetail(!showDetail)}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-[#61f7a2] hover:bg-[#2a2a45] transition-all font-medium"
+              >
+                {showDetail ? (
+                  <>
+                    Cacher le détail <ChevronUp className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    Voir le détail <ChevronDown className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              {/* Detail Breakdown */}
+              {showDetail && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="border-t border-[#2a2a45] pt-4 mt-2 space-y-3"
+                >
+                  {revenues.map((rev) => (
+                    <div
+                      key={rev.key}
+                      className="flex items-center justify-between py-3 px-4 bg-[#11112b] rounded-2xl border border-[#2a2a45]"
+                    >
+                      <div>
+                        <span className="text-white text-sm font-semibold">{rev.label}</span>
+                        <p className="text-gray-400 text-xs">×{rev.multiplier} ventes/mois</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[#61f7a2] font-bold">{rev.total.toLocaleString('fr-FR')} €</span>
+                        <p className="text-gray-400 text-xs">{rev.price} € × {rev.multiplier}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="flex items-center justify-between py-4 px-4 bg-[#2a2a45] rounded-2xl border-2 border-[#61f7a2]/30">
+                    <span className="text-white font-bold">Total Mensuel</span>
+                    <span className="text-[#61f7a2] font-bold text-xl">
+                      {potentialRevenue.toLocaleString('fr-FR')} €
                     </span>
                   </div>
                 </motion.div>
-              ))}
-            </div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="mt-6 p-5 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border border-yellow-200"
-            >
-              <p className="text-gray-700 text-sm text-center leading-relaxed">
-                💡 <strong className="text-gray-900">Astuce :</strong> Commence par te concentrer sur ton Produit Principal pour valider le marché, puis ajoute progressivement les autres offres. Ces volumes sont indicatifs et s'ajustent avec ton expérience.
-              </p>
+              )}
             </motion.div>
-          </motion.div>
 
-          {/* Bottom CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex justify-center"
-          >
-            <GlowButton onClick={handleContinue} size="lg" className="px-12">
-              Voir le Plan de mise en place CONCRÈTE
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
-          </motion.div>
-        </div>
+            {/* Roadmap to Goal */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-gradient-to-br from-yellow-50 to-white rounded-3xl border-2 border-yellow-300/50 p-8 mb-8 shadow-lg"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Ton Plan de Route pour Atteindre ton Objectif
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    Scénario indicatif pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
+                    {totalProjected > 0 && (
+                      <span className="block mt-1 text-[#61f7a2] font-semibold">
+                        → Projection totale : {totalProjected.toLocaleString('fr-FR')}€/mois
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {salesNeeded.map((item, idx) => (
+                  <motion.div
+                    key={item.key}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 + idx * 0.1 }}
+                    className="flex items-center justify-between py-4 px-5 bg-white rounded-2xl border border-gray-200 shadow-sm"
+                  >
+                    <div>
+                      <span className="text-gray-900 text-sm font-semibold">{item.label}</span>
+                      <p className="text-gray-500 text-xs">{item.price} € par vente</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-yellow-500" />
+                      <span className="text-yellow-600 font-bold text-lg">
+                        {item.salesNeeded} ventes
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 }}
+                className="mt-6 p-5 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border border-yellow-200"
+              >
+                <p className="text-gray-700 text-sm text-center leading-relaxed">
+                  💡 <strong className="text-gray-900">Astuce :</strong> Commence par te concentrer sur ton Produit Principal pour valider le marché, puis ajoute progressivement les autres offres. Ces volumes sont indicatifs et s'ajustent avec ton expérience.
+                </p>
+              </motion.div>
+            </motion.div>
+
+            {/* Bottom CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex justify-center"
+            >
+              <GlowButton onClick={handleContinue} size="lg" className="px-12">
+                Voir le Plan de mise en place CONCRÈTE
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </GlowButton>
+            </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Transition Animation */}
       {showTransition && (
-        <OfferTransition 
-          message="Nova prépare ton plan de route..." 
-          onComplete={handleTransitionComplete} 
+        <OfferTransition
+          message="Noah prépare ton plan de route..."
+          onComplete={handleTransitionComplete}
         />
       )}
     </div>

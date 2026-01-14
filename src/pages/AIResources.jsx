@@ -4,14 +4,14 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from 'framer-motion';
-import { 
-  Sparkles, 
-  Loader2, 
-  BarChart3, 
-  User, 
-  Package, 
-  FileText, 
-  MessageCircle, 
+import {
+  Sparkles,
+  Loader2,
+  BarChart3,
+  User,
+  Package,
+  FileText,
+  MessageCircle,
   Send,
   Share2,
   Megaphone,
@@ -114,6 +114,7 @@ export default function AIResources() {
   const [session, setSession] = useState(null);
   const [generatedResources, setGeneratedResources] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -168,7 +169,7 @@ export default function AIResources() {
         'social-media': false,
         'ads': false
       };
-      
+
       setGeneratedResources(resourcesState);
 
     } catch (error) {
@@ -185,22 +186,36 @@ export default function AIResources() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-white">
-        <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
+      <div className="flex h-screen bg-white">
+        <Sidebar currentPage="AIResources" progress={0} />
+        <div className="flex-1 ml-0 lg:ml-72">
+          <TopBar user={user} />
+          <div className="flex items-center justify-center h-[calc(100vh-5rem)]">
+            <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="AIResources" progress={0} />
-      
-      <div className="flex-1 ml-72">
-        <TopBar user={user} />
-        
+      <Sidebar
+        currentPage="AIResources"
+        progress={0}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <div className="flex-1 ml-0 lg:ml-72">
+        <TopBar
+          user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
+        />
+
         <main className="p-8">
           <div className="max-w-7xl mx-auto space-y-8">
-            
+
             {/* Bandeau "Tout est prêt" */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -239,7 +254,7 @@ export default function AIResources() {
               {resources.map((resource, index) => {
                 const Icon = resource.icon;
                 const isGenerated = generatedResources[resource.id];
-                
+
                 return (
                   <motion.div
                     key={resource.id}

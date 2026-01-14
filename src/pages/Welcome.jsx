@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 // Liste pour le roulement (en minuscules)
-const ROTATING_WORDS = ["savoir", "passion", "talent", "vécu", "expertise"];
+const ROTATING_WORDS = ["savoir", "expérience", "talent", "vécu", "expertise"];
 
 // Floating AI Icons Component
 const FloatingIcon = ({ icon: Icon, delay = 0, className = "", mobile = false }) => (

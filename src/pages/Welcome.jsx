@@ -189,22 +189,41 @@ export default function Welcome() {
             </div>
           </motion.div>
 
-          {/* Category Tags - SANS GLOW */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
-            {categories.map((category, index) =>
-              <button
-                key={index}
-                onClick={() => handleCategoryClick(category.label)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105 ${category.color}`}>
-                <category.icon className="w-3.5 h-3.5" />
-                {category.label}
-              </button>
-            )}
-          </motion.div>
+          {/* Scrolling Categories Tags - Défilement Horizontal */}
+<motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ delay: 0.9 }}
+  className="relative mt-12 overflow-hidden max-w-2xl mx-auto py-2"
+>
+  {/* Conteneur de défilement (Marquee) */}
+  <div className="flex overflow-hidden group">
+    <motion.div 
+      className="flex gap-4 items-center whitespace-nowrap pr-4"
+      animate={{ x: [0, -1030] }} // Ajusté pour un défilement fluide
+      transition={{ 
+        duration: 30, 
+        repeat: Infinity, 
+        ease: "linear",
+      }}
+    >
+      {/* On double la liste pour un effet de boucle infinie sans coupure */}
+      {[...categories, ...categories].map((category, index) =>
+        <button
+          key={index}
+          onClick={() => handleCategoryClick(category.label)}
+          className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all hover:scale-105 shadow-sm border border-gray-100/50 ${category.color}`}>
+          <category.icon className="w-3.5 h-3.5" />
+          {category.label}
+        </button>
+      )}
+    </motion.div>
+  </div>
+  
+  {/* Effet de fondu sur les côtés pour le style "Premium" */}
+  <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 via-gray-50/20 to-transparent pointer-events-none z-10" />
+  <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 via-gray-50/20 to-transparent pointer-events-none z-10" />
+</motion.div>
         </div>
 
         {/* Floating Cards around Hero */}

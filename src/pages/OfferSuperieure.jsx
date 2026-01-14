@@ -115,7 +115,7 @@ export default function OfferSuperieure() {
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       <OfferSidebar currentStep={3} />
       
-      <div className="ml-72 py-12">
+      <div className="lg:ml-72 pt-32 lg:pt-12 pb-12">
         <div className="max-w-3xl mx-auto px-4">
           {/* Step Title */}
           <div className="text-center mb-8">

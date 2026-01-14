@@ -33,8 +33,11 @@ export default function OnboardingDynamic() {
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+    // Scroll auto avec un petit délai pour laisser l'animation de la bulle finir
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }, [messages, isLoading, currentQuestion]);
 
   const buildMessagesFromHistory = (history) => {
     const msgs = [];
@@ -201,7 +204,8 @@ export default function OnboardingDynamic() {
       <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progress} />
 
       <div className="flex-1 flex flex-col lg:ml-80 h-screen relative">
-        <div className="absolute top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
+        {/* Header Parcours */}
+        <div className="sticky top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
           <div className="px-6 py-4 flex items-center justify-between max-w-4xl mx-auto w-full">
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-gray-900">Parcours de création</span>
@@ -222,7 +226,8 @@ export default function OnboardingDynamic() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto pt-24 pb-48 px-4 md:px-6">
+        {/* Messaging Area - pb-80 POUR ÉVITER L'OVERLAP */}
+        <div className="flex-1 overflow-y-auto pt-8 pb-80 px-4 md:px-6">
           <div className="max-w-3xl mx-auto space-y-8">
             <div className="flex gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
@@ -282,13 +287,13 @@ export default function OnboardingDynamic() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex gap-4"
+                className="flex gap-4 pb-12"
               >
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1 pulse-noah">
                   <Brain className="w-5 h-5 text-white" />
                 </div>
                 <div className="space-y-4 max-w-[85%]">
-                  <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-5 shadow-sm">
+                  <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-5 shadow-sm ring-1 ring-[#61f7a2]/10">
                     <h3 className="text-gray-900 font-bold text-lg mb-2">
                       {currentQuestion.text || currentQuestion.title}
                     </h3>
@@ -317,9 +322,10 @@ export default function OnboardingDynamic() {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] to-transparent z-40">
+        {/* Sticky Input Area - z-50 ET OMBRE FORTE */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] to-transparent z-50">
           <div className="max-w-3xl mx-auto">
-            <motion.div layout className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden">
+            <motion.div layout className="bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden">
               <div className="p-4 md:p-6">
                 {!isLoading && currentQuestion && (
                   <div className="space-y-4">
@@ -366,7 +372,7 @@ export default function OnboardingDynamic() {
                             className={cn(
                               "px-5 py-3 rounded-2xl text-sm font-semibold transition-all shadow-sm border",
                               value === option
-                                ? "bg-gray-900 text-white border-gray-900"
+                                ? "bg-black text-white border-black"
                                 : "bg-white text-gray-700 border-gray-200 hover:border-black"
                             )}
                             onClick={() => {
@@ -389,8 +395,8 @@ export default function OnboardingDynamic() {
                             className={cn(
                               "px-5 py-3 rounded-2xl text-sm font-semibold transition-all border shadow-sm flex items-center gap-2",
                               value.includes(option)
-                                ? "bg-gray-900 text-white border-gray-900"
-                                : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
+                                ? "bg-[#1a1a1a] text-white border-black"
+                                : "bg-white text-gray-700 border-gray-200 hover:border-black"
                             )}
                           >
                             <Checkbox checked={value.includes(option)} className="border-white/20" />
@@ -418,14 +424,15 @@ export default function OnboardingDynamic() {
                       </div>
                     )}
 
+                    {/* BOUTON NOIR PREMIUM FORCÉ */}
                     {currentQuestion.type !== 'single_choice' && (
                       <button
                         onClick={handleNext}
                         disabled={!canProceed() || isSaving}
                         className={cn(
                           "w-full h-14 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-all duration-300",
-                          "bg-gradient-to-br from-[#1a1a1a] to-black text-white shadow-lg",
-                          "hover:shadow-[0_0_25px_rgba(97,247,162,0.5)] hover:border-[#61f7a2]/30 hover:-translate-y-0.5 active:scale-95",
+                          "bg-gradient-to-br from-[#1a1a1a] to-black text-white shadow-xl border border-white/10",
+                          "hover:shadow-[0_0_25px_rgba(97,247,162,0.5)] hover:brightness-110 hover:-translate-y-0.5 active:scale-95",
                           (!canProceed() || isSaving) && "opacity-50 cursor-not-allowed shadow-none transform-none"
                         )}
                       >
@@ -436,7 +443,7 @@ export default function OnboardingDynamic() {
                 )}
                 {(isLoading || !currentQuestion) && (
                   <div className="h-20 flex items-center justify-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-gray-300" />
+                    <Loader2 className="w-6 h-6 animate-spin text-[#61f7a2]" />
                   </div>
                 )}
               </div>

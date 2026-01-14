@@ -221,7 +221,7 @@ export default function OfferResume() {
   }
 
   if (showTransition) {
-    return <OfferTransition message="Nova analyse ton offre..." onComplete={handleTransitionComplete} />;
+    return <OfferTransition message="Noah analyse ton offre..." onComplete={handleTransitionComplete} />;
   }
 
   // 🔥 FALLBACK : si pas d'offres générées

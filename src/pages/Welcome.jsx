@@ -7,8 +7,8 @@ import { Sparkles, ArrowRight, Zap, Target, FileText, TrendingUp, Search, Music,
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-// Liste pour le roulement
-const ROTATING_WORDS = ["Savoir", "Passion", "Talent", "Vécu", "Expertise"];
+// Liste pour le roulement (en minuscules)
+const ROTATING_WORDS = ["savoir", "passion", "talent", "vécu", "expertise"];
 
 // Floating AI Icons Component
 const FloatingIcon = ({ icon: Icon, delay = 0, className = "", mobile = false }) => (
@@ -54,7 +54,6 @@ const features = [
   }
 ];
 
-
 const categories = [
   { icon: Music, label: "Composition musicale", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
   { icon: Code, label: "Programmation Python", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
@@ -67,7 +66,6 @@ const categories = [
   { icon: Video, label: "Montage vidéo", color: "bg-cyan-100 text-cyan-700 hover:bg-cyan-200" },
   { icon: Heart, label: "Yoga", color: "bg-rose-100 text-rose-700 hover:bg-rose-200" }
 ];
-
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -103,8 +101,14 @@ export default function Welcome() {
         </div>
         <div className="flex items-center gap-3">
           <Button
+            onClick={handleLogin}
+            variant="outline"
+            className="bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-900 px-8 py-2 rounded-full font-medium">
+            Connexion
+          </Button>
+          <Button
             onClick={handleStart}
-            className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-8 py-2 rounded-xl font-medium shadow-sm">
+            className="bg-gray-900 hover:bg-gray-800 text-white border-2 border-gray-900 px-8 py-2 rounded-full font-medium shadow-sm">
             Démarrer gratuitement
           </Button>
         </div>
@@ -112,7 +116,6 @@ export default function Welcome() {
 
       {/* Hero Section with Floating Cards */}
       <div className="relative flex items-center justify-center px-6 py-20 md:py-32 overflow-hidden">
-
         <div className="max-w-4xl text-center relative z-10">
           {/* AI Badge */}
           <motion.div
@@ -132,7 +135,7 @@ export default function Welcome() {
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             
             Transforme ton{' '}
-            <span className="inline-block relative w-[240px] text-left align-top h-[1.2em] overflow-hidden align-middle">
+            <span className="inline-block relative w-[200px] md:w-[240px] text-left align-top h-[1.2em] overflow-hidden align-middle">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={ROTATING_WORDS[wordIndex]}
@@ -156,7 +159,7 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
             className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            L'IA génère ton offre, ta page de vente et tes emails. Tu n'as plus qu'à partager ta passion.
+            Notre IA sur-entraînée pour monétiser une passion, te livre un plan d'action sur 7 jours 100% personnalisé, tes offres complètes avec tes prix, ta page de vente, tes messages de vente. Tu n'as plus qu'à partager ta passion.
           </motion.p>
           
           {/* Search Bar */}
@@ -165,7 +168,6 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
             className="mb-6 max-w-2xl mx-auto">
-
             <div className="relative backdrop-blur-sm bg-white/95 rounded-2xl shadow-xl p-3 flex items-center gap-3 border border-gray-200">
               <Search className="w-5 h-5 text-gray-400 ml-3" />
               <Input
@@ -173,10 +175,9 @@ export default function Welcome() {
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Quelle compétence voudrais-tu enseigner ?"
                 className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base h-12" />
-
               <Button
                 onClick={handleStart}
-                className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-6 h-12 rounded-xl font-semibold shadow-md transition-all">
+                className="bg-gray-900 hover:bg-gray-800 text-white border-2 border-gray-900 px-6 h-12 rounded-full font-semibold shadow-md transition-all">
                 Démarrer
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -323,15 +324,12 @@ export default function Welcome() {
         </motion.div>
       </div>
 
-
-
       {/* 4 Steps Section */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.4 }}
         className="w-full max-w-6xl mx-auto px-6 py-20">
-
         {/* Title */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
@@ -348,7 +346,6 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.5 }}
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
-
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center">
                 <Target className="w-7 h-7 text-blue-600" />
@@ -367,7 +364,6 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6 }}
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
-
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center">
                 <Sparkles className="w-7 h-7 text-pink-600" />
@@ -386,7 +382,6 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.7 }}
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
-
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
                 <FileText className="w-7 h-7 text-amber-600" />
@@ -405,7 +400,6 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.8 }}
             className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-md transition-all group">
-
             <div className="flex items-start justify-between mb-4">
               <div className="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center">
                 <TrendingUp className="w-7 h-7 text-green-600" />
@@ -426,7 +420,6 @@ export default function Welcome() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.9 }}
         className="w-full bg-gradient-to-br from-gray-50 to-white py-24">
-
         <div className="max-w-3xl mx-auto px-6">
           <div className="bg-white rounded-3xl shadow-xl p-12">
             <div className="text-center">
@@ -437,13 +430,10 @@ export default function Welcome() {
                 Découvre comment ton savoir-faire peut générer de vrais revenus grâce à l'IA. <span className="text-gray-900 font-semibold">Commence dès maintenant !</span>
               </p>
 
-              {/* Three badges */}
+              {/* Two badges */}
               <div className="flex flex-wrap justify-center gap-3 mb-8">
                 <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
                   <span className="text-gray-700 text-sm font-medium">✓ Inscription 100% gratuite</span>
-                </div>
-                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
-                  <span className="text-gray-700 text-sm font-medium">✓ Documents IA offerts</span>
                 </div>
                 <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
                   <span className="text-gray-700 text-sm font-medium">✓ Communauté vérifiée</span>
@@ -454,13 +444,11 @@ export default function Welcome() {
               <div className="flex justify-center mb-4">
                 <Button
                   onClick={handleStart}
-                  className="bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all">
+                  className="bg-gray-900 hover:bg-gray-800 text-white border-2 border-gray-900 px-10 py-6 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all">
                   <Sparkles className="w-5 h-5 mr-2" />
                   Commencer gratuitement
                 </Button>
               </div>
-
-
             </div>
           </div>
         </div>

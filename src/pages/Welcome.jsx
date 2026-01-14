@@ -357,7 +357,7 @@ export default function Welcome() {
             </div>
             <h3 className="text-gray-900 font-bold text-lg mb-3">On comprend ton potentiel</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Tu nous parles de ta passion, de ton parcours ou de ce que tu sais faire. L’IA s’adapte à ton niveau, même si tu débutes.
+              Tu nous parles de ta passion, de ton parcours ou de ce que tu sais faire. L’IA s’adapte à ton niveau.
             </p>
           </motion.div>
 
@@ -439,7 +439,7 @@ export default function Welcome() {
                   <span className="text-gray-700 text-sm font-medium">✓ Inscription 100% gratuite</span>
                 </div>
                 <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
-                  <span className="text-gray-700 text-sm font-medium">✓ Sans expértise technique</span>
+                  <span className="text-gray-700 text-sm font-medium">✓ Sans expertise technique</span>
                 </div>
               </div>
 

@@ -148,13 +148,13 @@ export default function Settings() {
       content: (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Photo de profil</label>
+            <label className="block text-sm text-gray-700 font-medium mb-2">Photo de profil</label>
             <div className="flex items-center gap-4">
               {formData.avatar_url ? (
                 <img
                   src={formData.avatar_url}
                   alt="Avatar"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-[#2a2a45]"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
                 />
               ) : (
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
@@ -175,62 +175,62 @@ export default function Settings() {
                     }
                   }
                 }}
-                className="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#61f7a2]/10 file:text-[#61f7a2] hover:file:bg-[#61f7a2]/20 file:cursor-pointer"
+                className="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-[#61f7a2]/10 file:text-[#61f7a2] hover:file:bg-[#61f7a2]/20 file:cursor-pointer"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Prénom</label>
+            <label className="block text-sm text-gray-700 font-medium mb-2">Prénom</label>
             <input
               type="text"
               value={formData.first_name}
               onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-              className="w-full bg-[#11112b] border border-[#2a2a45] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#61f7a2]"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-[#61f7a2] focus:ring-1 focus:ring-[#61f7a2] transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Nom</label>
+            <label className="block text-sm text-gray-700 font-medium mb-2">Nom</label>
             <input
               type="text"
               value={formData.last_name}
               onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-              className="w-full bg-[#11112b] border border-[#2a2a45] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#61f7a2]"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-[#61f7a2] focus:ring-1 focus:ring-[#61f7a2] transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Email</label>
+            <label className="block text-sm text-gray-700 font-medium mb-2">Email</label>
             <input
               type="email"
               value={user?.email || ''}
               disabled
-              className="w-full bg-[#11112b] border border-[#2a2a45] rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Ta passion / compétence</label>
+            <label className="block text-sm text-gray-700 font-medium mb-2">Ta passion / compétence</label>
             <input
               type="text"
               value={formData.passion}
               onChange={(e) => setFormData({ ...formData, passion: e.target.value })}
-              className="w-full bg-[#11112b] border border-[#2a2a45] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#61f7a2]"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-[#61f7a2] focus:ring-1 focus:ring-[#61f7a2] transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Ton audience cible</label>
+            <label className="block text-sm text-gray-700 font-medium mb-2">Ton audience cible</label>
             <input
               type="text"
               value={formData.target_audience}
               onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
-              className="w-full bg-[#11112b] border border-[#2a2a45] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#61f7a2]"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-[#61f7a2] focus:ring-1 focus:ring-[#61f7a2] transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Objectif de revenu mensuel (€)</label>
+            <label className="block text-sm text-gray-700 font-medium mb-2">Objectif de revenu mensuel (€)</label>
             <input
               type="number"
               value={formData.revenue_goal}
               onChange={(e) => setFormData({ ...formData, revenue_goal: e.target.value })}
-              className="w-full bg-[#11112b] border border-[#2a2a45] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#61f7a2]"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-[#61f7a2] focus:ring-1 focus:ring-[#61f7a2] transition-all"
             />
           </div>
           <GlowButton onClick={handleSave} loading={saving} icon={Save} className="mt-4">
@@ -244,7 +244,7 @@ export default function Settings() {
       icon: RefreshCw,
       content: (
         <div>
-          <p className="text-gray-400 mb-4">
+          <p className="text-gray-600 mb-4">
             Tu peux recommencer l'onboarding pour mettre à jour tes réponses et régénérer ton analyse.
           </p>
           <GlowButton variant="secondary" onClick={handleRestartOnboarding} icon={RefreshCw}>
@@ -258,7 +258,7 @@ export default function Settings() {
       icon: FileText,
       content: (
         <div>
-          <p className="text-gray-400 mb-4">
+          <p className="text-gray-600 mb-4">
             Régénère tous tes documents IA avec tes nouvelles informations de profil.
           </p>
           <GlowButton variant="secondary" onClick={handleRegenerateDocuments} loading={regenerating} icon={Sparkles}>
@@ -276,14 +276,14 @@ export default function Settings() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white font-medium">PASSION IA - Accès complet</p>
-                <p className="text-gray-400 text-sm">Paiement unique</p>
+                <p className="text-purple-100 text-sm">Paiement unique</p>
               </div>
-              <span className="px-3 py-1 bg-[#61f7a2]/10 text-[#61f7a2] rounded-full text-sm">
+              <span className="px-3 py-1 bg-[#61f7a2]/20 text-[#61f7a2] rounded-full text-sm font-semibold border border-[#61f7a2]/30">
                 Actif
               </span>
             </div>
           </div>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-600 text-sm">
             Tu as un accès à vie à tous les documents et fonctionnalités.
           </p>
         </div>
@@ -292,7 +292,7 @@ export default function Settings() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#11112b]">
+    <div className="flex min-h-screen bg-white">
       <Sidebar
         currentPage="Settings"
         progress={progress}
@@ -322,13 +322,13 @@ export default function Settings() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-[#1b1b33] rounded-2xl border border-[#2a2a45] p-6"
+                  className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
                 >
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl bg-[#61f7a2]/10 flex items-center justify-center">
                       <section.icon className="w-5 h-5 text-[#61f7a2]" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white">{section.title}</h3>
+                    <h3 className="text-xl font-bold text-gray-900">{section.title}</h3>
                   </div>
                   {section.content}
                 </motion.div>
@@ -342,7 +342,7 @@ export default function Settings() {
               >
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-gray-50 text-gray-600 hover:bg-gray-100/80 hover:text-red-600 transition-all border border-gray-100"
                 >
                   <LogOut className="w-5 h-5" />
                   Se déconnecter

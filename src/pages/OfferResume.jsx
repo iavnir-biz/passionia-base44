@@ -295,7 +295,7 @@ export default function OfferResume() {
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       <OfferSidebar currentStep={5} />
       
-      <div className="ml-72 py-12">
+      <div className="lg:ml-72 pt-32 lg:pt-12 pb-12">
         <div className="max-w-6xl mx-auto px-4">
         {/* Title */}
         <motion.div

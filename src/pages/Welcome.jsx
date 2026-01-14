@@ -162,7 +162,7 @@ export default function Welcome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
             className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Notre IA sur-entraînée pour monétiser une passion, te livre un plan d'action sur 7 jours 100% personnalisé, tes offres complètes avec tes prix, ta page de vente, tes messages de vente. Tu n'as plus qu'à partager ta passion.
+            Notre IA sur-entraînée transforme ton savoir en offres, messages et page de vente, avec un plan clair et personnalisé.
           </motion.p>
           
           {/* Search Bar */}

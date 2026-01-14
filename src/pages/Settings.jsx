@@ -4,10 +4,10 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
-import { 
-  User, 
-  RefreshCw, 
-  CreditCard, 
+import {
+  User,
+  RefreshCw,
+  CreditCard,
   LogOut,
   ChevronRight,
   Sparkles,
@@ -27,7 +27,8 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -36,33 +37,33 @@ export default function Settings() {
     target_audience: '',
     revenue_goal: ''
   });
-  
+
   useEffect(() => {
     if (isAuthenticated) {
       loadData();
     }
   }, [isAuthenticated]);
-  
+
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      
+
       // Load profile
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       let profileData = profiles.length > 0 ? profiles[0] : null;
-      
+
       // Load session for onboarding data
       let sessionData = null;
       const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
       if (sessions.length > 0) {
         sessionData = sessions[0];
       }
-      
+
       if (profileData) {
         setProfile(profileData);
       }
-      
+
       // Merge data: Profile data + Session onboarding data
       setFormData({
         first_name: profileData?.first_name || currentUser.firstName || '',
@@ -72,7 +73,7 @@ export default function Settings() {
         target_audience: profileData?.target_audience || sessionData?.onboarding_summary?.learner_profile || '',
         revenue_goal: profileData?.revenue_goal?.toString() || sessionData?.potential_revenue?.toString() || ''
       });
-      
+
       // Load plan steps for progress
       const steps = await base44.entities.PlanStep.filter({ created_by: currentUser.email });
       const completed = steps.filter(s => s.is_completed).length;
@@ -83,17 +84,17 @@ export default function Settings() {
       setLoading(false);
     }
   };
-  
+
   const handleSave = async () => {
     setSaving(true);
     try {
       // Update user full_name
       const fullName = `${formData.first_name} ${formData.last_name}`.trim();
-      await base44.auth.updateMe({ 
+      await base44.auth.updateMe({
         full_name: fullName,
-        profile_picture: formData.avatar_url 
+        profile_picture: formData.avatar_url
       });
-      
+
       // Update profile
       if (profile) {
         await base44.entities.UserProfile.update(profile.id, {
@@ -105,7 +106,7 @@ export default function Settings() {
           revenue_goal: parseInt(formData.revenue_goal) || 0
         });
       }
-      
+
       await loadData();
     } catch (error) {
       console.error('Error saving:', error);
@@ -113,11 +114,11 @@ export default function Settings() {
       setSaving(false);
     }
   };
-  
+
   const handleRestartOnboarding = () => {
     navigate(createPageUrl('Onboarding'));
   };
-  
+
   const handleRegenerateDocuments = async () => {
     setRegenerating(true);
     try {
@@ -126,7 +127,7 @@ export default function Settings() {
       for (const doc of docs) {
         await base44.entities.Document.delete(doc.id);
       }
-      
+
       // Navigate to documents page to regenerate
       navigate(createPageUrl('Documents'));
     } catch (error) {
@@ -135,11 +136,11 @@ export default function Settings() {
       setRegenerating(false);
     }
   };
-  
+
   const handleLogout = async () => {
     await base44.auth.logout();
   };
-  
+
   const settingsSections = [
     {
       title: 'Profil',
@@ -289,18 +290,25 @@ export default function Settings() {
       )
     }
   ];
-  
+
   return (
     <div className="flex min-h-screen bg-[#11112b]">
-      <Sidebar currentPage="Settings" progress={progress} user={user} />
-      
-      <div className="flex-1 ml-72">
-        <TopBar 
-          title="Paramètres" 
+      <Sidebar
+        currentPage="Settings"
+        progress={progress}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <div className="flex-1 ml-0 lg:ml-72">
+        <TopBar
+          title="Paramètres"
           subtitle="Gère ton compte et tes préférences"
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
-        
+
         <main className="p-8 max-w-3xl">
           {loading ? (
             <div className="flex items-center justify-center py-20">
@@ -325,7 +333,7 @@ export default function Settings() {
                   {section.content}
                 </motion.div>
               ))}
-              
+
               {/* Logout */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

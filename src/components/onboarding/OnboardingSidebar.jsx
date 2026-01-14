@@ -180,7 +180,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   transition={{ delay: index * 0.1 }}
                   className={cn(
                     "relative flex items-center gap-3 p-3 rounded-xl transition-all duration-300",
-                    isActive && "bg-gray-50 shadow-sm border border-gray-100 scale-105",
+                    isActive && "bg-gray-900 shadow-md border border-gray-900 scale-105",
                     isCompleted && "opacity-60 grayscale hover:grayscale-0 transition-all",
                     isFuture && "opacity-30 blur-[0.5px]"
                   )}
@@ -210,7 +210,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   <div className="flex-1">
                     <p className={cn(
                       "text-sm font-semibold transition-colors",
-                      isActive ? "text-gray-900" : "text-gray-500",
+                      isActive ? "text-white" : "text-gray-500",
                       isCompleted && "line-through text-gray-400 decoration-gray-300"
                     )}>
                       {step.title}

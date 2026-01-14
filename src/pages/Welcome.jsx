@@ -183,7 +183,7 @@ export default function Welcome() {
               <Button
                 onClick={handleStart}
                 className="bg-gradient-to-br from-[#1a1a1a] to-black text-white border border-transparent px-6 h-12 rounded-full font-semibold transition-all duration-300 ease-out hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] hover:border-[#61f7a2]/30 hover:-translate-y-0.5">
-                Démarrer
+                Voir mon potentiel →
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>

@@ -69,20 +69,27 @@ export default function PlanAction() {
         // --- FIX ICI : Gestion robuste du JSON ---
         let savedProgress = userProfile.plan_7days_progress;
 
+        console.log("🔍 DEBUT DEBUG - Type de plan_7days_progress:", typeof savedProgress);
+        console.log("🔍 DEBUT DEBUG - Valeur brute:", savedProgress);
+
         // Si la base renvoie une string (ex: "{...}"), on la convertit en Objet
         if (typeof savedProgress === "string") {
           try {
             savedProgress = JSON.parse(savedProgress);
+            console.log("✅ JSON parsé avec succès:", savedProgress);
           } catch (e) {
-            console.error("Erreur de parsing JSON", e);
+            console.error("❌ Erreur de parsing JSON", e);
             savedProgress = {};
           }
         }
 
         // Si c'est vide ou null, on met un objet vide
-        if (!savedProgress) savedProgress = {};
+        if (!savedProgress) {
+          console.log("⚠️ savedProgress est vide/null, initialisation à {}");
+          savedProgress = {};
+        }
 
-        console.log("📥 Progression chargée :", savedProgress); // Pour vérifier dans la console IDX
+        console.log("📥 Progression chargée FINALE:", savedProgress); // Pour vérifier dans la console IDX
 
         setDayProgress(savedProgress);
 

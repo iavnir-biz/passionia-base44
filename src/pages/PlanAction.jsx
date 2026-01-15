@@ -549,7 +549,7 @@ export default function PlanAction() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-left mb-12"
           >
             <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-full mb-4">
               <Target className="w-4 h-4 text-[#61f7a2]" />
@@ -566,7 +566,7 @@ export default function PlanAction() {
               Ta première vente en 7 jours
             </h2>
 
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl">
               Une action par jour. Pas plus. Pas moins.
             </p>
           </motion.div>

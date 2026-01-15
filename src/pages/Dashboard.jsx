@@ -222,6 +222,9 @@ export default function Dashboard() {
             <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3 mb-2">
               Hello {user?.first_name || profile?.first_name || ''} <span className="text-4xl">👋</span>
             </h1>
+            <p className="text-xl text-gray-600 font-medium">
+              C'est Noah, j'ai hâte qu'on démarre ! Prêt à bosser un peu ?
+            </p>
           </motion.div>
 
           {/* 2️⃣ MISSION DU JOUR - SECTION DOMINANTE */}
@@ -229,14 +232,14 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3dd980] rounded-3xl p-10 mb-8 shadow-2xl"
+            className="bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3dd980] rounded-3xl px-6 py-8 md:p-10 mb-8 shadow-2xl"
           >
-            <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
+            <div className="text-left mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-start gap-2">
                 <Target className="w-8 h-8" />
                 Ta mission aujourd'hui
               </h2>
-              <p className="text-2xl font-bold text-white mb-2">
+              <p className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
                 {getNextIncompleteTask()?.title}
               </p>
               <p className="text-white/90 text-lg">
@@ -244,11 +247,11 @@ export default function Dashboard() {
               </p>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex justify-start">
               <GlowButton
                 onClick={() => navigate(createPageUrl(getNextIncompleteTask()?.page))}
                 size="lg"
-                className="bg-white text-gray-900 hover:bg-gray-100 px-12 py-4 text-xl font-bold"
+                className="bg-white text-gray-900 hover:bg-gray-100 w-full md:w-auto px-6 md:px-12 py-3 md:py-4 text-lg md:text-xl font-bold"
               >
                 👉 Lancer cette mission
               </GlowButton>

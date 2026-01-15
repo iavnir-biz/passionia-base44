@@ -250,7 +250,14 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
               </div>
               <div className="flex flex-col">
                 <h1 className="text-[12px] font-bold text-gray-900 leading-none">PASSION IA</h1>
-                <p className="text-[9px] text-gray-500 font-medium mt-0.5">Étape {activeStepId}/8</p>
+                <p className="text-[9px] text-gray-500 font-medium mt-0.5">
+                  Étape {activeStepId}/8
+                  {totalPagesInStep > 1 && (
+                    <span className="ml-1 text-[#61f7a2]">
+                      • {Math.round(progressInStep)}%
+                    </span>
+                  )}
+                </p>
               </div>
             </div>
 
@@ -317,21 +324,17 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
 
         {/* Interactive Step Progress Bar (Bottom Line) */}
         {totalPagesInStep > 1 && (
-          <div className="absolute bottom-0 left-0 right-0 h-5 bg-gray-100">
-            {/* Progress Bar */}
+          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-100">
             <motion.div
-              className="h-full bg-gray-900"
+              className="h-full bg-gray-900 relative"
               initial={{ width: 0 }}
               animate={{ width: `${progressInStep}%` }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            />
-
-            {/* Percentage Text with Mix Blend Mode for Auto-Contrast */}
-            <div className="absolute inset-0 flex items-center justify-center mix-blend-difference z-10">
-              <span className="text-[10px] font-black text-white tracking-widest uppercase">
-                {Math.round(progressInStep)}%
-              </span>
-            </div>
+            >
+              {/* Glowing Tip Effect */}
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-8 h-8 bg-gray-900/20 blur-md rounded-full pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(0,0,0,0.5)]" />
+            </motion.div>
           </div>
         )}
       </div>

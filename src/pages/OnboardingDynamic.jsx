@@ -204,8 +204,8 @@ export default function OnboardingDynamic() {
       <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progress} />
 
       <div className="flex-1 flex flex-col lg:ml-80 h-screen relative">
-        {/* Header Parcours */}
-        <div className="sticky top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
+        {/* Header Parcours - Hidden on mobile as sidebar handles it */}
+        <div className="hidden lg:block sticky top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
           <div className="px-6 py-4 flex items-center justify-end max-w-4xl mx-auto w-full">
             <div className="flex flex-col items-end">
               <span className="text-xs font-bold text-[#61f7a2] mb-1">
@@ -222,18 +222,14 @@ export default function OnboardingDynamic() {
           </div>
         </div>
 
-        {/* Messaging Area - pb-80 POUR ÉVITER L'OVERLAP */}
-        <div className="flex-1 overflow-y-auto pt-8 pb-80 px-4 md:px-6">
+        {/* Messaging Area - Increased padding-top on mobile to clear sidebar completely */}
+        <div className="flex-1 overflow-y-auto pt-48 md:pt-32 pb-80 px-4 md:px-6">
           <div className="max-w-3xl mx-auto space-y-8">
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
-                <Brain className="w-5 h-5 text-white" />
-              </div>
-              <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-4 shadow-sm max-w-[85%]">
-                <p className="text-gray-800 leading-relaxed text-sm md:text-base">
-                  C'est un plaisir de t'aider à structurer ton projet ! Je vais te poser quelques questions pour comprendre ton univers.
-                </p>
-              </div>
+            {/* Intro Message - Static Gray Text (Unstyled, no brain icon, no bubble) */}
+            <div className="flex justify-center w-full px-6 py-6">
+              <p className="text-gray-400 text-[11px] md:text-xs text-center max-w-sm leading-relaxed font-medium uppercase tracking-wider opacity-70">
+                C'est un plaisir de t'aider à structurer ton projet ! <br /> Je vais te poser quelques questions pour comprendre ton univers.
+              </p>
             </div>
 
             <AnimatePresence mode="popLayout">

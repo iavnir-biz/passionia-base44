@@ -139,20 +139,25 @@ export default function Welcome() {
             className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
 
             Transforme ton{' '}
-            <span className="inline-block relative w-[140px] md:w-[240px] text-left align-top h-[1.2em] overflow-hidden align-middle">
-              <AnimatePresence mode="wait">
+            Transforme ton{' '}
+            <motion.span
+              layout
+              className="inline-flex relative h-[1.2em] align-top overflow-hidden align-middle mx-1 md:mx-2 justify-start min-w-[60px]"
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.span
                   key={ROTATING_WORDS[wordIndex]}
-                  initial={{ y: 40, opacity: 0 }}
+                  initial={{ y: "100%", opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -40, opacity: 0 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="absolute left-0 text-[#61f7a2]"
+                  exit={{ y: "-100%", opacity: 0 }}
+                  transition={{ duration: 0.4, ease: "backOut" }}
+                  className="text-[#61f7a2] block whitespace-nowrap"
                 >
                   {ROTATING_WORDS[wordIndex]}
                 </motion.span>
               </AnimatePresence>
-            </span>
+            </motion.span>
             <br className="hidden md:block" />
             en <span className="underline decoration-[#61f7a2]/30">première vente</span> <br className="md:hidden" />dès cette semaine.
           </motion.h1>

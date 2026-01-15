@@ -296,18 +296,16 @@ export default function OfferResume() {
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
       <OfferSidebar currentStep={5} />
 
-      <div className="ml-72 py-12">
+      <div className="ml-0 lg:ml-72 pt-40 md:pt-32 lg:pt-12 pb-12">
         <div className="max-w-6xl mx-auto px-4">
           {/* Title */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8">
+            className="text-center mb-10 md:mb-12">
 
-            <h1 className="text-slate-950 mb-3 text-3xl font-bold">📋 Résumé de ton offre
-
-            </h1>
-            <p className="text-gray-400">
+            <h1 className="text-slate-950 mb-3 text-2xl md:text-3xl font-bold">📋 Résumé de ton offre</h1>
+            <p className="text-gray-400 text-sm md:text-base">
               Voici la gamme complète que tu as construite pour ton activité.
             </p>
           </motion.div>
@@ -322,10 +320,9 @@ export default function OfferResume() {
             <GlowButton
               onClick={handleContinue}
               size="lg"
-              className="px-12">
-
+              className="w-full md:w-auto px-6 md:px-12 text-sm md:text-base">
               Découvrir si mon marché est validé
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
             </GlowButton>
           </motion.div>
 
@@ -336,8 +333,8 @@ export default function OfferResume() {
             transition={{ delay: 0.1 }}
             className="mb-6">
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Check className="w-6 h-6 text-[#61f7a2]" />
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <Check className="w-5 h-5 md:w-6 md:h-6 text-[#61f7a2]" />
               Tes 4 offres complètes
             </h2>
 
@@ -360,24 +357,24 @@ export default function OfferResume() {
                 return (
                   <div
                     key={product.key}
-                    className={`${scheme.bg} ${scheme.border} border rounded-2xl p-5 flex items-center gap-4 transition-all hover:shadow-md`}
+                    className={`${scheme.bg} ${scheme.border} border rounded-2xl p-4 md:p-5 flex items-center gap-3 md:gap-4 transition-all hover:shadow-md`}
                   >
                     {/* Icon avec couleur flash */}
                     <div className="flex-shrink-0">
-                      <div className={`w-14 h-14 rounded-2xl ${scheme.iconBg} shadow-lg flex items-center justify-center`}>
-                        <Icon className={`w-7 h-7 ${scheme.iconColor}`} />
+                      <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl ${scheme.iconBg} shadow-lg flex items-center justify-center`}>
+                        <Icon className={`w-6 h-6 md:w-7 md:h-7 ${scheme.iconColor}`} />
                       </div>
                     </div>
 
                     {/* Title & Subtitle */}
-                    <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 mb-1">{product.label}</h3>
-                      <p className="text-sm text-gray-600">{product.data?.title || 'Non défini'}</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-900 mb-0.5 md:mb-1 text-sm md:text-base truncate md:whitespace-normal">{product.label}</h3>
+                      <p className="text-xs md:text-sm text-gray-600 truncate md:whitespace-normal">{product.data?.title || 'Non défini'}</p>
                     </div>
 
                     {/* Price */}
                     <div className="flex-shrink-0">
-                      <span className="text-2xl font-bold text-gray-900">{product.data?.price || '—'}</span>
+                      <span className="text-lg md:text-2xl font-bold text-gray-900 whitespace-nowrap">{product.data?.price || '—'}</span>
                     </div>
                   </div>
                 );
@@ -403,29 +400,30 @@ export default function OfferResume() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }} className="bg-[#11112b] text-black mb-8 p-6 rounded-2xl from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
+            transition={{ delay: 0.2 }}
+            className="bg-[#11112b] text-white mb-8 p-5 md:p-6 rounded-2xl shadow-lg border border-white/5">
 
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="bg-[#61f7a2] rounded-lg w-10 h-10 flex items-center justify-center backdrop-blur-sm">
+              <div className="bg-[#61f7a2] rounded-lg w-10 h-10 flex-shrink-0 flex items-center justify-center backdrop-blur-sm">
                 <TrendingUp className="w-5 h-5 text-[#11112b]" />
               </div>
               <div>
-                <h2 className="text-[#61f7a2] text-lg font-bold">Ton Potentiel de Revenus Mensuels
-
+                <h2 className="text-[#61f7a2] text-base md:text-lg font-bold leading-tight">
+                  Ton Potentiel de Revenus Mensuels
                 </h2>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-400 text-[10px] md:text-sm">
                   Basé sur une hypothèse d'une vente par jour
                 </p>
               </div>
             </div>
 
             {/* Big Number */}
-            <div className="text-center py-6">
-              <span className="text-5xl md:text-6xl font-bold text-[#61f7a2]">
+            <div className="text-center py-4 md:py-6">
+              <span className="text-4xl md:text-6xl font-bold text-[#61f7a2] block">
                 {totalMonthly.toLocaleString('fr-FR')} €
               </span>
-              <p className="text-gray-400 mt-2">par mois</p>
+              <p className="text-gray-400 text-sm mt-1">par mois</p>
             </div>
 
             {/* Toggle Detail */}
@@ -496,7 +494,7 @@ export default function OfferResume() {
             <GlowButton
               onClick={handleContinue}
               size="lg"
-              className="px-12">
+              className="w-full md:w-auto px-12">
 
               Voir si mon marché est validé
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -504,6 +502,6 @@ export default function OfferResume() {
           </motion.div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

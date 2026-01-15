@@ -104,7 +104,7 @@ export default function Sidebar({ currentPage, progress = 0, user, isOpen, onClo
       )}>
         {/* Logo */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <div className="flex items-center gap-3 justify-center w-full">
+          <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
@@ -190,29 +190,6 @@ export default function Sidebar({ currentPage, progress = 0, user, isOpen, onClo
             </a>
           </div>
 
-          <Link
-            to={createPageUrl('Settings')}
-            className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 mb-1",
-              currentPage === 'Settings'
-                ? "bg-[#61f7a2]/10 text-[#61f7a2] border border-[#61f7a2]/20"
-                : "text-gray-600 hover:text-gray-900 hover:bg-blue-900/10"
-            )}
-            onClick={() => onClose && onClose()}
-          >
-            <Settings className="w-5 h-5" />
-            <span className="font-medium">Paramètres</span>
-          </Link>
-          <button
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-red-500 hover:bg-blue-900/10 w-full transition-all"
-            onClick={() => {
-              base44.auth.logout();
-              onClose && onClose();
-            }}
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Déconnexion</span>
-          </button>
         </div>
       </aside>
     </>

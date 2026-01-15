@@ -76,7 +76,7 @@ const menuStructure = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Plan d\'action', icon: Target, page: 'PlanAction' },
   { name: 'Ressources IA', icon: Sparkles, page: 'AIResources' },
-  { name: 'Discuter avec nous', icon: MessageCircle, page: 'NovaChat', locked: true },
+  { name: 'Discuter avec Noah', icon: MessageCircle, page: 'NovaChat', locked: true },
 ];
 
 export default function Sidebar({ currentPage, progress = 0, user, isOpen, onClose }) {
@@ -103,12 +103,11 @@ export default function Sidebar({ currentPage, progress = 0, user, isOpen, onClo
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {/* Logo */}
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="flex items-center gap-3 justify-center w-full">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
+              <Sparkles className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-lg font-bold text-gray-900">PASSION IA</h1>
           </div>
           {/* Mobile Close Button */}
           <button
@@ -120,7 +119,7 @@ export default function Sidebar({ currentPage, progress = 0, user, isOpen, onClo
         </div>
 
         {/* User Profile - Nouveau bloc */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200">
           <UserProfileBlock user={user} progress={progress} calculateDay={calculateDay} />
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -163,37 +162,31 @@ export default function Sidebar({ currentPage, progress = 0, user, isOpen, onClo
 
         {/* Bloc Besoin d'aide - Premium */}
         <div className="p-4 border-t border-gray-200">
-          <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-5 mb-4">
-            <h3 className="text-white font-bold text-base mb-2 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-xl p-3 mb-2 shadow-sm">
+            <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
               ✨ Besoin d'aide ?
             </h3>
-            <p className="text-purple-100 text-xs mb-4">
-              Un expert peut t'aider à avancer plus vite.
-            </p>
             <Link
               to={createPageUrl('Booking')}
-              className="flex items-center justify-center gap-2 w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold py-2.5 px-4 rounded-xl transition-all"
+              className="flex items-center justify-center gap-2 w-full bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-3 rounded-lg transition-all backdrop-blur-sm border border-white/10"
             >
               <Calendar className="w-4 h-4" />
-              <span className="text-sm">Prendre rendez-vous</span>
+              <span className="text-xs">Prendre RDV</span>
             </Link>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl p-5 mb-4">
-            <h3 className="text-white font-bold text-base mb-2 flex items-center gap-2">
-              ✨ Accéder à la communauté
+          <div className="bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl p-3 mb-2 shadow-sm">
+            <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
+              ✨ Communauté
             </h3>
-            <p className="text-amber-50 text-xs mb-4">
-              Partage avec d'autres adhérents, reçois du soutien.
-            </p>
             <a
               href="https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full bg-white hover:bg-gray-50 text-gray-900 font-semibold py-2.5 px-4 rounded-xl transition-all"
+              className="flex items-center justify-center gap-2 w-full bg-white/10 hover:bg-white/20 text-white font-medium py-2 px-3 rounded-lg transition-all backdrop-blur-sm border border-white/10"
             >
               <Users className="w-4 h-4" />
-              <span className="text-sm">Accéder à Skool</span>
+              <span className="text-xs">Accéder à Skool</span>
             </a>
           </div>
 

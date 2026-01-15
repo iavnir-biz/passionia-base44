@@ -73,7 +73,7 @@ const ONBOARDING_STEPS = [
   }
 ];
 
-export default function OnboardingSidebar({ currentPage, completedSteps = [], progressInStep = 0 }) {
+export default function OnboardingSidebar({ currentPage, completedSteps = [] }) {
   const scrollContainerRef = useRef(null);
 
   // Déterminer l'étape active basée sur la page courante
@@ -82,6 +82,11 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
   );
 
   const activeStepId = activeStep?.id || 1;
+
+  // Calculer la progression dans l'étape courante
+  const currentPageIndexInStep = activeStep?.pages.indexOf(currentPage) ?? 0;
+  const totalPagesInStep = activeStep?.pages.length || 1;
+  const progressInStep = ((currentPageIndexInStep + 1) / totalPagesInStep) * 100;
 
   // Auto-scroll pour mobile
   useEffect(() => {
@@ -250,11 +255,12 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
             </div>
 
             {/* Mini Progress Bar Global */}
-            <div className="w-20 h-1 bg-gray-100 rounded-full overflow-hidden shrink-0">
+            <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden shrink-0">
               <motion.div
                 className="h-full bg-[#61f7a2]"
                 initial={{ width: 0 }}
                 animate={{ width: `${(activeStepId / 8) * 100}%` }}
+                transition={{ duration: 0.5, ease: "circOut" }}
               />
             </div>
           </div>
@@ -308,6 +314,22 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
             })}
           </div>
         </div>
+
+        {/* Interactive Step Progress Bar (Bottom Line) */}
+        {totalPagesInStep > 1 && (
+          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-100">
+            <motion.div
+              className="h-full bg-gray-900 relative"
+              initial={{ width: 0 }}
+              animate={{ width: `${progressInStep}%` }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            >
+              {/* Glowing Tip Effect */}
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-8 h-8 bg-gray-900/20 blur-md rounded-full pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(0,0,0,0.5)]" />
+            </motion.div>
+          </div>
+        )}
       </div>
     </>
   );

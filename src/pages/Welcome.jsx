@@ -139,9 +139,10 @@ export default function Welcome() {
             className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
 
             Transforme ton{' '}
+            Transforme ton <br className="md:hidden" />
             <motion.span
               layout
-              className="inline-flex relative h-[1.2em] align-top overflow-hidden align-middle mx-1 md:mx-2 justify-start min-w-[60px]"
+              className="inline-flex relative h-[1.2em] align-top overflow-hidden align-middle mx-1 md:mx-2 justify-center md:justify-start min-w-[60px]"
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <AnimatePresence mode="wait" initial={false}>
@@ -157,7 +158,7 @@ export default function Welcome() {
                 </motion.span>
               </AnimatePresence>
             </motion.span>
-            <br className="hidden md:block" />
+            <br className="md:hidden" />
             en <span className="underline decoration-[#61f7a2]/30">première vente</span> <br className="md:hidden" />dès cette semaine.
           </motion.h1>
 

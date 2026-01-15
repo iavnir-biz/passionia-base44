@@ -235,22 +235,22 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
       </aside >
 
       {/* Mobile - Top bar improved */}
-      < div className="lg:hidden fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-gray-200 z-50 transition-all" >
-        <div className="px-4 py-3">
+      < div className="lg:hidden fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-100 z-50 transition-all shadow-sm" >
+        <div className="px-4 pt-2 pb-1">
           {/* Header Compact */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-sm font-bold text-gray-900 leading-none">PASSION IA</h1>
-                <p className="text-[10px] text-gray-500 font-medium mt-0.5">Étape {activeStepId}/8</p>
+                <h1 className="text-[12px] font-bold text-gray-900 leading-none">PASSION IA</h1>
+                <p className="text-[9px] text-gray-500 font-medium mt-0.5">Étape {activeStepId}/8</p>
               </div>
             </div>
 
             {/* Mini Progress Bar Global */}
-            <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden shrink-0">
+            <div className="w-20 h-1bg-gray-100 rounded-full overflow-hidden shrink-0">
               <motion.div
                 className="h-full bg-[#61f7a2]"
                 initial={{ width: 0 }}
@@ -262,7 +262,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
           {/* Horizontal Scrollable Steps - Auto Centering */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory -mx-2 px-2"
+            className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-2 px-2"
           >
             {ONBOARDING_STEPS.map((step) => {
               const Icon = step.icon;

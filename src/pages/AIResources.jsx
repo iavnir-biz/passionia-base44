@@ -25,20 +25,45 @@ import ChatBubble from '@/components/chat/ChatBubble';
 import { cn } from "@/lib/utils";
 
 const resources = [
+  // 🎯 Priorité haute - Commence ici
   {
-    id: 'market-analysis',
-    title: 'Analyse de marché',
-    description: 'Valide ton idée avec des données réelles sur ton marché cible',
-    icon: BarChart3,
-    color: 'from-blue-500 to-cyan-500',
-    bgColor: 'bg-blue-50',
-    page: 'MarketAnalysis',
-    isBeta: false
+    id: 'sales-messages',
+    title: 'Messages de vente',
+    description: '10 messages prêts à copier-coller pour démarrer tes conversations',
+    icon: MessageCircle,
+    color: 'from-indigo-500 to-purple-500',
+    bgColor: 'bg-indigo-50',
+    page: 'SalesMessages',
+    isBeta: false,
+    isHighPriority: true
   },
+  {
+    id: 'offers',
+    title: 'Offres',
+    description: 'Ton offre low-ticket complète : nom, prix, promesse, livrables',
+    icon: Package,
+    color: 'from-orange-500 to-red-500',
+    bgColor: 'bg-orange-50',
+    page: 'MyOffers',
+    isBeta: false,
+    isHighPriority: true
+  },
+  {
+    id: 'sales-page',
+    title: 'Page de vente',
+    description: 'Ta page de vente complète, prête à copier dans Carrd ou Notion',
+    icon: FileText,
+    color: 'from-green-500 to-emerald-500',
+    bgColor: 'bg-green-50',
+    page: 'SalesPage',
+    isBeta: false,
+    isHighPriority: true
+  },
+  // Priorité moyenne
   {
     id: 'avatars',
     title: 'Avatars clients',
-    description: 'Définis précisément qui sont tes clients idéaux et leurs besoins',
+    description: '3 profils de clients cibles avec leurs problèmes et motivations',
     icon: User,
     color: 'from-purple-500 to-pink-500',
     bgColor: 'bg-purple-50',
@@ -46,45 +71,26 @@ const resources = [
     isBeta: false
   },
   {
-    id: 'offers',
-    title: 'Offres',
-    description: 'Structure tes produits et services avec des prix optimisés',
-    icon: Package,
-    color: 'from-orange-500 to-red-500',
-    bgColor: 'bg-orange-50',
-    page: 'MyOffers',
-    isBeta: false
-  },
-  {
-    id: 'sales-page',
-    title: 'Page de vente',
-    description: 'Crée une landing page qui convertit tes visiteurs en clients',
-    icon: FileText,
-    color: 'from-green-500 to-emerald-500',
-    bgColor: 'bg-green-50',
-    page: 'SalesPage',
-    isBeta: false
-  },
-  {
-    id: 'sales-messages',
-    title: 'Messages de vente',
-    description: 'Génère des scripts de vente persuasifs pour convaincre',
-    icon: MessageCircle,
-    color: 'from-indigo-500 to-purple-500',
-    bgColor: 'bg-indigo-50',
-    page: 'SalesMessages',
-    isBeta: false
-  },
-  {
     id: 'emails',
     title: 'Emails marketing',
-    description: 'Automatise tes campagnes email pour nurture tes prospects',
+    description: '5 emails de suivi automatiques pour transformer tes prospects en clients',
     icon: Send,
     color: 'from-pink-500 to-rose-500',
     bgColor: 'bg-pink-50',
     page: 'EmailsMarketing',
     isBeta: false
   },
+  {
+    id: 'market-analysis',
+    title: 'Analyse de marché',
+    description: 'Analyse complète : concurrents, prix moyens, angles de vente qui marchent',
+    icon: BarChart3,
+    color: 'from-blue-500 to-cyan-500',
+    bgColor: 'bg-blue-50',
+    page: 'MarketAnalysis',
+    isBeta: false
+  },
+  // Fonctionnalités avancées/bêta
   {
     id: 'social-media',
     title: 'Réseaux sociaux',
@@ -225,7 +231,7 @@ export default function AIResources() {
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-[#61f7a2]" />
                 <p className="text-gray-900 font-medium">
-                  ✅ Tout est prêt. Ouvre chaque ressource quand tu veux.
+                  ✅ Tout est généré. Récupère ce dont tu as besoin pour ta mission du jour.
                 </p>
               </div>
             </motion.div>
@@ -242,10 +248,10 @@ export default function AIResources() {
                 <span className="text-xs font-semibold text-[#61f7a2]">Générés par IA</span>
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                ✨ Tes ressources IA
+                ✨ Tes livrables prêts à lancer
               </h1>
               <p className="text-gray-600 text-lg">
-                Tous les outils IA essentiels pour créer et vendre ton activité en ligne.
+                Noah a généré tout ce dont tu as besoin. Ouvre, personnalise, lance.
               </p>
             </motion.div>
 
@@ -281,7 +287,12 @@ export default function AIResources() {
                           <Icon className="w-7 h-7 text-white" />
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                          {isGenerated && !resource.isBeta && (
+                          {resource.isHighPriority && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-[#61f7a2]/20 rounded-lg border border-[#61f7a2]">
+                              <span className="text-xs font-bold text-gray-900">🎯 Commence ici</span>
+                            </div>
+                          )}
+                          {isGenerated && !resource.isBeta && !resource.isHighPriority && (
                             <div className="flex items-center gap-1 px-2 py-1 bg-green-50 rounded-lg border border-green-200">
                               <CheckCircle2 className="w-3 h-3 text-green-600" />
                               <span className="text-xs font-medium text-green-700">Prêt</span>
@@ -313,12 +324,12 @@ export default function AIResources() {
                       <div className="flex items-center justify-between">
                         <span className={cn(
                           "text-sm font-semibold flex items-center gap-2",
-                          resource.isBeta ? "text-gray-400" : "text-[#61f7a2] group-hover:underline"
+                          resource.isBeta ? "text-gray-400" : "text-gray-900 group-hover:text-black"
                         )}>
                           {resource.isBeta ? 'Bientôt disponible' : 'Ouvrir'}
                         </span>
                         {!resource.isBeta && (
-                          <ArrowRight className="w-4 h-4 text-[#61f7a2] group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="w-4 h-4 text-gray-900 group-hover:translate-x-1 transition-transform" />
                         )}
                       </div>
                     </div>

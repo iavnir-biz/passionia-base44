@@ -338,29 +338,7 @@ export default function OnboardingQuestionPage({
       <OnboardingSidebar currentPage={window.location.pathname.split('/').pop()} completedSteps={completedSteps} />
 
       <div className="flex-1 w-full flex flex-col lg:ml-80 pt-20 lg:pt-0 overflow-x-hidden relative">
-        {/* Progress bar for current block */}
-        {blockType && (
-          <div className="fixed top-0 lg:top-0 left-0 lg:left-80 right-0 bg-white border-b border-gray-200 z-40 pt-[90px] lg:pt-0">
-            <div className="px-4 md:px-6 py-2 md:py-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs md:text-sm font-medium text-gray-900">{blockTitle}</span>
-                <span className="text-xs md:text-sm font-semibold text-[#61f7a2]">
-                  {currentQuestion}/{totalQuestions} questions
-                </span>
-              </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
-                  initial={{ width: '0%' }}
-                  animate={{ width: `${blockProgress}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className={`flex-1 flex items-center justify-center p-3 md:p-6 ${blockType ? 'mt-[60px] md:mt-24 lg:mt-20' : ''}`}>
+        <div className="flex-1 flex items-center justify-center p-3 md:p-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -486,8 +464,8 @@ export default function OnboardingQuestionPage({
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.3, delay: idx * 0.1 }}
                           className={`flex items-center space-x-3 p-2.5 md:p-4 rounded-xl border cursor-pointer transition-all shadow-sm ${value === optionLabel
-                              ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
-                              : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-md'
+                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
+                            : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-md'
                             }`}
                           onClick={() => {
                             setValue(optionLabel);
@@ -518,8 +496,8 @@ export default function OnboardingQuestionPage({
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: idx * 0.1 }}
                         className={`flex items-center space-x-3 p-2.5 md:p-4 rounded-xl border cursor-pointer transition-all shadow-sm ${value.includes(option)
-                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
-                            : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-md'
+                          ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
+                          : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-md'
                           }`}
                         onClick={() => handleCheckboxChange(option, !value.includes(option))}
                         whileHover={{ scale: 1.02 }}

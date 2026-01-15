@@ -72,8 +72,23 @@ export default function PlanAction() {
         console.log("🔍 DEBUT DEBUG - Type de plan_7days_progress:", typeof savedProgress);
         console.log("🔍 DEBUT DEBUG - Valeur brute:", savedProgress);
 
+        // 🆕 SI LE CHAMP N'EXISTE PAS (undefined), on l'initialise en base
+        if (savedProgress === undefined || savedProgress === null) {
+          console.log("⚠️ Le champ plan_7days_progress n'existe pas, initialisation en base...");
+          savedProgress = {};
+
+          // On initialise le champ en base pour les prochaines fois
+          try {
+            await base44.entities.UserProfile.update(userProfile.id, {
+              plan_7days_progress: JSON.stringify({})
+            });
+            console.log("✅ Champ plan_7days_progress initialisé en base");
+          } catch (error) {
+            console.error("❌ Erreur lors de l'initialisation du champ:", error);
+          }
+        }
         // Si la base renvoie une string (ex: "{...}"), on la convertit en Objet
-        if (typeof savedProgress === "string") {
+        else if (typeof savedProgress === "string") {
           try {
             savedProgress = JSON.parse(savedProgress);
             console.log("✅ JSON parsé avec succès:", savedProgress);
@@ -81,12 +96,6 @@ export default function PlanAction() {
             console.error("❌ Erreur de parsing JSON", e);
             savedProgress = {};
           }
-        }
-
-        // Si c'est vide ou null, on met un objet vide
-        if (!savedProgress) {
-          console.log("⚠️ savedProgress est vide/null, initialisation à {}");
-          savedProgress = {};
         }
 
         console.log("📥 Progression chargée FINALE:", savedProgress); // Pour vérifier dans la console IDX

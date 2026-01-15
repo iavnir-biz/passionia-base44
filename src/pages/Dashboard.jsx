@@ -213,41 +213,15 @@ export default function Dashboard() {
         />
 
         <main className="p-8 max-w-6xl mx-auto">
-          {/* 1️⃣ OWNERSHIP & VALEUR */}
+          {/* 1️⃣ GREETING SIMPLE */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-3xl border-2 border-gray-200 p-8 mb-8"
+            className="mb-8"
           >
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Ton business personnalisé est prêt
+            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+              Bonjour {user?.first_name || 'entrepreneur'} <span className="text-4xl">👋</span>
             </h1>
-            <p className="text-lg text-gray-700 mb-6">
-              Noah a déjà construit tout ce dont tu as besoin pour vendre.
-            </p>
-
-            <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
-                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm font-medium text-gray-900">Offres</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
-                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm font-medium text-gray-900">Messages de vente</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
-                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm font-medium text-gray-900">Page de vente</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
-                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm font-medium text-gray-900">Emails marketing</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
-                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-sm font-medium text-gray-900">Plan d'action 7 jours</span>
-              </div>
-            </div>
           </motion.div>
 
           {/* 2️⃣ MISSION DU JOUR - SECTION DOMINANTE */}
@@ -345,10 +319,10 @@ export default function Dashboard() {
                 <div
                   key={day}
                   className={`flex-1 h-2 rounded-full transition-all ${day < getCurrentStep()
-                      ? 'bg-[#61f7a2]'
-                      : day === getCurrentStep()
-                        ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30'
-                        : 'bg-gray-200'
+                    ? 'bg-[#61f7a2]'
+                    : day === getCurrentStep()
+                      ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30'
+                      : 'bg-gray-200'
                     }`}
                 />
               ))}

@@ -93,41 +93,42 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white overflow-x-hidden">
       {/* Header */}
-      <header className="w-full flex justify-between items-center px-8 py-6">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg">
-          <Sparkles className="w-6 h-6 text-white" />
+      <header className="w-full flex justify-between items-center px-4 py-4 md:px-8 md:py-6">
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg shrink-0">
+          <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-white" />
         </div>
-        <div className="flex items-center gap-3">
-          {/* Bouton Connexion - Blanc */}
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Bouton Connexion */}
           <Button
             onClick={handleLogin}
             variant="outline"
-            className="bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-900 px-8 py-2 rounded-full font-medium transition-all duration-300 ease-out">
+            className="bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-900 px-3 py-1.5 text-xs md:text-base md:px-8 md:py-2 rounded-full font-medium transition-all duration-300 ease-out h-auto">
             Connexion
           </Button>
-          
-          {/* Bouton Démarrer - Noir avec Glow Vert */}
+
+          {/* Bouton Démarrer */}
           <Button
             onClick={handleStart}
-            className="bg-gradient-to-br from-[#1a1a1a] to-black text-white border border-transparent px-8 py-2 rounded-full font-medium transition-all duration-300 ease-out hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] hover:border-[#61f7a2]/30 hover:-translate-y-0.5">
-            Démarrer gratuitement
+            className="bg-gradient-to-br from-[#1a1a1a] to-black text-white border border-transparent px-3 py-1.5 text-xs md:text-base md:px-8 md:py-2 rounded-full font-medium transition-all duration-300 ease-out hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] hover:border-[#61f7a2]/30 hover:-translate-y-0.5 h-auto">
+            <span className="hidden md:inline">Démarrer gratuitement</span>
+            <span className="md:hidden">Démarrer</span>
           </Button>
         </div>
       </header>
 
       {/* Hero Section with Floating Cards */}
-      <div className="relative flex items-center justify-center px-6 py-20 md:py-32 overflow-hidden">
-        <div className="max-w-4xl text-center relative z-10">
+      <div className="relative flex items-center justify-center px-4 py-12 md:px-6 md:py-32 overflow-hidden">
+        <div className="max-w-4xl text-center relative z-10 w-full">
           {/* AI Badge */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-5 py-2.5 mb-8 shadow-sm">
-            <Sparkles className="w-4 h-4 text-[#61f7a2]" />
-            <span className="text-gray-700 text-sm font-medium">Propulsé par l'Intelligence Artificielle</span>
+            className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-2 md:px-5 md:py-2.5 mb-6 md:mb-8 shadow-sm">
+            <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-[#61f7a2]" />
+            <span className="text-gray-700 text-xs md:text-sm font-medium">Propulsé par l'Intelligence Artificielle</span>
           </motion.div>
 
           {/* Title */}
@@ -135,10 +136,10 @@ export default function Welcome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            
+            className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+
             Transforme ton{' '}
-            <span className="inline-block relative w-[200px] md:w-[240px] text-left align-top h-[1.2em] overflow-hidden align-middle">
+            <span className="inline-block relative w-[140px] md:w-[240px] text-left align-top h-[1.2em] overflow-hidden align-middle">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={ROTATING_WORDS[wordIndex]}
@@ -153,36 +154,38 @@ export default function Welcome() {
               </AnimatePresence>
             </span>
             <br className="hidden md:block" />
-            en <span className="underline decoration-[#61f7a2]/30">première vente</span> dès cette semaine.
+            en <span className="underline decoration-[#61f7a2]/30">première vente</span> <br className="md:hidden" />dès cette semaine.
           </motion.h1>
-          
+
           {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            className="text-base md:text-xl text-gray-600 mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed px-2">
             Notre IA sur-entraînée transforme ton savoir en offres, messages et page de vente, avec un plan clair et personnalisé.
           </motion.p>
-          
+
           {/* Search Bar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="mb-6 max-w-2xl mx-auto">
-            <div className="relative backdrop-blur-sm bg-white/95 rounded-2xl shadow-xl p-3 flex items-center gap-3 border border-gray-200">
-              <Search className="w-5 h-5 text-gray-400 ml-3" />
-              <Input
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="Quel talent veux-tu transformer en revenus ?"
-                className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-base h-12" />
-              
+            className="mb-6 max-w-2xl mx-auto w-full">
+            <div className="relative backdrop-blur-sm bg-white/95 rounded-2xl shadow-xl p-2 md:p-3 flex flex-col md:flex-row items-center gap-2 md:gap-3 border border-gray-200">
+              <div className="flex items-center w-full md:w-auto flex-1 pl-2">
+                <Search className="w-5 h-5 text-gray-400 shrink-0" />
+                <Input
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  placeholder="Quel talent veux-tu transformer ?"
+                  className="flex-1 border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus-visible:ring-0 text-sm md:text-base h-10 md:h-12" />
+              </div>
+
               {/* Bouton Démarrer - Noir avec Glow Vert */}
               <Button
                 onClick={handleStart}
-                className="bg-gradient-to-br from-[#1a1a1a] to-black text-white border border-transparent px-6 h-12 rounded-full font-semibold transition-all duration-300 ease-out hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] hover:border-[#61f7a2]/30 hover:-translate-y-0.5">
+                className="w-full md:w-auto bg-gradient-to-br from-[#1a1a1a] to-black text-white border border-transparent px-6 h-10 md:h-12 rounded-xl md:rounded-full font-semibold transition-all duration-300 ease-out hover:shadow-[0_0_20px_rgba(97,247,162,0.4)] hover:border-[#61f7a2]/30 hover:-translate-y-0.5 whitespace-nowrap">
                 Découvrir mon potentiel
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -190,40 +193,40 @@ export default function Welcome() {
           </motion.div>
 
           {/* Scrolling Categories Tags - Défilement Horizontal */}
-<motion.div
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  transition={{ delay: 0.9 }}
-  className="relative mt-12 overflow-hidden max-w-2xl mx-auto py-2"
->
-  {/* Conteneur de défilement (Marquee) */}
-  <div className="flex overflow-hidden group">
-    <motion.div 
-      className="flex gap-4 items-center whitespace-nowrap pr-4"
-      animate={{ x: [0, -1030] }} // Ajusté pour un défilement fluide
-      transition={{ 
-        duration: 30, 
-        repeat: Infinity, 
-        ease: "linear",
-      }}
-    >
-      {/* On double la liste pour un effet de boucle infinie sans coupure */}
-      {[...categories, ...categories].map((category, index) =>
-        <button
-          key={index}
-          onClick={() => handleCategoryClick(category.label)}
-          className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all hover:scale-105 shadow-sm border border-gray-100/50 ${category.color}`}>
-          <category.icon className="w-3.5 h-3.5" />
-          {category.label}
-        </button>
-      )}
-    </motion.div>
-  </div>
-  
-  {/* Effet de fondu sur les côtés pour le style "Premium" */}
-  <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 via-gray-50/20 to-transparent pointer-events-none z-10" />
-  <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 via-gray-50/20 to-transparent pointer-events-none z-10" />
-</motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="relative mt-12 overflow-hidden max-w-2xl mx-auto py-2"
+          >
+            {/* Conteneur de défilement (Marquee) */}
+            <div className="flex overflow-hidden group">
+              <motion.div
+                className="flex gap-4 items-center whitespace-nowrap pr-4"
+                animate={{ x: [0, -1030] }} // Ajusté pour un défilement fluide
+                transition={{
+                  duration: 30,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              >
+                {/* On double la liste pour un effet de boucle infinie sans coupure */}
+                {[...categories, ...categories].map((category, index) =>
+                  <button
+                    key={index}
+                    onClick={() => handleCategoryClick(category.label)}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all hover:scale-105 shadow-sm border border-gray-100/50 ${category.color}`}>
+                    <category.icon className="w-3.5 h-3.5" />
+                    {category.label}
+                  </button>
+                )}
+              </motion.div>
+            </div>
+
+            {/* Effet de fondu sur les côtés pour le style "Premium" */}
+            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 via-gray-50/20 to-transparent pointer-events-none z-10" />
+            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 via-gray-50/20 to-transparent pointer-events-none z-10" />
+          </motion.div>
         </div>
 
         {/* Floating Cards around Hero */}
@@ -441,23 +444,23 @@ export default function Welcome() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.9 }}
-        className="w-full bg-gradient-to-br from-gray-50 to-white py-24">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="bg-white rounded-3xl shadow-xl p-12">
+        className="w-full bg-gradient-to-br from-gray-50 to-white py-12 md:py-24">
+        <div className="max-w-3xl mx-auto px-4 md:px-6">
+          <div className="bg-white rounded-3xl shadow-xl p-6 md:p-12">
             <div className="text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-5">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-5">
                 Tu n’as rien à perdre. Tout à construire.
               </h2>
-              <p className="text-lg text-gray-600 mb-8">
-              Tu ne t’engages pas dans un projet compliqué. Tu commences simplement par comprendre ton potentiel — le reste est guidé.
+              <p className="text-base md:text-lg text-gray-600 mb-8">
+                Tu ne t’engages pas dans un projet compliqué. Tu commences simplement par comprendre ton potentiel — le reste est guidé.
               </p>
 
               {/* Two badges */}
-              <div className="flex flex-wrap justify-center gap-3 mb-8">
-                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mb-8">
+                <div className="inline-flex items-center justify-center gap-2 bg-gray-100 rounded-full px-4 py-2 md:px-5 md:py-3">
                   <span className="text-gray-700 text-sm font-medium">✓ Inscription 100% gratuite</span>
                 </div>
-                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-5 py-3">
+                <div className="inline-flex items-center justify-center gap-2 bg-gray-100 rounded-full px-4 py-2 md:px-5 md:py-3">
                   <span className="text-gray-700 text-sm font-medium">✓ Sans expertise technique</span>
                 </div>
               </div>
@@ -466,8 +469,8 @@ export default function Welcome() {
               <div className="flex justify-center mb-4">
                 <Button
                   onClick={handleStart}
-                  className="bg-gradient-to-br from-[#61f7a2] to-[#4de88f] text-gray-900 px-10 py-6 text-lg font-semibold rounded-full transition-all duration-300 ease-out hover:shadow-[0_0_25px_rgba(97,247,162,0.6)] hover:brightness-110 hover:-translate-y-0.5">
-                  <Sparkles className="w-5 h-5 mr-2" />
+                  className="bg-gradient-to-br from-[#61f7a2] to-[#4de88f] text-gray-900 px-6 py-4 md:px-10 md:py-6 text-base md:text-lg font-semibold rounded-full transition-all duration-300 ease-out hover:shadow-[0_0_25px_rgba(97,247,162,0.6)] hover:brightness-110 hover:-translate-y-0.5 h-auto whitespace-normal text-center">
+                  <Sparkles className="w-5 h-5 mr-2 shrink-0" />
                   Commencer gratuitement
                 </Button>
               </div>
@@ -479,8 +482,8 @@ export default function Welcome() {
       {/* Footer */}
       <footer className="w-full border-t border-gray-200 bg-gray-50/50 py-8">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-row justify-between items-center gap-6 overflow-x-auto">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-3 self-center md:self-auto">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
@@ -490,15 +493,15 @@ export default function Welcome() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-4 text-xs text-gray-600 whitespace-nowrap overflow-x-auto">
+            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 text-xs text-gray-600">
               <a href="#" className="hover:text-gray-900 transition-colors">Réglementation AI Act</a>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-300 hidden md:inline">•</span>
               <a href="#" className="hover:text-gray-900 transition-colors">Protection des données</a>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-300 hidden md:inline">•</span>
               <a href="#" className="hover:text-gray-900 transition-colors">RGPD</a>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-300 hidden md:inline">•</span>
               <a href="#" className="hover:text-gray-900 transition-colors">Politique de confidentialité</a>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-300 hidden md:inline">•</span>
               <a href="#" className="hover:text-gray-900 transition-colors">Mentions légales</a>
             </div>
           </div>

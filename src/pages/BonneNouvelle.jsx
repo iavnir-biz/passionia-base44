@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { 
-  Loader2, 
+import {
+  Loader2,
   TrendingUp,
   ArrowRight,
   ChevronDown,
@@ -134,15 +134,15 @@ export default function BonneNouvelle() {
 
   const generateMarketAnalysis = async (sessionId, currentSession) => {
     if (!sessionId) return;
-    
+
     setIsGenerating(true);
     try {
       const summary = currentSession?.onboarding_summary || {};
-      
+
       const { data } = await base44.functions.invoke('generateMarketValidation', {
         sessionId
       });
-      
+
       if (data.success) {
         setMarketAnalysis({
           validationText: data.marketValidation,
@@ -157,7 +157,7 @@ export default function BonneNouvelle() {
       const summary = currentSession?.onboarding_summary || {};
       const who = summary.who_to_teach || 'ta compétence';
       const profile = summary.learner_profile || 'des personnes motivées';
-      
+
       setMarketAnalysis({
         validationText: `${user?.firstName || ''}, les personnes que tu veux aider font face à un blocage réel. Ce problème les empêche de progresser efficacement.\n\nCe que tu proposes répond directement à ce blocage : un résultat rapide dès le départ, puis une transformation durable. Cette progression claire crée une valeur perçue forte.\n\nTon objectif de revenus est cohérent avec les formats que tu as choisis et le niveau de transformation que tu apportes. Le ratio effort/revenus est favorable.`,
         marketScores: {
@@ -200,17 +200,17 @@ export default function BonneNouvelle() {
   // 🔥 REVENUE depuis Session (pas User)
   const finalized = session?.finalized_offer || null;
   const myOffers = session?.my_generated_offers || null;
-  
+
   const defaultRevenues = [
     { key: 'low', label: 'Produit Principal', price: 97, multiplier: 30 },
     { key: 'bump', label: 'Order Bump', price: 27, multiplier: 15 },
     { key: 'mid', label: 'Upsell', price: 297, multiplier: 9 },
     { key: 'high', label: 'Premium', price: 3000, multiplier: 1 }
   ];
-  
+
   let revenues = [];
   let revenueSource = 'defaults';
-  
+
   // Priorité 1: my_generated_offers
   if (myOffers?.low || myOffers?.bump || myOffers?.mid || myOffers?.high) {
     revenueSource = 'my_generated_offers';
@@ -251,14 +251,14 @@ export default function BonneNouvelle() {
   }
 
   const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
-  
+
   console.log('[BONNENOUVELLE][REVENUE]', {
     source: revenueSource,
     totalMonthly,
     hasFinalized: !!finalized,
     hasMyOffers: !!myOffers
   });
-  
+
   const scores = marketAnalysis?.marketScores || {};
   const scoreExplanations = marketAnalysis?.scoreExplanations || {};
   const summary = marketAnalysis?.summary || {};
@@ -270,247 +270,248 @@ export default function BonneNouvelle() {
       <OnboardingSidebar currentPage="BonneNouvelle" completedSteps={completedSteps} progressInStep={0} />
 
       {/* Content */}
-      <div className="flex-1 flex flex-col lg:ml-80">
+      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-32 lg:pt-0 overflow-x-hidden relative">
         <div className="py-12">
-        <div className="max-w-3xl mx-auto px-4">
-          {/* Top CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex justify-center mb-8"
-          >
-            <GlowButton onClick={handleContinue} size="lg" className="px-12">
-              Voir ma vie future
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
-          </motion.div>
-
-          {/* Title */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-5xl font-bold text-gray-900 mb-2">
-              🎉 Bonne nouvelle
-            </h1>
-            <p className="text-xl text-gray-600">
-              Ton marché est réel et viable
-            </p>
-          </motion.div>
-
-          {/* Validation Text Block - Emotional */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
-          >
-            {isGenerating ? (
-              <div className="flex items-center justify-center gap-3 py-12">
-                <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                <span className="text-gray-600">Noah analyse le marché...</span>
-              </div>
-            ) : (
-              <div className="space-y-5 text-gray-700 leading-relaxed text-base">
-                <p>
-                  Après analyse de ton marché autour de <strong>{summary.coreSkill || summary.who_to_teach || 'ta compétence'}</strong>, une chose ressort très clairement.
-                </p>
-                <p>
-                  Nous sommes en 2024–2025, et jamais autant de personnes n'ont cherché à apprendre, progresser ou se former sur ce sujet. Ce n'est pas une intuition. Les données montrent une augmentation forte de l'intérêt, une douleur bien identifiée, et surtout un comportement d'achat déjà existant.
-                </p>
-                <p className="font-medium text-gray-900">
-                  Autrement dit : tu n'arrives pas trop tôt. Tu arrives au bon moment.
-                </p>
-              </div>
-            )}
-          </motion.div>
-
-          {/* Contextual Proof Block with Sources */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
-          >
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
-              🔍 Ce que montrent les données récentes
-            </h2>
-
-            {isGenerating ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="border-l-4 border-[#61f7a2] pl-4 py-3">
-                  <p className="text-gray-700 text-base">
-                    • Intérêt croissant pour les solutions en ligne autour de <strong>{summary.coreSkill || 'ta compétence'}</strong> avec une forte croissance observée sur les 12 derniers mois.
-                  </p>
-                </div>
-                <div className="border-l-4 border-[#61f7a2] pl-4 py-3">
-                  <p className="text-gray-700 text-base">
-                    • Les personnes cherchent déjà des réponses : comportement d'achat confirmé, demande active, et solutions partielles existantes validant le marché.
-                  </p>
-                </div>
-              </div>
-            )}
-          </motion.div>
-
-          {/* Market Potential Indicators */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
-          >
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
-              📊 Ton potentiel sur ce marché
-            </h2>
-
-            {isGenerating ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <ProgressBarItem 
-                  label="Potentiel du marché"
-                  value={scores.marketSize || scores.taille_du_probleme || 75}
-                  explanation="Taille et accessibilité de l'audience pour ton offre."
-                  icon={Globe}
-                  delay={0}
-                />
-                <ProgressBarItem 
-                  label="Évolution récente"
-                  value={scores.demandIntensity || scores.intensite_de_la_douleur || 78}
-                  explanation="Croissance de l'intérêt sur les 12 derniers mois."
-                  icon={TrendingUp}
-                  delay={0.1}
-                />
-                <ProgressBarItem 
-                  label="Potentiel de monétisation"
-                  value={scores.revenueRecurrence || scores.potentiel_de_monetisation || 80}
-                  explanation="Capacité à générer des revenus stables avec les bons formats."
-                  icon={Package}
-                  delay={0.2}
-                />
-              </div>
-            )}
-          </motion.div>
-
-          {/* Revenue Calculation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 rounded-3xl border-2 border-yellow-600 p-8 mb-8 shadow-2xl"
-          >
-            <div className="flex items-center gap-4 mb-6">
-              <motion.div 
-                className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <TrendingUp className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <h2 className="text-xl font-bold text-white drop-shadow-sm">
-                  🎯 {revenueSource !== 'defaults' ? 'Ton Objectif de Revenus Mensuels' : 'Potentiel de Revenus Mensuels'}
-                </h2>
-                <p className="text-white/80 text-sm drop-shadow-sm">
-                  {revenueSource !== 'defaults' ? 'Basé sur ton offre complète' : 'Estimation basée sur les standards du secteur'}
-                </p>
-              </div>
-            </div>
-
-            {/* Big Number */}
-            <motion.div 
-              className="text-center py-8 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5 }}
+          <div className="max-w-3xl mx-auto px-4">
+            {/* Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-10"
             >
-              <span className="text-6xl md:text-8xl font-black text-white drop-shadow-xl">
-                {totalMonthly.toLocaleString('fr-FR')} €
-              </span>
-              <p className="text-white/90 mt-4 text-xl font-bold drop-shadow-sm">💰 par mois</p>
+              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">
+                🎉 Bonne nouvelle
+              </h1>
+              <p className="text-lg md:text-xl text-gray-600 mb-8">
+                Ton marché est réel et viable
+              </p>
+
+              {/* CTA Button moved underneath subtitle as requested */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="flex justify-center"
+              >
+                <GlowButton onClick={handleContinue} size="lg" className="w-full md:w-auto px-12">
+                  Voir ma vie future
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </GlowButton>
+              </motion.div>
             </motion.div>
 
-            {/* Toggle Detail */}
-            <button
-              onClick={() => setShowDetail(!showDetail)}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-white hover:bg-white/10 transition-all font-medium mt-4"
+            {/* Validation Text Block - Emotional */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8 mb-8"
             >
-              {showDetail ? (
-                <>
-                  Cacher le détail <ChevronUp className="w-4 h-4" />
-                </>
-              ) : (
-                <>
-                  Voir le détail <ChevronDown className="w-4 h-4" />
-                </>
-              )}
-            </button>
-
-            {/* Detail Breakdown */}
-            {showDetail && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="border-t border-white/20 pt-4 mt-2 space-y-3"
-              >
-                {revenues.map((rev) => (
-                  <div 
-                    key={rev.key}
-                    className="flex items-center justify-between py-3 px-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20"
-                  >
-                    <div>
-                      <span className="text-white text-sm font-semibold">{rev.label}</span>
-                      <p className="text-white/70 text-xs">×{rev.multiplier} ventes/mois</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-white font-bold">{rev.total.toLocaleString('fr-FR')} €</span>
-                      <p className="text-white/70 text-xs">{rev.price} € × {rev.multiplier}</p>
-                    </div>
-                  </div>
-                ))}
-                
-                <div className="flex items-center justify-between py-4 px-4 bg-white/20 backdrop-blur-sm rounded-2xl border-2 border-white/40">
-                  <span className="text-white font-bold">Total Mensuel</span>
-                  <span className="text-white font-bold text-xl">
-                    {totalMonthly.toLocaleString('fr-FR')} €
-                  </span>
+              {isGenerating ? (
+                <div className="flex items-center justify-center gap-3 py-12">
+                  <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
+                  <span className="text-gray-600">Noah analyse le marché...</span>
                 </div>
+              ) : (
+                <div className="space-y-5 text-gray-700 leading-relaxed text-base">
+                  <p>
+                    Après analyse de ton marché autour de <strong>{summary.coreSkill || summary.who_to_teach || 'ta compétence'}</strong>, une chose ressort très clairement.
+                  </p>
+                  <p>
+                    Nous sommes en 2024–2025, et jamais autant de personnes n'ont cherché à apprendre, progresser ou se former sur ce sujet. Ce n'est pas une intuition. Les données montrent une augmentation forte de l'intérêt, une douleur bien identifiée, et surtout un comportement d'achat déjà existant.
+                  </p>
+                  <p className="font-medium text-gray-900">
+                    Autrement dit : tu n'arrives pas trop tôt. Tu arrives au bon moment.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+
+            {/* Contextual Proof Block with Sources */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8 mb-8"
+            >
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
+                🔍 Ce que montrent les données récentes
+              </h2>
+
+              {isGenerating ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="border-l-4 border-[#61f7a2] pl-4 py-3">
+                    <p className="text-gray-700 text-base">
+                      • Intérêt croissant pour les solutions en ligne autour de <strong>{summary.coreSkill || 'ta compétence'}</strong> avec une forte croissance observée sur les 12 derniers mois.
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-[#61f7a2] pl-4 py-3">
+                    <p className="text-gray-700 text-base">
+                      • Les personnes cherchent déjà des réponses : comportement d'achat confirmé, demande active, et solutions partielles existantes validant le marché.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+
+            {/* Market Potential Indicators */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8 mb-8"
+            >
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
+                📊 Ton potentiel sur ce marché
+              </h2>
+
+              {isGenerating ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <ProgressBarItem
+                    label="Potentiel du marché"
+                    value={scores.marketSize || scores.taille_du_probleme || 75}
+                    explanation="Taille et accessibilité de l'audience pour ton offre."
+                    icon={Globe}
+                    delay={0}
+                  />
+                  <ProgressBarItem
+                    label="Évolution récente"
+                    value={scores.demandIntensity || scores.intensite_de_la_douleur || 78}
+                    explanation="Croissance de l'intérêt sur les 12 derniers mois."
+                    icon={TrendingUp}
+                    delay={0.1}
+                  />
+                  <ProgressBarItem
+                    label="Potentiel de monétisation"
+                    value={scores.revenueRecurrence || scores.potentiel_de_monetisation || 80}
+                    explanation="Capacité à générer des revenus stables avec les bons formats."
+                    icon={Package}
+                    delay={0.2}
+                  />
+                </div>
+              )}
+            </motion.div>
+
+            {/* Revenue Calculation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 rounded-3xl border-2 border-yellow-600 p-5 md:p-8 mb-8 shadow-2xl"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <motion.div
+                  className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </motion.div>
+                <div>
+                  <h2 className="text-xl font-bold text-white drop-shadow-sm">
+                    🎯 {revenueSource !== 'defaults' ? 'Ton Objectif de Revenus Mensuels' : 'Potentiel de Revenus Mensuels'}
+                  </h2>
+                  <p className="text-white/80 text-sm drop-shadow-sm">
+                    {revenueSource !== 'defaults' ? 'Basé sur ton offre complète' : 'Estimation basée sur les standards du secteur'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Big Number */}
+              <motion.div
+                className="text-center py-6 md:py-8 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <span className="text-4xl md:text-8xl font-black text-white drop-shadow-xl block">
+                  {totalMonthly.toLocaleString('fr-FR')} €
+                </span>
+                <p className="text-white/90 mt-2 md:mt-4 text-lg md:text-xl font-bold drop-shadow-sm">💰 par mois</p>
               </motion.div>
-            )}
-          </motion.div>
 
-          {/* Conclusion Block */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-gradient-to-r from-[#61f7a2]/10 to-[#4de88f]/10 rounded-2xl border border-[#61f7a2]/20 p-6 mb-8 text-center"
-          >
-            <p className="text-gray-700 text-lg font-medium">
-              👉 Tu n'essaies pas de créer un marché. Tu arrives sur un marché qui existe déjà.
-            </p>
-          </motion.div>
+              {/* Toggle Detail */}
+              <button
+                onClick={() => setShowDetail(!showDetail)}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-white hover:bg-white/10 transition-all font-medium mt-4"
+              >
+                {showDetail ? (
+                  <>
+                    Cacher le détail <ChevronUp className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    Voir le détail <ChevronDown className="w-4 h-4" />
+                  </>
+                )}
+              </button>
 
-          {/* Bottom CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex justify-center"
-          >
-            <GlowButton onClick={handleContinue} size="lg" className="px-12">
-              Voir ma vie future
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </GlowButton>
-          </motion.div>
-        </div>
+              {/* Detail Breakdown */}
+              {showDetail && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="border-t border-white/20 pt-4 mt-2 space-y-3"
+                >
+                  {revenues.map((rev) => (
+                    <div
+                      key={rev.key}
+                      className="flex items-center justify-between py-3 px-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20"
+                    >
+                      <div>
+                        <span className="text-white text-sm font-semibold">{rev.label}</span>
+                        <p className="text-white/70 text-xs">×{rev.multiplier} ventes/mois</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-white font-bold">{rev.total.toLocaleString('fr-FR')} €</span>
+                        <p className="text-white/70 text-xs">{rev.price} € × {rev.multiplier}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="flex items-center justify-between py-4 px-4 bg-white/20 backdrop-blur-sm rounded-2xl border-2 border-white/40">
+                    <span className="text-white font-bold">Total Mensuel</span>
+                    <span className="text-white font-bold text-xl">
+                      {totalMonthly.toLocaleString('fr-FR')} €
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+
+            {/* Conclusion Block */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-gradient-to-r from-[#61f7a2]/10 to-[#4de88f]/10 rounded-2xl border border-[#61f7a2]/20 p-6 mb-8 text-center"
+            >
+              <p className="text-gray-700 text-lg font-medium">
+                👉 Tu n'essaies pas de créer un marché. Tu arrives sur un marché qui existe déjà.
+              </p>
+            </motion.div>
+
+            {/* Bottom CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex justify-center"
+            >
+              <GlowButton onClick={handleContinue} size="lg" className="px-12">
+                Voir ma vie future
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </GlowButton>
+            </motion.div>
+          </div>
         </div>
       </div>
     </div>

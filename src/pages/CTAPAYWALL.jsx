@@ -181,7 +181,7 @@ export default function CTAPAYWALL() {
       <OnboardingSidebar currentPage="CTAPAYWALL" completedSteps={completedSteps} progressInStep={0} />
 
       <div className="flex-1 flex flex-col lg:ml-80">
-        <div className="max-w-4xl mx-auto px-6 py-12">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-12 pt-28 md:pt-12">
 
           {/* Header */}
           <motion.div
@@ -196,7 +196,7 @@ export default function CTAPAYWALL() {
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h1 className="text-2xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
               Maintenant, on va mettre tout ça en place ensemble
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -788,14 +788,17 @@ export default function CTAPAYWALL() {
                 )}
               </GlowButton>
             </div>
-            <div className="flex items-center justify-center gap-4 text-gray-500 text-sm mt-4">
-              <div className="flex items-center gap-2 bg-[#635BFF]/10 px-3 py-1.5 rounded-lg border border-[#635BFF]/20">
-                <svg className="w-12 h-6" viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg">
-                  <path fill="#635BFF" d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a8.33 8.33 0 0 1-4.55 1.1c-4.85 0-6.83-2.5-6.83-6.35 0-4.8 2.3-7.11 5.78-7.11 3.39 0 5.24 2.33 5.24 6.3 0 .44-.04.9-.11 1.14zM55.8 11.72c.11-1.42-.82-2.12-2.34-2.12-1.9 0-2.8 1.1-2.9 2.12h5.24zm-14.85 2.12h-3.4v6.17h-4.04v-9.1c0-2.3.94-3.5 2.85-3.5 1.35 0 2.36.42 2.89.87l-1.46 3.01c-.34-.23-.74-.4-1.23-.4-.73 0-1.02.48-1.02 1.3v1.65h2.4v6.17h4.01v-6.17zm-14.7 6.17h-4.04V7.27h4.05v10.78zm-2.02-12.7c-1.35 0-2.3.92-2.3 2.15 0 1.25.96 2.15 2.3 2.15 1.35 0 2.3-.9 2.3-2.15 0-1.22-.95-2.15-2.3-2.15zm-10.42 12.7h-3.11v-1.63c-1.05 1.4-2.6 1.9-4.32 1.9-2.8 0-4.9-2.3-4.9-5.73 0-3.3 2.1-5.63 4.98-5.63 1.63 0 3.19.64 4.07 1.76v-5h4.28v14.33zm-4.04-5.59c0-1.87-1-3-2.56-3-1.6 0-2.67 1.2-2.67 3s1.08 3 2.67 3c1.55 0 2.56-1.12 2.56-3z" />
-                </svg>
+
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 text-gray-500 text-sm mt-8 pb-8">
+              <div className="flex items-center gap-2 text-gray-400">
+                <Shield className="w-4 h-4" />
+                <span>Paiement 100% sécurisé</span>
               </div>
-              <span>•</span>
-              <span className="text-gray-600 font-medium">Satisfait ou remboursé 30 jours</span>
+              <div className="hidden md:block w-1 h-1 bg-gray-300 rounded-full" />
+              <div className="flex items-center gap-2 text-gray-600 font-medium">
+                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
+                <span>Satisfait ou remboursé 30 jours</span>
+              </div>
             </div>
           </motion.div>
 

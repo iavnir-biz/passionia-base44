@@ -317,17 +317,21 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
 
         {/* Interactive Step Progress Bar (Bottom Line) */}
         {totalPagesInStep > 1 && (
-          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-100">
+          <div className="absolute bottom-0 left-0 right-0 h-5 bg-gray-100">
+            {/* Progress Bar */}
             <motion.div
-              className="h-full bg-gray-900 relative"
+              className="h-full bg-gray-900"
               initial={{ width: 0 }}
               animate={{ width: `${progressInStep}%` }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            >
-              {/* Glowing Tip Effect */}
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-8 h-8 bg-gray-900/20 blur-md rounded-full pointer-events-none" />
-              <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(0,0,0,0.5)]" />
-            </motion.div>
+            />
+
+            {/* Percentage Text with Mix Blend Mode for Auto-Contrast */}
+            <div className="absolute inset-0 flex items-center justify-center mix-blend-difference z-10">
+              <span className="text-[10px] font-black text-white tracking-widest uppercase">
+                {Math.round(progressInStep)}%
+              </span>
+            </div>
           </div>
         )}
       </div>

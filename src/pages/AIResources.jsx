@@ -231,7 +231,7 @@ export default function AIResources() {
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-[#61f7a2]" />
                 <p className="text-gray-900 font-medium">
-                  ✅ Tout est généré. Récupère ce dont tu as besoin pour ta mission du jour.
+                  Tout est généré. Récupère ce dont tu as besoin pour ta mission du jour.
                 </p>
               </div>
             </motion.div>
@@ -248,7 +248,7 @@ export default function AIResources() {
                 <span className="text-xs font-semibold text-[#61f7a2]">Générés par IA</span>
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                ✨ Tes livrables prêts à lancer
+                Tes livrables prêts à lancer
               </h1>
               <p className="text-gray-600 text-lg">
                 Noah a généré tout ce dont tu as besoin. Ouvre, personnalise, lance.

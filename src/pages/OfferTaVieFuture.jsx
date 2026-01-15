@@ -192,8 +192,8 @@ export default function OfferTaVieFuture() {
       <OnboardingSidebar currentPage="OfferTaVieFuture" completedSteps={completedSteps} progressInStep={0} />
 
       {/* Content */}
-      <div className="flex-1 flex flex-col lg:ml-80">
-        <div className="pt-40 pb-12 lg:py-12">
+      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-32 lg:pt-0 overflow-x-hidden relative">
+        <div className="py-6 md:py-12">
           <div className="max-w-3xl mx-auto px-4">
             {/* Title */}
             <motion.div
@@ -201,21 +201,20 @@ export default function OfferTaVieFuture() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center mb-8"
             >
-              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+              <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3">
                 ✨ Voici ce que ta vie future te réserve…
               </h1>
             </motion.div>
 
-            {/* Top CTA */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="flex justify-center mb-8"
             >
-              <GlowButton onClick={handleContinue} size="lg" className="px-10">
+              <GlowButton onClick={handleContinue} size="lg" className="w-full md:w-auto px-6 md:px-10 text-sm md:text-base">
                 Voir le Plan de mise en place CONCRÈTE
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
               </GlowButton>
             </motion.div>
 
@@ -224,7 +223,7 @@ export default function OfferTaVieFuture() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-6"
+              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8 mb-6"
             >
               <div className="flex items-start gap-4 mb-6">
                 <motion.div
@@ -274,34 +273,30 @@ export default function OfferTaVieFuture() {
               className="bg-[#1b1b33] rounded-3xl border border-[#2a2a45] p-8 mb-6 shadow-lg"
             >
               <div className="flex items-center gap-4 mb-6">
-                <motion.div
-                  className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </motion.div>
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">
+                  <h2 className="text-lg md:text-xl font-bold text-white leading-tight">
                     Ton Potentiel de Revenus Mensuels
                   </h2>
-                  <p className="text-gray-400 text-sm">
-                    Basé sur les produits sélectionnés et une hypothèse d'une vente par jour
+                  <p className="text-gray-400 text-[10px] md:text-sm mt-0.5">
+                    Basé sur une hypothèse d'une vente par jour
                   </p>
                 </div>
               </div>
 
               {/* Big Number */}
               <motion.div
-                className="text-center py-8"
+                className="text-center py-6 md:py-8"
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                <span className="text-5xl md:text-7xl font-bold text-[#61f7a2]">
+                <span className="text-4xl md:text-7xl font-bold text-[#61f7a2]">
                   {potentialRevenue.toLocaleString('fr-FR')} €
                 </span>
-                <p className="text-gray-400 mt-3 text-lg font-medium">par mois</p>
+                <p className="text-gray-400 mt-2 md:mt-3 text-base md:text-lg font-medium">par mois</p>
               </motion.div>
 
               {/* Toggle Detail */}
@@ -358,25 +353,23 @@ export default function OfferTaVieFuture() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="bg-gradient-to-br from-yellow-50 to-white rounded-3xl border-2 border-yellow-300/50 p-8 mb-8 shadow-lg"
+              className="bg-gradient-to-br from-yellow-50 to-white rounded-3xl border-2 border-yellow-300/50 p-5 md:p-8 mb-8 shadow-lg"
             >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    Ton Plan de Route pour Atteindre ton Objectif
-                  </h2>
-                  <p className="text-gray-600 text-sm">
-                    Scénario indicatif pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
-                    {totalProjected > 0 && (
-                      <span className="block mt-1 text-[#61f7a2] font-semibold">
-                        → Projection totale : {totalProjected.toLocaleString('fr-FR')}€/mois
-                      </span>
-                    )}
-                  </p>
-                </div>
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Target className="w-5 h-5 md:w-6 md:h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 leading-tight">
+                  Ton Plan de Route pour Atteindre ton Objectif
+                </h2>
+                <p className="text-gray-600 text-[11px] md:text-sm mt-0.5">
+                  Scénario indicatif pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
+                  {totalProjected > 0 && (
+                    <span className="block mt-1 text-emerald-600 font-semibold">
+                      → Projection totale : {totalProjected.toLocaleString('fr-FR')}€/mois
+                    </span>
+                  )}
+                </p>
               </div>
 
               <div className="space-y-3">
@@ -386,15 +379,15 @@ export default function OfferTaVieFuture() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 + idx * 0.1 }}
-                    className="flex items-center justify-between py-4 px-5 bg-white rounded-2xl border border-gray-200 shadow-sm"
+                    className="flex items-center justify-between py-3 md:py-4 px-4 md:px-5 bg-white rounded-2xl border border-gray-200 shadow-sm"
                   >
                     <div>
-                      <span className="text-gray-900 text-sm font-semibold">{item.label}</span>
-                      <p className="text-gray-500 text-xs">{item.price} € par vente</p>
+                      <span className="text-gray-900 text-sm font-semibold truncate block max-w-[150px] md:max-w-none">{item.label}</span>
+                      <p className="text-gray-500 text-[10px] md:text-xs">{item.price} € par vente</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-yellow-500" />
-                      <span className="text-yellow-600 font-bold text-lg">
+                    <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                      <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-yellow-500" />
+                      <span className="text-yellow-600 font-bold text-base md:text-lg">
                         {item.salesNeeded} ventes
                       </span>
                     </div>
@@ -414,16 +407,15 @@ export default function OfferTaVieFuture() {
               </motion.div>
             </motion.div>
 
-            {/* Bottom CTA */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
               className="flex justify-center"
             >
-              <GlowButton onClick={handleContinue} size="lg" className="px-12">
+              <GlowButton onClick={handleContinue} size="lg" className="w-full md:w-auto px-6 md:px-12 text-sm md:text-base">
                 Voir le Plan de mise en place CONCRÈTE
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
               </GlowButton>
             </motion.div>
           </div>

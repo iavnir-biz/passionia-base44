@@ -57,10 +57,10 @@ const features = [
 const categories = [
   { icon: Music, label: "Composition musicale", color: "bg-pink-100 text-pink-700 hover:bg-pink-200" },
   { icon: Code, label: "Programmation Python", color: "bg-blue-100 text-blue-700 hover:bg-blue-200" },
-  { icon: Languages, label: "Anglais", color: "bg-green-100 text-green-700 hover:bg-green-200" },
+  { icon: Languages, label: "Anglais startup", color: "bg-green-100 text-green-700 hover:bg-green-200" },
   { icon: Dumbbell, label: "Calisthénie", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
   { icon: ChefHat, label: "Cuisine moléculaire", color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" },
-  { icon: Camera, label: "Photographie", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
+  { icon: Camera, label: "Créer du contenu", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
   { icon: Sword, label: "Jujitsu", color: "bg-red-100 text-red-700 hover:bg-red-200" },
   { icon: Sparkle, label: "Intelligence artificielle", color: "bg-indigo-100 text-indigo-700 hover:bg-indigo-200" },
   { icon: Video, label: "Montage vidéo", color: "bg-cyan-100 text-cyan-700 hover:bg-cyan-200" },
@@ -138,7 +138,6 @@ export default function Welcome() {
             transition={{ delay: 0.3 }}
             className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
 
-            Transforme ton{' '}
             Transforme ton <br className="md:hidden" />
             <motion.span
               layout

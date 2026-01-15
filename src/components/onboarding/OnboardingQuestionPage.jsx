@@ -337,14 +337,14 @@ export default function OnboardingQuestionPage({
     <div className="min-h-screen w-full bg-gradient-to-b from-white via-gray-50 to-white flex overflow-x-hidden">
       <OnboardingSidebar currentPage={window.location.pathname.split('/').pop()} completedSteps={completedSteps} />
 
-      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-32 lg:pt-0 overflow-x-hidden relative">
+      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-24 lg:pt-0 overflow-x-hidden relative">
         {/* Progress bar for current block */}
         {blockType && (
-          <div className="fixed top-0 lg:top-0 left-0 lg:left-80 right-0 bg-white border-b border-gray-200 z-40 pt-20 lg:pt-0">
-            <div className="px-6 py-4">
+          <div className="fixed top-0 lg:top-0 left-0 lg:left-80 right-0 bg-white border-b border-gray-200 z-40 pt-[115px] lg:pt-0">
+            <div className="px-4 md:px-6 py-3 md:py-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-900">{blockTitle}</span>
-                <span className="text-sm font-semibold text-[#61f7a2]">
+                <span className="text-xs md:text-sm font-medium text-gray-900">{blockTitle}</span>
+                <span className="text-xs md:text-sm font-semibold text-[#61f7a2]">
                   {currentQuestion}/{totalQuestions} questions
                 </span>
               </div>
@@ -360,7 +360,7 @@ export default function OnboardingQuestionPage({
           </div>
         )}
 
-        <div className={`flex-1 flex items-center justify-center p-6 ${blockType ? 'mt-24 lg:mt-20' : ''}`}>
+        <div className={`flex-1 flex items-center justify-center p-4 md:p-6 ${blockType ? 'mt-20 md:mt-24 lg:mt-20' : ''}`}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -368,13 +368,13 @@ export default function OnboardingQuestionPage({
             className="w-full max-w-2xl"
           >
             <motion.div
-              className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm"
+              className="bg-white rounded-3xl p-5 md:p-8 border border-gray-200 shadow-sm"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <motion.h1
-                className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed"
+                className="text-xl md:text-2xl font-bold text-gray-900 mb-4 leading-relaxed"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -485,9 +485,9 @@ export default function OnboardingQuestionPage({
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.3, delay: idx * 0.1 }}
-                          className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${value === optionLabel
-                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
-                            : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
+                          className={`flex items-center space-x-3 p-3.5 md:p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${value === optionLabel
+                              ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
+                              : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                             }`}
                           onClick={() => {
                             setValue(optionLabel);
@@ -500,7 +500,7 @@ export default function OnboardingQuestionPage({
                         >
                           <RadioGroupItem value={optionLabel} id={`option-${idx}`} />
                           {OptionIcon && <OptionIcon className="w-5 h-5 text-gray-600" />}
-                          <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
+                          <Label htmlFor={`option-${idx}`} className="text-sm md:text-base text-gray-900 cursor-pointer flex-1 font-medium">
                             {optionLabel}
                           </Label>
                         </motion.div>
@@ -517,9 +517,9 @@ export default function OnboardingQuestionPage({
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: idx * 0.1 }}
-                        className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${value.includes(option)
-                          ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
-                          : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
+                        className={`flex items-center space-x-3 p-3.5 md:p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${value.includes(option)
+                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
+                            : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                           }`}
                         onClick={() => handleCheckboxChange(option, !value.includes(option))}
                         whileHover={{ scale: 1.02 }}
@@ -529,7 +529,7 @@ export default function OnboardingQuestionPage({
                           checked={value.includes(option)}
                           onCheckedChange={(checked) => handleCheckboxChange(option, checked)}
                         />
-                        <Label className="text-gray-900 cursor-pointer flex-1 font-medium">{option}</Label>
+                        <Label className="text-sm md:text-base text-gray-900 cursor-pointer flex-1 font-medium">{option}</Label>
                       </motion.div>
                     ))}
                   </div>
@@ -587,7 +587,7 @@ export default function OnboardingQuestionPage({
                     onClick={handleNext}
                     disabled={!canProceed()}
                     loading={isSaving}
-                    className="w-full"
+                    className="w-full text-base"
                     size="lg"
                   >
                     {buttonText}

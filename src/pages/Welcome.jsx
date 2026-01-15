@@ -139,7 +139,6 @@ export default function Welcome() {
             className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
 
             Transforme ton{' '}
-            Transforme ton{' '}
             <motion.span
               layout
               className="inline-flex relative h-[1.2em] align-top overflow-hidden align-middle mx-1 md:mx-2 justify-start min-w-[60px]"

@@ -233,35 +233,164 @@ export default function PlanAction() {
         }
       ],
       2: [
-        { text: "Identifier où se trouve mon avatar (réseaux / groupes)", checked: false },
-        { text: "Envoyer 10 messages de diagnostic", checked: false },
-        { text: "Poser des questions, écouter, comprendre", checked: false }
+        {
+          text: "Identifier où se trouve mon avatar (réseaux / groupes)",
+          checked: false,
+          details: "Exemples : groupes Facebook de niche, forums Reddit, communautés LinkedIn, Discord spécialisés. Pense aux endroits où ton avatar pose déjà des questions sur ses problèmes.",
+          action: { type: "link", label: "Voir mes avatars clients", page: "AvatarClients" }
+        },
+        {
+          text: "Envoyer 10 messages de diagnostic",
+          checked: false,
+          details: "Utilise tes messages prêts à l'emploi. L'objectif : comprendre leurs problèmes, pas vendre. Pose des questions ouvertes : 'Qu'est-ce qui te bloque le plus en ce moment ?'",
+          action: { type: "link", label: "Copier mes messages de diagnostic", page: "SalesMessages" }
+        },
+        {
+          text: "Poser des questions, écouter, comprendre",
+          checked: false,
+          details: "Note les mots exacts qu'ils utilisent pour décrire leur problème. Ce sont ces mots que tu réutiliseras pour leur parler de ta solution demain.",
+        },
+        {
+          text: "Identifier au moins 3 conversations prometteuses",
+          checked: false,
+          details: "Repère les personnes qui ont un vrai problème urgent et qui semblent ouvertes à une solution. Ce sont tes prospects prioritaires pour demain."
+        }
       ],
       3: [
-        { text: "Identifier les conversations avec une vraie douleur", checked: false },
-        { text: "Proposer le petit produit comme une aide / un test", checked: false },
-        { text: "Répondre calmement aux objections simples", checked: false },
-        { text: "Obtenir au moins un \"oui\" ou un intérêt clair", checked: false }
+        {
+          text: "Identifier les conversations avec une vraie douleur",
+          checked: false,
+          details: "Relis tes échanges d'hier. Qui a mentionné un problème urgent ou frustrant ? Ce sont ces personnes que tu vas recontacter en priorité.",
+        },
+        {
+          text: "Proposer le petit produit comme une aide / un test",
+          checked: false,
+          details: "Exemple de message : 'J'ai créé un mini-guide qui aide justement avec ce problème. Je le teste avec quelques personnes. Ça t'intéresse de le tester pour 27€ ?' Reste simple et humain.",
+          action: { type: "link", label: "Voir mon offre", page: "MyOffers" }
+        },
+        {
+          text: "Répondre calmement aux objections simples",
+          checked: false,
+          details: "Les objections courantes : prix (justifie par le temps gagné), timing (propose de commencer petit), doute (partage un mini-aperçu). Ne force jamais.",
+        },
+        {
+          text: "Obtenir au moins un 'oui' ou un intérêt clair",
+          checked: false,
+          details: "Un 'oui' peut être : un paiement, un 'envoie-moi les détails', ou un 'OK je teste'. Si personne ne dit oui, c'est OK : tu as appris ce qui ne marche pas.",
+        },
+        {
+          text: "Célébrer ta première proposition (même si c'est un non)",
+          checked: false,
+          details: "Tu viens de faire ce que 99% des gens ne font jamais : proposer ton travail. C'est énorme. Note ce que tu as appris.",
+        }
       ],
       4: [
-        { text: "Créer le produit (PDF simple ou vidéo Loom)", checked: false },
-        { text: "Livrer au client", checked: false },
-        { text: "Envoyer un message de suivi bienveillant", checked: false }
+        {
+          text: "Créer le produit (PDF simple ou vidéo Loom)",
+          checked: false,
+          details: "N'essaie pas de faire quelque chose de parfait. Crée un PDF de 5-10 pages dans Google Docs ou enregistre une vidéo Loom de 15-20 minutes. L'essentiel : que ça résolve leur problème.",
+        },
+        {
+          text: "Livrer au client dans les 24-48h",
+          checked: false,
+          details: "Envoie par email avec un message personnel : 'Voilà ce que j'ai créé pour toi. Dis-moi ce que tu en penses et si quelque chose n'est pas clair.'",
+        },
+        {
+          text: "Envoyer un message de suivi bienveillant",
+          checked: false,
+          details: "24h après la livraison, envoie un message : 'Tu as eu le temps de regarder ? Des questions ?' Sois disponible, pas insistant.",
+        },
+        {
+          text: "Noter ce qui a pris le plus de temps",
+          checked: false,
+          details: "Identifie ce qui t'a ralenti dans la création. La prochaine fois, tu pourras optimiser ou même créer le produit AVANT de vendre (mais seulement après avoir validé qu'il y a de la demande).",
+        }
       ],
       5: [
-        { text: "Demander un feedback honnête", checked: false },
-        { text: "Comprendre ce qui a le plus aidé", checked: false },
-        { text: "Identifier les besoins suivants", checked: false }
+        {
+          text: "Demander un feedback honnête",
+          checked: false,
+          details: "Message type : 'Je veux vraiment améliorer ce produit. Qu'est-ce qui t'a le plus aidé ? Qu'est-ce qui manquait ?' Insiste sur le fait que tu veux la vérité, pas des compliments.",
+        },
+        {
+          text: "Comprendre ce qui a le plus aidé",
+          checked: false,
+          details: "Note les phrases exactes du client. Si plusieurs personnes mentionnent la même chose, c'est un signal fort : c'est ça qui a le plus de valeur.",
+        },
+        {
+          text: "Identifier les besoins suivants",
+          checked: false,
+          details: "Demande : 'Maintenant que tu as résolu ça, quel est ton prochain défi ?' C'est comme ça que tu découvres ton prochain produit.",
+        },
+        {
+          text: "Ajuster ton offre ou ta communication",
+          checked: false,
+          details: "Si le produit était bon mais mal expliqué : améliore ta page de vente. Si le produit manquait quelque chose : ajoute une section. Petit ajustement = gros impact.",
+          action: { type: "link", label: "Mettre à jour mon offre", page: "MyOffers" }
+        },
+        {
+          text: "Demander un témoignage (si le client est satisfait)",
+          checked: false,
+          details: "Message simple : 'Ça m'aiderait énormément si tu pouvais écrire 2-3 phrases sur ce que ça t'a apporté. Je peux l'utiliser pour aider d'autres personnes ?' La plupart diront oui.",
+        }
       ],
       6: [
-        { text: "Contacter 30 nouvelles personnes", checked: false },
-        { text: "Utiliser les messages améliorés", checked: false },
-        { text: "Demander un témoignage aux premiers clients", checked: false }
+        {
+          text: "Contacter 30 nouvelles personnes",
+          checked: false,
+          details: "Tu connais maintenant ton message. Tu sais ce qui marche. Multiplie par 3 ton volume d'hier. Utilise les mêmes canaux qui ont fonctionné.",
+          action: { type: "link", label: "Voir mes messages", page: "SalesMessages" }
+        },
+        {
+          text: "Utiliser les messages améliorés",
+          checked: false,
+          details: "Intègre les mots exacts que tes premiers clients ont utilisés. Si quelqu'un a dit 'j'étais perdu', utilise ce mot dans tes nouveaux messages.",
+        },
+        {
+          text: "Demander un témoignage aux premiers clients",
+          checked: false,
+          details: "Si tu ne l'as pas fait hier, fais-le aujourd'hui. Un témoignage = crédibilité instantanée. Utilise-le dans tes prochaines conversations.",
+        },
+        {
+          text: "Tracker tes conversations et résultats",
+          checked: false,
+          details: "Crée un Google Sheet simple : Personne | Canal | Réponse | Intérêt (Oui/Non/Peut-être). Tu commences à voir des patterns.",
+        },
+        {
+          text: "Viser 3-5 nouvelles ventes",
+          checked: false,
+          details: "Tu as déjà vendu une fois. Tu sais que ça marche. Maintenant, c'est juste une question de volume. Plus tu parles à des gens, plus tu vends. C'est mathématique.",
+        }
       ],
       7: [
-        { text: "Finaliser la page de vente", checked: false },
-        { text: "Activer les emails automatiques", checked: false },
-        { text: "Identifier une suite possible (order bump / accompagnement)", checked: false }
+        {
+          text: "Finaliser la page de vente",
+          checked: false,
+          details: "Maintenant que tu as des vrais retours clients et peut-être un témoignage, mets tout ça sur ta page. Elle sera 10x plus convaincante qu'au Jour 1.",
+          action: { type: "link", label: "Mettre à jour ma page de vente", page: "SalesPage" }
+        },
+        {
+          text: "Activer les emails automatiques",
+          checked: false,
+          details: "Configure une séquence simple : Email 1 (présentation), Email 2 (problème), Email 3 (solution), Email 4 (offre). Utilise les modèles déjà générés.",
+          action: { type: "link", label: "Voir mes emails marketing", page: "EmailsMarketing" }
+        },
+        {
+          text: "Identifier une suite possible (upsell / accompagnement)",
+          checked: false,
+          details: "Tes clients qui ont acheté ton produit à 27€ ont maintenant un nouveau problème. Quelle est la prochaine étape logique ? Un produit à 97€ ? Un coaching à 297€ ? Note l'idée, ne la crée pas encore.",
+        },
+        {
+          text: "Planifier ta semaine prochaine",
+          checked: false,
+          details: "Bloque 1h par jour pour continuer à contacter des prospects. Tu as maintenant un système qui marche. Il suffit de le faire tourner.",
+        },
+        {
+          text: "Célébrer tes victoires",
+          checked: false,
+          details: "Prends 5 minutes pour réaliser ce que tu viens de faire en 7 jours. Tu es passé d'une idée à des ventes réelles. C'est énorme. Partage ça dans la communauté Skool !",
+          action: { type: "external", label: "Partager dans la communauté", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
+        }
       ]
     };
 
@@ -270,10 +399,13 @@ export default function PlanAction() {
 
     // Merge par index : on garde le texte/details/action du default,
     // et on applique le checked sauvegardé si présent
-    return base.map((item, idx) => ({
-      ...item,
-      checked: typeof saved?.[idx]?.checked === "boolean" ? saved[idx].checked : (item.checked ?? false),
-    }));
+    return base.map((item, idx) => {
+      const savedItem = saved[idx];
+      return {
+        ...item,
+        checked: savedItem?.checked ?? item.checked ?? false
+      };
+    });
   };
 
   const days = [

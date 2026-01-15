@@ -60,12 +60,12 @@ export default function OnboardingQuestionPage({
   const fileInputRef = useRef(null);
 
   // Calculer la progression dans le bloc actuel
-  const blockProgress = blockType && BLOCK_CONFIG[blockType] 
+  const blockProgress = blockType && BLOCK_CONFIG[blockType]
     ? ((BLOCK_CONFIG[blockType].pages.indexOf(window.location.pathname.split('/').pop()) + 1) / BLOCK_CONFIG[blockType].totalQuestions) * 100
     : progress;
 
   const blockTitle = blockType && BLOCK_CONFIG[blockType] ? BLOCK_CONFIG[blockType].title : '';
-  const currentQuestion = blockType && BLOCK_CONFIG[blockType] 
+  const currentQuestion = blockType && BLOCK_CONFIG[blockType]
     ? BLOCK_CONFIG[blockType].pages.indexOf(window.location.pathname.split('/').pop()) + 1
     : 0;
   const totalQuestions = blockType && BLOCK_CONFIG[blockType] ? BLOCK_CONFIG[blockType].totalQuestions : 0;
@@ -81,7 +81,7 @@ export default function OnboardingQuestionPage({
         const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
         const firstName = localStorage.getItem('onboarding_firstName') || '';
         const storedValue = localStorage.getItem(`onboarding_${fieldName}`);
-        
+
         setUser({ firstName });
         if (storedValue) {
           setValue(inputType === 'checkbox' ? JSON.parse(storedValue) : storedValue);
@@ -90,7 +90,7 @@ export default function OnboardingQuestionPage({
         // Mode base44 classique
         const currentUser = await base44.auth.me();
         setUser(currentUser);
-        
+
         if (currentUser[fieldName] !== undefined && currentUser[fieldName] !== null) {
           setValue(currentUser[fieldName]);
         }
@@ -104,9 +104,9 @@ export default function OnboardingQuestionPage({
 
   const replaceVariables = (text) => {
     if (!text) return text;
-    
+
     let result = text;
-    
+
     // Pour les questions en mode localStorage
     if (useLocalStorage) {
       const targetIncome = localStorage.getItem('onboarding_targetIncome') || '';
@@ -115,7 +115,7 @@ export default function OnboardingQuestionPage({
         .replace(/\{\{user\.targetIncome\}\}/g, targetIncome)
         .replace(/\{\{user\.targetIncomeDelay\}\}/g, targetIncomeDelay);
     }
-    
+
     // Pour les questions authentifiées
     if (user) {
       result = result
@@ -124,32 +124,32 @@ export default function OnboardingQuestionPage({
         .replace(/\{\{user\.targetIncome\}\}/g, user.targetIncome || '')
         .replace(/\{\{user\.targetIncomeDelay\}\}/g, user.targetIncomeDelay || '');
     }
-    
+
     return result;
   };
 
   const handleNext = async () => {
     if (!canProceed()) return;
-    
+
     // 🔒 Anti-double-click
     if (isSavingRef.current) {
       console.warn('⚠️ Already saving, ignoring click');
       return;
     }
-    
+
     isSavingRef.current = true;
     setIsSaving(true);
-    
+
     try {
       if (customHandleSave) {
         await customHandleSave(user, value);
         navigate(createPageUrl(nextPage));
         return;
       }
-      
+
       if (useLocalStorage) {
         // 🔥 DOUBLE SAUVEGARDE : localStorage + Session.onboarding_full
-        localStorage.setItem(`onboarding_${fieldName}`, 
+        localStorage.setItem(`onboarding_${fieldName}`,
           inputType === 'checkbox' ? JSON.stringify(value) : value
         );
 
@@ -182,7 +182,7 @@ export default function OnboardingQuestionPage({
 
       // Mode base44 - sauvegarder dans User
       await base44.auth.updateMe({ [fieldName]: value });
-      
+
       // 🔥 BACKEND MERGE : appeler la fonction qui fait le merge server-side
       if (user.sessionId && fieldName) {
         try {
@@ -191,7 +191,7 @@ export default function OnboardingQuestionPage({
             field: fieldName,
             value
           });
-          
+
           if (response.data?.success) {
             console.log('✅ [ONBOARDING_SAVE]', {
               sessionId: user.sessionId,
@@ -207,7 +207,7 @@ export default function OnboardingQuestionPage({
           console.error('❌ [ONBOARDING_SAVE] Backend call failed:', backendError);
           // Continue anyway - User data is saved
         }
-        
+
         // Cas spécial Q26 : sync format_preferences dans summary
         if (fieldName === 'deliveryPreferences') {
           try {
@@ -226,15 +226,15 @@ export default function OnboardingQuestionPage({
           }
         }
       }
-      
+
       // Marquer onboarding_completed si on va vers OfferGenerationStart
       if (nextPage === 'OfferGenerationStart') {
         await base44.auth.updateMe({ onboarding_completed: true });
       }
-      
+
       // 🚀 TOUJOURS naviguer après save
       navigate(createPageUrl(nextPage));
-      
+
     } catch (error) {
       console.error('❌ [ONBOARDING_SAVE] Error:', error);
       alert('Erreur lors de la sauvegarde. Réessaye.');
@@ -334,10 +334,10 @@ export default function OnboardingQuestionPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
+    <div className="min-h-screen w-full bg-gradient-to-b from-white via-gray-50 to-white flex overflow-x-hidden">
       <OnboardingSidebar currentPage={window.location.pathname.split('/').pop()} completedSteps={completedSteps} />
 
-      <div className="flex-1 flex flex-col lg:ml-80 pt-32 lg:pt-0">
+      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-32 lg:pt-0 overflow-x-hidden relative">
         {/* Progress bar for current block */}
         {blockType && (
           <div className="fixed top-0 lg:top-0 left-0 lg:left-80 right-0 bg-white border-b border-gray-200 z-40 pt-20 lg:pt-0">
@@ -367,13 +367,13 @@ export default function OnboardingQuestionPage({
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="w-full max-w-2xl"
           >
-            <motion.div 
+            <motion.div
               className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <motion.h1 
+              <motion.h1
                 className="text-2xl font-bold text-gray-900 mb-4 leading-relaxed"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -383,7 +383,7 @@ export default function OnboardingQuestionPage({
               </motion.h1>
 
               {subtitle && (
-                <motion.p 
+                <motion.p
                   className="text-gray-600 mb-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -393,7 +393,7 @@ export default function OnboardingQuestionPage({
                 </motion.p>
               )}
 
-              <motion.div 
+              <motion.div
                 className="mb-8"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -480,35 +480,34 @@ export default function OnboardingQuestionPage({
                       const optionLabel = typeof option === 'object' ? option.label : option;
                       const OptionIcon = typeof option === 'object' ? option.icon : null;
                       return (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: idx * 0.1 }}
-                        className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
-                          value === optionLabel 
-                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]' 
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.1 }}
+                          className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${value === optionLabel
+                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
                             : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
-                        }`}
-                        onClick={() => {
-                          setValue(optionLabel);
-                          if (autoSubmit) {
-                            setTimeout(() => handleNext(), 300);
-                          }
-                        }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <RadioGroupItem value={optionLabel} id={`option-${idx}`} />
-                        {OptionIcon && <OptionIcon className="w-5 h-5 text-gray-600" />}
-                        <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
-                          {optionLabel}
-                        </Label>
-                      </motion.div>
+                            }`}
+                          onClick={() => {
+                            setValue(optionLabel);
+                            if (autoSubmit) {
+                              setTimeout(() => handleNext(), 300);
+                            }
+                          }}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <RadioGroupItem value={optionLabel} id={`option-${idx}`} />
+                          {OptionIcon && <OptionIcon className="w-5 h-5 text-gray-600" />}
+                          <Label htmlFor={`option-${idx}`} className="text-gray-900 cursor-pointer flex-1 font-medium">
+                            {optionLabel}
+                          </Label>
+                        </motion.div>
                       );
-                      })}
-                      </RadioGroup>
-                      )}
+                    })}
+                  </RadioGroup>
+                )}
 
                 {inputType === 'checkbox' && (
                   <div className="space-y-3">
@@ -518,11 +517,10 @@ export default function OnboardingQuestionPage({
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: idx * 0.1 }}
-                        className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${
-                          value.includes(option)
-                            ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
-                            : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
-                        }`}
+                        className={`flex items-center space-x-3 p-4 rounded-2xl border cursor-pointer transition-all shadow-sm ${value.includes(option)
+                          ? 'bg-gradient-to-br from-green-50 to-blue-50 border-[#61f7a2]'
+                          : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
+                          }`}
                         onClick={() => handleCheckboxChange(option, !value.includes(option))}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
@@ -539,7 +537,7 @@ export default function OnboardingQuestionPage({
 
                 {inputType === 'slider' && (
                   <div className="space-y-6">
-                    <motion.div 
+                    <motion.div
                       className="text-center"
                       key={value}
                       initial={{ scale: 1.1 }}
@@ -566,7 +564,7 @@ export default function OnboardingQuestionPage({
                 )}
               </motion.div>
 
-              <motion.div 
+              <motion.div
                 className="flex gap-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

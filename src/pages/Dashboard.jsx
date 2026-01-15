@@ -222,9 +222,6 @@ export default function Dashboard() {
             <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3 mb-2">
               Hello {user?.first_name || profile?.first_name || ''} <span className="text-4xl">👋</span>
             </h1>
-            <p className="text-xl text-gray-600 font-medium">
-              C'est Noah, j'ai hâte qu'on démarre ! Prêt à bosser un peu ?
-            </p>
           </motion.div>
 
           {/* 2️⃣ MISSION DU JOUR - SECTION DOMINANTE */}

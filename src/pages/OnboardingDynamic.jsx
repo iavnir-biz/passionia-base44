@@ -1,439 +1,488 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Loader2, Sparkles, Mic, StopCircle, Brain, Send, User as UserIcon, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
+import { cn } from "@/lib/utils";
 
-const anthropic = new Anthropic({
-  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
-});
+export default function OnboardingDynamic() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [value, setValue] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [questionCount, setQuestionCount] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
-// Structure des 11 questions à suivre STRICTEMENT
-const QUESTION_STRUCTURE = [
-  { 
-    id: 1, 
-    field: "coreSkill", 
-    theme: "Compétence à monétiser", 
-    type: "text",
-    transformation_focus: "identification_passion",
-    titleTemplate: "Salut {{firstName}} ! Quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu et enseigner ?",
-    subtitleTemplate: "Sois précis. Ex : peindre des aquarelles, conseiller en décoration intérieure, consulting RH, créer un programme de fitness maison."
-  },
-  { 
-    id: 2, 
-    field: "experienceLevel", 
-    theme: "Niveau d'expérience", 
-    type: "single_choice", 
-    options: ["C'est une passion, je débute", "J'ai déjà aidé des amis ou proches gratuitement", "Je suis professionnel, j'ai déjà eu des clients"],
-    transformation_focus: "légitimité_à_enseigner",
-    titleTemplate: "Super, tu veux enseigner {{coreSkill}}. Dis-moi : quel est ton niveau d'expérience actuel ?",
-    subtitleTemplate: "Choisis l'option qui te ressemble le plus."
-  },
-  { 
-    id: 3, 
-    field: "yearsPracticing", 
-    theme: "Années de pratique", 
-    type: "slider", 
-    min: 0, 
-    max: 15, 
-    step: 1,
-    transformation_focus: "ancrage_expertise",
-    titleTemplate: "Depuis combien d'années pratiques-tu {{coreSkill}} ?",
-    subtitleTemplate: "Même si tu débutes, ton parcours a de la valeur. Indique simplement ton niveau réel."
-  },
-  { 
-    id: 4, 
-    field: "targetAudience", 
-    theme: "À qui enseigner", 
-    type: "text",
-    transformation_focus: "identification_élève_idéal",
-    titleTemplate: "À qui aimerais-tu le plus transmettre ce savoir, {{firstName}} ?",
-    subtitleTemplate: "Pense à ceux qui veulent vraiment passer de l'idée à une app concrète, mais se sentent bloqués par la complexité de l'IA ou du codage. Les gens qui veulent entreprendre avec l'IA principalement"
-  },
-  { 
-    id: 5, 
-    field: "mainProblem", 
-    theme: "Problème principal", 
-    type: "text",
-    transformation_focus: "blocage_confusion",
-    titleTemplate: "Tu veux vraiment aider {{targetAudience}}. Qu'est-ce qui, selon toi, les empêche aujourd'hui de voir clair et d'avancer sereinement ?",
-    subtitleTemplate: "Comme la peur de ne pas comprendre les concepts d'IA, la confusion face à la terminologie du codage ou le doute sur leur capacité à gérer un projet."
-  },
-  { 
-    id: 6, 
-    field: "firstQuickResult", 
-    theme: "Déclic rapide", 
-    type: "text",
-    transformation_focus: "première_victoire",
-    titleTemplate: "Donc, tu veux aider {{targetAudience}} à dépasser leurs peurs. À quel moment penses-tu qu'ils ressentiront leur premier soulagement, ce déclic où tout deviendra plus clair pour eux ?",
-    subtitleTemplate: "Comme quand ils réussissent enfin à créer un prototype fonctionnel ou comprennent un concept complexe d'IA avec facilité."
-  },
-  { 
-    id: 7, 
-    field: "finalTransformation", 
-    theme: "Transformation finale", 
-    type: "text",
-    transformation_focus: "nouvelle_identité",
-    titleTemplate: "Donc, tu veux montrer à tes élèves qu'ils n'ont pas besoin d'être ingénieurs pour créer des applications, juste savoir comment utiliser les bons outils. Au bout du compte, comment imagines-tu leur transformation personnelle et professionnelle ?",
-    subtitleTemplate: "Ils pourront passer de novices hésitants à des créateurs confiants, capables de matérialiser leurs idées en applications concrètes."
-  },
-  { 
-    id: 8, 
-    field: "mainTeaching", 
-    theme: "Prise de conscience clé", 
-    type: "text",
-    transformation_focus: "principe_central",
-    titleTemplate: "Je vois que tu veux vraiment démystifier l'IA et le codage pour les rendre accessibles à tous. Qu'est-ce qui rend ta façon de les enseigner unique, selon toi ?",
-    subtitleTemplate: "Comme montrer que coder c'est comme cuisiner avec des recettes simples, ou utiliser des métaphores pour expliquer des concepts techniques."
-  },
-  { 
-    id: 9, 
-    field: "uniqueMethod", 
-    theme: "Approche unique", 
-    type: "text",
-    transformation_focus: "différenciation",
-    titleTemplate: "Tu veux vraiment simplifier les choses pour ceux qui pensent que coder est hors de portée. Qu'est-ce qui t'a donné envie de montrer que l'IA et le codage peuvent être aussi accessibles que cuisiner avec des recettes simples ?",
-    subtitleTemplate: "Peut-être un moment où tu t'es senti bloqué, une réussite inattendue, ou une envie de rendre les choses plus simples pour les autres."
-  },
-  { 
-    id: 10, 
-    field: "typicalMistake", 
-    theme: "Erreur courante", 
-    type: "text",
-    transformation_focus: "fausse_croyance",
-    titleTemplate: "Quelle erreur de raisonnement fait perdre du temps aux débutants ?",
-    subtitleTemplate: "Pense que c'est compliqué, ou qu'il faut trop de budget pouyr y arriver"
-  },
-  { 
-    id: 11, 
-    field: "extraDetail", 
-    theme: "Histoire personnelle", 
-    type: "text",
-    transformation_focus: "authenticité",
-    titleTemplate: "Pour finir : qu'est-ce qui t'a donné envie de transmettre ça ?",
-    subtitleTemplate: "Car j'ai tout perdu, et j'ai creer mes propres app pour des entreprises, et je les aiet revendus beaucoup d'argent, maintenant je bosse d'ou je veux, je creer des apps pour tous les corps de métiers; etc etc"
-  }
-];
+  useEffect(() => {
+    initializeOnboarding();
+  }, []);
 
-const SYSTEM_PROMPT = `Tu es Noah, un coach stratégique humain, empathique et pédagogue.
+  useEffect(() => {
+    // Scroll avec délai plus long pour laisser l'animation finir
+    const timer = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [messages, currentQuestion]);
 
-Tu discutes avec un futur formateur qui veut TRANSMETTRE son savoir-faire et aider ses futurs élèves.
-
-RÈGLES ABSOLUES :
-1. Tu ne remplis pas un formulaire, tu mènes une vraie conversation intelligente
-2. L'utilisateur n'enseigne jamais un outil - il aide ses élèves à passer d'un état de confusion à un état de clarté et de maîtrise
-3. Tu reformules la question en t'appuyant sur ce que l'utilisateur vient de dire
-4. Tu montres que tu as VRAIMENT compris sa réponse précédente
-
-STRUCTURE DE TA RÉPONSE :
-1. Commence par montrer que tu as compris (1 phrase max, naturelle)
-2. Pose UNE question claire qui découle logiquement de sa réponse
-3. Parle du PROBLÈME de ses futurs élèves ou de leur TRANSFORMATION, jamais de l'outil technique
-
-TON & STYLE :
-- Langage simple, vivant, humain (tutoiement)
-- Phrases courtes et directes
-- Questions qui pourraient être posées dans une vraie discussion
-- Zéro jargon, zéro formalisme
-
-INTERDICTIONS :
-❌ Reformuler mot pour mot le template
-❌ Répéter exactement ce que l'utilisateur a dit
-❌ Être générique ou scolaire
-❌ Ignorer le contexte de la réponse précédente
-
-TEST QUALITÉ :
-"Est-ce que cette question pourrait être posée par un humain dans une vraie conversation ?"
-Si non → reformule.
-
-FORMAT DE SORTIE (JSON uniquement) :
-{
-  "text": "la question reformulée, naturelle et contextuelle",
-  "subtitle": "1 phrase d'exemples concrets et parlants"
-}`;
-
-Deno.serve(async (req) => {
-  try {
-    const base44 = createClientFromRequest(req);
-    const { sessionId, userAnswer, firstName } = await req.json();
-
-    if (!sessionId) {
-      return Response.json({ error: 'sessionId required' }, { status: 400 });
-    }
-
-    // ÉTAPE 1 : Sauvegarder la réponse si présente
-    if (userAnswer) {
-      const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
-      if (!sessions || sessions.length === 0) {
-        return Response.json({ error: 'Session not found' }, { status: 404 });
-      }
-
-      const currentSession = sessions[0];
-      const workingHistory = currentSession.onboarding_history || [];
-      const workingSummary = currentSession.onboarding_summary || {};
-
-      const normalizedAnswer = typeof userAnswer === 'string' ? userAnswer : JSON.stringify(userAnswer);
-      
-      const currentQuestionConfig = QUESTION_STRUCTURE[workingHistory.length];
-      const questionText = currentQuestionConfig 
-        ? currentQuestionConfig.titleTemplate
-            .replace('{{firstName}}', firstName || '')
-            .replace('{{coreSkill}}', workingSummary.who_to_teach || 'cette compétence')
-            .replace('{{targetAudience}}', workingSummary.learner_profile || 'ces personnes')
-        : `Question ${workingHistory.length + 1}`;
-
-      const updatedHistory = [
-        ...workingHistory,
-        {
-          question: questionText,
-          type: currentQuestionConfig?.type || 'text',
-          answer: normalizedAnswer,
-          at: new Date().toISOString()
-        }
-      ];
-
-      const fullData = currentSession.onboarding_full || {};
-      const coreSkill = workingHistory.length === 0 
-        ? normalizedAnswer 
-        : (fullData.coreSkill || workingSummary.who_to_teach || '');
-
-      const updatePayload = {
-        onboarding_history: updatedHistory,
-        skill: coreSkill
-      };
-      
-      // Mapping spécifique selon la question
-      if (workingHistory.length === 0) {
-        // Q1: coreSkill
-        updatePayload.onboarding_full = { 
-          ...(currentSession.onboarding_full || {}),
-          coreSkill: normalizedAnswer 
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          who_to_teach: normalizedAnswer
-        };
-      } else if (workingHistory.length === 3) {
-        // Q4: targetAudience
-        updatePayload.onboarding_full = {
-          ...(currentSession.onboarding_full || {}),
-          targetAudience: normalizedAnswer
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          learner_profile: normalizedAnswer
-        };
-      } else if (workingHistory.length === 4) {
-        // Q5: mainProblem
-        updatePayload.onboarding_full = {
-          ...(currentSession.onboarding_full || {}),
-          mainProblem: normalizedAnswer
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          main_learning_problem: normalizedAnswer
-        };
-      } else if (workingHistory.length === 5) {
-        // Q6: firstQuickResult
-        updatePayload.onboarding_full = {
-          ...(currentSession.onboarding_full || {}),
-          firstQuickResult: normalizedAnswer
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          quick_win: normalizedAnswer
-        };
-      } else if (workingHistory.length === 6) {
-        // Q7: finalTransformation
-        updatePayload.onboarding_full = {
-          ...(currentSession.onboarding_full || {}),
-          finalTransformation: normalizedAnswer
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          big_transformation: normalizedAnswer
-        };
-      } else if (workingHistory.length === 7) {
-        // Q8: mainTeaching
-        updatePayload.onboarding_full = {
-          ...(currentSession.onboarding_full || {}),
-          mainTeaching: normalizedAnswer
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          main_teaching: normalizedAnswer
-        };
-      } else if (workingHistory.length === 8) {
-        // Q9: uniqueMethod
-        updatePayload.onboarding_full = {
-          ...(currentSession.onboarding_full || {}),
-          uniqueMethod: normalizedAnswer
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          method_angle: normalizedAnswer
-        };
-      } else if (workingHistory.length === 9) {
-        // Q10: typicalMistake
-        updatePayload.onboarding_full = {
-          ...(currentSession.onboarding_full || {}),
-          typicalMistake: normalizedAnswer
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          common_mistake: normalizedAnswer
-        };
-      } else if (workingHistory.length === 10) {
-        // Q11: extraDetail (dernière question)
-        updatePayload.onboarding_full = {
-          ...(currentSession.onboarding_full || {}),
-          extraDetail: normalizedAnswer
-        };
-        updatePayload.onboarding_summary = {
-          ...(currentSession.onboarding_summary || {}),
-          proof_or_story: normalizedAnswer
-        };
-        updatePayload.is_onboarding_done = true;
-      }
-
-      await base44.asServiceRole.entities.Session.update(sessionId, updatePayload);
-      
-      // Si dernière question, pas de prochaine question
-      if (workingHistory.length >= 10) {
-        return Response.json({
-          done: true,
-          nextQuestionNumber: null
+  const buildMessagesFromHistory = (history) => {
+    const msgs = [];
+    if (history && history.length > 0) {
+      history.forEach((item, index) => {
+        msgs.push({
+          id: `q-${index}`,
+          sender: 'noah',
+          content: item.question
         });
-      }
-    }
-
-    // ÉTAPE 2 : Générer la prochaine question
-    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
-    if (!sessions || sessions.length === 0) {
-      return Response.json({ error: 'Session not found' }, { status: 404 });
-    }
-
-    const session = sessions[0];
-    const history = session.onboarding_history || [];
-    const summary = session.onboarding_summary || {};
-    
-    const nextQuestionIndex = history.length;
-    
-    if (nextQuestionIndex >= QUESTION_STRUCTURE.length) {
-      return Response.json({
-        done: true,
-        nextQuestionNumber: null
+        msgs.push({
+          id: `a-${index}`,
+          sender: 'user',
+          content: item.answer
+        });
       });
     }
+    return msgs;
+  };
 
-    const nextQuestion = QUESTION_STRUCTURE[nextQuestionIndex];
-    
-    // Pour les questions de type choice ou slider, pas besoin d'appeler Claude
-    if (nextQuestion.type === 'single_choice' || nextQuestion.type === 'slider') {
-      const staticTitle = nextQuestion.titleTemplate
-        .replace('{{firstName}}', firstName || '')
-        .replace('{{coreSkill}}', summary.who_to_teach || 'cette compétence')
-        .replace('{{targetAudience}}', summary.learner_profile || 'ces personnes');
-      
-      return Response.json({
-        done: false,
-        nextQuestion: {
-          number: nextQuestionIndex + 1,
-          field: nextQuestion.field,
-          type: nextQuestion.type,
-          title: staticTitle,
-          subtitle: nextQuestion.subtitleTemplate,
-          options: nextQuestion.options || null,
-          min: nextQuestion.min || null,
-          max: nextQuestion.max || null,
-          step: nextQuestion.step || null
-        }
-      });
-    }
-
-    // Pour les questions de type text, on appelle Claude pour reformulation contextuelle
-    const lastAnswer = history.length > 0 ? history[history.length - 1].answer : null;
-    const previousContext = history.map(h => `Q: ${h.question}\nR: ${h.answer}`).join('\n\n');
-
-    const userPrompt = `Contexte de la conversation jusqu'à maintenant :
-${previousContext}
-
-Dernière réponse de l'utilisateur : "${lastAnswer}"
-
-Transformation focus pour cette question : ${nextQuestion.transformation_focus}
-
-Template de base (à reformuler de manière NATURELLE et CONTEXTUELLE) :
-Titre : ${nextQuestion.titleTemplate}
-Sous-titre : ${nextQuestion.subtitleTemplate}
-
-Variables disponibles :
-- firstName: ${firstName || 'non renseigné'}
-- coreSkill (ce qu'il veut enseigner): ${summary.who_to_teach || 'non renseigné'}
-- targetAudience (à qui il veut enseigner): ${summary.learner_profile || 'non renseigné'}
-
-MISSION :
-Reformule cette question de manière naturelle, en montrant que tu as compris sa dernière réponse.
-Rends la question fluide, comme si tu étais dans une vraie conversation.
-
-Retourne UNIQUEMENT un JSON avec cette structure :
-{
-  "text": "la question reformulée, naturelle et contextuelle",
-  "subtitle": "1 phrase d'exemples concrets"
-}`;
-
-    console.log("ANTHROPIC_CALL start", { 
-      fn: "onboardingNextQuestion", 
-      sessionId, 
-      model: "claude-sonnet-4-20250514",
-      questionNumber: nextQuestionIndex + 1
-    });
-
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      messages: [
-        { role: "user", content: userPrompt }
-      ]
-    });
-
-    console.log("ANTHROPIC_CALL end", { 
-      fn: "onboardingNextQuestion", 
-      sessionId,
-      usage: message.usage
-    });
-
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
-    
-    let reformulated;
+  const initializeOnboarding = async () => {
     try {
-      reformulated = JSON.parse(responseText);
-    } catch (e) {
-      console.error("JSON parse error, using fallback", e);
-      reformulated = {
-        text: nextQuestion.titleTemplate
-          .replace('{{firstName}}', firstName || '')
-          .replace('{{coreSkill}}', summary.who_to_teach || 'cette compétence')
-          .replace('{{targetAudience}}', summary.learner_profile || 'ces personnes'),
-        subtitle: nextQuestion.subtitleTemplate
-      };
-    }
+      const currentUser = await base44.auth.me();
+      const realSessionId = currentUser.sessionId;
 
-    return Response.json({
-      done: false,
-      nextQuestion: {
-        number: nextQuestionIndex + 1,
-        field: nextQuestion.field,
-        type: nextQuestion.type,
-        title: reformulated.text,
-        subtitle: reformulated.subtitle
+      if (!realSessionId) {
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
       }
-    });
 
-  } catch (error) {
-    console.error('Error in onboardingNextQuestion:', error);
-    return Response.json({ 
-      error: error.message,
-      stack: error.stack 
-    }, { status: 500 });
-  }
-});
+      const sessions = await base44.entities.Session.filter({ id: realSessionId });
+      if (!sessions || sessions.length === 0) {
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
 
+      const loadedSession = sessions[0];
+      const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
 
+      setUser({ firstName });
+      setSession(loadedSession);
+      setMessages(buildMessagesFromHistory(loadedSession.onboarding_history || []));
+
+      if (loadedSession.is_onboarding_done) {
+        navigate(createPageUrl('OnboardingTransition'));
+        return;
+      }
+
+      await fetchNextQuestion(realSessionId, null);
+    } catch (error) {
+      console.error('Error initializing:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
+    try {
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      
+      // 🔥 AMÉLIORATION 1: Ajouter la réponse utilisateur IMMÉDIATEMENT (optimistic update)
+      if (lastAnswer && currentQuestion) {
+        const userMessage = {
+          id: `temp-user-${Date.now()}`,
+          sender: 'user',
+          content: typeof lastAnswer === 'string' ? lastAnswer : JSON.stringify(lastAnswer)
+        };
+        setMessages(prev => [...prev, userMessage]);
+      }
+
+      const { data } = await base44.functions.invoke('onboardingNextQuestion', {
+        sessionId,
+        userAnswer: lastAnswer,
+        firstName
+      });
+
+      if (data.done || data.isDone) {
+        await base44.entities.Session.update(sessionId, {
+          is_onboarding_done: true
+        });
+        navigate(createPageUrl('OnboardingTransition'));
+        return;
+      }
+
+      // 🔥 AMÉLIORATION 2: Récupérer la session mise à jour pour la synchronisation
+      const updatedSessions = await base44.entities.Session.filter({ id: sessionId });
+      if (updatedSessions && updatedSessions.length > 0) {
+        const freshSession = updatedSessions[0];
+        setSession(freshSession);
+        setQuestionCount(Math.min(freshSession.onboarding_history?.length || 0, 11));
+        
+        // 🔥 AMÉLIORATION 3: Reconstruire les messages depuis l'historique pour éviter les duplications
+        const historicMessages = buildMessagesFromHistory(freshSession.onboarding_history || []);
+        setMessages(historicMessages);
+      }
+
+      // 🔥 AMÉLIORATION 4: Ajouter la nouvelle question de Noah IMMÉDIATEMENT
+      if (data.nextQuestion) {
+        const questionText = data.nextQuestion.text || data.nextQuestion.title;
+        const noahMessage = {
+          id: `noah-${Date.now()}`,
+          sender: 'noah',
+          content: questionText
+        };
+        
+        setMessages(prev => [...prev, noahMessage]);
+        setCurrentQuestion(data.nextQuestion);
+        initializeValue(data.nextQuestion.type, data.nextQuestion);
+      }
+
+    } catch (error) {
+      console.error('Error fetching next question:', error);
+    } finally {
+      setIsLoading(false);
+      setIsSaving(false);
+    }
+  };
+
+  const initializeValue = (type, question = null) => {
+    if (type === 'multiple_choice') setValue([]);
+    else if (type === 'slider') setValue(question?.min || 0);
+    else setValue('');
+  };
+
+  const handleNext = async () => {
+    if (!canProceed()) return;
+    setIsSaving(true);
+
+    const normalizedAnswer = typeof value === 'string' ? value : JSON.stringify(value);
+    
+    // Ne pas mettre isLoading à true ici pour garder l'input visible
+    await fetchNextQuestion(session.id, normalizedAnswer);
+    
+    setValue('');
+  };
+
+  const handleNextDirect = async (directValue) => {
+    setIsSaving(true);
+    await fetchNextQuestion(session.id, directValue);
+    setValue('');
+  };
+
+  const canProceed = () => {
+    if (!currentQuestion) return false;
+    if (currentQuestion.type === 'multiple_choice') return value.length > 0;
+    if (currentQuestion.type === 'slider') return true;
+    if (currentQuestion.type === 'single_choice') return value !== '';
+    return value && value.trim() !== '';
+  };
+
+  const handleCheckboxChange = (option, checked) => {
+    if (checked) setValue([...value, option]);
+    else setValue(value.filter(v => v !== option));
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setIsTranscribing(true);
+        try {
+          const file = new File([audioBlob], 'voice.webm', { type: 'audio/webm' });
+          const upload = await base44.integrations.Core.UploadFile({ file });
+          const { data } = await base44.functions.invoke('transcribeAudio', { audioUrl: upload.file_url });
+          setValue(prev => prev ? `${prev}\n${data.text}` : data.text);
+        } catch (err) { 
+          console.error('Transcription error:', err); 
+        } finally { 
+          setIsTranscribing(false); 
+        }
+        stream.getTracks().forEach(t => t.stop());
+      };
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (err) { 
+      console.error('Recording error:', err); 
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const progress = Math.min(((session?.onboarding_history?.length || 0) / 11) * 100, 100);
+  const completedSteps = (session?.onboarding_history?.length || 0) >= 11 ? [1] : [];
+
+  return (
+    <div className="min-h-screen bg-[#f9fafb] flex overflow-hidden">
+      <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progress} />
+
+      <div className="flex-1 flex flex-col lg:ml-80 h-screen relative">
+        {/* Header Parcours - Hidden on mobile as sidebar handles it */}
+        <div className="hidden lg:block sticky top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
+          <div className="px-6 py-4 flex items-center justify-end max-w-4xl mx-auto w-full">
+            <div className="flex flex-col items-end">
+              <span className="text-xs font-bold text-[#61f7a2] mb-1">
+                {Math.min(session?.onboarding_history?.length || 0, 11)}/11
+              </span>
+              <div className="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Messaging Area */}
+        <div className="flex-1 overflow-y-auto pt-48 md:pt-32 pb-80 px-4 md:px-6">
+          <div className="max-w-3xl mx-auto space-y-8">
+            {/* Intro Message */}
+            <div className="flex justify-center w-full px-6 py-6">
+              <p className="text-gray-400 text-[11px] md:text-xs text-center max-w-sm leading-relaxed font-medium uppercase tracking-wider opacity-70">
+                C'est un plaisir de t'aider à structurer ton projet ! <br /> Je vais te poser quelques questions pour comprendre ton univers.
+              </p>
+            </div>
+
+            <AnimatePresence mode="popLayout">
+              {messages.map((msg, idx) => (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, delay: idx * 0.05 }}
+                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} gap-4`}
+                >
+                  {msg.sender === 'noah' && (
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
+                      <Brain className="w-5 h-5 text-white" />
+                    </div>
+                  )}
+                  <div className={cn(
+                    "max-w-[85%] p-4 shadow-sm text-sm md:text-base leading-relaxed whitespace-pre-line",
+                    msg.sender === 'user'
+                      ? "bg-gray-900 text-white rounded-2xl rounded-tr-none"
+                      : "bg-white border border-gray-100 rounded-2xl rounded-tl-none text-gray-800"
+                  )}>
+                    {msg.content}
+                  </div>
+                  {msg.sender === 'user' && (
+                    <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center flex-shrink-0 mt-1">
+                      <UserIcon className="w-5 h-5 text-gray-500" />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            {/* 🔥 AMÉLIORATION 5: Loader uniquement au premier chargement */}
+            {isLoading && messages.length === 0 && (
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
+                  <Brain className="w-5 h-5 text-white" />
+                </div>
+                <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-4 shadow-sm">
+                  <div className="flex gap-1.5 py-1">
+                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2 h-2 rounded-full bg-gray-300" />
+                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-2 h-2 rounded-full bg-gray-300" />
+                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-2 h-2 rounded-full bg-gray-300" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 🔥 AMÉLIORATION 6: Dernière question badge si c'est la 11ème */}
+            {currentQuestion && (session?.onboarding_history?.length || 0) === 10 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl flex gap-3 shadow-sm"
+              >
+                <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-orange-800 leading-relaxed font-medium">
+                  C'est notre dernière étape ! N'hésite pas à être très précis, Noah adore les détails.
+                </p>
+              </motion.div>
+            )}
+
+            <div ref={messagesEndRef} className="h-4" />
+          </div>
+        </div>
+
+        {/* Sticky Input Area */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] to-transparent z-50">
+          <div className="max-w-3xl mx-auto">
+            <motion.div layout className="bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden">
+              <div className="p-4 md:p-6">
+                {currentQuestion && !isLoading ? (
+                  <div className="space-y-4">
+                    {currentQuestion.type === 'text' && (
+                      <div className="relative group">
+                        <Textarea
+                          value={value}
+                          onChange={(e) => setValue(e.target.value)}
+                          placeholder="Écris ton message ici..."
+                          className="w-full bg-gray-50 border-gray-200 text-gray-900 min-h-[80px] md:min-h-[100px] text-base p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2]/20 transition-all"
+                          autoFocus
+                          disabled={isSaving}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey && canProceed()) {
+                              e.preventDefault();
+                              handleNext();
+                            }
+                          }}
+                        />
+                        <div className="absolute bottom-3 right-3 flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className={cn(
+                              "h-10 w-10 rounded-full transition-all",
+                              isRecording ? "bg-red-50 text-red-500 animate-pulse" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            )}
+                            onClick={isRecording ? stopRecording : startRecording}
+                            disabled={isTranscribing || isSaving}
+                          >
+                            {isTranscribing ? <Loader2 className="w-4 h-4 animate-spin text-[#61f7a2]" /> : isRecording ? <StopCircle className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {currentQuestion.type === 'single_choice' && (
+                      <div className="flex flex-wrap gap-2">
+                        {(currentQuestion.options || []).map((option, idx) => (
+                          <motion.button
+                            key={idx}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={cn(
+                              "px-5 py-3 rounded-2xl text-sm font-semibold transition-all shadow-sm border",
+                              value === option
+                                ? "bg-black text-white border-black"
+                                : "bg-white text-gray-700 border-gray-200 hover:border-black"
+                            )}
+                            onClick={() => {
+                              setValue(option);
+                              handleNextDirect(option);
+                            }}
+                            disabled={isSaving}
+                          >
+                            {option}
+                          </motion.button>
+                        ))}
+                      </div>
+                    )}
+
+                    {currentQuestion.type === 'multiple_choice' && (
+                      <div className="flex flex-wrap gap-2">
+                        {(currentQuestion.options || []).map((option, idx) => (
+                          <motion.button
+                            key={idx}
+                            onClick={() => handleCheckboxChange(option, !value.includes(option))}
+                            className={cn(
+                              "px-5 py-3 rounded-2xl text-sm font-semibold transition-all border shadow-sm flex items-center gap-2",
+                              value.includes(option)
+                                ? "bg-[#1a1a1a] text-white border-black"
+                                : "bg-white text-gray-700 border-gray-200 hover:border-black"
+                            )}
+                            disabled={isSaving}
+                          >
+                            <Checkbox checked={value.includes(option)} className="border-white/20" />
+                            {option}
+                          </motion.button>
+                        ))}
+                      </div>
+                    )}
+
+                    {currentQuestion.type === 'slider' && (
+                      <div className="px-4 py-2 space-y-6">
+                        <div className="flex justify-between items-end">
+                          <span className="text-gray-400 text-sm font-medium">Expérience</span>
+                          <span className="text-3xl font-black text-gray-900">
+                            {value >= (currentQuestion.max || 10) ? `${value}+` : value} <span className="text-base text-gray-400">ans</span>
+                          </span>
+                        </div>
+                        <Slider
+                          value={[value]}
+                          onValueChange={(vals) => setValue(vals[0])}
+                          min={currentQuestion.min || 0}
+                          max={currentQuestion.max || 10}
+                          step={currentQuestion.step || 1}
+                          disabled={isSaving}
+                        />
+                      </div>
+                    )}
+
+                    {currentQuestion.type !== 'single_choice' && (
+                      <button
+                        onClick={handleNext}
+                        disabled={!canProceed() || isSaving}
+                        className={cn(
+                          "w-full h-14 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-all duration-300",
+                          "bg-gradient-to-br from-[#1a1a1a] to-black text-white shadow-xl border border-white/10",
+                          "hover:shadow-[0_0_25px_rgba(97,247,162,0.5)] hover:brightness-110 hover:-translate-y-0.5 active:scale-95",
+                          (!canProceed() || isSaving) && "opacity-50 cursor-not-allowed shadow-none transform-none"
+                        )}
+                      >
+                        {isSaving ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <span>Envoi en cours...</span>
+                          </>
+                        ) : (
+                          <>
+                            Envoyer ma réponse
+                            <Send className="w-5 h-5" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="h-20 flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#61f7a2]" />
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .pulse-noah { animation: noahpulse 2s infinite; }
+        @keyframes noahpulse {
+          0% { box-shadow: 0 0 0 0px rgba(97, 247, 162, 0.4); }
+          70% { box-shadow: 0 0 0 12px rgba(97, 247, 162, 0); }
+          100% { box-shadow: 0 0 0 0px rgba(97, 247, 162, 0); }
+        }
+      `}} />
+    </div>
+  );
+}
+
+// Export par défaut requis pour React
+export default OnboardingDynamic;

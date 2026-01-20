@@ -95,6 +95,8 @@ Deno.serve(async (req) => {
     const generationSteps = [
       { name: 'marketValidation', field: 'market_validation', function: 'generateMarketValidation' },
       { name: 'avatars', field: 'generated_avatars', function: 'generateAvatars' },
+      { name: 'detailedOffers', field: 'detailed_offers', function: 'generateDetailedOffers' },  // 🆕 AJOUTÉ
+      { name: 'completeMarketAnalysis', field: 'complete_market_analysis', function: 'generateMarketAnalysisV2' },  // 🆕 AJOUTÉ
       { name: 'myOffers', field: 'my_generated_offers', function: 'generateMyOffers' },
       { name: 'salesMessages', field: 'generated_sales_messages', function: 'generateSalesMessage' },
       { name: 'marketingEmails', field: 'generated_marketing_emails', function: 'generateMarketingEmail' },

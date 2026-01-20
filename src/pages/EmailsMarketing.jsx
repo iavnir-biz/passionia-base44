@@ -1,366 +1,436 @@
-import React, { useState, useEffect } from 'react';
-import { useRequireAuth } from '@/components/hooks/useRequireAuth';
-import { motion } from 'framer-motion';
-import Sidebar from '@/components/navigation/Sidebar';
-import TopBar from '@/components/navigation/TopBar';
-import GlowButton from '@/components/ui/GlowButton';
-import { base44 } from '@/api/base44Client';
-import { Send, Copy, Download, Eye, Loader2, Sparkles, Lock, Brain, Mail } from 'lucide-react';
-import { cn } from "@/lib/utils";
-import ReactMarkdown from 'react-markdown';
-import { toast } from 'sonner';
-import UpgradeModal from '@/components/paywall/UpgradeModal';
-import ChatBubble from '@/components/chat/ChatBubble';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
 
-const emailTypes = [
-  {
-    id: 'contraste',
-    title: 'Le Contraste',
-    subtitle: 'Email 1',
-    objective: 'Faire prendre conscience de l\'écart entre aujourd\'hui et demain',
-    icon: Send,
-    color: 'from-blue-500 to-cyan-500'
-  },
-  {
-    id: 'validation',
-    title: 'La Validation',
-    subtitle: 'Email 2',
-    objective: 'Créer la connexion émotionnelle ("Tu n\'es pas seul")',
-    icon: Send,
-    color: 'from-purple-500 to-pink-500'
-  },
-  {
-    id: 'calcul',
-    title: 'Le Calcul',
-    subtitle: 'Email 3',
-    objective: 'Rassurer le cerveau logique (c\'est faisable)',
-    icon: Send,
-    color: 'from-orange-500 to-red-500'
-  },
-  {
-    id: 'impact',
-    title: 'L\'Impact',
-    subtitle: 'Email 4',
-    objective: 'Donner du sens à l\'action (fierté, avancer enfin)',
-    icon: Send,
-    color: 'from-amber-500 to-yellow-500'
-  },
-  {
-    id: 'urgence',
-    title: 'L\'Urgence',
-    subtitle: 'Email 5',
-    objective: 'Déclencher la décision (coût de l\'inaction)',
-    icon: Send,
-    color: 'from-green-500 to-emerald-500'
-  }
-];
+const anthropic = new Anthropic({
+  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
+});
 
-export default function EmailsMarketing() {
-  const { isLoading: authLoading, user } = useRequireAuth();
-  const [loading, setLoading] = useState(false);
-  const [generatedEmails, setGeneratedEmails] = useState({});
-  const [previewEmail, setPreviewEmail] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [session, setSession] = useState(null);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [hasPremium, setHasPremium] = useState(false);
+const SYSTEM_PROMPT = `Tu es Noah, expert en email marketing conversationnel et copywriting humain pour créateurs de produits d'information.
 
-  useEffect(() => {
-    if (user) {
-      loadUserData();
-    }
-  }, [user]);
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TA MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  const isNonEmpty = (value) => {
-    if (value === null || value === undefined) return false;
-    if (typeof value === 'string') return value.trim().length > 0;
-    if (typeof value === 'number') return true;
-    if (typeof value === 'boolean') return true;
-    if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === 'object') return Object.keys(value).length > 0;
-    return false;
-  };
+Créer une SÉQUENCE COMPLÈTE de 5 EMAILS MARKETING pour vendre UN SEUL PRODUIT : le produit LOW TICKET (produit d'entrée, 27-97€).
 
-  const loadUserData = async () => {
-    try {
-      // 🔥 DB-first: charger Session via sessionId
-      const sessionId = user.sessionId;
-      if (!sessionId) {
-        console.error('[EmailsMarketing] No sessionId');
-        return;
-      }
+⚠️ IMPORTANT :
+- Ces emails vendent UN produit simple et accessible
+- PAS une marque, PAS une offre premium
+- Objectif : conversion douce vers le produit d'appel
+- Ton relationnel, pas agressif
 
-      const sessions = await base44.entities.Session.filter({ id: sessionId });
-      const userSession = sessions?.[0];
-      
-      if (!userSession) {
-        console.error('[EmailsMarketing] Session not found');
-        return;
-      }
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 STRUCTURE DE LA SÉQUENCE (5 EMAILS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-      setSession(userSession);
-      console.log('[EmailsMarketing] Session loaded:', userSession);
-      console.log('[EmailsMarketing] Generated marketing emails:', userSession.generated_marketing_emails);
-      
-      // Charger emails si présents
-      if (isNonEmpty(userSession.generated_marketing_emails)) {
-        setGeneratedEmails(userSession.generated_marketing_emails);
-      }
+**EMAIL 1 : LE CONTRASTE** (Jour 1)
+**Objectif :** Faire prendre conscience de l'écart entre aujourd'hui et demain
+**Timing :** Premier contact
+**Structure :**
+- Sujet accrocheur (question ou constat)
+- Situation actuelle frustrante (2-3 paragraphes)
+- Vision de ce qui pourrait changer
+- AUCUNE vente directe
+- Invitation à réfléchir
+- PS optionnel (renforce la réflexion)
+**Longueur :** 200-300 mots
 
-      const profileRes = await base44.entities.UserProfile.filter({ created_by: user.email });
-      if (profileRes.length > 0) {
-        setProfile(profileRes[0]);
-        setHasPremium(profileRes[0].has_paid === true);
-      }
-    } catch (error) {
-      console.error('[EmailsMarketing] Error loading user data:', error);
-    }
-  };
+**EMAIL 2 : LA VALIDATION** (Jour 3)
+**Objectif :** Créer la connexion émotionnelle
+**Timing :** 2 jours après email 1
+**Structure :**
+- Sujet empathique
+- "Tu n'es pas seul·e"
+- Histoire personnelle OU cas client (storytelling court)
+- Normalisation du problème
+- Validation des émotions
+- TOUJOURS pas de pression commerciale
+- PS réconfortant
+**Longueur :** 250-350 mots
 
-  const handleGenerateAll = async () => {
-    if (!session) {
-      toast.error('Session non trouvée');
-      return;
-    }
+**EMAIL 3 : LE CALCUL** (Jour 5)
+**Objectif :** Rassurer le cerveau logique
+**Timing :** 2 jours après email 2
+**Structure :**
+- Sujet pragmatique
+- Montrer que c'est faisable
+- Décomposer le chemin en étapes simples
+- Introduction DOUCE du produit low ticket
+- Expliquer pourquoi c'est une bonne première étape
+- Bénéfices concrets et mesurables
+- Lien vers le produit (sans pression)
+- PS avec mini-FAQ ou objection
+**Longueur :** 300-400 mots
 
-    setLoading('all');
-    try {
-      console.log('[EmailsMarketing] Invoking generateMarketingEmail:', { sessionId: session.id, generateAll: true });
-      const response = await base44.functions.invoke('generateMarketingEmail', {
-        sessionId: session.id,
-        generateAll: true
-      });
+**EMAIL 4 : L'IMPACT** (Jour 7)
+**Objectif :** Donner du sens à l'action
+**Timing :** 2 jours après email 3
+**Structure :**
+- Sujet inspirant
+- Vision de transformation
+- Impact personnel (fierté, accomplissement)
+- Sentiment d'avancer ENFIN
+- Le produit présenté comme un LEVIER, pas une fin
+- Témoignage ou résultat client (si disponible)
+- CTA clair mais sans pression
+- PS motivant
+**Longueur :** 300-400 mots
 
-      setGeneratedEmails(response.data.emails);
+**EMAIL 5 : L'URGENCE** (Jour 10)
+**Objectif :** Déclencher la décision
+**Timing :** 3 jours après email 4 (dernier email)
+**Structure :**
+- Sujet urgent (mais pas manipulateur)
+- Coût de l'inaction (ce qui se passe si tu ne fais rien)
+- Rappel des bénéfices du produit
+- Raison légitime de l'urgence (date limite, places, etc.)
+- CTA direct et clair
+- Garantie ou réassurance
+- PS final (dernière chance, ton bienveillant)
+**Longueur :** 250-350 mots
 
-      // Save to session
-      await base44.entities.Session.update(session.id, {
-        generated_marketing_emails: response.data.emails
-      });
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎨 STYLE & TON (CRITIQUE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-      // Recharger pour confirmer
-      await loadUserData();
+**FORMAT ABSOLU :**
+- TEXTE BRUT (plain text, pas de HTML)
+- ZÉRO markdown (pas de **, pas de ##, pas de - pour les listes)
+- Paragraphes courts (2-3 lignes max)
+- Sauts de ligne généreux (lisibilité)
+- Copiable tel quel dans Gmail/Mailchimp/Notion
 
-      toast.success('Séquence complète générée !');
-    } catch (error) {
-      console.error('Error generating emails:', error);
-      toast.error('Erreur lors de la génération');
-    } finally {
-      setLoading(null);
-    }
-  };
+**TON & VOIX :**
+- Tutoiement EXCLUSIF
+- Langage parlé et naturel
+- Comme si tu écrivais à un ami
+- Simple et accessible
+- Zéro jargon marketing
+- Zéro promesses exagérées
+- Authenticité totale
 
-  const handleCopy = (content) => {
-    navigator.clipboard.writeText(content);
-    toast.success('Copié dans le presse-papier !');
-  };
+**PHRASES NATURELLES (exemples) :**
+✅ "Écoute, je vais être honnête avec toi"
+✅ "Je vois plein de gens dans ta situation"
+✅ "C'est vraiment pas sorcier"
+✅ "Tu sais ce qui marche bien ?"
 
-  const handleDownload = (content, type) => {
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `email-${type}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+**PHRASES À ÉVITER :**
+❌ "Opportunité unique"
+❌ "Changez votre vie"
+❌ "Système révolutionnaire"
+❌ "Offre exclusive"
+❌ "Garantie 100%"
 
-  if (authLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-white">
-        <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
-      </div>
-    );
-  }
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 STRUCTURE DE CHAQUE EMAIL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="EmailsMarketing" />
-      
-      <div className="flex-1 ml-72">
-        <TopBar 
-          title="Emails Marketing" 
-          subtitle=""
-          user={user}
-        />
+Chaque email doit contenir :
 
-        <main className="p-8">
-          <div className="max-w-6xl mx-auto space-y-8">
-            
-            {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-left"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
-                <Brain className="w-4 h-4 text-[#61f7a2]" />
-                <span className="text-xs font-medium text-gray-700">Emails générés par IA</span>
-              </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                Tes emails marketing
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Une séquence prête à envoyer pour vendre ton produit d'entrée de gamme, sans forcer.
-              </p>
-            </motion.div>
-
-            {/* Context Block */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 rounded-2xl p-6"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    📧 Comment utiliser cette séquence ?
-                  </h3>
-                  <p className="text-sm text-gray-700 leading-relaxed mb-3">
-                    Cette séquence d'emails est pensée comme une conversation naturelle, pas un tunnel agressif. 
-                    Utilise-les après tes messages privés ou DM pour nourrir la relation et transformer l'intérêt en vente.
-                  </p>
-                  <p className="text-xs text-gray-600 font-medium">
-                    ⚠️ Ces emails sont liés à ton produit low ticket : ils ne peuvent pas être modifiés ni régénérés.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Global Generate Button */}
-            {Object.keys(generatedEmails).length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="flex justify-center"
-              >
-                <GlowButton
-                  onClick={handleGenerateAll}
-                  variant="primary"
-                  size="lg"
-                  loading={loading === 'all'}
-                  icon={Sparkles}
-                  className="px-8 py-4"
-                >
-                  {loading === 'all' ? 'Nova écrit tes emails...' : 'Générer mes emails'}
-                </GlowButton>
-              </motion.div>
-            )}
-
-            {/* Email Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {emailTypes.map((email, index) => {
-                const generated = generatedEmails[email.id];
-                const isGenerating = loading === email.id;
-
-                return (
-                  <motion.div
-                    key={email.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + index * 0.03 }}
-                    className="bg-gray-50 border border-gray-200 rounded-2xl p-6 hover:border-gray-300 transition-all"
-                  >
-                    {/* Icon Header */}
-                    <div className={cn(
-                      "w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4",
-                      email.color
-                    )}>
-                      <email.icon className="w-7 h-7 text-white" />
-                    </div>
-
-                    {/* Content */}
-                    <p className="text-[#61f7a2] text-xs font-semibold uppercase tracking-wide mb-1">
-                      {email.subtitle}
-                    </p>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">
-                      {email.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-6">
-                      <span className="font-medium">Objectif :</span> {email.objective}
-                    </p>
-
-                    {/* Actions */}
-                    {generated ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setPreviewEmail({ type: email.id, content: generated, title: email.title })}
-                          className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
-                        >
-                          <Eye className="w-4 h-4" />
-                          <span className="text-sm font-medium">Voir</span>
-                        </button>
-                        <button
-                          onClick={() => handleCopy(generated)}
-                          className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDownload(generated, email.id)}
-                          className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
-                        >
-                          <Download className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : null}
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </main>
-      </div>
-
-      {/* Preview Modal */}
-      {previewEmail && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden border border-gray-200 shadow-2xl"
-          >
-            <div className="bg-gray-100 p-6 border-b border-gray-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-gray-700" />
-                <h3 className="text-lg font-bold text-gray-900">Aperçu de l'email</h3>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleCopy(previewEmail.content)}
-                  className="px-3 py-1.5 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-700"
-                >
-                  <Copy className="w-4 h-4" />
-                  <span className="text-sm font-medium">Copier</span>
-                </button>
-                <button
-                  onClick={() => setPreviewEmail(null)}
-                  className="text-gray-500 hover:text-gray-900 transition-colors text-xl"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-            <div className="p-8 overflow-y-auto max-h-[calc(85vh-100px)] bg-white">
-              <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
-                <pre className="whitespace-pre-wrap font-sans">
-                  {previewEmail.content}
-                </pre>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Chat Bubble */}
-      <ChatBubble />
-
-      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
-    </div>
-  );
+{
+  "subject": "Ligne de sujet (40-60 caractères, accrocheur sans clickbait)",
+  "preheader": "Texte de prévisualisation (50-100 caractères, complète le sujet)",
+  "body": "Corps de l'email (texte brut, paragraphes courts, sauts de ligne)",
+  "ps": "Post-scriptum optionnel (1-2 phrases percutantes)"
 }
+
+**RÈGLES SUJETS :**
+- Court (40-60 caractères max)
+- Question OU constat OU curiosité
+- Personnalisé au problème
+- ZÉRO clickbait manipulateur
+- Doit donner envie d'ouvrir
+
+**Exemples de BONS sujets :**
+✅ "Tu galères avec [problème] ?"
+✅ "Ce qui bloque vraiment..."
+✅ "3 jours pour [résultat]"
+✅ "Pourquoi ça ne marche pas"
+
+**Exemples de MAUVAIS sujets :**
+❌ "OFFRE EXCLUSIVE 🔥"
+❌ "Tu ne vas pas en croire tes yeux"
+❌ "Dernier jour !!!"
+❌ "RE: RE: RE: Important"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ RÈGLES CRITIQUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. **CONSERVER EXACTEMENT :**
+   - Titre du produit (ne PAS inventer)
+   - Prix du produit (ne PAS changer)
+   - Promesse du produit (ne PAS exagérer)
+
+2. **PERSONNALISATION :**
+   - Utiliser le problème spécifique
+   - Utiliser la transformation promise
+   - Utiliser le vocabulaire de l'avatar
+   - Être spécifique (pas générique)
+
+3. **PROGRESSION :**
+   - Email 1 & 2 : Zéro mention du produit
+   - Email 3 : Introduction douce du produit
+   - Email 4 : Le produit comme solution
+   - Email 5 : Appel à l'action clair
+
+4. **CTA (Call-to-Action) :**
+   - Email 1 & 2 : Pas de CTA produit
+   - Email 3 : CTA soft "Si tu veux en savoir plus..."
+   - Email 4 : CTA moyen "Tu peux commencer ici..."
+   - Email 5 : CTA fort "C'est le dernier jour..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 FORMAT DE SORTIE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Retourne UNIQUEMENT un JSON valide :
+
+{
+  "email1_contraste": {
+    "title": "Email 1 : Le Contraste",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  },
+  "email2_validation": {
+    "title": "Email 2 : La Validation",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  },
+  "email3_calcul": {
+    "title": "Email 3 : Le Calcul",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  },
+  "email4_impact": {
+    "title": "Email 4 : L'Impact",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  },
+  "email5_urgence": {
+    "title": "Email 5 : L'Urgence",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  }
+}
+
+Pas de markdown, pas de texte avant/après, juste le JSON pur.`;
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const sessionId = body.sessionId || body.session?.id || user.sessionId;
+
+    if (!sessionId) {
+      return Response.json({ error: 'sessionId required' }, { status: 400 });
+    }
+
+    // Get session
+    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+    if (!sessions || sessions.length === 0) {
+      return Response.json({ error: 'Session not found' }, { status: 404 });
+    }
+
+    const session = sessions[0];
+
+    // Check cache
+    if (session.generated_marketing_emails && Object.keys(session.generated_marketing_emails).length === 5) {
+      return Response.json({
+        success: true,
+        emails: session.generated_marketing_emails,
+        fromCache: true
+      });
+    }
+
+    const finalizedOffer = session.finalized_offer || {};
+    const onboardingSummary = session.onboarding_summary || {};
+    const onboardingFull = session.onboarding_full || {};
+    const avatars = session.generated_avatars || {};
+
+    // Get main product (low ticket)
+    const mainProduct = finalizedOffer.mainProduct || {};
+    
+    if (!mainProduct.title || !mainProduct.price) {
+      return Response.json({
+        error: 'Produit principal incomplet'
+      }, { status: 400 });
+    }
+
+    const userPrompt = `CONTEXTE DU PROJET :
+
+**Créateur :**
+Prénom : ${user.firstName || user.full_name || 'le créateur'}
+
+**Compétence enseignée :**
+${session.skill || onboardingSummary.who_to_teach || 'Non défini'}
+
+**Audience cible :**
+${onboardingSummary.learner_profile || 'Non défini'}
+
+**Problème principal :**
+${onboardingSummary.main_learning_problem || 'Non défini'}
+
+**Quick win promis :**
+${onboardingSummary.quick_win || 'Non défini'}
+
+**Grande transformation :**
+${onboardingSummary.big_transformation || 'Non défini'}
+
+**Méthode/Angle unique :**
+${onboardingSummary.method_angle || 'Non défini'}
+
+**Erreur typique à éviter :**
+${onboardingSummary.common_mistake || 'Non défini'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRODUIT À VENDRE (PRODUIT PRINCIPAL - LOW TICKET) :
+
+**Titre :** ${mainProduct.title}
+**Prix :** ${mainProduct.price}
+**Format :** ${mainProduct.productType || 'Formation'}
+**Description :** ${mainProduct.description || mainProduct.subtitle || ''}
+
+⚠️ CRITIQUE : TU DOIS utiliser EXACTEMENT ce titre et ce prix.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AVATARS CLIENTS (pour personnalisation) :
+${JSON.stringify(avatars, null, 2)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TA MISSION :
+
+Génère une SÉQUENCE COMPLÈTE de 5 EMAILS selon la structure définie.
+
+**RÈGLES CRITIQUES :**
+
+1. **Utilise les vraies données :**
+   - Titre exact : "${mainProduct.title}"
+   - Prix exact : ${mainProduct.price}
+   - Problème réel : "${onboardingSummary.main_learning_problem}"
+   - Transformation réelle : "${onboardingSummary.big_transformation}"
+
+2. **Progression naturelle :**
+   - Email 1 : Contraste (pas de vente)
+   - Email 2 : Validation (pas de vente)
+   - Email 3 : Calcul (introduction douce)
+   - Email 4 : Impact (le produit comme levier)
+   - Email 5 : Urgence (appel à l'action)
+
+3. **Style conversationnel :**
+   - Texte brut (pas de markdown)
+   - Paragraphes courts
+   - Langage naturel
+   - Tutoiement exclusif
+
+4. **Personnalisation :**
+   - Vocabulaire des avatars
+   - Situations concrètes
+   - Frustrations spécifiques
+
+**Exemple de BON email 1 (Contraste) :**
+
+Sujet : Tu galères avec [problème] ?
+
+Tu sais ce moment où tu te dis :
+"J'ai l'idée, mais je ne sais pas par où commencer" ?
+
+C'est exactement là où sont coincés la plupart des [audience].
+
+L'idée est là.
+La motivation aussi.
+
+Mais entre l'idée et le résultat, y'a ce truc énorme qui bloque.
+
+[développement 2-3 paragraphes]
+
+Bref, je voulais juste te dire : tu n'es pas seul·e.
+
+À bientôt,
+[Prénom]
+
+P.S. : Demain, je te raconte comment j'ai débloqué ça.
+
+---
+
+Génère maintenant les 5 emails complets en JSON.`;
+
+    console.log('ANTHROPIC_CALL start', {
+      fn: 'generateMarketingEmail',
+      sessionId,
+      model: 'claude-sonnet-4-20250514'
+    });
+
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 12000,
+      system: SYSTEM_PROMPT,
+      messages: [
+        { role: "user", content: userPrompt }
+      ]
+    });
+
+    console.log('ANTHROPIC_CALL end', {
+      fn: 'generateMarketingEmail',
+      sessionId,
+      usage: message.usage
+    });
+
+    const responseText = message.content[0].type === 'text'
+      ? message.content[0].text.trim()
+      : '{}';
+
+    // Clean potential markdown
+    const cleanedResponse = responseText
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    let marketingEmails;
+    try {
+      marketingEmails = JSON.parse(cleanedResponse);
+    } catch (e) {
+      console.error('JSON parse error:', e);
+      return Response.json({
+        error: 'Failed to parse marketing emails',
+        details: e.message
+      }, { status: 500 });
+    }
+
+    // Save to session
+    await base44.asServiceRole.entities.Session.update(sessionId, {
+      generated_marketing_emails: marketingEmails
+    });
+
+    console.log('✅ [generateMarketingEmail] Saved to session', { sessionId });
+
+    return Response.json({
+      success: true,
+      emails: marketingEmails
+    });
+
+  } catch (error) {
+    console.error('Error in generateMarketingEmail:', error);
+    return Response.json({
+      error: error.message,
+      details: error.stack
+    }, { status: 500 });
+  }
+});

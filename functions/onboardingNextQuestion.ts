@@ -1,19 +1,18 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import OpenAI from 'npm:openai@4.73.1';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
 
-const openai = new OpenAI({
-  apiKey: Deno.env.get("OPENAI_API_KEY"),
+const anthropic = new Anthropic({
+  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
 
 // Structure des 11 questions à suivre STRICTEMENT
-// 🧠 P1 : Chaque question a un "transformation_focus" qui guide la reformulation
 const QUESTION_STRUCTURE = [
   { 
     id: 1, 
     field: "coreSkill", 
     theme: "Compétence à monétiser", 
     type: "text",
-    transformation_focus: "identification_passion", // P1
+    transformation_focus: "identification_passion",
     titleTemplate: "Salut {{firstName}} ! Quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu et enseigner ?",
     subtitleTemplate: "Sois précis. Ex : peindre des aquarelles, conseiller en décoration intérieure, consulting RH, créer un programme de fitness maison."
   },
@@ -23,7 +22,7 @@ const QUESTION_STRUCTURE = [
     theme: "Niveau d'expérience", 
     type: "single_choice", 
     options: ["C'est une passion, je débute", "J'ai déjà aidé des amis ou proches gratuitement", "Je suis professionnel, j'ai déjà eu des clients"],
-    transformation_focus: "légitimité_à_enseigner", // P1
+    transformation_focus: "légitimité_à_enseigner",
     titleTemplate: "Super, tu veux enseigner {{coreSkill}}. Dis-moi : quel est ton niveau d'expérience actuel ?",
     subtitleTemplate: "Choisis l'option qui te ressemble le plus."
   },
@@ -35,7 +34,7 @@ const QUESTION_STRUCTURE = [
     min: 0, 
     max: 15, 
     step: 1,
-    transformation_focus: "ancrage_expertise", // P1
+    transformation_focus: "ancrage_expertise",
     titleTemplate: "Depuis combien d'années pratiques-tu {{coreSkill}} ?",
     subtitleTemplate: "Même si tu débutes, ton parcours a de la valeur. Indique simplement ton niveau réel."
   },
@@ -44,123 +43,122 @@ const QUESTION_STRUCTURE = [
     field: "targetAudience", 
     theme: "À qui enseigner", 
     type: "text",
-    transformation_focus: "identification_élève_idéal", // P1
+    transformation_focus: "identification_élève_idéal",
     titleTemplate: "À qui aimerais-tu le plus transmettre ce savoir, {{firstName}} ?",
-    subtitleTemplate: "Pense à des personnes qui ont un vrai besoin, pas juste un intérêt passager."
+    subtitleTemplate: "Pense à ceux qui veulent vraiment passer de l'idée à une app concrète, mais se sentent bloqués par la complexité de l'IA ou du codage. Les gens qui veulent entreprendre avec l'IA principalement"
   },
   { 
     id: 5, 
     field: "mainProblem", 
-    theme: "Problème #1 de l'élève", 
+    theme: "Problème principal", 
     type: "text",
-    transformation_focus: "désorganisation_confusion_blocage", // P1 - le VRAI problème AVANT d'avoir une méthode
-    titleTemplate: "Qu'est-ce qui bloque ces personnes AVANT même qu'elles aient une méthode ?",
-    subtitleTemplate: "Pas le manque de compétence, mais le vrai frein : confusion, peur, désorganisation, manque de clarté..."
+    transformation_focus: "blocage_confusion",
+    titleTemplate: "Tu veux vraiment aider {{targetAudience}}. Qu'est-ce qui, selon toi, les empêche aujourd'hui de voir clair et d'avancer sereinement ?",
+    subtitleTemplate: "Comme la peur de ne pas comprendre les concepts d'IA, la confusion face à la terminologie du codage ou le doute sur leur capacité à gérer un projet."
   },
   { 
     id: 6, 
     field: "firstQuickResult", 
-    theme: "Premier résultat rapide", 
+    theme: "Déclic rapide", 
     type: "text",
-    transformation_focus: "première_victoire_soulagement", // P1 - déclic émotionnel
-    titleTemplate: "Quel sera leur premier déclic ? Le moment où ils se diront « ça y est, j'ai compris » ?",
-    subtitleTemplate: "Ce moment de soulagement où tout devient plus clair, plus simple."
+    transformation_focus: "première_victoire",
+    titleTemplate: "Donc, tu veux aider {{targetAudience}} à dépasser leurs peurs. À quel moment penses-tu qu'ils ressentiront leur premier soulagement, ce déclic où tout deviendra plus clair pour eux ?",
+    subtitleTemplate: "Comme quand ils réussissent enfin à créer un prototype fonctionnel ou comprennent un concept complexe d'IA avec facilité."
   },
   { 
     id: 7, 
     field: "finalTransformation", 
     theme: "Transformation finale", 
     type: "text",
-    transformation_focus: "changement_identité_autonomie", // P1 - nouvelle version de soi
-    titleTemplate: "Et à la fin, qui seront-ils devenus grâce à toi ?",
-    subtitleTemplate: "Pas juste une compétence acquise, mais une vraie transformation : confiance, autonomie, nouvelle identité."
+    transformation_focus: "nouvelle_identité",
+    titleTemplate: "Donc, tu veux montrer à tes élèves qu'ils n'ont pas besoin d'être ingénieurs pour créer des applications, juste savoir comment utiliser les bons outils. Au bout du compte, comment imagines-tu leur transformation personnelle et professionnelle ?",
+    subtitleTemplate: "Ils pourront passer de novices hésitants à des créateurs confiants, capables de matérialiser leurs idées en applications concrètes."
   },
   { 
     id: 8, 
     field: "mainTeaching", 
-    theme: "Le plus important à apprendre", 
+    theme: "Prise de conscience clé", 
     type: "text",
-    transformation_focus: "principe_clé_déclic", // P1 - le concept central
-    titleTemplate: "Quelle est LA prise de conscience qui change tout pour eux ?",
-    subtitleTemplate: "Le principe clé, le déclic mental qui fait la différence entre stagner et progresser."
+    transformation_focus: "principe_central",
+    titleTemplate: "Je vois que tu veux vraiment démystifier l'IA et le codage pour les rendre accessibles à tous. Qu'est-ce qui rend ta façon de les enseigner unique, selon toi ?",
+    subtitleTemplate: "Comme montrer que coder c'est comme cuisiner avec des recettes simples, ou utiliser des métaphores pour expliquer des concepts techniques."
   },
   { 
     id: 9, 
     field: "uniqueMethod", 
-    theme: "Méthode unique", 
+    theme: "Approche unique", 
     type: "text",
-    transformation_focus: "approche_différenciante", // P1
-    titleTemplate: "Comment tu t'y prends différemment des autres pour obtenir ces résultats ?",
-    subtitleTemplate: "Ta façon à toi, ton approche, ce qui rend ton enseignement unique. Si tu ne sais pas encore, écris « je ne sais pas encore »."
+    transformation_focus: "différenciation",
+    titleTemplate: "Tu veux vraiment simplifier les choses pour ceux qui pensent que coder est hors de portée. Qu'est-ce qui t'a donné envie de montrer que l'IA et le codage peuvent être aussi accessibles que cuisiner avec des recettes simples ?",
+    subtitleTemplate: "Peut-être un moment où tu t'es senti bloqué, une réussite inattendue, ou une envie de rendre les choses plus simples pour les autres."
   },
   { 
     id: 10, 
     field: "typicalMistake", 
-    theme: "Erreur typique", 
+    theme: "Erreur courante", 
     type: "text",
-    transformation_focus: "erreur_racine_faux_raisonnement", // P1 - la VRAIE cause d'échec
+    transformation_focus: "fausse_croyance",
     titleTemplate: "Quelle erreur de raisonnement fait perdre du temps aux débutants ?",
-    subtitleTemplate: "Pas juste une erreur technique, mais une fausse croyance, un mauvais réflexe qui sabote leur progression."
+    subtitleTemplate: "Pense que c'est compliqué, ou qu'il faut trop de budget pouyr y arriver"
   },
   { 
     id: 11, 
     field: "extraDetail", 
-    theme: "Détail personnel", 
+    theme: "Histoire personnelle", 
     type: "text",
-    transformation_focus: "histoire_personnelle_authenticité", // P1
+    transformation_focus: "authenticité",
     titleTemplate: "Pour finir : qu'est-ce qui t'a donné envie de transmettre ça ?",
-    subtitleTemplate: "Un déclic, une galère surmontée, une envie profonde... Ce qui rend ton projet personnel."
+    subtitleTemplate: "Car j'ai tout perdu, et j'ai creer mes propres app pour des entreprises, et je les aiet revendus beaucoup d'argent, maintenant je bosse d'ou je veux, je creer des apps pour tous les corps de métiers; etc etc"
   }
 ];
 
-const SYSTEM_PROMPT = `Tu es Noah, coach stratégique humain et pédagogue.
+const SYSTEM_PROMPT = `Tu es Noah, un coach stratégique humain, empathique et pédagogue.
 
-Tu discutes avec un futur formateur qui veut TRANSMETTRE son savoir-faire.
-Tu ne remplis pas un formulaire.
-Tu mènes une vraie conversation intelligente.
+Tu discutes avec un futur formateur qui veut TRANSMETTRE son savoir-faire et aider ses futurs élèves.
 
-RÈGLE ABSOLUE :
-L'utilisateur n'enseigne jamais un outil.
-Il aide ses élèves à passer d'un état de confusion à un état de clarté, d'autonomie ou de maîtrise.
+RÈGLES ABSOLUES :
+1. Tu ne remplis pas un formulaire, tu mènes une vraie conversation intelligente
+2. L'utilisateur n'enseigne jamais un outil - il aide ses élèves à passer d'un état de confusion à un état de clarté et de maîtrise
+3. Tu reformules la question en t'appuyant sur ce que l'utilisateur vient de dire
+4. Tu montres que tu as VRAIMENT compris sa réponse précédente
 
-Ta mission est simple :
-Reformuler la prochaine question comme le ferait un humain expert,
-en t'appuyant sur ce que l'utilisateur vient de dire.
+STRUCTURE DE TA RÉPONSE :
+1. Commence par montrer que tu as compris (1 phrase max, naturelle)
+2. Pose UNE question claire qui découle logiquement de sa réponse
+3. Parle du PROBLÈME de ses futurs élèves ou de leur TRANSFORMATION, jamais de l'outil technique
 
-Tu dois :
-- Montrer que tu as compris sa réponse (1 phrase max)
-- Poser UNE question claire et naturelle
-- Parler du PROBLÈME ou de la TRANSFORMATION, jamais de l'outil
-- Utiliser un langage simple, vivant, humain
+TON & STYLE :
+- Langage simple, vivant, humain (tutoiement)
+- Phrases courtes et directes
+- Questions qui pourraient être posées dans une vraie discussion
+- Zéro jargon, zéro formalisme
 
-Interdictions :
-- Reformuler mot pour mot
-- Répéter la compétence
-- Être générique
-- Être scolaire
+INTERDICTIONS :
+❌ Reformuler mot pour mot le template
+❌ Répéter exactement ce que l'utilisateur a dit
+❌ Être générique ou scolaire
+❌ Ignorer le contexte de la réponse précédente
 
-Test qualité :
-"Est-ce que cette question pourrait être posée dans une vraie discussion ?"
+TEST QUALITÉ :
+"Est-ce que cette question pourrait être posée par un humain dans une vraie conversation ?"
 Si non → reformule.
 
-Tu retournes UNIQUEMENT :
+FORMAT DE SORTIE (JSON uniquement) :
 {
-  "text": "la question reformulée",
+  "text": "la question reformulée, naturelle et contextuelle",
   "subtitle": "1 phrase d'exemples concrets et parlants"
-}
-Rien d'autre.`;
+}`;
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-
     const { sessionId, userAnswer, firstName } = await req.json();
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // 🔥 ÉTAPE 1 : Sauvegarder d'abord la réponse si présente
+    // ÉTAPE 1 : Sauvegarder la réponse si présente
     if (userAnswer) {
       const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
       if (!sessions || sessions.length === 0) {
@@ -175,7 +173,10 @@ Deno.serve(async (req) => {
       
       const currentQuestionConfig = QUESTION_STRUCTURE[workingHistory.length];
       const questionText = currentQuestionConfig 
-        ? currentQuestionConfig.titleTemplate.replace('{{firstName}}', firstName || '').replace('{{coreSkill}}', workingSummary.who_to_teach || 'cette compétence')
+        ? currentQuestionConfig.titleTemplate
+            .replace('{{firstName}}', firstName || '')
+            .replace('{{coreSkill}}', workingSummary.who_to_teach || 'cette compétence')
+            .replace('{{targetAudience}}', workingSummary.learner_profile || 'ces personnes')
         : `Question ${workingHistory.length + 1}`;
 
       const updatedHistory = [
@@ -188,7 +189,6 @@ Deno.serve(async (req) => {
         }
       ];
 
-      // 🔥 SKILL PROPAGATION FIX: toujours récupérer depuis onboarding_full.coreSkill ou la réponse actuelle
       const fullData = currentSession.onboarding_full || {};
       const coreSkill = workingHistory.length === 0 
         ? normalizedAnswer 
@@ -199,7 +199,9 @@ Deno.serve(async (req) => {
         skill: coreSkill
       };
       
+      // Mapping spécifique selon la question
       if (workingHistory.length === 0) {
+        // Q1: coreSkill
         updatePayload.onboarding_full = { 
           ...(currentSession.onboarding_full || {}),
           coreSkill: normalizedAnswer 
@@ -209,402 +211,219 @@ Deno.serve(async (req) => {
           who_to_teach: normalizedAnswer
         };
       } else if (workingHistory.length === 3) {
-        // Q4 targetAudience
+        // Q4: targetAudience
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           targetAudience: normalizedAnswer
         };
-        // 🔥 Mapper aussi dans summary.learner_profile
-        const existingSummary = currentSession.onboarding_summary || {};
         updatePayload.onboarding_summary = {
-          ...existingSummary,
-          learner_profile: `${existingSummary.learner_profile || ''} ${normalizedAnswer}`.trim()
+          ...(currentSession.onboarding_summary || {}),
+          learner_profile: normalizedAnswer
         };
       } else if (workingHistory.length === 4) {
-        // Q5 mainProblem
+        // Q5: mainProblem
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           mainProblem: normalizedAnswer
         };
+        updatePayload.onboarding_summary = {
+          ...(currentSession.onboarding_summary || {}),
+          main_learning_problem: normalizedAnswer
+        };
       } else if (workingHistory.length === 5) {
-        // Q6 firstQuickResult
+        // Q6: firstQuickResult
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           firstQuickResult: normalizedAnswer
         };
+        updatePayload.onboarding_summary = {
+          ...(currentSession.onboarding_summary || {}),
+          quick_win: normalizedAnswer
+        };
       } else if (workingHistory.length === 6) {
-        // Q7 finalTransformation
+        // Q7: finalTransformation
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           finalTransformation: normalizedAnswer
         };
+        updatePayload.onboarding_summary = {
+          ...(currentSession.onboarding_summary || {}),
+          big_transformation: normalizedAnswer
+        };
       } else if (workingHistory.length === 7) {
-        // Q8 mainTeaching
+        // Q8: mainTeaching
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           mainTeaching: normalizedAnswer
         };
-        // 🔥 Mapper dans summary.main_teaching
         updatePayload.onboarding_summary = {
           ...(currentSession.onboarding_summary || {}),
           main_teaching: normalizedAnswer
         };
       } else if (workingHistory.length === 8) {
-        // Q9 uniqueMethod
+        // Q9: uniqueMethod
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           uniqueMethod: normalizedAnswer
         };
+        updatePayload.onboarding_summary = {
+          ...(currentSession.onboarding_summary || {}),
+          method_angle: normalizedAnswer
+        };
       } else if (workingHistory.length === 9) {
-        // Q10 typicalMistake
+        // Q10: typicalMistake
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           typicalMistake: normalizedAnswer
         };
+        updatePayload.onboarding_summary = {
+          ...(currentSession.onboarding_summary || {}),
+          common_mistake: normalizedAnswer
+        };
       } else if (workingHistory.length === 10) {
-        // Q11 extraDetail
+        // Q11: extraDetail (dernière question)
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           extraDetail: normalizedAnswer
         };
+        updatePayload.onboarding_summary = {
+          ...(currentSession.onboarding_summary || {}),
+          proof_or_story: normalizedAnswer
+        };
+        updatePayload.is_onboarding_done = true;
       }
 
       await base44.asServiceRole.entities.Session.update(sessionId, updatePayload);
-
-      console.log('💾 [SAVE FIRST]', {
-        sessionId,
-        questionIndex: workingHistory.length,
-        newHistoryLength: updatedHistory.length,
-        skill: coreSkill
-      });
+      
+      // Si dernière question, pas de prochaine question
+      if (workingHistory.length >= 10) {
+        return Response.json({
+          done: true,
+          nextQuestionNumber: null
+        });
+      }
     }
 
-    // 🔥 ÉTAPE 2 : Recharger la session APRÈS sauvegarde
+    // ÉTAPE 2 : Générer la prochaine question
     const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (!sessions || sessions.length === 0) {
       return Response.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    const currentSession = sessions[0];
-    const workingHistory = currentSession.onboarding_history || [];
-    const workingSummary = currentSession.onboarding_summary || {};
+    const session = sessions[0];
+    const history = session.onboarding_history || [];
+    const summary = session.onboarding_summary || {};
     
-    const name = firstName || '';
-    const skill = workingSummary.who_to_teach || '';
-
-    const nextQuestionIndex = workingHistory.length;
-
-    console.log('🔍 [RELOAD AFTER SAVE]', {
-      sessionId,
-      historyLength: workingHistory.length,
-      nextQuestionIndex,
-      hasUserAnswer: !!userAnswer
-    });
-
-    // 🚀 P0 FIX : Q1 instantané SANS OpenAI (déterministe)
-    if (!userAnswer && nextQuestionIndex === 0) {
-      const q1 = QUESTION_STRUCTURE[0];
-      console.log('✅ [P0 INSTANT Q1] Retour Q1 sans OpenAI', {
-        sessionId,
-        questionType: q1.type,
-        noOpenAI: true
-      });
-      
-      return Response.json({
-        isDone: false,
-        question: {
-          title: q1.titleTemplate.replace('{{firstName}}', name || ''),
-          subtitle: q1.subtitleTemplate,
-          text: q1.titleTemplate.replace('{{firstName}}', name || ''),
-          type: q1.type,
-          placeholder: q1.placeholder || '',
-          options: q1.options || []
-        },
-        summary: workingSummary
-      });
-    }
-
-    // Note: l'ajout de l'answer à l'historique est géré côté frontend
+    const nextQuestionIndex = history.length;
     
-    const historyText = workingHistory
-      .map((h, idx) => `Q${idx + 1}: ${h.question}\nR${idx + 1}: ${JSON.stringify(h.answer)}`)
-      .join('\n\n');
-
-    // Dernière question/réponse pour relance naturelle
-    const lastEntry = workingHistory.length > 0 ? workingHistory[workingHistory.length - 1] : null;
-    const lastQA = lastEntry 
-      ? `\n\nDERNIÈRE INTERACTION (utilise-la pour faire une relance naturelle) :\nQuestion précédente : ${lastEntry.question}\nRéponse de l'utilisateur : ${JSON.stringify(lastEntry.answer)}`
-      : '';
-
-    // Anti-répétition : 3 dernières questions
-    const recentQuestions = workingHistory
-      .slice(-3)
-      .map(h => h.question)
-      .filter(q => q);
-
     if (nextQuestionIndex >= QUESTION_STRUCTURE.length) {
-      console.log('✅ [ONBOARDING COMPLETE]', { sessionId, totalQuestions: QUESTION_STRUCTURE.length });
       return Response.json({
-        isDone: true,
-        summary: workingSummary
+        done: true,
+        nextQuestionNumber: null
       });
     }
 
-    const nextQuestionConfig = QUESTION_STRUCTURE[nextQuestionIndex];
+    const nextQuestion = QUESTION_STRUCTURE[nextQuestionIndex];
     
-    // 🛡️ HELPER : Construire question déterministe depuis structure
-    const buildDeterministicQuestion = (config, userName, userSkill) => {
-      return {
-        title: config.titleTemplate.replace('{{firstName}}', userName || '').replace('{{coreSkill}}', userSkill || 'cette compétence'),
-        subtitle: config.subtitleTemplate.replace('{{firstName}}', userName || '').replace('{{coreSkill}}', userSkill || 'cette compétence'),
-        text: config.titleTemplate.replace('{{firstName}}', userName || '').replace('{{coreSkill}}', userSkill || 'cette compétence'),
-        type: config.type,
-        placeholder: config.placeholder || '',
-        options: config.options || [],
-        min: config.min,
-        max: config.max,
-        step: config.step
-      };
-    };
+    // Pour les questions de type choice ou slider, pas besoin d'appeler Claude
+    if (nextQuestion.type === 'single_choice' || nextQuestion.type === 'slider') {
+      const staticTitle = nextQuestion.titleTemplate
+        .replace('{{firstName}}', firstName || '')
+        .replace('{{coreSkill}}', summary.who_to_teach || 'cette compétence')
+        .replace('{{targetAudience}}', summary.learner_profile || 'ces personnes');
+      
+      return Response.json({
+        done: false,
+        nextQuestion: {
+          number: nextQuestionIndex + 1,
+          field: nextQuestion.field,
+          type: nextQuestion.type,
+          title: staticTitle,
+          subtitle: nextQuestion.subtitleTemplate,
+          options: nextQuestion.options || null,
+          min: nextQuestion.min || null,
+          max: nextQuestion.max || null,
+          step: nextQuestion.step || null
+        }
+      });
+    }
 
-    let questionToReturn = buildDeterministicQuestion(nextQuestionConfig, name, skill);
-    let updatedSummary = { ...workingSummary };
+    // Pour les questions de type text, on appelle Claude pour reformulation contextuelle
+    const lastAnswer = history.length > 0 ? history[history.length - 1].answer : null;
+    const previousContext = history.map(h => `Q: ${h.question}\nR: ${h.answer}`).join('\n\n');
 
-    // 🧠 P1 : Récupérer le focus de transformation pour cette question
-    const transformationFocus = nextQuestionConfig?.transformation_focus || '';
-    
-    // 🔮 P2 : Construire le contexte pour la micro-reformulation
-    const lastAnswer = lastEntry?.answer || '';
-    const previousContext = workingHistory.length >= 2 
-      ? workingHistory.slice(-2).map(h => `Q: ${h.question?.substring(0, 50)}... → R: ${JSON.stringify(h.answer)?.substring(0, 80)}...`).join('\n')
-      : '';
-
-    const userPrompt = `CONTEXTE UTILISATEUR :
-Prénom : ${name || 'non fourni'}
-Compétence principale : ${skill || 'non fournie encore'}
-
-SUMMARY ACTUEL (à enrichir progressivement) :
-${JSON.stringify(workingSummary, null, 2)}
-
-HISTORIQUE COMPLET DES Q/R :
-${historyText || 'Aucune question posée encore.'}
-${lastQA}
-
-${recentQuestions.length > 0 ? `ATTENTION - Questions récentes (ne les repose pas) :
-${recentQuestions.map((q, i) => `- ${q}`).join('\n')}
-` : ''}
-
-ÉTAT :
-- Nombre de questions déjà posées : ${workingHistory.length}
-- Prochaine question à poser : ${nextQuestionConfig ? `#${nextQuestionConfig.id} - ${nextQuestionConfig.theme}` : 'TERMINÉ'}
-- Clés remplies dans summary : ${Object.keys(workingSummary).filter(k => workingSummary[k] && (typeof workingSummary[k] === 'string' ? workingSummary[k].trim() : true)).join(', ') || 'aucune'}
-
-⚠️ IMPORTANT : Tu peux t'arrêter AVANT la question 11 si tu as collecté TOUTES les informations nécessaires dans le summary :
-- who_to_teach (compétence)
-- learner_profile (public cible + niveau expérience)
-- main_learning_problem (problème principal)
-- quick_win (premier résultat)
-- big_transformation (transformation finale)
-- method_angle (méthode unique)
-- common_mistake (erreur typique)
-- proof_or_story (histoire personnelle)
-
-Si TOUTES ces clés sont remplies ET pertinentes, tu peux renvoyer isDone: true même avant Q11.
-
-${nextQuestionConfig ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 PROCHAINE QUESTION À POSER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Question #${nextQuestionConfig.id} : ${nextQuestionConfig.theme}
-Type : ${nextQuestionConfig.type}
-${nextQuestionConfig.options ? `Options : ${JSON.stringify(nextQuestionConfig.options)}` : ''}
-${nextQuestionConfig.min !== undefined ? `Slider: min=${nextQuestionConfig.min}, max=${nextQuestionConfig.max}, step=${nextQuestionConfig.step}` : ''}
-
-🧠 FOCUS DE TRANSFORMATION (P1) : "${transformationFocus}"
-👉 Ce focus guide ta reformulation. La question doit explorer ce thème de transformation chez l'ÉLÈVE.
-
-📝 TEMPLATE DE BASE (à personnaliser) :
-titleTemplate: "${nextQuestionConfig.titleTemplate}"
-subtitleTemplate: "${nextQuestionConfig.subtitleTemplate}"
-
-${workingHistory.length >= 2 ? `📌 CONTEXTE RÉCENT POUR MICRO-REFORMULATION (P2) :
-Dernière réponse : "${lastAnswer}"
+    const userPrompt = `Contexte de la conversation jusqu'à maintenant :
 ${previousContext}
-` : ''}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 MISSION POUR CETTE QUESTION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Dernière réponse de l'utilisateur : "${lastAnswer}"
 
-${nextQuestionConfig.id >= 3 ? `1. 🪞 MICRO-REFORMULATION MIROIR (P2) — OBLIGATOIRE
-   Commence par une phrase qui montre que tu as COMPRIS ce que l'utilisateur a dit.
-   
-   Exemples adaptés au focus "${transformationFocus}" :
-   - "Ce que je comprends, c'est que tu veux aider des gens qui [situation spécifique]..."
-   - "OK, donc le vrai enjeu pour tes futurs élèves, c'est [problème identifié]..."
-   - "Intéressant — tu as déjà [expérience mentionnée] et tu veux aller plus loin..."
-   
-   ⚠️ Cette phrase doit être SPÉCIFIQUE à la dernière réponse "${lastAnswer?.substring(0, 100)}..."
-   ⚠️ Pas de phrase générique type "C'est super !"
+Transformation focus pour cette question : ${nextQuestion.transformation_focus}
 
-2. ` : '1. '}🔄 REFORMULATION ORIENTÉE TRANSFORMATION (P0) — CRITIQUE
-   Ta question doit être centrée sur la TRANSFORMATION de l'élève, PAS sur l'outil/compétence.
-   
-   🧪 AUTO-TEST :
-   - Est-ce que je pourrais poser cette question SANS citer "${skill}" ? → OUI = bien formulé
-   - Est-ce que ça parle du PROBLÈME/RÉSULTAT/TRANSFORMATION de l'élève ? → OUI = bien formulé
-   
-   Focus actuel : "${transformationFocus}"
-   
-   ❌ INTERDIT : "Quel est le problème en ${skill} ?"
-   ✅ OBLIGATOIRE : "Qu'est-ce qui bloque ces personnes AVANT même d'avoir une méthode ?"
+Template de base (à reformuler de manière NATURELLE et CONTEXTUELLE) :
+Titre : ${nextQuestion.titleTemplate}
+Sous-titre : ${nextQuestion.subtitleTemplate}
 
-${nextQuestionConfig.id >= 3 ? '3' : '2'}. 💡 EXEMPLES ULTRA-SPÉCIFIQUES dans le subtitle
-   Les exemples doivent refléter le FOCUS de transformation "${transformationFocus}"
-   ET être spécifiques au domaine "${skill || 'la compétence'}"
-   
-   ❌ Générique : "manque de temps, peur de mal faire"
-   ✅ Spécifique : exemples concrets du domaine "${skill}" liés à "${transformationFocus}"
+Variables disponibles :
+- firstName: ${firstName || 'non renseigné'}
+- coreSkill (ce qu'il veut enseigner): ${summary.who_to_teach || 'non renseigné'}
+- targetAudience (à qui il veut enseigner): ${summary.learner_profile || 'non renseigné'}
 
-${nextQuestionConfig.id >= 3 ? '4' : '3'}. 🎨 TON NATUREL ET HUMAIN
-   - Varie les formulations (pas toujours "Super ${name}")
-   - Conversation proche, parfois avec humour
-   - Montre que tu COMPRENDS vraiment la passion de "${name}"
+MISSION :
+Reformule cette question de manière naturelle, en montrant que tu as compris sa dernière réponse.
+Rends la question fluide, comme si tu étais dans une vraie conversation.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 FORMAT ATTENDU DU TITLE (Q${nextQuestionConfig.id})
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Retourne UNIQUEMENT un JSON avec cette structure :
+{
+  "text": "la question reformulée, naturelle et contextuelle",
+  "subtitle": "1 phrase d'exemples concrets"
+}`;
 
-${nextQuestionConfig.id >= 3 ? `"[Micro-reformulation miroir 1 phrase]. [Question orientée transformation]"
-
-Exemple pour Q${nextQuestionConfig.id} avec focus "${transformationFocus}" :
-"Ce que je comprends, c'est que [reformulation spécifique]. [Question sur ${transformationFocus}] ?"` : 
-`"[Accusé de réception varié]. [Question orientée transformation]"
-
-Exemple : "Génial ${name} ! [Question sur ${transformationFocus}] ?"`}
-
-⚠️ CRITIQUES ABSOLUES :
-- Questions CENTRÉES SUR LA TRANSFORMATION de l'élève (pas sur l'outil)
-- Micro-reformulation SPÉCIFIQUE à la dernière réponse (Q3+)
-- Exemples ULTRA-SPÉCIFIQUES au domaine "${skill}"
-- Ton NATUREL, HUMAIN, PROCHE
-- VARIE les formulations` : 
-'MISSION : Les 11 questions ont été posées. Retourne isDone=true avec le summary complet final.'}`;
-
-    // 🤖 ENRICHISSEMENT OPTIONNEL OPENAI (non bloquant)
-    let openaiUsed = false;
-    try {
-      console.log("OPENAI_CALL start", { fn: "onboardingNextQuestion", sessionId, model: "gpt-4o-mini", questionIndex: nextQuestionIndex });
-      
-      // Appel OpenAI avec structured output
-      const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: userPrompt }
-      ],
-      temperature: 0.65,
-      max_tokens: 400,
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "question_reformulation",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              text: { type: "string" },
-              subtitle: { type: "string" }
-            },
-            required: ["text", "subtitle"],
-            additionalProperties: false
-          }
-        }
-      }
-    });
-
-      console.log("OPENAI_CALL end", { 
-        fn: "onboardingNextQuestion", 
-        sessionId, 
-        usage: completion.usage 
-      });
-
-      const result = JSON.parse(completion.choices[0].message.content);
-      openaiUsed = true;
-
-      // Enrichir la question avec la reformulation LLM
-      if (result.text) {
-        questionToReturn.text = result.text;
-        questionToReturn.title = result.text;
-      }
-      if (result.subtitle) {
-        questionToReturn.subtitle = result.subtitle;
-      }
-
-      console.log('✅ [OPENAI ENRICHMENT] Success', { sessionId, questionIndex: nextQuestionIndex });
-
-    } catch (aiError) {
-      console.warn('⚠️ [OPENAI FALLBACK] Using deterministic question', {
-        sessionId,
-        questionIndex: nextQuestionIndex,
-        error: aiError?.message,
-        fallbackUsed: true
-      });
-      // Continue avec questionToReturn déterministe déjà construit
-    }
-
-    // 🔥 GUARDRAIL : Fallback sur QUESTION_STRUCTURE si réponse malformée
-    if (openaiUsed) {
-      // Ces guardrails ne s'appliquent que si OpenAI a été utilisé
-      const needsGuardrail = !questionToReturn.text || 
-                             (questionToReturn.type === 'slider' && (questionToReturn.min === undefined || questionToReturn.max === undefined)) ||
-                             ((questionToReturn.type === 'single_choice' || questionToReturn.type === 'multiple_choice') && (!questionToReturn.options || questionToReturn.options.length === 0));
-      
-      if (needsGuardrail) {
-        // Fallback text
-        if (!questionToReturn.text || questionToReturn.text.trim() === '') {
-          questionToReturn = buildDeterministicQuestion(nextQuestionConfig, name, skill);
-          console.log('⚠️ [GUARDRAIL] Text fallback appliqué');
-        }
-
-        // Fallback slider
-        if (questionToReturn.type === 'slider' && (questionToReturn.min === undefined || questionToReturn.max === undefined)) {
-          questionToReturn.min = nextQuestionConfig.min;
-          questionToReturn.max = nextQuestionConfig.max;
-          questionToReturn.step = nextQuestionConfig.step || 1;
-          console.log('⚠️ [GUARDRAIL] Slider fallback appliqué');
-        }
-
-        // Fallback options
-        if ((questionToReturn.type === 'single_choice' || questionToReturn.type === 'multiple_choice') && 
-            (!questionToReturn.options || questionToReturn.options.length === 0)) {
-          questionToReturn.options = nextQuestionConfig.options || [];
-          console.log('⚠️ [GUARDRAIL] Options fallback appliqué');
-        }
-      }
-    }
-
-    // 🔥 METTRE À JOUR LE SUMMARY
-    await base44.asServiceRole.entities.Session.update(sessionId, {
-      onboarding_summary: updatedSummary,
-      is_onboarding_done: false
-    });
-
-    console.log('✅ [UPDATE SUMMARY]', { 
+    console.log("ANTHROPIC_CALL start", { 
+      fn: "onboardingNextQuestion", 
       sessionId, 
-      questionIndex: nextQuestionIndex,
-      summaryKeys: Object.keys(updatedSummary),
-      openaiUsed
+      model: "claude-sonnet-4-20250514",
+      questionNumber: nextQuestionIndex + 1
     });
+
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: SYSTEM_PROMPT,
+      messages: [
+        { role: "user", content: userPrompt }
+      ]
+    });
+
+    console.log("ANTHROPIC_CALL end", { 
+      fn: "onboardingNextQuestion", 
+      sessionId,
+      usage: message.usage
+    });
+
+    const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
+    
+    let reformulated;
+    try {
+      reformulated = JSON.parse(responseText);
+    } catch (e) {
+      console.error("JSON parse error, using fallback", e);
+      reformulated = {
+        text: nextQuestion.titleTemplate
+          .replace('{{firstName}}', firstName || '')
+          .replace('{{coreSkill}}', summary.who_to_teach || 'cette compétence')
+          .replace('{{targetAudience}}', summary.learner_profile || 'ces personnes'),
+        subtitle: nextQuestion.subtitleTemplate
+      };
+    }
 
     return Response.json({
-      isDone: false,
-      question: questionToReturn,
-      summary: updatedSummary,
-      _debug: {
-        questionIndex: nextQuestionIndex,
-        openaiUsed,
-        deterministic: !openaiUsed
+      done: false,
+      nextQuestion: {
+        number: nextQuestionIndex + 1,
+        field: nextQuestion.field,
+        type: nextQuestion.type,
+        title: reformulated.text,
+        subtitle: reformulated.subtitle
       }
     });
 
@@ -612,7 +431,9 @@ Exemple : "Génial ${name} ! [Question sur ${transformationFocus}] ?"`}
     console.error('Error in onboardingNextQuestion:', error);
     return Response.json({ 
       error: error.message,
-      details: error.stack 
+      stack: error.stack 
     }, { status: 500 });
   }
 });
+
+

@@ -1,0 +1,280 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+
+/**
+ * Lance la génération progressive de TOUS les assets après paiement
+ * Génère 1 par 1 avec délais pour éviter rate limits
+ * Sauvegarde la progression en temps réel
+ */
+Deno.serve(async (req) => {
+  const startTime = Date.now();
+  console.log('[startGeneration] START', { timestamp: new Date().toISOString() });
+
+  try {
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { sessionId } = await req.json().catch(() => ({}));
+    const resolvedSessionId = sessionId || user.sessionId;
+
+    if (!resolvedSessionId) {
+      return Response.json({ error: 'sessionId required' }, { status: 400 });
+    }
+
+    // Get session
+    const sessions = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
+    if (sessions.length === 0) {
+      return Response.json({ error: 'Session not found' }, { status: 404 });
+    }
+
+    const session = sessions[0];
+    console.log('[startGeneration] Session loaded', { sessionId: resolvedSessionId });
+
+    // Vérifier que l'utilisateur a payé
+    if (!user.has_purchased) {
+      return Response.json({ 
+        error: 'User has not purchased',
+        message: 'Payment required to generate assets'
+      }, { status: 403 });
+    }
+
+    // Vérifier les pré-requis
+    if (!session.finalized_offer?.mainProduct?.title) {
+      return Response.json({
+        error: 'Missing required data',
+        message: 'Onboarding must be completed first'
+      }, { status: 400 });
+    }
+
+    // 🔒 LOCK anti double-run
+    if (session.generation_in_progress) {
+      console.warn('[startGeneration] Generation already in progress');
+      return Response.json({ 
+        error: 'generation_in_progress',
+        message: 'Generation is already running for this session',
+        status: session.generation_status
+      }, { status: 409 });
+    }
+
+    // Initialiser le status
+    const initialStatus = {
+      completeMarketAnalysis: { status: 'pending', progress: 0 },
+      avatars: { status: 'pending', progress: 0 },
+      detailedOffers: { status: 'pending', progress: 0 },
+      salesMessages: { status: 'pending', progress: 0 },
+      marketingEmails: { status: 'pending', progress: 0 }
+    };
+
+    // Activer le lock
+    await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
+      generation_in_progress: true,
+      generation_started_at: new Date().toISOString(),
+      generation_status: initialStatus
+    });
+
+    console.log('[startGeneration] Lock activated, starting generation pipeline');
+
+    // 📋 Pipeline de génération (5 étapes critiques)
+    const generationSteps = [
+      {
+        id: 'completeMarketAnalysis',
+        name: 'Analyse de marché SWOT',
+        field: 'complete_market_analysis',
+        function: 'generateMarketAnalysisV2',
+        description: 'Analyse complète avec SWOT, concurrence, stratégie'
+      },
+      {
+        id: 'avatars',
+        name: '3 Avatars clients',
+        field: 'generated_avatars',
+        function: 'generateAvatars',
+        description: 'Profils détaillés de tes clients idéaux'
+      },
+      {
+        id: 'detailedOffers',
+        name: '4 Offres complètes',
+        field: 'detailed_offers',
+        function: 'generateDetailedOffers',
+        description: 'Tes 4 offres ultra-détaillées'
+      },
+      {
+        id: 'salesMessages',
+        name: 'Messages de vente',
+        field: 'generated_sales_messages',
+        function: 'generateSalesMessage',
+        description: '8 messages pour vendre en DM'
+      },
+      {
+        id: 'marketingEmails',
+        name: '5 Emails marketing',
+        field: 'generated_marketing_emails',
+        function: 'generateMarketingEmail',
+        description: 'Séquence email complète'
+      }
+    ];
+
+    const totalSteps = generationSteps.length;
+
+    // 🔄 GÉNÉRATION PROGRESSIVE
+    for (let i = 0; i < generationSteps.length; i++) {
+      const step = generationSteps[i];
+      const progressPercent = Math.round(((i + 1) / totalSteps) * 100);
+
+      console.log(`[startGeneration] Step ${i + 1}/${totalSteps}: ${step.name}`);
+
+      // Update status: loading
+      const currentStatus = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
+      const currentGenerationStatus = currentStatus[0].generation_status || {};
+      
+      await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
+        generation_status: {
+          ...currentGenerationStatus,
+          [step.id]: { 
+            status: 'loading', 
+            progress: progressPercent,
+            startedAt: new Date().toISOString()
+          }
+        }
+      });
+
+      // Check cache
+      const sessionCheck = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
+      const latestSession = sessionCheck[0];
+
+      if (latestSession[step.field]) {
+        console.log(`[startGeneration] ${step.name} already exists, marking as done`);
+        
+        await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
+          generation_status: {
+            ...currentGenerationStatus,
+            [step.id]: { 
+              status: 'done', 
+              progress: progressPercent,
+              completedAt: new Date().toISOString(),
+              fromCache: true
+            }
+          }
+        });
+        
+        continue;
+      }
+
+      // Generate
+      try {
+        console.log(`[startGeneration] Calling ${step.function}...`);
+        
+        const result = await base44.asServiceRole.functions.invoke(step.function, { 
+          sessionId: resolvedSessionId 
+        });
+
+        if (result.data?.success || result.data?.avatars || result.data?.messages || result.data?.emails || result.data?.offers || result.data?.analysis) {
+          console.log(`[startGeneration] ${step.name} ✅ SUCCESS`);
+          
+          const updatedStatus = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
+          const updatedGenerationStatus = updatedStatus[0].generation_status || {};
+          
+          await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
+            generation_status: {
+              ...updatedGenerationStatus,
+              [step.id]: { 
+                status: 'done', 
+                progress: progressPercent,
+                completedAt: new Date().toISOString()
+              }
+            }
+          });
+        } else {
+          throw new Error('Unexpected response format');
+        }
+
+      } catch (error) {
+        console.error(`[startGeneration] ${step.name} ❌ ERROR:`, error.message);
+        
+        const errorStatus = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
+        const errorGenerationStatus = errorStatus[0].generation_status || {};
+        
+        await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
+          generation_status: {
+            ...errorGenerationStatus,
+            [step.id]: { 
+              status: 'error', 
+              progress: progressPercent,
+              error: error.message,
+              failedAt: new Date().toISOString()
+            }
+          }
+        });
+
+        // Continue même en cas d'erreur pour ne pas bloquer les autres
+      }
+
+      // 🔥 DÉLAI entre chaque génération (évite rate limits)
+      if (i < generationSteps.length - 1) {
+        console.log('[startGeneration] Waiting 5 seconds before next generation...');
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
+
+    // 🔓 Désactiver le lock
+    const finalSession = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
+    const finalStatus = finalSession[0].generation_status || {};
+    
+    // Vérifier si tout est OK
+    const allDone = generationSteps.every(step => 
+      finalStatus[step.id]?.status === 'done'
+    );
+
+    const hasErrors = generationSteps.some(step => 
+      finalStatus[step.id]?.status === 'error'
+    );
+
+    await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
+      generation_in_progress: false,
+      generation_completed_at: new Date().toISOString(),
+      all_assets_ready: allDone
+    });
+
+    const duration = Date.now() - startTime;
+    
+    console.log('[startGeneration] END', {
+      duration: `${duration}ms`,
+      allDone,
+      hasErrors,
+      status: finalStatus
+    });
+
+    return Response.json({
+      success: true,
+      allDone,
+      hasErrors,
+      status: finalStatus,
+      duration
+    });
+
+  } catch (error) {
+    console.error('[startGeneration] FATAL ERROR:', error);
+    
+    // Tenter de désactiver le lock même en cas d'erreur
+    try {
+      const { sessionId } = await req.json().catch(() => ({}));
+      if (sessionId) {
+        const base44 = createClientFromRequest(req);
+        await base44.asServiceRole.entities.Session.update(sessionId, {
+          generation_in_progress: false,
+          generation_error: error.message,
+          generation_failed_at: new Date().toISOString()
+        });
+      }
+    } catch (unlockError) {
+      console.error('[startGeneration] Failed to unlock:', unlockError);
+    }
+
+    return Response.json({
+      error: error.message,
+      stack: error.stack
+    }, { status: 500 });
+  }
+});

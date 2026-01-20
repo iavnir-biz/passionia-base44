@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
 
-export default function OnboardingDynamic() {
+function OnboardingDynamic() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);

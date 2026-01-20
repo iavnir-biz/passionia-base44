@@ -1,302 +1,222 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Sparkles, CheckCircle2, Package, DollarSign, Mail, FileText, Rocket, Brain, Zap } from 'lucide-react';
-import GlowButton from '@/components/ui/GlowButton';
-import confetti from 'canvas-confetti';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
 
-export default function OnboardingTransition() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [visibleItems, setVisibleItems] = useState(0);
-  const [progress, setProgress] = useState(78);
-  const [statusText, setStatusText] = useState('Analyse de ton positionnement…');
-  const [transitionMessage, setTransitionMessage] = useState('Ta passion vaut de l\'or');
+const anthropic = new Anthropic({
+  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
+});
 
-  const items = [
-    { icon: CheckCircle2, title: 'Validation complète de ton idée' },
-    { icon: Package, title: 'Tes 4 offres prêtes à vendre' },
-    { icon: DollarSign, title: 'Les prix parfaits' },
-    { icon: Mail, title: 'Les emails marketing essentiels' },
-    { icon: FileText, title: 'Une page de vente à haute conversion' },
-    { icon: Rocket, title: 'Un plan d\'action sur 7 jours' },
-    { icon: Brain, title: 'Le protocole complet pour créer ton activité de formation en ligne' }
-  ];
+const SYSTEM_PROMPT = `Tu es Noah, coach business bienveillant et pédagogue de Passion IA.
 
-  const statusTexts = [
-    'Analyse de ton positionnement…',
-    'Structuration de tes offres…',
-    'Optimisation des prix…',
-    'Préparation du plan d\'action…'
-  ];
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 CONTEXTE D'UTILISATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  useEffect(() => {
-    loadUser();
+Tu génères le message de transition personnalisé qui apparaît après les 11 questions dynamiques d'onboarding.
 
-    // Déclencher les confettis au chargement de la page
-    const hasShownConfetti = sessionStorage.getItem('talents_confetti_shown');
-    if (!hasShownConfetti) {
-      setTimeout(() => {
-        confetti({
-          particleCount: 150,
-          spread: 100,
-          origin: { y: 0.6 }
-        });
-      }, 500);
-      sessionStorage.setItem('talents_confetti_shown', 'true');
+L'utilisateur vient de :
+1. Définir sa compétence à monétiser
+2. Identifier son public cible
+3. Clarifier le problème de ses futurs élèves
+4. Définir la transformation qu'il promet
+
+Maintenant, il va passer aux questions de profil (revenus, objectifs, obstacles) avant de voir ses offres générées.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ OBJECTIF DU MESSAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le message doit accomplir 3 choses :
+
+1. **RÉSUMER** ce qui a été défini (en 2-3 phrases max)
+   - Ce qu'il va enseigner (sa compétence)
+   - À qui il va enseigner (son audience)
+   - La transformation promise
+
+2. **VALORISER** le travail accompli
+   - Créer une sensation de clarté et de progression
+   - Ancrer que c'est déjà un grand pas de franchi
+   - Parler de TRANSFORMATION, jamais d'outil brut
+
+3. **ANNONCER LA SUITE** (dernière phrase)
+   - Dire qu'on va poser quelques questions supplémentaires
+   - Expliquer pourquoi : mieux comprendre ses objectifs et sa situation
+   - Créer de l'anticipation positive pour les offres qui arrivent
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📐 STRUCTURE ATTENDUE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ton message doit suivre cette structure en 4-5 phrases :
+
+**[RÉSUMÉ - 2-3 phrases]**
+"Tu veux aider [AUDIENCE] à [TRANSFORMATION]. Tu vas leur montrer comment [MÉTHODE/APPROCHE UNIQUE]. C'est un projet qui a du sens."
+
+**[TRANSITION - 1 phrase]**
+"Avant de te montrer tes offres, j'ai encore quelques questions pour mieux comprendre tes objectifs et ta situation."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎨 TON & STYLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- **Tutoiement** (toujours)
+- **Ton humain, chaleureux, confiant**
+- **Langage simple et naturel** (pas de jargon business)
+- **Phrases courtes et directes**
+- **Valorisant sans être excessif**
+- **Parle de transformation, pas d'outil**
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚫 INTERDICTIONS ABSOLUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ Ne JAMAIS utiliser :
+- "Ta passion vaut de l'or" (cliché)
+- "Analyse", "algorithme", "stratégie" (trop corporate)
+- Des promesses marketing excessives
+- Des chiffres ou des prix
+- Des emojis
+- Plus de 5 phrases (trop long)
+- Répéter mot pour mot les réponses de l'utilisateur
+- Parler d'argent, de vente ou de prix à ce stade
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ EXEMPLES DE MESSAGES RÉUSSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**Exemple 1 (Créateur d'apps IA) :**
+"Tu veux aider ceux qui ont des idées d'apps mais se sentent bloqués par la technique. Tu vas leur montrer qu'on peut créer sans être développeur, en utilisant les bons outils. C'est un projet concret et utile. Avant de te montrer tes offres personnalisées, j'ai encore quelques questions pour mieux comprendre tes objectifs et ta situation actuelle."
+
+**Exemple 2 (Coach fitness) :**
+"Tu veux aider les femmes occupées à retrouver leur énergie sans sacrifier leur temps. Tu vas leur montrer comment transformer leur corps en 20 minutes par jour, sans salle de sport. C'est une transformation qui change des vies. Avant de te montrer tes offres, j'ai quelques questions sur tes objectifs de revenus et ta disponibilité."
+
+**Exemple 3 (Expert Notion) :**
+"Tu veux aider les entrepreneurs débordés à retrouver le contrôle de leur activité. Tu vas leur montrer comment construire un système qui pense pour eux. C'est exactement ce dont ils ont besoin. Avant de te présenter tes offres sur mesure, j'ai quelques questions pour affiner la stratégie à ta situation."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 FORMAT DE SORTIE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Retourne UNIQUEMENT le texte du message en texte brut (string).
+AUCUN JSON, AUCUNE balise, AUCUN markdown, AUCUN commentaire.
+
+Juste le texte direct, prêt à être affiché.`;
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    
+    const { sessionId, firstName } = await req.json();
+
+    if (!sessionId) {
+      return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // Cleanup du flag confetti après navigation
-    return () => {
-      sessionStorage.removeItem('talents_confetti_shown');
-    };
-  }, []);
-
-  useEffect(() => {
-    // Animation des items qui apparaissent un par un
-    if (visibleItems < items.length) {
-      const timer = setTimeout(() => {
-        setVisibleItems(prev => prev + 1);
-      }, 400);
-      return () => clearTimeout(timer);
+    // Récupérer la session
+    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+    if (!sessions || sessions.length === 0) {
+      return Response.json({ error: 'Session not found' }, { status: 404 });
     }
-  }, [visibleItems, items.length]);
 
-  useEffect(() => {
-    // Animation de la barre de progression
-    const progressTimer = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 92) return 92;
-        return prev + 2;
-      });
-    }, 600);
-    return () => clearInterval(progressTimer);
-  }, []);
+    const session = sessions[0];
+    const summary = session.onboarding_summary || {};
+    const onboardingFull = session.onboarding_full || {};
 
-  useEffect(() => {
-    // Changement du texte de statut
-    let index = 0;
-    const statusTimer = setInterval(() => {
-      index = (index + 1) % statusTexts.length;
-      setStatusText(statusTexts[index]);
-    }, 1500);
-    return () => clearInterval(statusTimer);
-  }, []);
+    const userPrompt = `Génère le message de transition personnalisé pour ${firstName || 'l\'utilisateur'}.
 
-  useEffect(() => {
-    // Redirection automatique UNIQUEMENT si données OK
-    if (!isLoading && user) {
-      const redirectTimer = setTimeout(() => {
-        handleNext();
-      }, 10000);
-      return () => clearTimeout(redirectTimer);
-    }
-  }, [isLoading, user]);
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 CONTEXTE UTILISATEUR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  const loadUser = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
+**Compétence qu'il va enseigner :**
+${summary.who_to_teach || onboardingFull.coreSkill || 'non défini'}
 
-      // Vérifier que la Session existe et contient les données
-      if (!currentUser.sessionId) {
-        console.error('❌ [OnboardingTransition] Pas de sessionId');
-        // Rediriger vers l'onboarding pour reprendre
-        navigate(createPageUrl('OnboardingFirstName'));
-        return;
-      }
+**Public cible (à qui il enseigne) :**
+${summary.learner_profile || onboardingFull.targetAudience || 'non défini'}
 
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
-      if (!sessions || sessions.length === 0) {
-        console.error('❌ [OnboardingTransition] Session introuvable');
-        navigate(createPageUrl('OnboardingFirstName'));
-        return;
-      }
+**Problème principal de son audience :**
+${summary.main_learning_problem || onboardingFull.mainProblem || 'non défini'}
 
-      const session = sessions[0];
-      const summary = session.onboarding_summary || {};
+**Transformation promise (résultat final) :**
+${summary.big_transformation || onboardingFull.finalTransformation || 'non défini'}
 
-      console.log('✅ [OnboardingTransition] Session chargée:', {
-        sessionId: session.id,
-        historyLength: session.onboarding_history?.length || 0,
-        skill: session.skill,
-        isDone: session.is_onboarding_done
-      });
+**Approche/Méthode unique :**
+${summary.method_angle || onboardingFull.uniqueMethod || 'non défini'}
 
-      // Vérifier que l'onboarding est complet
-      if ((session.onboarding_history?.length || 0) < 11) {
-        console.error('❌ [OnboardingTransition] Onboarding incomplet');
-        navigate(createPageUrl('OnboardingDynamic'));
-        return;
-      }
+**Quick win (premier résultat) :**
+${summary.quick_win || onboardingFull.firstQuickResult || 'non défini'}
 
-      setUser({ firstName: firstName, full_name: firstName });
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TA MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-      // Enrichir le User avec les données du summary (une seule fois)
-      const fullData = session.onboarding_full || {};
+Génère un message de 4-5 phrases qui :
 
-      await base44.auth.updateMe({
-        firstName: firstName,
-        coreSkill: session.skill || fullData.coreSkill || '',
-        targetAudience: fullData.targetAudience || '',
-        mainProblem: fullData.mainProblem || '',
-        firstResult: fullData.firstQuickResult || '',
-        finalTransformation: fullData.finalTransformation || '',
-        uniqueMethod: fullData.uniqueMethod || '',
-        typicalMistake: fullData.typicalMistake || '',
-        extraDetail: fullData.extraDetail || ''
-      });
+1. **RÉSUME** ce que l'utilisateur va faire (2-3 phrases)
+   - À qui il va aider
+   - Quelle transformation il promet
+   - Son approche unique
 
-      console.log('✅ [OnboardingTransition] User enrichi avec summary');
+2. **VALORISE** le travail accompli (intégré dans le résumé)
+   - Créer une sensation de clarté
+   - Montrer que c'est déjà un grand pas
 
-      // Générer la phrase de transition personnalisée
-      try {
-        const { data } = await base44.functions.invoke('generateTransitionMessage', {
-          sessionId: session.id,
-          firstName: firstName
-        });
-        if (data?.message) {
-          setTransitionMessage(data.message);
-        }
-      } catch (err) {
-        console.warn('⚠️ [OnboardingTransition] Fallback message used:', err);
-        // Garder le message par défaut
-      }
+3. **ANNONCE LA SUITE** (dernière phrase)
+   - Dire qu'il reste quelques questions
+   - Expliquer pourquoi : mieux comprendre ses objectifs
+   - Créer l'anticipation pour les offres
 
-      setIsLoading(false);
-    } catch (error) {
-      console.error('❌ [OnboardingTransition] Error:', error);
-      setIsLoading(false);
-    }
-  };
+**STRUCTURE RECOMMANDÉE :**
+"Tu veux aider [AUDIENCE] à [TRANSFORMATION]. Tu vas leur montrer [APPROCHE/MÉTHODE]. [VALORISATION]. Avant de te montrer tes offres personnalisées, j'ai quelques questions sur tes objectifs et ta situation."
 
-  const handleNext = () => {
-    navigate(createPageUrl('OnboardingQ12AgeRange'));
-  };
+**CONTRAINTES :**
+- 4-5 phrases maximum
+- Tutoiement
+- Ton chaleureux et confiant
+- Aucun emoji
+- Parler de transformation, pas d'outil
+- Être spécifique au contexte de l'utilisateur
 
-  if (isLoading) {
-    return null;
+Génère maintenant le message (texte brut uniquement, pas de JSON).`;
+
+    console.log("ANTHROPIC_CALL start", { 
+      fn: "generateTransitionMessage", 
+      sessionId, 
+      model: "claude-sonnet-4-20250514" 
+    });
+
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 512,
+      system: SYSTEM_PROMPT,
+      messages: [
+        { role: "user", content: userPrompt }
+      ]
+    });
+
+    console.log("ANTHROPIC_CALL end", { 
+      fn: "generateTransitionMessage", 
+      sessionId,
+      usage: message.usage
+    });
+
+    const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+    const cleanedMessage = responseText.trim();
+
+    return Response.json({ 
+      success: true,
+      message: cleanedMessage
+    });
+
+  } catch (error) {
+    console.error('Error in generateTransitionMessage:', error);
+    
+    // Fallback message si erreur
+    const fallbackMessage = "Tu as posé les bases solides de ton projet. Avant de te montrer tes offres personnalisées, j'ai quelques questions pour mieux comprendre tes objectifs et ta situation.";
+    
+    return Response.json({ 
+      success: true,
+      message: fallbackMessage,
+      warning: 'Fallback message used due to error'
+    });
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-lg"
-      >
-        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-          {/* Cerveau IA animé au centre */}
-          <div className="flex justify-center mb-6">
-            <motion.div
-              animate={{
-                scale: [1, 1.05, 1],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="relative"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-xl">
-                <Brain className="w-8 h-8 text-white" />
-              </div>
-              {/* Particules animées autour */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-3"
-              >
-                <Zap className="absolute top-0 left-1/2 w-3 h-3 text-[#61f7a2] opacity-60" />
-                <Sparkles className="absolute bottom-0 right-0 w-3 h-3 text-[#4de88f] opacity-60" />
-              </motion.div>
-            </motion.div>
-          </div>
-
-          {/* Titre principal */}
-          <motion.h1
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-lg font-bold text-gray-900 mb-3 text-center leading-tight"
-          >
-            Merci pour toutes ces réponses, {user?.firstName} !<br />
-            {transitionMessage}
-          </motion.h1>
-
-
-
-          {/* Barre de progression intelligente */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mb-6"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-gray-700">🔍 Analyse de ton potentiel</span>
-              <span className="text-xs font-bold text-[#61f7a2]">{progress}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-full"
-                initial={{ width: '78%' }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-            <motion.p
-              key={statusText}
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="text-xs text-gray-500 mt-1"
-            >
-              {statusText}
-            </motion.p>
-          </motion.div>
-
-          {/* Bloc central - Ce qui se construit */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <h2 className="text-lg font-bold text-gray-900 mb-4 text-center">
-              🎁 Ce que je construis pour toi
-            </h2>
-
-            <div className="space-y-3">
-              <AnimatePresence>
-                {items.slice(0, visibleItems).map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4 }}
-                    className="flex items-center gap-3 p-2.5 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200"
-                  >
-                    <div className="flex-shrink-0 w-8 h-8 bg-[#61f7a2] rounded-lg flex items-center justify-center">
-                      <item.icon className="w-4 h-4 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 text-base">{item.title}</h3>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-
-
-        </div>
-      </motion.div>
-    </div>
-  );
-}
+});

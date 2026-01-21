@@ -8,41 +8,28 @@ import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import DayCard from '@/components/plan/DayCard';
 import ChatBubble from '@/components/chat/ChatBubble';
-import {
-  Loader2,
-  Target,
-  Sparkles,
-  Users,
-  BarChart3,
-  MessageSquare,
-  FileText,
-  Mail,
-  Share2
-} from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { Loader2, Target, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function PlanAction() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading: authLoading, user } = useRequireAuth();
   const [profile, setProfile] = useState(null);
+  const [session, setSession] = useState(null);
   const [currentDay, setCurrentDay] = useState(1);
   const [dayProgress, setDayProgress] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [docsReady, setDocsReady] = useState(false);
 
   useEffect(() => {
     if (user && user.email) {
-      // Petit délai pour être sûr que Base44 est prêt
-      const timer = setTimeout(() => {
-        checkAccess();
-      }, 500);
+      const timer = setTimeout(() => { checkAccess(); }, 500);
       return () => clearTimeout(timer);
     }
   }, [user]);
 
   const checkAccess = async () => {
-    // 🔥 P0-3: Guard paywall (réactivé en prod)
     try {
       const currentUser = await base44.auth.me();
       if (!currentUser.has_purchased) {
@@ -57,59 +44,57 @@ export default function PlanAction() {
   };
 
   const loadData = async () => {
-    setIsLoading(true); // On affiche le chargement
+    setIsLoading(true);
     try {
-      // On récupère le profil
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-
+      
       if (profiles.length > 0) {
         const userProfile = profiles[0];
         setProfile(userProfile);
 
-        // --- FIX ICI : Gestion robuste du JSON ---
         let savedProgress = userProfile.plan_7days_progress;
 
-        console.log("🔍 DEBUT DEBUG - Type de plan_7days_progress:", typeof savedProgress);
-        console.log("🔍 DEBUT DEBUG - Valeur brute:", savedProgress);
-
-        // 🆕 SI LE CHAMP N'EXISTE PAS (undefined), on l'initialise en base
         if (savedProgress === undefined || savedProgress === null) {
-          console.log("⚠️ Le champ plan_7days_progress n'existe pas, initialisation en base...");
           savedProgress = {};
-
-          // On initialise le champ en base pour les prochaines fois
           try {
             await base44.entities.UserProfile.update(userProfile.id, {
               plan_7days_progress: JSON.stringify({})
             });
-            console.log("✅ Champ plan_7days_progress initialisé en base");
           } catch (error) {
-            console.error("❌ Erreur lors de l'initialisation du champ:", error);
+            console.error('Erreur initialisation:', error);
           }
-        }
-        // Si la base renvoie une string (ex: "{...}"), on la convertit en Objet
-        else if (typeof savedProgress === "string") {
+        } else if (typeof savedProgress === "string") {
           try {
             savedProgress = JSON.parse(savedProgress);
-            console.log("✅ JSON parsé avec succès:", savedProgress);
           } catch (e) {
-            console.error("❌ Erreur de parsing JSON", e);
+            console.error('Erreur parsing JSON', e);
             savedProgress = {};
           }
         }
 
-        console.log("📥 Progression chargée FINALE:", savedProgress); // Pour vérifier dans la console IDX
-
         setDayProgress(savedProgress);
 
-        // Recalcul du jour actuel basé sur la sauvegarde
         const completedDays = Object.keys(savedProgress).filter(
-          key => savedProgress[key].completed
+          key => savedProgress[key]?.completed
         ).length;
-
-        // On force au moins le jour 1, ou le jour suivant
         setCurrentDay(Math.min(completedDays + 1, 7));
       }
+
+      const sessions = await base44.entities.Session.filter({ created_by: user.email });
+      if (sessions.length > 0) {
+        const userSession = sessions[0];
+        setSession(userSession);
+        
+        const allReady = !!(
+          userSession.complete_market_analysis &&
+          userSession.generated_avatars &&
+          userSession.detailed_offers &&
+          userSession.generated_sales_messages &&
+          userSession.generated_marketing_emails
+        );
+        setDocsReady(allReady);
+      }
+
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -118,18 +103,12 @@ export default function PlanAction() {
   };
 
   const handleChecklistChange = async (day, itemIndex) => {
-    // 1. SÉCURITÉ : Vérifions qu'on a bien l'ID
     if (!profile?.id) {
-      console.error("⛔ ERREUR GRAVE : Aucun profil chargé, impossible de sauvegarder");
+      console.error('⛔ Aucun profil chargé');
       return;
     }
 
-    console.log("💾 Tentative de sauvegarde pour le profil ID:", profile.id);
-
-    // 2. On met à jour l'état local (UI)
-    // ✅ FIX: Toujours utiliser getDayChecklist qui merge correctement les données sauvegardées
     const currentList = getDayChecklist(day);
-
     const newChecklist = currentList.map((item, idx) =>
       idx === itemIndex ? { ...item, checked: !item.checked } : item
     );
@@ -145,27 +124,18 @@ export default function PlanAction() {
 
     setDayProgress(newProgress);
 
-    // 3. SAUVEGARDE : On convertit l'objet en Texte (JSON.stringify)
     try {
-      // ⚠️ LE CHANGEMENT EST ICI : JSON.stringify()
-      // On s'assure que la base reçoit une string, pas un objet JS complexe
-      const dataToSave = JSON.stringify(newProgress);
-
       await base44.entities.UserProfile.update(profile.id, {
-        plan_7days_progress: dataToSave
+        plan_7days_progress: JSON.stringify(newProgress)
       });
-      console.log("✅ Sauvegardé en base avec succès !");
+      console.log('✅ Sauvegardé');
     } catch (error) {
-      console.error("❌ ÉCHEC de la sauvegarde Base44 :", error);
-      alert("Attention : Votre progression n'a pas pu être sauvegardée. Vérifiez votre connexion.");
+      console.error('❌ Erreur sauvegarde:', error);
     }
   };
 
   const handleDayComplete = async (day) => {
-    if (!profile?.id) {
-      console.error("⛔ ERREUR : Aucun profil chargé");
-      return;
-    }
+    if (!profile?.id) return;
 
     const newProgress = {
       ...dayProgress,
@@ -179,233 +149,307 @@ export default function PlanAction() {
     setDayProgress(newProgress);
     setCurrentDay(Math.min(day + 1, 7));
 
-    // Sauvegarder en base
     try {
       await base44.entities.UserProfile.update(profile.id, {
         plan_7days_progress: JSON.stringify(newProgress)
       });
-      console.log("✅ Jour complété et sauvegardé !");
     } catch (error) {
-      console.error("❌ Erreur lors de la sauvegarde de la complétion du jour:", error);
+      console.error('❌ Erreur:', error);
     }
   };
-
   const getDayChecklist = (day) => {
-    // Default checklists
+    const mainProduct = session?.finalized_offer?.mainProduct;
+    const orderBump = session?.finalized_offer?.orderBump;
+    const upsell = session?.finalized_offer?.upsell1;
+    const avatars = session?.generated_avatars;
+    
     const defaults = {
       1: [
         {
-          text: "Ajouter ma photo de profil dans Passion IA",
+          text: "Ajouter ma photo de profil",
           checked: false,
-          details: "Vous retrouverez cela dans les paramètres de l'application.",
+          details: "Une photo de profil professionnelle augmente la confiance. Va dans les paramètres pour l'ajouter.",
           action: { type: "link", label: "Aller aux paramètres", page: "Settings" }
         },
         {
           text: "Rejoindre la communauté Skool",
           checked: false,
-          details: "Rejoignez notre communauté pour échanger avec d'autres membres et obtenir du soutien.",
-          action: { type: "external", label: "Cliquer ici pour rejoindre", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
+          details: "Rejoins notre communauté pour échanger avec d'autres entrepreneurs et obtenir du soutien.",
+          action: { type: "external", label: "Rejoindre maintenant", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
         },
         {
           text: "Me présenter dans la communauté",
           checked: false,
-          details: "Présentez-vous aux autres membres : qui vous êtes, ce que vous voulez vendre, quels sont vos objectifs. N'hésitez pas à faire une vidéo dans la communauté !"
+          details: "Présente-toi : qui tu es, ce que tu vends, tes objectifs. Une vidéo courte fonctionne très bien !",
+          action: { type: "external", label: "Aller dans la communauté", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
         },
         {
-          text: "Générer mon analyse de marché",
-          checked: false,
-          details: "L'analyse de marché vous aide à comprendre votre positionnement et valider la demande.",
-          action: { type: "link", label: "Cliquer ici pour générer votre analyse de marché", page: "MarketAnalysis" }
+          text: session?.complete_market_analysis ? "✅ Analyse de marché générée" : "Générer mon analyse de marché SWOT",
+          checked: !!session?.complete_market_analysis,
+          autoChecked: !!session?.complete_market_analysis,
+          details: session?.complete_market_analysis
+            ? "Ton analyse de marché est prête. Consulte-la pour comprendre ton positionnement et valider la demande."
+            : "L'analyse de marché t'aide à comprendre ton positionnement, identifier tes concurrents et valider la demande.",
+          action: { type: "link", label: "Voir mon analyse", page: "MarketAnalysis" }
         },
         {
-          text: "Générer mes avatars clients",
-          checked: false,
-          details: "Définissez précisément qui sont vos clients idéaux pour mieux les adresser.",
-          action: { type: "link", label: "Cliquer ici pour générer vos avatars clients", page: "AvatarClients" }
+          text: session?.generated_avatars ? `✅ ${Object.keys(avatars || {}).length} Avatars clients générés` : "Générer mes 3 avatars clients",
+          checked: !!session?.generated_avatars,
+          autoChecked: !!session?.generated_avatars,
+          details: session?.generated_avatars
+            ? "Tes avatars clients sont prêts. Ce sont des profils ultra-détaillés de tes clients idéaux."
+            : "Définis précisément qui sont tes clients idéaux : leurs problèmes, leurs rêves, leur vocabulaire.",
+          action: { type: "link", label: "Voir mes avatars", page: "AvatarClients" }
         },
         {
-          text: "Générer mes offres (produits & prix)",
-          checked: false,
-          details: "Créez votre gamme d'offres avec des prix cohérents et attractifs.",
-          action: { type: "link", label: "Cliquer ici pour générer vos offres", page: "MyOffers" }
+          text: session?.detailed_offers ? `✅ Mes offres générées (${mainProduct?.title || 'Produit principal'} + upsells)` : "Générer mes 4 offres complètes",
+          checked: !!session?.detailed_offers,
+          autoChecked: !!session?.detailed_offers,
+          details: session?.detailed_offers
+            ? `Tes 4 offres sont prêtes : ${mainProduct?.title} (${mainProduct?.price}), ${orderBump?.title || 'Order bump'}, ${upsell?.title || 'Upsell'} et ton offre premium.`
+            : "Crée ta gamme d'offres avec des prix cohérents : produit d'appel, order bump, upsells.",
+          action: { type: "link", label: "Voir mes offres", page: "MyOffers" }
         },
         {
-          text: "Générer ma page de vente",
-          checked: false,
-          details: "Une page de vente professionnelle pour présenter votre offre de manière convaincante.",
-          action: { type: "link", label: "Cliquer ici pour générer votre page de vente", page: "SalesPage" }
+          text: session?.generated_sales_pages ? "✅ Page de vente générée" : "Générer ma page de vente",
+          checked: !!session?.generated_sales_pages,
+          autoChecked: !!session?.generated_sales_pages,
+          details: session?.generated_sales_pages
+            ? "Ta page de vente est prête. Elle présente ton offre de manière convaincante."
+            : "Une page de vente professionnelle pour présenter ton offre et convertir tes prospects.",
+          action: { type: "link", label: "Voir ma page", page: "SalesPage" }
         },
         {
-          text: "Générer mes messages de vente",
-          checked: false,
-          details: "Des messages prêts à l'emploi pour approcher vos prospects avec confiance.",
-          action: { type: "link", label: "Cliquer ici pour générer vos messages de vente", page: "SalesMessages" }
+          text: session?.generated_sales_messages ? "✅ 8 Messages de vente générés" : "Générer mes messages de vente",
+          checked: !!session?.generated_sales_messages,
+          autoChecked: !!session?.generated_sales_messages,
+          details: session?.generated_sales_messages
+            ? "Tes 8 messages de vente sont prêts : diagnostic, empathie, solution, achat, objections, etc."
+            : "Des messages prêts à l'emploi pour approcher tes prospects avec confiance en DM.",
+          action: { type: "link", label: "Voir mes messages", page: "SalesMessages" }
         },
         {
-          text: "Générer mes emails marketing",
-          checked: false,
-          details: "Une séquence d'emails automatiques pour nurture vos prospects.",
-          action: { type: "link", label: "Cliquer ici pour générer vos emails marketing", page: "EmailsMarketing" }
+          text: session?.generated_marketing_emails ? "✅ 5 Emails marketing générés" : "Générer mes 5 emails marketing",
+          checked: !!session?.generated_marketing_emails,
+          autoChecked: !!session?.generated_marketing_emails,
+          details: session?.generated_marketing_emails
+            ? "Ta séquence de 5 emails est prête : contraste, validation, calcul, impact, urgence."
+            : "Une séquence d'emails automatiques pour nurturer tes prospects et les convertir.",
+          action: { type: "link", label: "Voir mes emails", page: "EmailsMarketing" }
         }
       ],
       2: [
         {
-          text: "Identifier où se trouve mon avatar (réseaux / groupes)",
+          text: "Identifier où se trouve mon avatar (groupes, forums, réseaux)",
           checked: false,
-          details: "Exemples : groupes Facebook de niche, forums Reddit, communautés LinkedIn, Discord spécialisés. Pense aux endroits où ton avatar pose déjà des questions sur ses problèmes.",
-          action: { type: "link", label: "Voir mes avatars clients", page: "AvatarClients" }
+          details: `Pense aux groupes Facebook de niche, forums Reddit, communautés LinkedIn, Discord spécialisés. Où ton avatar ${avatars?.avatar1?.identity?.situation || 'idéal'} pose-t-il des questions sur ses problèmes ?`,
+          action: { type: "link", label: "Consulter mes avatars", page: "AvatarClients" }
         },
         {
-          text: "Envoyer 10 messages de diagnostic",
+          text: "Créer une liste de 50 prospects potentiels",
           checked: false,
-          details: "Utilise tes messages prêts à l'emploi. L'objectif : comprendre leurs problèmes, pas vendre. Pose des questions ouvertes : 'Qu'est-ce qui te bloque le plus en ce moment ?'",
+          details: "Note leurs noms, où tu les as trouvés, et pourquoi ils correspondent à ton avatar. Un Google Sheet simple suffit : Nom | Canal | Notes."
+        },
+        {
+          text: "Envoyer 10 messages de diagnostic (pas de vente)",
+          checked: false,
+          details: `Utilise ton message de diagnostic généré. Objectif : comprendre leurs problèmes. Pose des questions ouvertes : "Qu'est-ce qui te bloque le plus en ce moment avec ${session?.skill || 'ta compétence'} ?"`,
           action: { type: "link", label: "Copier mes messages de diagnostic", page: "SalesMessages" }
         },
         {
-          text: "Poser des questions, écouter, comprendre",
+          text: "Poser des questions, écouter, comprendre (noter les mots exacts)",
           checked: false,
-          details: "Note les mots exacts qu'ils utilisent pour décrire leur problème. Ce sont ces mots que tu réutiliseras pour leur parler de ta solution demain.",
+          details: "Note les mots EXACTS qu'ils utilisent pour décrire leur problème. Ce vocabulaire sera crucial pour leur parler de ta solution demain."
         },
         {
           text: "Identifier au moins 3 conversations prometteuses",
           checked: false,
           details: "Repère les personnes qui ont un vrai problème urgent et qui semblent ouvertes à une solution. Ce sont tes prospects prioritaires pour demain."
+        },
+        {
+          text: "Créer mon premier post de valeur sur un réseau social",
+          checked: false,
+          details: `Partage une astuce concrète liée à ${session?.skill || 'ton expertise'}. Pas de vente, juste de la valeur. Utilise le vocabulaire de ton avatar. 200-300 mots max.`
         }
       ],
       3: [
         {
-          text: "Identifier les conversations avec une vraie douleur",
+          text: "Relire les conversations d'hier et identifier les vraies douleurs",
           checked: false,
-          details: "Relis tes échanges d'hier. Qui a mentionné un problème urgent ou frustrant ? Ce sont ces personnes que tu vas recontacter en priorité.",
+          details: "Relis tes échanges. Qui a mentionné un problème urgent ou frustrant ? Ces personnes sont tes priorités aujourd'hui."
         },
         {
-          text: "Proposer le petit produit comme une aide / un test",
+          text: `Proposer mon produit principal (${mainProduct?.title || 'offre d\'appel'}) comme une solution simple`,
           checked: false,
-          details: "Exemple de message : 'J'ai créé un mini-guide qui aide justement avec ce problème. Je le teste avec quelques personnes. Ça t'intéresse de le tester pour 27€ ?' Reste simple et humain.",
+          details: mainProduct
+            ? `Message type : "J'ai créé ${mainProduct.title} qui aide justement avec ce problème. Ça t'intéresse pour ${mainProduct.price} ?" Reste simple et humain.`
+            : "Propose ton produit d'appel (27-97€) comme une aide concrète. Pas de pression.",
           action: { type: "link", label: "Voir mon offre", page: "MyOffers" }
         },
         {
-          text: "Répondre calmement aux objections simples",
+          text: "Répondre calmement aux 3 objections les plus courantes",
           checked: false,
-          details: "Les objections courantes : prix (justifie par le temps gagné), timing (propose de commencer petit), doute (partage un mini-aperçu). Ne force jamais.",
+          details: "Prix → justifie par le temps gagné. Timing → propose de commencer petit. Doute → partage un mini-aperçu. Ne force jamais.",
+          action: { type: "link", label: "Voir mes réponses aux objections", page: "SalesMessages" }
         },
         {
-          text: "Obtenir au moins un 'oui' ou un intérêt clair",
+          text: "Obtenir au moins 1 'oui' ou intérêt clair",
           checked: false,
-          details: "Un 'oui' peut être : un paiement, un 'envoie-moi les détails', ou un 'OK je teste'. Si personne ne dit oui, c'est OK : tu as appris ce qui ne marche pas.",
+          details: "Un 'oui' peut être : un paiement, un 'envoie-moi les détails', ou un 'OK je teste'. Si personne ne dit oui, c'est OK : tu as appris."
         },
         {
-          text: "Célébrer ta première proposition (même si c'est un non)",
+          text: "Si 1ère vente : créer le produit dans les 24-48h",
           checked: false,
-          details: "Tu viens de faire ce que 99% des gens ne font jamais : proposer ton travail. C'est énorme. Note ce que tu as appris.",
+          details: "PDF de 5-10 pages dans Google Docs OU vidéo Loom de 15-20 minutes. N'essaie pas d'être parfait. Crée quelque chose d'UTILE."
+        },
+        {
+          text: "Célébrer ma première proposition (même si c'est un non)",
+          checked: false,
+          details: "Tu viens de faire ce que 99% des gens ne font jamais : proposer ton travail. C'est énorme. Partage dans la communauté !"
         }
       ],
       4: [
         {
-          text: "Créer le produit (PDF simple ou vidéo Loom)",
+          text: "Livrer le produit au client (si vente faite hier)",
           checked: false,
-          details: "N'essaie pas de faire quelque chose de parfait. Crée un PDF de 5-10 pages dans Google Docs ou enregistre une vidéo Loom de 15-20 minutes. L'essentiel : que ça résolve leur problème.",
+          details: "Envoie par email avec un message personnel : 'Voilà ce que j'ai créé pour toi. Dis-moi ce que tu en penses.'"
         },
         {
-          text: "Livrer au client dans les 24-48h",
+          text: "Envoyer un message de suivi bienveillant 24h après",
           checked: false,
-          details: "Envoie par email avec un message personnel : 'Voilà ce que j'ai créé pour toi. Dis-moi ce que tu en penses et si quelque chose n'est pas clair.'",
+          details: "Message : 'Tu as eu le temps de regarder ? Des questions ?' Sois disponible, pas insistant."
         },
         {
-          text: "Envoyer un message de suivi bienveillant",
+          text: "Continuer à contacter 10 nouvelles personnes",
           checked: false,
-          details: "24h après la livraison, envoie un message : 'Tu as eu le temps de regarder ? Des questions ?' Sois disponible, pas insistant.",
+          details: "Ne t'arrête pas après 1 vente. Continue le volume. Plus tu parles à des gens, plus tu vends.",
+          action: { type: "link", label: "Utiliser mes messages", page: "SalesMessages" }
         },
         {
-          text: "Noter ce qui a pris le plus de temps",
+          text: "Proposer mon offre à 3-5 nouvelles personnes",
           checked: false,
-          details: "Identifie ce qui t'a ralenti dans la création. La prochaine fois, tu pourras optimiser ou même créer le produit AVANT de vendre (mais seulement après avoir validé qu'il y a de la demande).",
+          details: "Tu sais maintenant que ça marche. Tu as le vocabulaire qui résonne. Utilise-le."
+        },
+        {
+          text: "Noter ce qui a pris le plus de temps dans la création",
+          checked: false,
+          details: "Identifie ce qui t'a ralenti. Note aussi ce que le client a le plus apprécié."
+        },
+        {
+          text: "Créer un Google Sheet de suivi : Prospect | Canal | Statut",
+          checked: false,
+          details: "Colonnes simples : Nom, Où trouvé, Intérêt, Date, Notes. Tu commences à voir des patterns."
         }
       ],
       5: [
         {
-          text: "Demander un feedback honnête",
+          text: "Demander un feedback honnête à mes premiers clients",
           checked: false,
-          details: "Message type : 'Je veux vraiment améliorer ce produit. Qu'est-ce qui t'a le plus aidé ? Qu'est-ce qui manquait ?' Insiste sur le fait que tu veux la vérité, pas des compliments.",
+          details: "Message : 'Je veux vraiment améliorer. Qu'est-ce qui t'a le plus aidé ? Qu'est-ce qui manquait ?' Tu veux la vérité."
         },
         {
-          text: "Comprendre ce qui a le plus aidé",
+          text: "Identifier ce qui a eu le plus de valeur",
           checked: false,
-          details: "Note les phrases exactes du client. Si plusieurs personnes mentionnent la même chose, c'est un signal fort : c'est ça qui a le plus de valeur.",
+          details: "Note les phrases exactes. Si plusieurs mentionnent la même chose, c'est ton angle de vente."
         },
         {
-          text: "Identifier les besoins suivants",
+          text: "Demander : 'Quel est ton prochain défi maintenant ?'",
           checked: false,
-          details: "Demande : 'Maintenant que tu as résolu ça, quel est ton prochain défi ?' C'est comme ça que tu découvres ton prochain produit.",
+          details: "C'est comme ça que tu découvres ton prochain produit. Si 3 personnes mentionnent le même problème, tu as ton upsell."
         },
         {
-          text: "Ajuster ton offre ou ta communication",
+          text: "Ajuster mon message ou ma page",
           checked: false,
-          details: "Si le produit était bon mais mal expliqué : améliore ta page de vente. Si le produit manquait quelque chose : ajoute une section. Petit ajustement = gros impact.",
-          action: { type: "link", label: "Mettre à jour mon offre", page: "MyOffers" }
+          details: "Produit bon mais mal expliqué → améliore ta page. Produit manquait quelque chose → ajoute une section.",
+          action: { type: "link", label: "Mettre à jour", page: "SalesPage" }
         },
         {
-          text: "Demander un témoignage (si le client est satisfait)",
+          text: "Demander un témoignage écrit (si client satisfait)",
           checked: false,
-          details: "Message simple : 'Ça m'aiderait énormément si tu pouvais écrire 2-3 phrases sur ce que ça t'a apporté. Je peux l'utiliser pour aider d'autres personnes ?' La plupart diront oui.",
+          details: "Message : 'Ça m'aiderait si tu pouvais écrire 2-3 phrases sur ce que ça t'a apporté.' La plupart diront oui."
+        },
+        {
+          text: "Poster le témoignage dans la communauté + réseau social",
+          checked: false,
+          details: "C'est la preuve sociale la plus puissante. Ça attire d'autres prospects.",
+          action: { type: "external", label: "Partager dans Skool", url: "https://www.skool.com/ia-pour-tous-6043" }
         }
       ],
       6: [
         {
-          text: "Contacter 30 nouvelles personnes",
+          text: "Contacter 30 nouvelles personnes (3x le volume)",
           checked: false,
-          details: "Tu connais maintenant ton message. Tu sais ce qui marche. Multiplie par 3 ton volume d'hier. Utilise les mêmes canaux qui ont fonctionné.",
+          details: "Tu connais ton message. Tu sais ce qui marche. Multiplie par 3.",
           action: { type: "link", label: "Voir mes messages", page: "SalesMessages" }
         },
         {
-          text: "Utiliser les messages améliorés",
+          text: "Utiliser les mots exacts de mes clients dans mes messages",
           checked: false,
-          details: "Intègre les mots exacts que tes premiers clients ont utilisés. Si quelqu'un a dit 'j'étais perdu', utilise ce mot dans tes nouveaux messages.",
+          details: "Si quelqu'un a dit 'j'étais perdu', utilise ce mot. Ça résonne instantanément."
         },
         {
-          text: "Demander un témoignage aux premiers clients",
+          text: "Viser 3-5 nouvelles ventes aujourd'hui",
           checked: false,
-          details: "Si tu ne l'as pas fait hier, fais-le aujourd'hui. Un témoignage = crédibilité instantanée. Utilise-le dans tes prochaines conversations.",
+          details: "Tu as déjà vendu. Tu sais que ça marche. C'est juste une question de volume."
         },
         {
-          text: "Tracker tes conversations et résultats",
+          text: `Proposer l'order bump (${orderBump?.title || 'offre complémentaire'}) aux clients`,
           checked: false,
-          details: "Crée un Google Sheet simple : Personne | Canal | Réponse | Intérêt (Oui/Non/Peut-être). Tu commences à voir des patterns.",
+          details: orderBump
+            ? `Propose ${orderBump.title} (${orderBump.price}) à ceux qui ont acheté. Ils te font déjà confiance.`
+            : "Propose une offre complémentaire à tes clients existants.",
+          action: { type: "link", label: "Voir mon order bump", page: "MyOffers" }
         },
         {
-          text: "Viser 3-5 nouvelles ventes",
+          text: "Mettre à jour mon tracker : noter tous les résultats",
           checked: false,
-          details: "Tu as déjà vendu une fois. Tu sais que ça marche. Maintenant, c'est juste une question de volume. Plus tu parles à des gens, plus tu vends. C'est mathématique.",
+          details: "Taux de réponse, taux de conversion, objections fréquentes, canaux efficaces. Ces données valent de l'or."
+        },
+        {
+          text: "Créer 2-3 posts de valeur sur mes réseaux",
+          checked: false,
+          details: `Partage des insights sur ${session?.skill || 'ton domaine'}. Pas de vente directe, juste de la valeur.`
         }
       ],
       7: [
         {
-          text: "Finaliser la page de vente",
+          text: "Mettre à jour ma page avec témoignages et résultats",
           checked: false,
-          details: "Maintenant que tu as des vrais retours clients et peut-être un témoignage, mets tout ça sur ta page. Elle sera 10x plus convaincante qu'au Jour 1.",
-          action: { type: "link", label: "Mettre à jour ma page de vente", page: "SalesPage" }
+          details: "Ajoute tes témoignages. Ta page sera 10x plus convaincante.",
+          action: { type: "link", label: "Mettre à jour", page: "SalesPage" }
         },
         {
-          text: "Activer les emails automatiques",
+          text: "Configurer ma séquence de 5 emails automatiques",
           checked: false,
-          details: "Configure une séquence simple : Email 1 (présentation), Email 2 (problème), Email 3 (solution), Email 4 (offre). Utilise les modèles déjà générés.",
-          action: { type: "link", label: "Voir mes emails marketing", page: "EmailsMarketing" }
+          details: "Utilise les 5 emails générés. Configure-les dans Mailchimp ou Brevo.",
+          action: { type: "link", label: "Voir mes emails", page: "EmailsMarketing" }
         },
         {
-          text: "Identifier une suite possible (upsell / accompagnement)",
+          text: `Identifier mon prochain produit (upsell ~${upsell?.price || '97-297€'})`,
           checked: false,
-          details: "Tes clients qui ont acheté ton produit à 27€ ont maintenant un nouveau problème. Quelle est la prochaine étape logique ? Un produit à 97€ ? Un coaching à 297€ ? Note l'idée, ne la crée pas encore.",
+          details: "Tes clients à 27€ ont un nouveau problème. Quelle est la prochaine étape logique ?",
+          action: { type: "link", label: "Voir mon upsell", page: "MyOffers" }
         },
         {
-          text: "Planifier ta semaine prochaine",
+          text: "Calculer mes résultats : CA total, ventes, taux conversion",
           checked: false,
-          details: "Bloque 1h par jour pour continuer à contacter des prospects. Tu as maintenant un système qui marche. Il suffit de le faire tourner.",
+          details: `Exemple : 100 contacts → 10 conversations → 3 ventes × ${mainProduct?.price || '27€'} = ${parseInt(mainProduct?.price || 27) * 3}€.`
         },
         {
-          text: "Célébrer tes victoires",
+          text: "Planifier ma semaine : 1h/jour pour prospecter",
           checked: false,
-          details: "Prends 5 minutes pour réaliser ce que tu viens de faire en 7 jours. Tu es passé d'une idée à des ventes réelles. C'est énorme. Partage ça dans la communauté Skool !",
-          action: { type: "external", label: "Partager dans la communauté", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
+          details: "Bloque 1h par jour. Tu as un système qui marche. Il suffit de le faire tourner."
+        },
+        {
+          text: "Partager mes victoires dans la communauté",
+          checked: false,
+          details: "Tu es passé d'une idée à des ventes réelles en 7 jours. Partage ton histoire !",
+          action: { type: "external", label: "Partager", url: "https://www.skool.com/ia-pour-tous-6043" }
+        },
+        {
+          text: "Célébrer : tu as prouvé que c'est possible 🎉",
+          checked: false,
+          details: "Tu as vendu. Tu as aidé quelqu'un. Tu es officiellement un entrepreneur. Célèbre ça."
         }
       ]
     };
@@ -413,100 +457,94 @@ export default function PlanAction() {
     const base = defaults[day] || [];
     const saved = dayProgress?.[day]?.checklist || [];
 
-    // Merge par index : on garde le texte/details/action du default,
-    // et on applique le checked sauvegardé si présent
     return base.map((item, idx) => {
       const savedItem = saved[idx];
+      if (item.autoChecked) {
+        return { ...item, checked: true, disabled: true };
+      }
       return {
         ...item,
         checked: savedItem?.checked ?? item.checked ?? false
       };
     });
   };
-
   const days = [
     {
       number: 1,
       title: "Tout préparer (sans vendre)",
-      objective: "Mettre en place ton environnement et générer tout ce dont tu as besoin.",
-      keyMessage: "Aujourd'hui, tu ne vends RIEN. Tu prépares.",
+      objective: "Mettre en place ton environnement et générer tous tes documents IA personnalisés.",
+      keyMessage: docsReady 
+        ? "✅ Tes documents sont prêts ! Concentre-toi sur les tâches communautaires." 
+        : "Aujourd'hui, tu ne vends RIEN. Tu prépares tout ce dont tu as besoin.",
       completionMessage: "Parfait. Tout est prêt. Demain, tu vas parler à de vraies personnes.",
       buttons: [
-        { label: "Analyse de marché", onClick: () => navigate(createPageUrl('MarketAnalysis')) },
-        { label: "Avatars clients", onClick: () => navigate(createPageUrl('AvatarClients')) },
-        { label: "Mes offres", onClick: () => navigate(createPageUrl('MyOffers')) },
-        { label: "Page de vente", onClick: () => navigate(createPageUrl('SalesPage')) },
-        { label: "Messages de vente", onClick: () => navigate(createPageUrl('SalesMessages')) },
-        { label: "Emails marketing", onClick: () => navigate(createPageUrl('EmailsMarketing')) }
+        { label: "Dashboard", onClick: () => navigate(createPageUrl('Dashboard')) }
       ]
     },
     {
       number: 2,
       title: "Ouvrir des conversations",
-      objective: "Parler à des gens. Comprendre leurs problèmes. Sans vendre.",
-      keyMessage: "Tu es là pour aider, pas pour convaincre.",
+      objective: "Parler à 10 personnes. Comprendre leurs vrais problèmes. Sans vendre.",
+      keyMessage: "Tu es là pour ÉCOUTER et COMPRENDRE, pas pour convaincre.",
       completionMessage: "Bravo ! Tu as écouté de vraies personnes. Demain, tu vas proposer.",
       buttons: [
-        { label: "Voir mes avatars", onClick: () => navigate(createPageUrl('AvatarClients')) },
-        { label: "Messages de diagnostic", onClick: () => navigate(createPageUrl('SalesMessages')) }
+        { label: "Mes avatars", onClick: () => navigate(createPageUrl('AvatarClients')) },
+        { label: "Mes messages", onClick: () => navigate(createPageUrl('SalesMessages')) }
       ]
     },
     {
       number: 3,
       title: "Proposer le petit produit",
-      objective: "Faire ta première proposition simple et humaine.",
-      specialMessage: "🎉 Ta première vente est proche.",
-      completionMessage: "Incroyable ! Tu as fait ta première proposition. Demain, tu vas créer.",
+      objective: `Faire ta première proposition : ${session?.finalized_offer?.mainProduct?.title || 'ton produit d\'appel'} à ${session?.finalized_offer?.mainProduct?.price || '27-97€'}.`,
+      specialMessage: "🎉 Ta première vente est proche. Reste humain et simple.",
+      completionMessage: "Incroyable ! Tu as fait ta première proposition. Demain, tu livres ou continues.",
       buttons: [
         { label: "Voir mon offre", onClick: () => navigate(createPageUrl('MyOffers')) }
       ]
     },
     {
       number: 4,
-      title: "Créer APRÈS avoir vendu",
-      objective: "Livrer ce que tu as vendu, simplement.",
-      keyMessage: "Tu n'as pas besoin d'être parfait. Tu dois être utile.",
-      completionMessage: "Félicitations ! Tu as livré. Demain, tu vas améliorer."
+      title: "Livrer & Continuer",
+      objective: "Livrer ce que tu as vendu (si vente faite) ET continuer à prospecter.",
+      keyMessage: "Tu n'as pas besoin d'être parfait. Tu dois être UTILE.",
+      completionMessage: "Félicitations ! Tu as livré (ou continué à prospecter). Demain, tu améliores."
     },
     {
       number: 5,
-      title: "Feedback & ajustement",
-      objective: "Améliorer avec de vrais retours clients.",
-      completionMessage: "Super ! Tu es à l'écoute. Demain, tu vas multiplier."
+      title: "Feedback & Optimisation",
+      objective: "Améliorer avec de vrais retours clients. Ajuster ton message.",
+      keyMessage: "Écoute tes clients. Ils te disent exactement comment vendre mieux.",
+      completionMessage: "Super ! Tu es à l'écoute. Demain, tu multiplies les résultats."
     },
     {
       number: 6,
-      title: "Répéter pour aller vers 10 ventes",
-      objective: "Refaire ce qui fonctionne.",
-      completionMessage: "Excellent ! Tu as une dynamique. Demain, tu structures."
+      title: "Scaler : 3-5 ventes",
+      objective: "Refaire ce qui fonctionne, mais en 3x plus grand.",
+      keyMessage: "Tu sais que ça marche. Maintenant : VOLUME.",
+      completionMessage: "Excellent ! Tu as une dynamique. Demain, tu structures pour durer."
     },
     {
       number: 7,
-      title: "Structurer la suite (simplement)",
-      objective: "Poser les bases pour continuer.",
-      specialMessage: "🎉 Tu as vendu. Tu as aidé quelqu'un. Tu viens de prouver que c'est possible.",
+      title: "Structurer la suite",
+      objective: "Automatiser, planifier, identifier l'upsell. Poser les bases pour continuer.",
+      specialMessage: "🎉 Tu as vendu. Tu as aidé. Tu viens de prouver que c'est possible.",
       buttons: [
-        { label: "Page de vente", onClick: () => navigate(createPageUrl('SalesPage')) },
-        { label: "Emails automatiques", onClick: () => navigate(createPageUrl('EmailsMarketing')) }
+        { label: "Ma page de vente", onClick: () => navigate(createPageUrl('SalesPage')) },
+        { label: "Mes emails", onClick: () => navigate(createPageUrl('EmailsMarketing')) }
       ]
     }
   ];
 
   const calculateProgress = () => {
-    // total tâches = somme des tâches de tous les jours
     const totalTasks = [1, 2, 3, 4, 5, 6, 7].reduce(
       (acc, day) => acc + getDayChecklist(day).length,
       0
     );
-
     if (totalTasks === 0) return 0;
-
-    // tâches cochées = somme des checked true
     const checkedTasks = [1, 2, 3, 4, 5, 6, 7].reduce((acc, day) => {
       const list = getDayChecklist(day);
       return acc + list.filter((i) => i.checked).length;
     }, 0);
-
     return Math.round((checkedTasks / totalTasks) * 100);
   };
 
@@ -514,11 +552,8 @@ export default function PlanAction() {
     return (
       <div className="flex h-screen bg-white">
         <Sidebar currentPage="PlanAction" progress={0} user={user} />
-        <div className="flex-1 ml-0 lg:ml-72">
-          <TopBar user={user} />
-          <div className="flex items-center justify-center h-[calc(100vh-5rem)]">
-            <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-          </div>
+        <div className="flex-1 ml-0 lg:ml-72 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
         </div>
       </div>
     );
@@ -539,51 +574,36 @@ export default function PlanAction() {
       />
 
       <div className="flex-1 ml-0 lg:ml-72 overflow-y-auto">
-        <TopBar
-          user={user}
-          onMenuClick={() => setIsSidebarOpen(true)}
-        />
+        <TopBar user={user} onMenuClick={() => setIsSidebarOpen(true)} />
 
         <div className="max-w-5xl mx-auto px-6 py-12">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-left mb-12"
-          >
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-left mb-8">
             <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-full mb-4">
               <Target className="w-4 h-4 text-[#61f7a2]" />
-              <span className="text-[#61f7a2] font-semibold text-sm">
-                Jour {currentDay} / 7
-              </span>
+              <span className="text-[#61f7a2] font-semibold text-sm">Jour {currentDay} / 7</span>
             </div>
-
-            <h1 className="text-5xl font-bold text-gray-900 mb-4">
-              Plan d'action
-            </h1>
-
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
-              Ta première vente en 7 jours
-            </h2>
-
-            <p className="text-lg text-gray-600 max-w-3xl">
-              Une action par jour. Pas plus. Pas moins.
-            </p>
+            <h1 className="text-5xl font-bold text-gray-900 mb-4">Plan d'action</h1>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Ta première vente en 7 jours</h2>
+            <p className="text-lg text-gray-600 max-w-3xl">Une action par jour. Pas plus. Pas moins.</p>
           </motion.div>
 
-          {/* Progress Bar */}
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            className="mb-12"
-          >
+          {!docsReady && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} 
+              className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-blue-900 font-semibold mb-1">Documents en cours de génération</p>
+                <p className="text-blue-700 text-sm">
+                  Les tâches du Jour 1 se cocheront automatiquement une fois prêts.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          <motion.div initial={{ opacity: 0, scaleX: 0 }} animate={{ opacity: 1, scaleX: 1 }} className="mb-12">
             <div className="bg-gray-100 rounded-full h-3 overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5 }}
-                className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
-              />
+              <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.5 }}
+                className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]" />
             </div>
             <div className="flex justify-between mt-2 text-sm text-gray-600">
               <span>Progression globale</span>
@@ -591,7 +611,6 @@ export default function PlanAction() {
             </div>
           </motion.div>
 
-          {/* Days List */}
           <div className="space-y-6">
             {days.map((day) => {
               const isCompleted = dayProgress[day.number]?.completed || false;
@@ -613,34 +632,22 @@ export default function PlanAction() {
             })}
           </div>
 
-          {/* Success Message */}
           {progress === 100 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mt-12 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-3xl p-12 text-center text-white"
-            >
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+              className="mt-12 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-3xl p-12 text-center text-white">
               <div className="w-20 h-20 bg-white rounded-full mx-auto mb-6 flex items-center justify-center">
                 <Sparkles className="w-10 h-10 text-[#61f7a2]" />
               </div>
-              <h2 className="text-4xl font-bold mb-4">
-                Félicitations ! 🎉
-              </h2>
-              <p className="text-xl mb-6">
-                Tu as complété le plan 7 jours. Tu as prouvé que c'est possible.
-              </p>
-              <Button
-                onClick={() => navigate(createPageUrl('Dashboard'))}
-                size="lg"
-                className="bg-white text-[#61f7a2] hover:bg-gray-100 font-bold px-8"
-              >
+              <h2 className="text-4xl font-bold mb-4">Félicitations ! 🎉</h2>
+              <p className="text-xl mb-6">Tu as complété le plan 7 jours. Tu as prouvé que c'est possible.</p>
+              <Button onClick={() => navigate(createPageUrl('Dashboard'))} size="lg"
+                className="bg-white text-[#61f7a2] hover:bg-gray-100 font-bold px-8">
                 Retour au Dashboard
               </Button>
             </motion.div>
           )}
         </div>
       </div>
-
       <ChatBubble />
     </div>
   );

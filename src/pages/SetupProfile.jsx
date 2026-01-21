@@ -81,15 +81,14 @@ export default function SetupProfile() {
 
     setSaving(true);
     try {
+      // 1. Sauvegarder le profil
       if (profile) {
-        // Update existing profile
         await base44.entities.UserProfile.update(profile.id, {
           first_name: formData.first_name,
           last_name: formData.last_name,
           avatar_url: formData.avatar_url
         });
       } else {
-        // Create new profile
         await base44.entities.UserProfile.create({
           first_name: formData.first_name,
           last_name: formData.last_name,
@@ -105,20 +104,38 @@ export default function SetupProfile() {
 
       toast.success('Profil enregistré !');
       
-      // Redirect to dashboard
-      const redirect = new URLSearchParams(location.search).get('redirect') || 'Dashboard';
-      navigate(createPageUrl(redirect));
+      // 2. 🔥 LANCER LA GÉNÉRATION
+      console.log('[SetupProfile] Launching generation...');
+      
+      // Appel NON-BLOQUANT (on attend pas la fin)
+      base44.functions.invoke('startGeneration', {
+        sessionId: user.sessionId
+      }).catch(error => {
+        console.error('[SetupProfile] Generation error:', error);
+      });
+
+      // 3. Redirect immédiat vers NoahGeneration
+      // (qui va afficher la progression)
+      navigate(createPageUrl('NoahGeneration'));
+      
     } catch (error) {
       console.error('Error saving profile:', error);
       toast.error('Erreur lors de la sauvegarde');
-    } finally {
       setSaving(false);
     }
   };
 
-  const handleSkip = () => {
-    const redirect = new URLSearchParams(location.search).get('redirect') || 'Dashboard';
-    navigate(createPageUrl(redirect));
+  const handleSkip = async () => {
+    // Même si skip, on lance la génération
+    console.log('[SetupProfile] Skip - Launching generation...');
+    
+    base44.functions.invoke('startGeneration', {
+      sessionId: user.sessionId
+    }).catch(error => {
+      console.error('[SetupProfile] Generation error:', error);
+    });
+    
+    navigate(createPageUrl('NoahGeneration'));
   };
 
   if (loading) {
@@ -149,7 +166,7 @@ export default function SetupProfile() {
             Complète ton profil
           </h1>
           <p className="text-gray-600 text-center mb-8">
-            Personnalise ton expérience en quelques secondes
+            Pendant ce temps, Noah prépare tes documents
           </p>
 
           {/* Avatar Upload */}
@@ -234,6 +251,7 @@ export default function SetupProfile() {
             <button
               onClick={handleSkip}
               className="w-full py-3 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              disabled={saving}
             >
               Passer cette étape
             </button>

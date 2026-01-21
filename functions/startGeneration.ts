@@ -4,6 +4,15 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
  * Lance la génération progressive de TOUS les assets après paiement
  * Génère 1 par 1 avec délais pour éviter rate limits
  * Sauvegarde la progression en temps réel
+ * 
+ * ORDRE LOGIQUE (7 ÉTAPES) :
+ * 1. Market Analysis SWOT (analyse complète)
+ * 2. Avatars (nécessaires pour les offres)
+ * 3. Detailed Offers (4 offres complètes)
+ * 4. Sales Messages (8 messages DM)
+ * 5. Marketing Emails (5 emails séquence)
+ * 6. Sales Page (page de vente)
+ * 7. Plan de Route (plan d'action)
  */
 Deno.serve(async (req) => {
   const startTime = Date.now();
@@ -59,29 +68,11 @@ Deno.serve(async (req) => {
       }, { status: 409 });
     }
 
-    // Initialiser le status
-    const initialStatus = {
-      completeMarketAnalysis: { status: 'pending', progress: 0 },
-      avatars: { status: 'pending', progress: 0 },
-      detailedOffers: { status: 'pending', progress: 0 },
-      salesMessages: { status: 'pending', progress: 0 },
-      marketingEmails: { status: 'pending', progress: 0 }
-    };
-
-    // Activer le lock
-    await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
-      generation_in_progress: true,
-      generation_started_at: new Date().toISOString(),
-      generation_status: initialStatus
-    });
-
-    console.log('[startGeneration] Lock activated, starting generation pipeline');
-
-    // 📋 Pipeline de génération (5 étapes critiques)
+    // 🔥 Pipeline de génération (7 étapes dans l'ordre logique)
     const generationSteps = [
       {
         id: 'completeMarketAnalysis',
-        name: 'Analyse de marché SWOT',
+        name: 'Analyse de marché SWOT complète',
         field: 'complete_market_analysis',
         function: 'generateMarketAnalysisV2',
         description: 'Analyse complète avec SWOT, concurrence, stratégie'
@@ -98,7 +89,7 @@ Deno.serve(async (req) => {
         name: '4 Offres complètes',
         field: 'detailed_offers',
         function: 'generateDetailedOffers',
-        description: 'Tes 4 offres ultra-détaillées'
+        description: 'Tes 4 offres ultra-détaillées avec prix'
       },
       {
         id: 'salesMessages',
@@ -113,10 +104,39 @@ Deno.serve(async (req) => {
         field: 'generated_marketing_emails',
         function: 'generateMarketingEmail',
         description: 'Séquence email complète'
+      },
+      {
+        id: 'salesPage',
+        name: 'Page de vente',
+        field: 'generated_sales_pages',
+        function: 'generateSalesPage',
+        description: 'Page de vente prête à convertir'
+      },
+      {
+        id: 'planDeRoute',
+        name: 'Plan de route',
+        field: 'plan_de_route',
+        function: 'generatePlanDeRoute',
+        description: 'Ton plan d\'action personnalisé'
       }
     ];
 
     const totalSteps = generationSteps.length;
+
+    // Initialiser le status
+    const initialStatus = {};
+    generationSteps.forEach(step => {
+      initialStatus[step.id] = { status: 'pending', progress: 0 };
+    });
+
+    // Activer le lock
+    await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
+      generation_in_progress: true,
+      generation_started_at: new Date().toISOString(),
+      generation_status: initialStatus
+    });
+
+    console.log('[startGeneration] Lock activated, starting generation pipeline');
 
     // 🔄 GÉNÉRATION PROGRESSIVE
     for (let i = 0; i < generationSteps.length; i++) {
@@ -170,7 +190,18 @@ Deno.serve(async (req) => {
           sessionId: resolvedSessionId 
         });
 
-        if (result.data?.success || result.data?.avatars || result.data?.messages || result.data?.emails || result.data?.offers || result.data?.analysis) {
+        // Validation flexible du résultat
+        const isSuccess = result.data?.success || 
+                         result.data?.avatars || 
+                         result.data?.messages || 
+                         result.data?.emails || 
+                         result.data?.offers || 
+                         result.data?.analysis ||
+                         result.data?.marketValidation ||
+                         result.data?.planDeRoute ||
+                         result.data?.salesPage;
+
+        if (isSuccess) {
           console.log(`[startGeneration] ${step.name} ✅ SUCCESS`);
           
           const updatedStatus = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
@@ -243,6 +274,8 @@ Deno.serve(async (req) => {
       duration: `${duration}ms`,
       allDone,
       hasErrors,
+      completedSteps: Object.keys(finalStatus).filter(k => finalStatus[k].status === 'done').length,
+      totalSteps: generationSteps.length,
       status: finalStatus
     });
 
@@ -251,6 +284,8 @@ Deno.serve(async (req) => {
       allDone,
       hasErrors,
       status: finalStatus,
+      completedSteps: Object.keys(finalStatus).filter(k => finalStatus[k].status === 'done').length,
+      totalSteps: generationSteps.length,
       duration
     });
 

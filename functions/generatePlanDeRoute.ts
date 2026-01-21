@@ -1,8 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import OpenAI from 'npm:openai@4.73.1';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
 
-const openai = new OpenAI({
-  apiKey: Deno.env.get("OPENAI_API_KEY"),
+const anthropic = new Anthropic({
+  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
 
 const SYSTEM_PROMPT = `Tu es Nova, une IA experte en stratégie business, structuration d'offres, pédagogie et accompagnement de créateurs indépendants.
@@ -65,6 +65,8 @@ LOGIQUE DE PERSONNALISATION
 - Utilise les vrais noms de produits générés
 - Adapte le niveau de complexité au user_level
 - Adapte le ton au confidence_level
+- Mentionne les VRAIS PRIX des offres
+- Utilise les VRAIS TITRES des produits
 
 RÉSULTAT ATTENDU
 Le texte final doit donner l'impression que :
@@ -120,11 +122,11 @@ Deno.serve(async (req) => {
     const upsell = finalizedOffer.upsell1 || {};
     const premiumOffer = finalizedOffer.upsell3 || {};
     
-    // 🔥 P0-4: Distinction objectif vs potentiel
+    // 🔥 Distinction objectif vs potentiel
     const targetIncome = onboardingFull.targetIncome || onboardingFull.target_income || 0;
     const potentialRevenue = session.potential_revenue || 0;
     
-    // 🔥 P1-5: Mapping DB-first (readinessScore existe, experienceLevel absent)
+    // 🔥 Mapping readinessScore
     const readinessScore = onboardingFull.readinessScore || 5;
     const userLevel = readinessScore >= 7 ? 'motivé' : readinessScore >= 4 ? 'intermédiaire' : 'débutant';
     const confidenceLevel = readinessScore >= 7 ? 'élevé' : readinessScore >= 4 ? 'moyen' : 'faible';
@@ -135,7 +137,9 @@ Deno.serve(async (req) => {
       userLevel,
       confidenceLevel,
       targetIncome,
-      potentialRevenue
+      potentialRevenue,
+      mainOfferTitle: mainOffer.title,
+      mainOfferPrice: mainOffer.price
     });
 
     const userPrompt = `DONNÉES OBLIGATOIRES À UTILISER
@@ -144,212 +148,195 @@ Prénom : ${name}
 Passion brute (NE PAS UTILISER TEL QUEL) : ${passionRaw}
 Passion reformulée (UTILISER CELLE-CI) : ${passionReformulated}
 
-Offres sélectionnées (UTILISER les vrais titres et prix dans CHAQUE phase) :
-Produit Principal : ${mainOffer.title || '—'} à ${mainOffer.price || '—'}
-Petit Extra : ${orderBump.title || '—'} à ${orderBump.price || '—'}
-Offre Supérieure : ${upsell.title || '—'} à ${upsell.price || '—'}
-Offre Premium : ${premiumOffer.title || '—'} à ${premiumOffer.price || '—'}
+🔥 OFFRES CRÉÉES (UTILISE les vrais titres et prix dans CHAQUE phase) :
+
+**Produit Principal :**
+- Titre : ${mainOffer.title || '—'}
+- Prix : ${mainOffer.price || '—'}
+- Promesse : ${mainOffer.promise || '—'}
+- Description : ${mainOffer.description || '—'}
+
+**Petit Extra (Order Bump) :**
+- Titre : ${orderBump.title || '—'}
+- Prix : ${orderBump.price || '—'}
+- Promesse : ${orderBump.promise || '—'}
+
+**Offre Supérieure (Upsell) :**
+- Titre : ${upsell.title || '—'}
+- Prix : ${upsell.price || '—'}
+- Promesse : ${upsell.promise || '—'}
+
+**Offre Premium :**
+- Titre : ${premiumOffer.title || '—'}
+- Prix : ${premiumOffer.price || '—'}
+- Promesse : ${premiumOffer.promise || '—'}
 
 🔥 DISTINCTION CRITIQUE (ne pas confondre) :
-Objectif utilisateur (ce qu'il/elle veut atteindre) : ${targetIncome}€/mois
-Potentiel calculé (ce que l'écosystème permet actuellement) : ${potentialRevenue}€/mois
+- Objectif utilisateur (ce qu'il/elle veut atteindre) : ${targetIncome}€/mois
+- Potentiel calculé (ce que l'écosystème permet actuellement) : ${potentialRevenue}€/mois
 
 Niveau utilisateur : ${userLevel}
 Niveau de confiance : ${confidenceLevel}
 
-MISSION
+🎯 EXEMPLES DE PERSONNALISATION ATTENDUE :
+
+**Phase 1 - Validation :**
+❌ Mauvais : "Tu vas commencer par vendre ton premier produit"
+✅ Bon : "Tu vas vendre ton premier "${mainOffer.title}" à ${mainOffer.price} en utilisant les messages de vente générés"
+
+**Phase 2 - Création :**
+❌ Mauvais : "Tu vas créer ton offre complète"
+✅ Bon : "Tu vas créer ${orderBump.title} (${orderBump.price}) pour compléter ton offre principale et proposer plus de valeur"
+
+**Phase 3 - Automatisation :**
+❌ Mauvais : "Tu vas automatiser tes ventes"
+✅ Bon : "Tu vas mettre en place une séquence d'emails automatique qui vend ${mainOffer.title} pendant que tu dors"
+
+**Phase 4 - Croissance :**
+❌ Mauvais : "Tu vas scaler ton business"
+✅ Bon : "Tu vas introduire ${upsell.title} (${upsell.price}) pour augmenter ton panier moyen et viser ${potentialRevenue}€/mois"
+
+MISSION :
 Génère le contenu complet de la page "Concrètement ?" en respectant STRICTEMENT les 8 sections obligatoires.
 
 Format de sortie JSON STRICT :
 {
-  "introduction": "texte d'intro rassurant et logique",
-  "parcoursGuide": "texte personnalisé d'introduction au parcours",
+  "introduction": "texte d'intro rassurant et logique (150-200 mots)",
+  "parcoursGuide": "texte personnalisé d'introduction au parcours (80-120 mots)",
   "phase1": {
     "title": "Validation : Ta Première Vente",
-    "objective": "...",
-    "plan": "...",
-    "result": "..."
+    "objective": "Ce que ${name} veut accomplir (50-80 mots)",
+    "plan": "Comment on aide concrètement avec ${mainOffer.title} à ${mainOffer.price} (80-120 mots)",
+    "result": "Ce qu'il/elle obtient (40-60 mots)"
   },
   "phase2": {
     "title": "Création : La Construction",
     "objective": "...",
-    "plan": "...",
+    "plan": "Mentionner ${orderBump.title} à ${orderBump.price}...",
     "result": "..."
   },
   "phase3": {
     "title": "Automatisation : La Machine",
     "objective": "...",
-    "plan": "...",
+    "plan": "Automatiser les ventes de ${mainOffer.title}...",
     "result": "..."
   },
   "phase4": {
     "title": "Croissance : L'Expansion",
     "objective": "...",
-    "plan": "...",
+    "plan": "Introduire ${upsell.title} (${upsell.price}) et ${premiumOffer.title} (${premiumOffer.price}) pour atteindre ${potentialRevenue}€/mois...",
     "result": "..."
   },
   "advantages": [
-    { "title": "...", "description": "..." },
-    { "title": "...", "description": "..." },
-    { "title": "...", "description": "..." },
-    { "title": "...", "description": "..." }
+    { "title": "Avantage 1", "description": "Explication spécifique (40-60 mots)" },
+    { "title": "Avantage 2", "description": "..." },
+    { "title": "Avantage 3", "description": "..." },
+    { "title": "Avantage 4", "description": "..." }
   ],
-  "conclusion": "texte de conclusion rassurant + appel naturel à continuer"
+  "conclusion": "Texte de conclusion rassurant + appel naturel (100-150 mots)"
 }
 
 RAPPELS CRITIQUES :
 - Utilise "${passionReformulated}", JAMAIS "${passionRaw}"
-- Intègre les vrais titres et prix des offres dans CHAQUE phase (au moins 1 par phase)
+- Intègre les vrais titres et prix des offres dans CHAQUE phase
 - Adapte le ton à "${userLevel}" et "${confidenceLevel}"
-- Chaque phase doit contenir 1 action concrète simple (pas de jargon marketing)
+- Chaque phase doit contenir 1 action concrète simple
 - Ne confonds JAMAIS l'objectif (${targetIncome}€) avec le potentiel (${potentialRevenue}€)
-- Si tu mentionnes des revenus, distingue clairement : "ton objectif" vs "le potentiel actuel"
 - Les 4 avantages doivent être spécifiques à ce parcours
-- Zéro jargon : pas de "funnel", "lead magnet", "nurture", "automation", etc.`;
+- Zéro jargon : pas de "funnel", "lead magnet", "nurture", "automation", etc.
 
-    console.log('OPENAI_CALL start', { 
+Génère maintenant l'analyse complète en JSON pur (pas de markdown, pas de texte avant/après).`;
+
+    console.log('ANTHROPIC_CALL start', { 
       fn: 'generatePlanDeRoute',
       sessionId,
-      model: 'gpt-4o'
+      model: 'claude-sonnet-4-20250514'
     });
 
-    // 🔥 P0-3: Retry logic avec validation
+    // 🔥 Retry logic
     let planDeRoute = null;
     let lastError = null;
     const MAX_RETRIES = 2;
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.7,
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "plan_de_route",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              introduction: { type: "string" },
-              parcoursGuide: { type: "string" },
-              phase1: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  objective: { type: "string" },
-                  plan: { type: "string" },
-                  result: { type: "string" }
-                },
-                required: ["title", "objective", "plan", "result"],
-                additionalProperties: false
-              },
-              phase2: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  objective: { type: "string" },
-                  plan: { type: "string" },
-                  result: { type: "string" }
-                },
-                required: ["title", "objective", "plan", "result"],
-                additionalProperties: false
-              },
-              phase3: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  objective: { type: "string" },
-                  plan: { type: "string" },
-                  result: { type: "string" }
-                },
-                required: ["title", "objective", "plan", "result"],
-                additionalProperties: false
-              },
-              phase4: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  objective: { type: "string" },
-                  plan: { type: "string" },
-                  result: { type: "string" }
-                },
-                required: ["title", "objective", "plan", "result"],
-                additionalProperties: false
-              },
-              advantages: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string" },
-                    description: { type: "string" }
-                  },
-                  required: ["title", "description"],
-                  additionalProperties: false
-                },
-                minItems: 4,
-                maxItems: 4
-              },
-              conclusion: { type: "string" }
-            },
-            required: ["introduction", "parcoursGuide", "phase1", "phase2", "phase3", "phase4", "advantages", "conclusion"],
-            additionalProperties: false
-          }
-        }
-      }
+        const message = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 8000,
+          system: SYSTEM_PROMPT,
+          messages: [
+            { role: "user", content: userPrompt }
+          ]
         });
 
-        console.log('OPENAI_CALL end', {
+        console.log('ANTHROPIC_CALL end', {
           fn: 'generatePlanDeRoute',
           sessionId,
           attempt: attempt + 1,
-          usage: completion.usage
+          usage: message.usage
         });
 
-        planDeRoute = JSON.parse(completion.choices[0].message.content);
+        const responseText = message.content[0].type === 'text' 
+          ? message.content[0].text.trim() 
+          : '{}';
 
-    // 🔥 P0-3: GUARDRAILS - Validation métier du contenu
-    const validationErrors = [];
-    
-    if (!planDeRoute.introduction || planDeRoute.introduction.length < 50) {
-      validationErrors.push('introduction trop courte ou vide');
-    }
-    if (!planDeRoute.parcoursGuide || planDeRoute.parcoursGuide.length < 30) {
-      validationErrors.push('parcoursGuide trop court ou vide');
-    }
-    
-    ['phase1', 'phase2', 'phase3', 'phase4'].forEach(phaseKey => {
-      const phase = planDeRoute[phaseKey];
-      if (!phase || !phase.objective || phase.objective.length < 20) {
-        validationErrors.push(`${phaseKey}.objective trop court`);
-      }
-      if (!phase || !phase.plan || phase.plan.length < 30) {
-        validationErrors.push(`${phaseKey}.plan trop court`);
-      }
-      if (!phase || !phase.result || phase.result.length < 20) {
-        validationErrors.push(`${phaseKey}.result trop court`);
-      }
-    });
-    
-    if (!planDeRoute.advantages || planDeRoute.advantages.length !== 4) {
-      validationErrors.push(`advantages doit contenir exactement 4 éléments (reçu: ${planDeRoute.advantages?.length || 0})`);
-    }
-    
-    if (!planDeRoute.conclusion || planDeRoute.conclusion.length < 50) {
-      validationErrors.push('conclusion trop courte ou vide');
-    }
+        // Clean markdown
+        const cleanedResponse = responseText
+          .replace(/```json\n?/g, '')
+          .replace(/```\n?/g, '')
+          .trim();
+
+        planDeRoute = JSON.parse(cleanedResponse);
+
+        // 🔥 VALIDATION
+        const validationErrors = [];
+        
+        if (!planDeRoute.introduction || planDeRoute.introduction.length < 50) {
+          validationErrors.push('introduction trop courte');
+        }
+        if (!planDeRoute.parcoursGuide || planDeRoute.parcoursGuide.length < 30) {
+          validationErrors.push('parcoursGuide trop court');
+        }
+        
+        ['phase1', 'phase2', 'phase3', 'phase4'].forEach(phaseKey => {
+          const phase = planDeRoute[phaseKey];
+          if (!phase || !phase.objective || phase.objective.length < 20) {
+            validationErrors.push(`${phaseKey}.objective trop court`);
+          }
+          if (!phase || !phase.plan || phase.plan.length < 30) {
+            validationErrors.push(`${phaseKey}.plan trop court`);
+          }
+          if (!phase || !phase.result || phase.result.length < 20) {
+            validationErrors.push(`${phaseKey}.result trop court`);
+          }
+          
+          // 🔥 Vérifier que les noms de produits sont présents
+          const planText = phase.plan || '';
+          const hasProductMention = 
+            planText.includes(mainOffer.title || 'XXXXX') ||
+            planText.includes(orderBump.title || 'XXXXX') ||
+            planText.includes(upsell.title || 'XXXXX') ||
+            planText.includes(premiumOffer.title || 'XXXXX');
+          
+          if (!hasProductMention && planText.length > 0) {
+            validationErrors.push(`${phaseKey}.plan ne mentionne aucun nom de produit`);
+          }
+        });
+        
+        if (!planDeRoute.advantages || planDeRoute.advantages.length !== 4) {
+          validationErrors.push(`advantages doit contenir exactement 4 éléments`);
+        }
+        
+        if (!planDeRoute.conclusion || planDeRoute.conclusion.length < 50) {
+          validationErrors.push('conclusion trop courte');
+        }
 
         if (validationErrors.length > 0) {
           console.warn(`⚠️ [generatePlanDeRoute] Validation failed (attempt ${attempt + 1}):`, validationErrors);
           lastError = new Error(`Validation métier échouée: ${validationErrors.join(', ')}`);
           
           if (attempt < MAX_RETRIES) {
-            console.log('🔄 Retrying with corrective feedback...');
+            console.log('🔄 Retrying...');
             continue;
           } else {
             throw lastError;
@@ -357,15 +344,13 @@ RAPPELS CRITIQUES :
         }
 
         console.log('✅ [generatePlanDeRoute] Validation passed');
-        break; // Success, exit retry loop
+        break;
 
       } catch (error) {
         lastError = error;
         console.error(`❌ [generatePlanDeRoute] Attempt ${attempt + 1} failed:`, error.message);
         
         if (attempt === MAX_RETRIES) {
-          // Fallback après tous les retries
-          console.error('🚨 All retries exhausted, using fallback plan');
           throw error;
         }
       }
@@ -375,6 +360,8 @@ RAPPELS CRITIQUES :
     await base44.asServiceRole.entities.Session.update(sessionId, {
       plan_de_route: planDeRoute
     });
+
+    console.log('✅ [generatePlanDeRoute] Saved to session');
 
     return Response.json({
       success: true,

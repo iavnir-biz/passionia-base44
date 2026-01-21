@@ -18,7 +18,7 @@ const useTypingEffect = (text, speed = 30) => {
 
   useEffect(() => {
     if (!text) return;
-    
+
     setDisplayedText('');
     setIsTyping(true);
     let index = 0;
@@ -58,7 +58,7 @@ export default function OnboardingDynamic() {
   // 🔥 Question actuelle avec typing effect
   const questionText = currentQuestion?.text || currentQuestion?.title || '';
   const { displayedText, isTyping } = useTypingEffect(
-    isThinking ? '' : questionText, 
+    isThinking ? '' : questionText,
     30
   );
 
@@ -130,7 +130,7 @@ export default function OnboardingDynamic() {
   const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
     try {
       const firstName = localStorage.getItem('onboarding_firstName') || '';
-      
+
       // 🔥 ÉTAPE 1 : Ajouter réponse utilisateur immédiatement
       if (lastAnswer && currentQuestion) {
         const userMessage = {
@@ -143,13 +143,18 @@ export default function OnboardingDynamic() {
 
       // 🔥 ÉTAPE 2 : Noah réfléchit (animation cerveau)
       setIsThinking(true);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 secondes de réflexion
 
-      const { data } = await base44.functions.invoke('onboardingNextQuestion', {
-        sessionId,
-        userAnswer: lastAnswer,
-        firstName
-      });
+      // Optimisation: Exécution en parallèle de l'appel API et du délai minimum
+      // On réduit le temps d'attente perçu (max(1s, temps_api) au lieu de 2s + temps_api)
+      const [response] = await Promise.all([
+        base44.functions.invoke('onboardingNextQuestion', {
+          sessionId,
+          userAnswer: lastAnswer,
+          firstName
+        }),
+        new Promise(resolve => setTimeout(resolve, 1000))
+      ]);
+      const { data } = response;
 
       if (data.done || data.isDone) {
         await base44.entities.Session.update(sessionId, {
@@ -164,7 +169,7 @@ export default function OnboardingDynamic() {
       if (updatedSessions && updatedSessions.length > 0) {
         const freshSession = updatedSessions[0];
         setSession(freshSession);
-        
+
         const historicMessages = buildMessagesFromHistory(freshSession.onboarding_history || []);
         setMessages(historicMessages);
       }
@@ -172,7 +177,7 @@ export default function OnboardingDynamic() {
       // 🔥 ÉTAPE 3 : Fin de la réflexion, début du typing
       if (data.nextQuestion) {
         setIsThinking(false);
-        
+
         // Ajouter la question aux messages (le typing se fait via le hook)
         const questionText = data.nextQuestion.text || data.nextQuestion.title;
         const noahMessage = {
@@ -181,7 +186,7 @@ export default function OnboardingDynamic() {
           content: questionText,
           isNew: true // Flag pour activer le typing
         };
-        
+
         setMessages(prev => [...prev, noahMessage]);
         setCurrentQuestion(data.nextQuestion);
         initializeValue(data.nextQuestion.type, data.nextQuestion);
@@ -244,17 +249,17 @@ export default function OnboardingDynamic() {
           const upload = await base44.integrations.Core.UploadFile({ file });
           const { data } = await base44.functions.invoke('transcribeAudio', { audioUrl: upload.file_url });
           setValue(prev => prev ? `${prev}\n${data.text}` : data.text);
-        } catch (err) { 
-          console.error('Transcription error:', err); 
-        } finally { 
-          setIsTranscribing(false); 
+        } catch (err) {
+          console.error('Transcription error:', err);
+        } finally {
+          setIsTranscribing(false);
         }
         stream.getTracks().forEach(t => t.stop());
       };
       mediaRecorderRef.current.start();
       setIsRecording(true);
-    } catch (err) { 
-      console.error('Recording error:', err); 
+    } catch (err) {
+      console.error('Recording error:', err);
     }
   };
 
@@ -343,12 +348,12 @@ export default function OnboardingDynamic() {
               >
                 <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center flex-shrink-0 mt-1">
                   <motion.div
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.2, 1],
                       rotate: [0, 5, -5, 0]
                     }}
-                    transition={{ 
-                      duration: 1.5, 
+                    transition={{
+                      duration: 1.5,
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}

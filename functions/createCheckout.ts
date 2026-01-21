@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     // Récupérer l'URL de l'app depuis les headers
     const referer = req.headers.get('referer') || '';
     const origin = referer ? new URL(referer).origin : 'https://6930250f9337193d59c1dcf5.base44.app';
-    const successUrl = `${origin}/Dashboard?payment=success`;
+    const successUrl = `${origin}/WelcomeOpening?payment=success`;
     const cancelUrl = `${origin}/PlanAction`;
 
     // Créer la session de paiement

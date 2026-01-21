@@ -17,7 +17,8 @@ import {
   Megaphone,
   ArrowRight,
   CheckCircle2,
-  Lock
+  Lock,
+  AlertCircle
 } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -29,22 +30,24 @@ const resources = [
   {
     id: 'sales-messages',
     title: 'Messages de vente',
-    description: '10 messages prêts à copier-coller pour démarrer tes conversations',
+    description: '8 messages prêts à copier-coller pour démarrer tes conversations',
     icon: MessageCircle,
     color: 'from-indigo-500 to-purple-500',
     bgColor: 'bg-indigo-50',
     page: 'SalesMessages',
+    field: 'generated_sales_messages',
     isBeta: false,
     isHighPriority: true
   },
   {
     id: 'offers',
     title: 'Offres',
-    description: 'Ton offre low-ticket complète : nom, prix, promesse, livrables',
+    description: '4 offres complètes : produit principal, order bump, upsells avec prix et détails',
     icon: Package,
     color: 'from-orange-500 to-red-500',
     bgColor: 'bg-orange-50',
     page: 'MyOffers',
+    field: 'detailed_offers',
     isBeta: false,
     isHighPriority: true
   },
@@ -56,6 +59,7 @@ const resources = [
     color: 'from-green-500 to-emerald-500',
     bgColor: 'bg-green-50',
     page: 'SalesPage',
+    field: 'generated_sales_pages',
     isBeta: false,
     isHighPriority: true
   },
@@ -63,31 +67,34 @@ const resources = [
   {
     id: 'avatars',
     title: 'Avatars clients',
-    description: '3 profils de clients cibles avec leurs problèmes et motivations',
+    description: '3 profils ultra-détaillés de clients cibles avec leurs problèmes et motivations',
     icon: User,
     color: 'from-purple-500 to-pink-500',
     bgColor: 'bg-purple-50',
     page: 'AvatarClients',
+    field: 'generated_avatars',
     isBeta: false
   },
   {
     id: 'emails',
     title: 'Emails marketing',
-    description: '5 emails de suivi automatiques pour transformer tes prospects en clients',
+    description: '5 emails de séquence automatique : contraste, validation, calcul, impact, urgence',
     icon: Send,
     color: 'from-pink-500 to-rose-500',
     bgColor: 'bg-pink-50',
     page: 'EmailsMarketing',
+    field: 'generated_marketing_emails',
     isBeta: false
   },
   {
     id: 'market-analysis',
     title: 'Analyse de marché',
-    description: 'Analyse complète : concurrents, prix moyens, angles de vente qui marchent',
+    description: 'Analyse SWOT complète : concurrents, prix, opportunités, canaux de distribution',
     icon: BarChart3,
     color: 'from-blue-500 to-cyan-500',
     bgColor: 'bg-blue-50',
     page: 'MarketAnalysis',
+    field: 'complete_market_analysis',
     isBeta: false
   },
   // Fonctionnalités avancées/bêta
@@ -99,6 +106,7 @@ const resources = [
     color: 'from-amber-500 to-orange-500',
     bgColor: 'bg-amber-50',
     page: 'SocialMedia',
+    field: null,
     isBeta: true
   },
   {
@@ -109,6 +117,7 @@ const resources = [
     color: 'from-red-500 to-pink-500',
     bgColor: 'bg-red-50',
     page: 'AdCopies',
+    field: null,
     isBeta: true
   }
 ];
@@ -143,7 +152,6 @@ export default function AIResources() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // 🔥 P0: DB-first - charger Session via sessionId
       const sessionId = currentUser.sessionId;
       if (!sessionId) {
         console.warn('[AIResources] No sessionId');
@@ -161,20 +169,25 @@ export default function AIResources() {
         return;
       }
 
-      // ✅ ACCÈS LIBRE pour diagnostiquer
-      console.log('[AIResources] Access granted for diagnostics');
+      console.log('[AIResources] Session loaded:', {
+        complete_market_analysis: !!userSession.complete_market_analysis,
+        generated_avatars: !!userSession.generated_avatars,
+        detailed_offers: !!userSession.detailed_offers,
+        generated_sales_messages: !!userSession.generated_sales_messages,
+        generated_marketing_emails: !!userSession.generated_marketing_emails,
+        generated_sales_pages: !!userSession.generated_sales_pages,
+        generation_in_progress: userSession.generation_in_progress
+      });
 
-      // Construire état "Prêt" depuis Session
-      const resourcesState = {
-        'market-analysis': isNonEmpty(userSession?.market_validation),
-        'avatars': isNonEmpty(userSession?.generated_avatars),
-        'offers': isNonEmpty(userSession?.my_generated_offers),
-        'sales-messages': isNonEmpty(userSession?.generated_sales_messages),
-        'emails': isNonEmpty(userSession?.generated_marketing_emails),
-        'sales-page': isNonEmpty(userSession?.generated_sales_pages),
-        'social-media': false,
-        'ads': false
-      };
+      // Construire état des ressources
+      const resourcesState = {};
+      resources.forEach(resource => {
+        if (resource.field) {
+          resourcesState[resource.id] = isNonEmpty(userSession?.[resource.field]);
+        } else {
+          resourcesState[resource.id] = false; // Beta
+        }
+      });
 
       setGeneratedResources(resourcesState);
 
@@ -186,19 +199,22 @@ export default function AIResources() {
   };
 
   const handleResourceClick = (resource) => {
-    if (resource.isBeta) return; // Bloquer clic sur bêta
+    if (resource.isBeta) return;
     navigate(createPageUrl(resource.page));
   };
+
+  const countGenerated = () => {
+    return Object.values(generatedResources).filter(Boolean).length;
+  };
+
+  const totalResources = resources.filter(r => !r.isBeta).length;
 
   if (authLoading || loading) {
     return (
       <div className="flex h-screen bg-white">
         <Sidebar currentPage="AIResources" progress={0} />
-        <div className="flex-1 ml-0 lg:ml-72">
-          <TopBar user={user} />
-          <div className="flex items-center justify-center h-[calc(100vh-5rem)]">
-            <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
-          </div>
+        <div className="flex-1 ml-0 lg:ml-72 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
         </div>
       </div>
     );
@@ -222,19 +238,38 @@ export default function AIResources() {
         <main className="p-8">
           <div className="max-w-7xl mx-auto space-y-8">
 
-            {/* Bandeau "Tout est prêt" */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-r from-[#61f7a2]/10 to-green-50 border border-[#61f7a2]/30 rounded-2xl p-4 mb-6"
-            >
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-[#61f7a2]" />
-                <p className="text-gray-900 font-medium">
-                  Tout est généré. Récupère ce dont tu as besoin pour ta mission du jour.
-                </p>
-              </div>
-            </motion.div>
+            {/* Banner génération en cours */}
+            {session?.generation_in_progress && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start gap-3"
+              >
+                <Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-blue-900 font-semibold mb-1">Génération en cours...</p>
+                  <p className="text-blue-700 text-sm">
+                    Noah génère tes documents. Les badges "Prêt" apparaîtront automatiquement une fois terminé. Ça prend 1-2 minutes.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Banner tout prêt */}
+            {!session?.generation_in_progress && countGenerated() === totalResources && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-r from-[#61f7a2]/10 to-green-50 border border-[#61f7a2]/30 rounded-2xl p-4 mb-6"
+              >
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-[#61f7a2]" />
+                  <p className="text-gray-900 font-medium">
+                    Tout est généré. Récupère ce dont tu as besoin pour ta mission du jour.
+                  </p>
+                </div>
+              </motion.div>
+            )}
 
             {/* Header */}
             <motion.div
@@ -243,13 +278,24 @@ export default function AIResources() {
               transition={{ delay: 0.1 }}
               className="text-left"
             >
-
-              <h1 className="text-4xl font-bold text-gray-900 mb-3">
-                Tes livrables prêts à lancer
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Noah a généré tout ce dont tu as besoin. Ouvre, personnalise, lance.
-              </p>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                    Tes livrables IA
+                  </h1>
+                  <p className="text-gray-600 text-lg">
+                    Noah a généré tout ce dont tu as besoin. Ouvre, personnalise, lance.
+                  </p>
+                </div>
+                {!session?.generation_in_progress && (
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600 mb-1">Progression</p>
+                    <p className="text-2xl font-bold text-[#61f7a2]">
+                      {countGenerated()} / {totalResources}
+                    </p>
+                  </div>
+                )}
+              </div>
             </motion.div>
 
             {/* Resources Grid */}
@@ -286,13 +332,19 @@ export default function AIResources() {
                         <div className="flex flex-col items-end gap-1">
                           {resource.isHighPriority && (
                             <div className="flex items-center gap-1 px-2 py-1 bg-[#61f7a2]/20 rounded-lg border border-[#61f7a2]">
-                              <span className="text-xs font-bold text-gray-900">🎯 Commence ici</span>
+                              <span className="text-xs font-bold text-gray-900">🎯 Priorité</span>
                             </div>
                           )}
                           {isGenerated && !resource.isBeta && !resource.isHighPriority && (
                             <div className="flex items-center gap-1 px-2 py-1 bg-green-50 rounded-lg border border-green-200">
                               <CheckCircle2 className="w-3 h-3 text-green-600" />
                               <span className="text-xs font-medium text-green-700">Prêt</span>
+                            </div>
+                          )}
+                          {!isGenerated && !resource.isBeta && session?.generation_in_progress && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 rounded-lg border border-blue-200">
+                              <Loader2 className="w-3 h-3 text-blue-600 animate-spin" />
+                              <span className="text-xs font-medium text-blue-700">En cours</span>
                             </div>
                           )}
                           {resource.isBeta && (

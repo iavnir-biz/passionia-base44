@@ -133,12 +133,19 @@ export default function OnboardingDynamic() {
 
       // 🔥 ÉTAPE 1 : Ajouter réponse utilisateur immédiatement
       if (lastAnswer && currentQuestion) {
+        // On ajoute d'abord la question qui vient d'être répondue à l'historique
+        const questionMessage = {
+          id: `q-temp-${Date.now()}`,
+          sender: 'noah',
+          content: currentQuestion.text || currentQuestion.title
+        };
+
         const userMessage = {
           id: `temp-user-${Date.now()}`,
           sender: 'user',
           content: typeof lastAnswer === 'string' ? lastAnswer : JSON.stringify(lastAnswer)
         };
-        setMessages(prev => [...prev, userMessage]);
+        setMessages(prev => [...prev, questionMessage, userMessage]);
       }
 
       // 🔥 ÉTAPE 2 : Noah réfléchit (animation cerveau)
@@ -178,16 +185,6 @@ export default function OnboardingDynamic() {
       if (data.nextQuestion) {
         setIsThinking(false);
 
-        // Ajouter la question aux messages (le typing se fait via le hook)
-        const questionText = data.nextQuestion.text || data.nextQuestion.title;
-        const noahMessage = {
-          id: `noah-${Date.now()}`,
-          sender: 'noah',
-          content: questionText,
-          isNew: true // Flag pour activer le typing
-        };
-
-        setMessages(prev => [...prev, noahMessage]);
         setCurrentQuestion(data.nextQuestion);
         initializeValue(data.nextQuestion.type, data.nextQuestion);
       }

@@ -3,41 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, Mic, StopCircle, Brain, Send, User as UserIcon } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, Mic, StopCircle, Brain, Send, User as UserIcon, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
-
-// 🔥 Hook pour l'effet typing
-const useTypingEffect = (text, speed = 30) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isTyping, setIsTyping] = useState(true);
-
-  useEffect(() => {
-    if (!text) return;
-
-    setDisplayedText('');
-    setIsTyping(true);
-    let index = 0;
-
-    const timer = setInterval(() => {
-      if (index < text.length) {
-        setDisplayedText(text.slice(0, index + 1));
-        index++;
-      } else {
-        setIsTyping(false);
-        clearInterval(timer);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [text, speed]);
-
-  return { displayedText, isTyping };
-};
 
 export default function OnboardingDynamic() {
   const navigate = useNavigate();
@@ -47,31 +20,42 @@ export default function OnboardingDynamic() {
   const [value, setValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isThinking, setIsThinking] = useState(false); // 🔥 Nouveau state
+  const [questionCount, setQuestionCount] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [prefilledAnswer, setPrefilledAnswer] = useState(''); // 🔥 NOUVEAU STATE
   const messagesEndRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  // 🔥 Question actuelle avec typing effect
-  const questionText = currentQuestion?.text || currentQuestion?.title || '';
-  const { displayedText, isTyping } = useTypingEffect(
-    isThinking ? '' : questionText,
-    30
-  );
-
   useEffect(() => {
+    // 🔥 Récupérer la skill pré-remplie depuis Welcome
+    const savedSkill = localStorage.getItem('prefilledSkill');
+    if (savedSkill) {
+      setPrefilledAnswer(savedSkill);
+      localStorage.removeItem('prefilledSkill'); // Nettoyer après utilisation
+      console.log('[OnboardingDynamic] Passion récupérée:', savedSkill);
+    }
+    
     initializeOnboarding();
   }, []);
 
   useEffect(() => {
+    // Scroll avec délai plus long pour laisser l'animation finir
     const timer = setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }, 300);
     return () => clearTimeout(timer);
-  }, [messages, displayedText]);
+  }, [messages, currentQuestion]);
+
+  // 🔥 Auto-remplir la première question si on a une passion pré-remplie
+  useEffect(() => {
+    if (currentQuestion?.number === 1 && prefilledAnswer && !value) {
+      console.log('[OnboardingDynamic] Auto-remplissage de la Q1:', prefilledAnswer);
+      setValue(prefilledAnswer);
+    }
+  }, [currentQuestion, prefilledAnswer]);
 
   const buildMessagesFromHistory = (history) => {
     const msgs = [];
@@ -130,38 +114,22 @@ export default function OnboardingDynamic() {
   const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
     try {
       const firstName = localStorage.getItem('onboarding_firstName') || '';
-
-      // 🔥 ÉTAPE 1 : Ajouter réponse utilisateur immédiatement
+      
+      // Ajouter la réponse utilisateur IMMÉDIATEMENT (optimistic update)
       if (lastAnswer && currentQuestion) {
-        // On ajoute d'abord la question qui vient d'être répondue à l'historique
-        const questionMessage = {
-          id: `q-temp-${Date.now()}`,
-          sender: 'noah',
-          content: currentQuestion.text || currentQuestion.title
-        };
-
         const userMessage = {
           id: `temp-user-${Date.now()}`,
           sender: 'user',
           content: typeof lastAnswer === 'string' ? lastAnswer : JSON.stringify(lastAnswer)
         };
-        setMessages(prev => [...prev, questionMessage, userMessage]);
+        setMessages(prev => [...prev, userMessage]);
       }
 
-      // 🔥 ÉTAPE 2 : Noah réfléchit (animation cerveau)
-      setIsThinking(true);
-
-      // Optimisation: Exécution en parallèle de l'appel API et du délai minimum
-      // On réduit le temps d'attente perçu (max(1s, temps_api) au lieu de 2s + temps_api)
-      const [response] = await Promise.all([
-        base44.functions.invoke('onboardingNextQuestion', {
-          sessionId,
-          userAnswer: lastAnswer,
-          firstName
-        }),
-        new Promise(resolve => setTimeout(resolve, 1000))
-      ]);
-      const { data } = response;
+      const { data } = await base44.functions.invoke('onboardingNextQuestion', {
+        sessionId,
+        userAnswer: lastAnswer,
+        firstName
+      });
 
       if (data.done || data.isDone) {
         await base44.entities.Session.update(sessionId, {
@@ -171,27 +139,34 @@ export default function OnboardingDynamic() {
         return;
       }
 
-      // Récupérer session mise à jour
+      // Récupérer la session mise à jour pour la synchronisation
       const updatedSessions = await base44.entities.Session.filter({ id: sessionId });
       if (updatedSessions && updatedSessions.length > 0) {
         const freshSession = updatedSessions[0];
         setSession(freshSession);
-
+        setQuestionCount(Math.min(freshSession.onboarding_history?.length || 0, 11));
+        
+        // Reconstruire les messages depuis l'historique pour éviter les duplications
         const historicMessages = buildMessagesFromHistory(freshSession.onboarding_history || []);
         setMessages(historicMessages);
       }
 
-      // 🔥 ÉTAPE 3 : Fin de la réflexion, début du typing
+      // Ajouter la nouvelle question de Noah IMMÉDIATEMENT
       if (data.nextQuestion) {
-        setIsThinking(false);
-
+        const questionText = data.nextQuestion.text || data.nextQuestion.title;
+        const noahMessage = {
+          id: `noah-${Date.now()}`,
+          sender: 'noah',
+          content: questionText
+        };
+        
+        setMessages(prev => [...prev, noahMessage]);
         setCurrentQuestion(data.nextQuestion);
         initializeValue(data.nextQuestion.type, data.nextQuestion);
       }
 
     } catch (error) {
       console.error('Error fetching next question:', error);
-      setIsThinking(false);
     } finally {
       setIsLoading(false);
       setIsSaving(false);
@@ -209,7 +184,9 @@ export default function OnboardingDynamic() {
     setIsSaving(true);
 
     const normalizedAnswer = typeof value === 'string' ? value : JSON.stringify(value);
+    
     await fetchNextQuestion(session.id, normalizedAnswer);
+    
     setValue('');
   };
 
@@ -246,17 +223,17 @@ export default function OnboardingDynamic() {
           const upload = await base44.integrations.Core.UploadFile({ file });
           const { data } = await base44.functions.invoke('transcribeAudio', { audioUrl: upload.file_url });
           setValue(prev => prev ? `${prev}\n${data.text}` : data.text);
-        } catch (err) {
-          console.error('Transcription error:', err);
-        } finally {
-          setIsTranscribing(false);
+        } catch (err) { 
+          console.error('Transcription error:', err); 
+        } finally { 
+          setIsTranscribing(false); 
         }
         stream.getTracks().forEach(t => t.stop());
       };
       mediaRecorderRef.current.start();
       setIsRecording(true);
-    } catch (err) {
-      console.error('Recording error:', err);
+    } catch (err) { 
+      console.error('Recording error:', err); 
     }
   };
 
@@ -267,9 +244,7 @@ export default function OnboardingDynamic() {
     }
   };
 
-// Compter uniquement les messages utilisateur (réponses données)
-const userMessagesCount = messages.filter(msg => msg.sender === 'user').length;
-const progress = Math.min((userMessagesCount / 11) * 100, 100);
+  const progress = Math.min(((session?.onboarding_history?.length || 0) / 11) * 100, 100);
   const completedSteps = (session?.onboarding_history?.length || 0) >= 11 ? [1] : [];
 
   return (
@@ -277,7 +252,7 @@ const progress = Math.min((userMessagesCount / 11) * 100, 100);
       <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progress} />
 
       <div className="flex-1 flex flex-col lg:ml-80 h-screen relative">
-        {/* Header */}
+        {/* Header Parcours - Hidden on mobile as sidebar handles it */}
         <div className="hidden lg:block sticky top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
           <div className="px-6 py-4 flex items-center justify-end max-w-4xl mx-auto w-full">
             <div className="flex flex-col items-end">
@@ -296,13 +271,13 @@ const progress = Math.min((userMessagesCount / 11) * 100, 100);
           </div>
         </div>
 
-        {/* Messages Area */}
+        {/* Messaging Area */}
         <div className="flex-1 overflow-y-auto pt-48 md:pt-32 pb-80 px-4 md:px-6">
           <div className="max-w-3xl mx-auto space-y-8">
-            {/* Intro */}
+            {/* Intro Message */}
             <div className="flex justify-center w-full px-6 py-6">
               <p className="text-gray-400 text-[11px] md:text-xs text-center max-w-sm leading-relaxed font-medium uppercase tracking-wider opacity-70">
-                Je vais te poser quelques questions pour comprendre ton univers.
+                C'est un plaisir de t'aider à structurer ton projet ! <br /> Je vais te poser quelques questions pour comprendre ton univers.
               </p>
             </div>
 
@@ -337,53 +312,7 @@ const progress = Math.min((userMessagesCount / 11) * 100, 100);
               ))}
             </AnimatePresence>
 
-            {/* 🔥 ANIMATION RÉFLEXION (Cerveau qui pulse) */}
-            {isThinking && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="flex gap-4"
-              >
-                <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center flex-shrink-0 mt-1">
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      rotate: [0, 5, -5, 0]
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <Brain className="w-8 h-8 text-[#61f7a2]" />
-                  </motion.div>
-                </div>
-                <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-4 shadow-sm">
-                  <p className="text-gray-400 text-sm italic">Noah réfléchit...</p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* 🔥 TYPING EFFECT sur nouvelle question */}
-            {!isThinking && currentQuestion && displayedText && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex gap-4"
-              >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
-                  <Brain className="w-5 h-5 text-white" />
-                </div>
-                <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-4 shadow-sm text-sm md:text-base leading-relaxed text-gray-800 max-w-[85%]">
-                  {displayedText}
-                  {isTyping && <span className="inline-block w-0.5 h-4 bg-[#61f7a2] ml-0.5 animate-pulse" />}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Loader initial */}
+            {/* Loader uniquement au premier chargement */}
             {isLoading && messages.length === 0 && (
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
@@ -399,7 +328,7 @@ const progress = Math.min((userMessagesCount / 11) * 100, 100);
               </div>
             )}
 
-            {/* Badge dernière question */}
+            {/* Dernière question badge si c'est la 11ème */}
             {currentQuestion && (session?.onboarding_history?.length || 0) === 10 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -422,7 +351,7 @@ const progress = Math.min((userMessagesCount / 11) * 100, 100);
           <div className="max-w-3xl mx-auto">
             <motion.div layout className="bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden">
               <div className="p-4 md:p-6">
-                {currentQuestion && !isLoading && !isThinking ? (
+                {currentQuestion && !isLoading ? (
                   <div className="space-y-4">
                     {currentQuestion.type === 'text' && (
                       <div className="relative group">
@@ -558,6 +487,15 @@ const progress = Math.min((userMessagesCount / 11) * 100, 100);
           </div>
         </div>
       </div>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .pulse-noah { animation: noahpulse 2s infinite; }
+        @keyframes noahpulse {
+          0% { box-shadow: 0 0 0 0px rgba(97, 247, 162, 0.4); }
+          70% { box-shadow: 0 0 0 12px rgba(97, 247, 162, 0); }
+          100% { box-shadow: 0 0 0 0px rgba(97, 247, 162, 0); }
+        }
+      `}} />
     </div>
   );
 }

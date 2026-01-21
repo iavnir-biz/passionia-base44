@@ -156,23 +156,18 @@ export default function BonneNouvelle() {
       console.error('Error generating analysis:', error);
       const summary = currentSession?.onboarding_summary || {};
       const who = summary.who_to_teach || 'ta compétence';
-      const profile = summary.learner_profile || 'des personnes motivées';
 
       setMarketAnalysis({
         validationText: `${user?.firstName || ''}, les personnes que tu veux aider font face à un blocage réel. Ce problème les empêche de progresser efficacement.\n\nCe que tu proposes répond directement à ce blocage : un résultat rapide dès le départ, puis une transformation durable. Cette progression claire crée une valeur perçue forte.\n\nTon objectif de revenus est cohérent avec les formats que tu as choisis et le niveau de transformation que tu apportes. Le ratio effort/revenus est favorable.`,
         marketScores: {
           marketSize: 68,
           demandIntensity: 74,
-          revenueRecurrence: 70,
-          onlineAccessibility: 82,
-          easeOfImplementation: 71
+          revenueRecurrence: 70
         },
         scoreExplanations: {
           marketSize: "Score modéré car audience ciblée spécifique.",
           demandIntensity: "Score élevé car besoin identifié et douleur concrète.",
-          revenueRecurrence: "Score élevé car potentiel de récurrence.",
-          onlineAccessibility: "Score très élevé car formats digitaux scalables.",
-          easeOfImplementation: "Score modéré car mise en œuvre progressive requise."
+          revenueRecurrence: "Score élevé car potentiel de récurrence."
         },
         summary
       });
@@ -197,7 +192,7 @@ export default function BonneNouvelle() {
     return <OfferTransition message="Noah prépare ta vision future..." onComplete={handleTransitionComplete} />;
   }
 
-  // 🔥 REVENUE depuis Session (pas User)
+  // 🔥 REVENUE depuis Session
   const finalized = session?.finalized_offer || null;
   const myOffers = session?.my_generated_offers || null;
 
@@ -211,7 +206,6 @@ export default function BonneNouvelle() {
   let revenues = [];
   let revenueSource = 'defaults';
 
-  // Priorité 1: my_generated_offers
   if (myOffers?.low || myOffers?.bump || myOffers?.mid || myOffers?.high) {
     revenueSource = 'my_generated_offers';
     revenues = [
@@ -227,9 +221,7 @@ export default function BonneNouvelle() {
         total: (price > 0 ? price : defaultRevenues[idx].price) * p.multiplier
       };
     });
-  }
-  // Priorité 2: finalized_offer
-  else if (finalized?.mainProduct || finalized?.upsell1 || finalized?.upsell2 || finalized?.upsell3) {
+  } else if (finalized?.mainProduct || finalized?.upsell1 || finalized?.upsell2 || finalized?.upsell3) {
     revenueSource = 'finalized_offer';
     revenues = [
       { key: 'main', label: 'Produit Principal', data: finalized.mainProduct, multiplier: 30 },
@@ -244,32 +236,19 @@ export default function BonneNouvelle() {
         total: (price > 0 ? price : defaultRevenues[idx].price) * p.multiplier
       };
     });
-  }
-  // Fallback: defaults
-  else {
+  } else {
     revenues = defaultRevenues.map(p => ({ ...p, total: p.price * p.multiplier }));
   }
 
   const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
 
-  console.log('[BONNENOUVELLE][REVENUE]', {
-    source: revenueSource,
-    totalMonthly,
-    hasFinalized: !!finalized,
-    hasMyOffers: !!myOffers
-  });
-
   const scores = marketAnalysis?.marketScores || {};
-  const scoreExplanations = marketAnalysis?.scoreExplanations || {};
-  const summary = marketAnalysis?.summary || {};
-
-  const completedSteps = [1, 2, 3, 4]; // Jusqu'à Tes offres complété
+  const completedSteps = [1, 2, 3, 4];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
       <OnboardingSidebar currentPage="BonneNouvelle" completedSteps={completedSteps} progressInStep={0} />
 
-      {/* Content */}
       <div className="flex-1 w-full flex flex-col lg:ml-80 pt-32 lg:pt-0 overflow-x-hidden relative">
         <div className="py-12">
           <div className="max-w-3xl mx-auto px-4">
@@ -286,7 +265,6 @@ export default function BonneNouvelle() {
                 Ton marché est réel et viable
               </p>
 
-              {/* CTA Button moved underneath subtitle as requested */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -300,7 +278,7 @@ export default function BonneNouvelle() {
               </motion.div>
             </motion.div>
 
-            {/* Validation Text Block - Emotional */}
+            {/* 🔥 BLOC 1 : Validation Text - UTILISE LA FUNCTION */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -313,52 +291,15 @@ export default function BonneNouvelle() {
                   <span className="text-gray-600">Noah analyse le marché...</span>
                 </div>
               ) : (
-                <div className="space-y-5 text-gray-700 leading-relaxed text-base">
-                  <p>
-                    Après analyse de ton marché autour de <strong>{summary.coreSkill || summary.who_to_teach || 'ta compétence'}</strong>, une chose ressort très clairement.
-                  </p>
-                  <p>
-                    Nous sommes en 2024–2025, et jamais autant de personnes n'ont cherché à apprendre, progresser ou se former sur ce sujet. Ce n'est pas une intuition. Les données montrent une augmentation forte de l'intérêt, une douleur bien identifiée, et surtout un comportement d'achat déjà existant.
-                  </p>
-                  <p className="font-medium text-gray-900">
-                    Autrement dit : tu n'arrives pas trop tôt. Tu arrives au bon moment.
-                  </p>
+                <div className="space-y-5 text-gray-700 leading-relaxed text-base whitespace-pre-line">
+                  {marketAnalysis?.validationText || 'Analyse en cours...'}
                 </div>
               )}
             </motion.div>
 
-            {/* Contextual Proof Block with Sources */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8 mb-8"
-            >
-              <h2 className="text-xl font-bold text-gray-900 mb-6">
-                🔍 Ce que montrent les données récentes
-              </h2>
+            {/* 🔥 BLOC 2 : Preuves - SUPPRIMÉ (déjà dans validationText) */}
 
-              {isGenerating ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="border-l-4 border-[#61f7a2] pl-4 py-3">
-                    <p className="text-gray-700 text-base">
-                      • Intérêt croissant pour les solutions en ligne autour de <strong>{summary.coreSkill || 'ta compétence'}</strong> avec une forte croissance observée sur les 12 derniers mois.
-                    </p>
-                  </div>
-                  <div className="border-l-4 border-[#61f7a2] pl-4 py-3">
-                    <p className="text-gray-700 text-base">
-                      • Les personnes cherchent déjà des réponses : comportement d'achat confirmé, demande active, et solutions partielles existantes validant le marché.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-
-            {/* Market Potential Indicators */}
+            {/* 🔥 BLOC 3 : Market Potential Indicators */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -377,21 +318,21 @@ export default function BonneNouvelle() {
                 <div className="space-y-6">
                   <ProgressBarItem
                     label="Potentiel du marché"
-                    value={scores.marketSize || scores.taille_du_probleme || 75}
+                    value={scores.marketSize || 75}
                     explanation="Taille et accessibilité de l'audience pour ton offre."
                     icon={Globe}
                     delay={0}
                   />
                   <ProgressBarItem
                     label="Évolution récente"
-                    value={scores.demandIntensity || scores.intensite_de_la_douleur || 78}
+                    value={scores.demandIntensity || 78}
                     explanation="Croissance de l'intérêt sur les 12 derniers mois."
                     icon={TrendingUp}
                     delay={0.1}
                   />
                   <ProgressBarItem
                     label="Potentiel de monétisation"
-                    value={scores.revenueRecurrence || scores.potentiel_de_monetisation || 80}
+                    value={scores.revenueRecurrence || 80}
                     explanation="Capacité à générer des revenus stables avec les bons formats."
                     icon={Package}
                     delay={0.2}
@@ -425,7 +366,6 @@ export default function BonneNouvelle() {
                 </div>
               </div>
 
-              {/* Big Number */}
               <motion.div
                 className="text-center py-6 md:py-8 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20"
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -438,7 +378,6 @@ export default function BonneNouvelle() {
                 <p className="text-white/90 mt-2 md:mt-4 text-lg md:text-xl font-bold drop-shadow-sm">💰 par mois</p>
               </motion.div>
 
-              {/* Toggle Detail */}
               <button
                 onClick={() => setShowDetail(!showDetail)}
                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-white hover:bg-white/10 transition-all font-medium mt-4"
@@ -454,7 +393,6 @@ export default function BonneNouvelle() {
                 )}
               </button>
 
-              {/* Detail Breakdown */}
               {showDetail && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
@@ -487,7 +425,7 @@ export default function BonneNouvelle() {
               )}
             </motion.div>
 
-            {/* Conclusion Block */}
+            {/* Conclusion */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

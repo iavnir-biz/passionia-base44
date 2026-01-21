@@ -267,7 +267,9 @@ export default function OnboardingDynamic() {
     }
   };
 
-  const progress = Math.min(((session?.onboarding_history?.length || 0) / 11) * 100, 100);
+// Compter uniquement les messages utilisateur (réponses données)
+const userMessagesCount = messages.filter(msg => msg.sender === 'user').length;
+const progress = Math.min((userMessagesCount / 11) * 100, 100);
   const completedSteps = (session?.onboarding_history?.length || 0) >= 11 ? [1] : [];
 
   return (

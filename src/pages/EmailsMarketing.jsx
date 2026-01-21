@@ -1,436 +1,357 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
+import React, { useState, useEffect } from 'react';
+import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { motion } from 'framer-motion';
+import Sidebar from '@/components/navigation/Sidebar';
+import TopBar from '@/components/navigation/TopBar';
+import GlowButton from '@/components/ui/GlowButton';
+import { base44 } from '@/api/base44Client';
+import { Send, Copy, Download, Eye, Loader2, Sparkles, Brain, Mail } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { toast } from 'sonner';
+import ChatBubble from '@/components/chat/ChatBubble';
 
-const anthropic = new Anthropic({
-  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
-});
-
-const SYSTEM_PROMPT = `Tu es Noah, expert en email marketing conversationnel et copywriting humain pour créateurs de produits d'information.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 TA MISSION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Créer une SÉQUENCE COMPLÈTE de 5 EMAILS MARKETING pour vendre UN SEUL PRODUIT : le produit LOW TICKET (produit d'entrée, 27-97€).
-
-⚠️ IMPORTANT :
-- Ces emails vendent UN produit simple et accessible
-- PAS une marque, PAS une offre premium
-- Objectif : conversion douce vers le produit d'appel
-- Ton relationnel, pas agressif
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 STRUCTURE DE LA SÉQUENCE (5 EMAILS)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-**EMAIL 1 : LE CONTRASTE** (Jour 1)
-**Objectif :** Faire prendre conscience de l'écart entre aujourd'hui et demain
-**Timing :** Premier contact
-**Structure :**
-- Sujet accrocheur (question ou constat)
-- Situation actuelle frustrante (2-3 paragraphes)
-- Vision de ce qui pourrait changer
-- AUCUNE vente directe
-- Invitation à réfléchir
-- PS optionnel (renforce la réflexion)
-**Longueur :** 200-300 mots
-
-**EMAIL 2 : LA VALIDATION** (Jour 3)
-**Objectif :** Créer la connexion émotionnelle
-**Timing :** 2 jours après email 1
-**Structure :**
-- Sujet empathique
-- "Tu n'es pas seul·e"
-- Histoire personnelle OU cas client (storytelling court)
-- Normalisation du problème
-- Validation des émotions
-- TOUJOURS pas de pression commerciale
-- PS réconfortant
-**Longueur :** 250-350 mots
-
-**EMAIL 3 : LE CALCUL** (Jour 5)
-**Objectif :** Rassurer le cerveau logique
-**Timing :** 2 jours après email 2
-**Structure :**
-- Sujet pragmatique
-- Montrer que c'est faisable
-- Décomposer le chemin en étapes simples
-- Introduction DOUCE du produit low ticket
-- Expliquer pourquoi c'est une bonne première étape
-- Bénéfices concrets et mesurables
-- Lien vers le produit (sans pression)
-- PS avec mini-FAQ ou objection
-**Longueur :** 300-400 mots
-
-**EMAIL 4 : L'IMPACT** (Jour 7)
-**Objectif :** Donner du sens à l'action
-**Timing :** 2 jours après email 3
-**Structure :**
-- Sujet inspirant
-- Vision de transformation
-- Impact personnel (fierté, accomplissement)
-- Sentiment d'avancer ENFIN
-- Le produit présenté comme un LEVIER, pas une fin
-- Témoignage ou résultat client (si disponible)
-- CTA clair mais sans pression
-- PS motivant
-**Longueur :** 300-400 mots
-
-**EMAIL 5 : L'URGENCE** (Jour 10)
-**Objectif :** Déclencher la décision
-**Timing :** 3 jours après email 4 (dernier email)
-**Structure :**
-- Sujet urgent (mais pas manipulateur)
-- Coût de l'inaction (ce qui se passe si tu ne fais rien)
-- Rappel des bénéfices du produit
-- Raison légitime de l'urgence (date limite, places, etc.)
-- CTA direct et clair
-- Garantie ou réassurance
-- PS final (dernière chance, ton bienveillant)
-**Longueur :** 250-350 mots
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎨 STYLE & TON (CRITIQUE)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-**FORMAT ABSOLU :**
-- TEXTE BRUT (plain text, pas de HTML)
-- ZÉRO markdown (pas de **, pas de ##, pas de - pour les listes)
-- Paragraphes courts (2-3 lignes max)
-- Sauts de ligne généreux (lisibilité)
-- Copiable tel quel dans Gmail/Mailchimp/Notion
-
-**TON & VOIX :**
-- Tutoiement EXCLUSIF
-- Langage parlé et naturel
-- Comme si tu écrivais à un ami
-- Simple et accessible
-- Zéro jargon marketing
-- Zéro promesses exagérées
-- Authenticité totale
-
-**PHRASES NATURELLES (exemples) :**
-✅ "Écoute, je vais être honnête avec toi"
-✅ "Je vois plein de gens dans ta situation"
-✅ "C'est vraiment pas sorcier"
-✅ "Tu sais ce qui marche bien ?"
-
-**PHRASES À ÉVITER :**
-❌ "Opportunité unique"
-❌ "Changez votre vie"
-❌ "Système révolutionnaire"
-❌ "Offre exclusive"
-❌ "Garantie 100%"
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📝 STRUCTURE DE CHAQUE EMAIL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Chaque email doit contenir :
-
-{
-  "subject": "Ligne de sujet (40-60 caractères, accrocheur sans clickbait)",
-  "preheader": "Texte de prévisualisation (50-100 caractères, complète le sujet)",
-  "body": "Corps de l'email (texte brut, paragraphes courts, sauts de ligne)",
-  "ps": "Post-scriptum optionnel (1-2 phrases percutantes)"
-}
-
-**RÈGLES SUJETS :**
-- Court (40-60 caractères max)
-- Question OU constat OU curiosité
-- Personnalisé au problème
-- ZÉRO clickbait manipulateur
-- Doit donner envie d'ouvrir
-
-**Exemples de BONS sujets :**
-✅ "Tu galères avec [problème] ?"
-✅ "Ce qui bloque vraiment..."
-✅ "3 jours pour [résultat]"
-✅ "Pourquoi ça ne marche pas"
-
-**Exemples de MAUVAIS sujets :**
-❌ "OFFRE EXCLUSIVE 🔥"
-❌ "Tu ne vas pas en croire tes yeux"
-❌ "Dernier jour !!!"
-❌ "RE: RE: RE: Important"
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ RÈGLES CRITIQUES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-1. **CONSERVER EXACTEMENT :**
-   - Titre du produit (ne PAS inventer)
-   - Prix du produit (ne PAS changer)
-   - Promesse du produit (ne PAS exagérer)
-
-2. **PERSONNALISATION :**
-   - Utiliser le problème spécifique
-   - Utiliser la transformation promise
-   - Utiliser le vocabulaire de l'avatar
-   - Être spécifique (pas générique)
-
-3. **PROGRESSION :**
-   - Email 1 & 2 : Zéro mention du produit
-   - Email 3 : Introduction douce du produit
-   - Email 4 : Le produit comme solution
-   - Email 5 : Appel à l'action clair
-
-4. **CTA (Call-to-Action) :**
-   - Email 1 & 2 : Pas de CTA produit
-   - Email 3 : CTA soft "Si tu veux en savoir plus..."
-   - Email 4 : CTA moyen "Tu peux commencer ici..."
-   - Email 5 : CTA fort "C'est le dernier jour..."
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📤 FORMAT DE SORTIE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Retourne UNIQUEMENT un JSON valide :
-
-{
-  "email1_contraste": {
-    "title": "Email 1 : Le Contraste",
-    "subject": "...",
-    "preheader": "...",
-    "body": "...",
-    "ps": "..."
+const emailTypes = [
+  {
+    id: 'email1_contraste',
+    title: 'Email 1 : Le Contraste',
+    subtitle: 'Aujourd\'hui vs Demain',
+    description: 'Faire prendre conscience de l\'écart',
+    icon: Send,
+    color: 'from-blue-500 to-cyan-500'
   },
-  "email2_validation": {
-    "title": "Email 2 : La Validation",
-    "subject": "...",
-    "preheader": "...",
-    "body": "...",
-    "ps": "..."
+  {
+    id: 'email2_validation',
+    title: 'Email 2 : La Validation',
+    subtitle: 'Tu n\'es pas seul·e',
+    description: 'Créer la connexion émotionnelle',
+    icon: Send,
+    color: 'from-purple-500 to-pink-500'
   },
-  "email3_calcul": {
-    "title": "Email 3 : Le Calcul",
-    "subject": "...",
-    "preheader": "...",
-    "body": "...",
-    "ps": "..."
+  {
+    id: 'email3_calcul',
+    title: 'Email 3 : Le Calcul',
+    subtitle: 'C\'est faisable',
+    description: 'Rassurer le cerveau logique',
+    icon: Send,
+    color: 'from-orange-500 to-red-500'
   },
-  "email4_impact": {
-    "title": "Email 4 : L'Impact",
-    "subject": "...",
-    "preheader": "...",
-    "body": "...",
-    "ps": "..."
+  {
+    id: 'email4_impact',
+    title: 'Email 4 : L\'Impact',
+    subtitle: 'Donner du sens',
+    description: 'Vision de transformation',
+    icon: Send,
+    color: 'from-amber-500 to-yellow-500'
   },
-  "email5_urgence": {
-    "title": "Email 5 : L'Urgence",
-    "subject": "...",
-    "preheader": "...",
-    "body": "...",
-    "ps": "..."
+  {
+    id: 'email5_urgence',
+    title: 'Email 5 : L\'Urgence',
+    subtitle: 'Déclencher la décision',
+    description: 'Coût de l\'inaction',
+    icon: Send,
+    color: 'from-green-500 to-emerald-500'
   }
-}
+];
 
-Pas de markdown, pas de texte avant/après, juste le JSON pur.`;
+export default function EmailsMarketing() {
+  const { isLoading: authLoading, user } = useRequireAuth();
+  const [loading, setLoading] = useState(false);
+  const [generatedEmails, setGeneratedEmails] = useState(null);
+  const [previewEmail, setPreviewEmail] = useState(null);
+  const [session, setSession] = useState(null);
 
-Deno.serve(async (req) => {
-  try {
-    const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  useEffect(() => {
+    if (user) {
+      loadUserData();
     }
+  }, [user]);
 
-    const body = await req.json().catch(() => ({}));
-    const sessionId = body.sessionId || body.session?.id || user.sessionId;
-
-    if (!sessionId) {
-      return Response.json({ error: 'sessionId required' }, { status: 400 });
-    }
-
-    // Get session
-    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
-    if (!sessions || sessions.length === 0) {
-      return Response.json({ error: 'Session not found' }, { status: 404 });
-    }
-
-    const session = sessions[0];
-
-    // Check cache
-    if (session.generated_marketing_emails && Object.keys(session.generated_marketing_emails).length === 5) {
-      return Response.json({
-        success: true,
-        emails: session.generated_marketing_emails,
-        fromCache: true
-      });
-    }
-
-    const finalizedOffer = session.finalized_offer || {};
-    const onboardingSummary = session.onboarding_summary || {};
-    const onboardingFull = session.onboarding_full || {};
-    const avatars = session.generated_avatars || {};
-
-    // Get main product (low ticket)
-    const mainProduct = finalizedOffer.mainProduct || {};
-    
-    if (!mainProduct.title || !mainProduct.price) {
-      return Response.json({
-        error: 'Produit principal incomplet'
-      }, { status: 400 });
-    }
-
-    const userPrompt = `CONTEXTE DU PROJET :
-
-**Créateur :**
-Prénom : ${user.firstName || user.full_name || 'le créateur'}
-
-**Compétence enseignée :**
-${session.skill || onboardingSummary.who_to_teach || 'Non défini'}
-
-**Audience cible :**
-${onboardingSummary.learner_profile || 'Non défini'}
-
-**Problème principal :**
-${onboardingSummary.main_learning_problem || 'Non défini'}
-
-**Quick win promis :**
-${onboardingSummary.quick_win || 'Non défini'}
-
-**Grande transformation :**
-${onboardingSummary.big_transformation || 'Non défini'}
-
-**Méthode/Angle unique :**
-${onboardingSummary.method_angle || 'Non défini'}
-
-**Erreur typique à éviter :**
-${onboardingSummary.common_mistake || 'Non défini'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PRODUIT À VENDRE (PRODUIT PRINCIPAL - LOW TICKET) :
-
-**Titre :** ${mainProduct.title}
-**Prix :** ${mainProduct.price}
-**Format :** ${mainProduct.productType || 'Formation'}
-**Description :** ${mainProduct.description || mainProduct.subtitle || ''}
-
-⚠️ CRITIQUE : TU DOIS utiliser EXACTEMENT ce titre et ce prix.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-AVATARS CLIENTS (pour personnalisation) :
-${JSON.stringify(avatars, null, 2)}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 TA MISSION :
-
-Génère une SÉQUENCE COMPLÈTE de 5 EMAILS selon la structure définie.
-
-**RÈGLES CRITIQUES :**
-
-1. **Utilise les vraies données :**
-   - Titre exact : "${mainProduct.title}"
-   - Prix exact : ${mainProduct.price}
-   - Problème réel : "${onboardingSummary.main_learning_problem}"
-   - Transformation réelle : "${onboardingSummary.big_transformation}"
-
-2. **Progression naturelle :**
-   - Email 1 : Contraste (pas de vente)
-   - Email 2 : Validation (pas de vente)
-   - Email 3 : Calcul (introduction douce)
-   - Email 4 : Impact (le produit comme levier)
-   - Email 5 : Urgence (appel à l'action)
-
-3. **Style conversationnel :**
-   - Texte brut (pas de markdown)
-   - Paragraphes courts
-   - Langage naturel
-   - Tutoiement exclusif
-
-4. **Personnalisation :**
-   - Vocabulaire des avatars
-   - Situations concrètes
-   - Frustrations spécifiques
-
-**Exemple de BON email 1 (Contraste) :**
-
-Sujet : Tu galères avec [problème] ?
-
-Tu sais ce moment où tu te dis :
-"J'ai l'idée, mais je ne sais pas par où commencer" ?
-
-C'est exactement là où sont coincés la plupart des [audience].
-
-L'idée est là.
-La motivation aussi.
-
-Mais entre l'idée et le résultat, y'a ce truc énorme qui bloque.
-
-[développement 2-3 paragraphes]
-
-Bref, je voulais juste te dire : tu n'es pas seul·e.
-
-À bientôt,
-[Prénom]
-
-P.S. : Demain, je te raconte comment j'ai débloqué ça.
-
----
-
-Génère maintenant les 5 emails complets en JSON.`;
-
-    console.log('ANTHROPIC_CALL start', {
-      fn: 'generateMarketingEmail',
-      sessionId,
-      model: 'claude-sonnet-4-20250514'
-    });
-
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 12000,
-      system: SYSTEM_PROMPT,
-      messages: [
-        { role: "user", content: userPrompt }
-      ]
-    });
-
-    console.log('ANTHROPIC_CALL end', {
-      fn: 'generateMarketingEmail',
-      sessionId,
-      usage: message.usage
-    });
-
-    const responseText = message.content[0].type === 'text'
-      ? message.content[0].text.trim()
-      : '{}';
-
-    // Clean potential markdown
-    const cleanedResponse = responseText
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
-
-    let marketingEmails;
+  const loadUserData = async () => {
     try {
-      marketingEmails = JSON.parse(cleanedResponse);
-    } catch (e) {
-      console.error('JSON parse error:', e);
-      return Response.json({
-        error: 'Failed to parse marketing emails',
-        details: e.message
-      }, { status: 500 });
+      const sessionRes = await base44.entities.Session.filter({ 
+        created_by: user.email 
+      });
+
+      if (sessionRes.length > 0) {
+        const userSession = sessionRes[0];
+        setSession(userSession);
+        
+        // Charger les emails générés depuis la session
+        if (userSession.generated_marketing_emails) {
+          console.log('Emails loaded from session:', userSession.generated_marketing_emails);
+          setGeneratedEmails(userSession.generated_marketing_emails);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
+
+  const handleGenerateAll = async () => {
+    if (!session) {
+      toast.error('Session introuvable');
+      return;
     }
 
-    // Save to session
-    await base44.asServiceRole.entities.Session.update(sessionId, {
-      generated_marketing_emails: marketingEmails
-    });
+    setLoading(true);
+    try {
+      console.log('Generating all emails for session:', session.id);
+      
+      const response = await base44.functions.invoke('generateMarketingEmail', {
+        sessionId: session.id
+      });
 
-    console.log('✅ [generateMarketingEmail] Saved to session', { sessionId });
+      console.log('Response:', response);
 
-    return Response.json({
-      success: true,
-      emails: marketingEmails
-    });
+      if (response.data?.success && response.data?.emails) {
+        setGeneratedEmails(response.data.emails);
+        toast.success('Les 5 emails ont été générés !');
+        
+        // Recharger pour confirmer
+        await loadUserData();
+      } else {
+        throw new Error('Format de réponse invalide');
+      }
+    } catch (error) {
+      console.error('Error generating emails:', error);
+      toast.error('Erreur lors de la génération : ' + (error.message || 'Erreur inconnue'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  } catch (error) {
-    console.error('Error in generateMarketingEmail:', error);
-    return Response.json({
-      error: error.message,
-      details: error.stack
-    }, { status: 500 });
+  const handleCopy = (content) => {
+    const fullContent = `${content.subject}\n\n${content.preheader}\n\n${content.body}\n\n${content.ps || ''}`;
+    navigator.clipboard.writeText(fullContent);
+    toast.success('Email copié dans le presse-papier !');
+  };
+
+  const handleDownload = (content, filename) => {
+    const fullContent = `Sujet: ${content.subject}\n\nPreheader: ${content.preheader}\n\n${content.body}\n\n${content.ps || ''}`;
+    const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white">
+        <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
+      </div>
+    );
   }
-});
+
+  return (
+    <div className="flex min-h-screen bg-white">
+      <Sidebar currentPage="EmailsMarketing" />
+      
+      <div className="flex-1 ml-72">
+        <TopBar 
+          title="Emails Marketing" 
+          subtitle="Séquence de 5 emails pour vendre ton produit"
+          user={user}
+        />
+
+        <main className="p-8">
+          <div className="max-w-6xl mx-auto space-y-8">
+            
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-left"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
+                <Brain className="w-4 h-4 text-[#61f7a2]" />
+                <span className="text-xs font-medium text-gray-700">Générés par Claude</span>
+              </div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+                Séquence d'emails marketing
+              </h1>
+              <p className="text-gray-600 text-lg mb-6">
+                5 emails pour convertir ton audience en clients
+              </p>
+
+              {/* Generate All Button */}
+              {!generatedEmails && (
+                <GlowButton
+                  onClick={handleGenerateAll}
+                  variant="primary"
+                  size="lg"
+                  loading={loading}
+                  icon={Sparkles}
+                  className="mb-8"
+                >
+                  {loading ? 'Génération en cours...' : 'Générer les 5 emails'}
+                </GlowButton>
+              )}
+
+              {generatedEmails && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-8 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-green-900 font-semibold">
+                      Tes 5 emails sont prêts !
+                    </p>
+                    <p className="text-green-700 text-sm">
+                      Clique sur un email pour le voir en détail
+                    </p>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+
+            {/* Email Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {emailTypes.map((email, index) => {
+                const emailContent = generatedEmails?.[email.id];
+                const hasContent = !!emailContent;
+
+                return (
+                  <motion.div
+                    key={email.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    className={cn(
+                      "bg-gray-50 border rounded-2xl p-6 transition-all",
+                      hasContent ? "border-gray-300 hover:border-[#61f7a2]" : "border-gray-200"
+                    )}
+                  >
+                    {/* Icon Header */}
+                    <div className={cn(
+                      "w-14 h-14 rounded-xl bg-gradient-to-br flex items-center justify-center mb-4",
+                      email.color
+                    )}>
+                      <email.icon className="w-7 h-7 text-white" />
+                    </div>
+
+                    {/* Content */}
+                    <p className="text-[#61f7a2] text-xs font-semibold uppercase tracking-wide mb-1">
+                      {email.subtitle}
+                    </p>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                      {email.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-6">{email.description}</p>
+
+                    {/* Actions */}
+                    {hasContent ? (
+                      <div className="space-y-3">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setPreviewEmail({ 
+                              type: email.id, 
+                              content: emailContent, 
+                              title: email.title 
+                            })}
+                            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
+                          >
+                            <Eye className="w-4 h-4" />
+                            <span className="text-sm font-medium">Voir</span>
+                          </button>
+                          <button
+                            onClick={() => handleCopy(emailContent)}
+                            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
+                            title="Copier"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDownload(emailContent, email.id)}
+                            className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-900"
+                            title="Télécharger"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* Preview Modal */}
+      {previewEmail && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden border border-gray-200 shadow-2xl"
+          >
+            {/* Header */}
+            <div className="bg-gray-100 p-6 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-gray-700" />
+                <h3 className="text-lg font-bold text-gray-900">{previewEmail.title}</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleCopy(previewEmail.content)}
+                  className="px-3 py-1.5 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 transition-all flex items-center gap-2 text-gray-700"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span className="text-sm font-medium">Copier</span>
+                </button>
+                <button
+                  onClick={() => setPreviewEmail(null)}
+                  className="text-gray-500 hover:text-gray-900 transition-colors text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-8 overflow-y-auto max-h-[calc(85vh-100px)] bg-white">
+              {/* Subject */}
+              <div className="mb-6 pb-6 border-b border-gray-200">
+                <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Sujet</p>
+                <p className="text-xl font-bold text-gray-900">{previewEmail.content.subject}</p>
+              </div>
+
+              {/* Preheader */}
+              <div className="mb-6 pb-6 border-b border-gray-200">
+                <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Prévisualisation</p>
+                <p className="text-gray-700">{previewEmail.content.preheader}</p>
+              </div>
+
+              {/* Body */}
+              <div className="mb-6 pb-6 border-b border-gray-200">
+                <p className="text-xs text-gray-500 uppercase font-semibold mb-3">Corps de l'email</p>
+                <div className="text-gray-800 leading-relaxed whitespace-pre-line">
+                  {previewEmail.content.body}
+                </div>
+              </div>
+
+              {/* PS */}
+              {previewEmail.content.ps && (
+                <div>
+                  <p className="text-xs text-gray-500 uppercase font-semibold mb-3">Post-Scriptum</p>
+                  <p className="text-gray-800 italic">{previewEmail.content.ps}</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Chat Bubble */}
+      <ChatBubble />
+    </div>
+  );
+}

@@ -6,18 +6,15 @@ import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from "framer-motion";
 import {
   Target,
-  Calendar,
-  FileText,
-  Sparkles,
   ArrowRight,
   CheckCircle,
-  Lock,
   User,
   MessageCircle,
   Send,
   Package,
   Users,
-  Video
+  FileText,
+  Loader2
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -85,21 +82,20 @@ export default function Dashboard() {
     }
   }, [isAuthenticated]);
 
-  // 🔥 Recharger la progression depuis la base tous les 1000ms (sync live)
+  // 🔥 Polling si génération en cours
   useEffect(() => {
-    if (profile?.id) {
+    if (session?.generation_in_progress) {
       const interval = setInterval(() => {
         loadData();
-      }, 1000);
+      }, 3000);
       return () => clearInterval(interval);
     }
-  }, [profile?.id]);
+  }, [session?.generation_in_progress]);
 
   const checkGenerationComplete = async () => {
     try {
       const currentUser = await base44.auth.me();
 
-      // ✅ Vérifier si profil complet
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       if (profiles.length === 0 || !profiles[0].first_name) {
         navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
@@ -108,7 +104,7 @@ export default function Dashboard() {
 
       loadData();
     } catch (error) {
-      console.error('[Dashboard] Error checking generation:', error);
+      console.error('[Dashboard] Error:', error);
       loadData();
     }
   };
@@ -136,59 +132,47 @@ export default function Dashboard() {
   };
 
   const calculateProgress = () => {
-    // 🔥 Progression basée sur les TÂCHES réellement cochées du Plan d'action
     if (!profile?.plan_7days_progress) return 0;
-
     const completedDays = Object.keys(profile.plan_7days_progress).filter(
       key => profile.plan_7days_progress[key]?.completed
     ).length;
-
     return Math.round((completedDays / 7) * 100);
   };
 
   const getCurrentStep = () => {
-    // 🔥 Lire le progrès RÉEL depuis le plan d'action (UserProfile)
     if (!profile?.plan_7days_progress) return 1;
-
     const completedDays = Object.keys(profile.plan_7days_progress).filter(
       key => profile.plan_7days_progress[key]?.completed
     ).length;
-
     return Math.min(completedDays + 1, 7);
   };
 
   const getNextIncompleteTask = () => {
-    // 🔥 Calculer la VRAIE première tâche incomplète
     if (!profile?.plan_7days_progress) return dailyMissions[0];
-
-    // Trouver le jour courant basé sur les jours complétés
     const completedDays = Object.keys(profile.plan_7days_progress).filter(
       key => profile.plan_7days_progress[key]?.completed
     ).length;
-
     const currentDayNum = Math.min(completedDays + 1, 7);
-
-    // ✅ Retourner la mission du jour courant
     return dailyMissions[currentDayNum - 1] || dailyMissions[6];
   };
 
   const livrables = [
-    { title: "Offres", page: "MyOffers", icon: Package },
-    { title: "Messages", page: "SalesMessages", icon: MessageCircle },
-    { title: "Emails", page: "EmailsMarketing", icon: Send },
-    { title: "Page de vente", page: "SalesPage", icon: FileText },
-    { title: "Avatars", page: "AvatarClients", icon: Users },
-    { title: "Analyse marché", page: "MarketAnalysis", icon: Target }
+    { title: "Analyse SWOT", page: "MarketAnalysis", icon: Target, field: "complete_market_analysis" },
+    { title: "3 Avatars", page: "AvatarClients", icon: Users, field: "generated_avatars" },
+    { title: "4 Offres", page: "MyOffers", icon: Package, field: "detailed_offers" },
+    { title: "Messages", page: "SalesMessages", icon: MessageCircle, field: "generated_sales_messages" },
+    { title: "Emails", page: "EmailsMarketing", icon: Send, field: "generated_marketing_emails" },
+    { title: "Page de vente", page: "SalesPage", icon: FileText, field: "generated_sales_pages" }
   ];
+
+  const countGenerated = () => livrables.filter(item => session?.[item.field]).length;
 
   if (authLoading || loading) {
     return (
       <div className="flex min-h-screen bg-white">
         <Sidebar currentPage="Dashboard" progress={0} />
-        <div className="flex-1 ml-0 lg:ml-72">
-          <div className="flex items-center justify-center h-screen">
-            <div className="animate-spin w-8 h-8 border-2 border-[#61f7a2] border-t-transparent rounded-full" />
-          </div>
+        <div className="flex-1 ml-0 lg:ml-72 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
         </div>
       </div>
     );
@@ -213,135 +197,123 @@ export default function Dashboard() {
         />
 
         <main className="p-8 max-w-6xl mx-auto">
-          {/* 1️⃣ GREETING SIMPLE */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3 mb-2">
-              Hello {user?.first_name || profile?.first_name || ''} <span className="text-4xl">👋</span>
-            </h1>
+          {/* GREETING avec photo */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex items-center gap-4">
+            <div className="flex-shrink-0">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Profil" className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+              )}
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+                Hello {profile?.first_name || user?.first_name || ''} <span className="text-4xl">👋</span>
+              </h1>
+              {session?.generation_in_progress && (
+                <p className="text-sm text-[#61f7a2] font-medium flex items-center gap-2 mt-1">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Noah génère tes documents...
+                </p>
+              )}
+            </div>
           </motion.div>
 
-          {/* 2️⃣ MISSION DU JOUR - SECTION DOMINANTE */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3dd980] rounded-3xl px-6 py-8 md:p-10 mb-8 shadow-2xl"
-          >
+          {/* BANNER génération */}
+          {session?.generation_in_progress && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-8 flex gap-3">
+              <Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-blue-900 font-semibold mb-1">Génération en cours...</p>
+                <p className="text-blue-700 text-sm">Noah génère tes documents. Ça prend 1-2 minutes.</p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* MISSION DU JOUR */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3dd980] rounded-3xl px-6 py-8 md:p-10 mb-8 shadow-2xl">
             <div className="text-left mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center justify-start gap-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center gap-2">
                 <Target className="w-8 h-8" />
                 Ta mission aujourd'hui
               </h2>
               <p className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
                 {getNextIncompleteTask()?.title}
               </p>
-              <p className="text-white/90 text-lg">
-                {getNextIncompleteTask()?.description}
-              </p>
+              <p className="text-white/90 text-lg">{getNextIncompleteTask()?.description}</p>
             </div>
-
-            <div className="flex justify-start">
-              <GlowButton
-                onClick={() => navigate(createPageUrl(getNextIncompleteTask()?.page))}
-                size="lg"
-                className="bg-white text-gray-900 hover:bg-gray-100 w-full md:w-auto px-6 md:px-12 py-3 md:py-4 text-lg md:text-xl font-bold"
-              >
-                👉 Lancer cette mission
-              </GlowButton>
-            </div>
+            <GlowButton onClick={() => navigate(createPageUrl(getNextIncompleteTask()?.page))} size="lg"
+              className="bg-white text-gray-900 hover:bg-gray-100 w-full md:w-auto px-6 md:px-12 py-3 md:py-4 text-lg md:text-xl font-bold">
+              👉 Lancer cette mission
+            </GlowButton>
           </motion.div>
 
-          {/* 3️⃣ PROGRESSION - COMPACT */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl border border-gray-200 p-6 mb-8"
-          >
+          {/* PROGRESSION */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl border border-gray-200 p-6 mb-8">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Ta progression</p>
                 <p className="text-2xl font-bold text-gray-900">Jour {getCurrentStep()} / 7</p>
               </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold text-[#61f7a2]">{calculateProgress()}%</p>
-              </div>
+              <p className="text-3xl font-bold text-[#61f7a2]">{calculateProgress()}%</p>
             </div>
             <ProgressBar value={calculateProgress()} max={100} className="mb-3" />
-            <p className="text-center text-gray-700 font-medium">
-              Tu es exactement là où tu dois être.
-            </p>
+            <p className="text-center text-gray-700 font-medium">Tu es exactement là où tu dois être.</p>
           </motion.div>
 
-          {/* 4️⃣ LIVRABLES PRÊTS - SECONDAIRE */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-8"
-          >
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Tes livrables sont prêts</h3>
+          {/* LIVRABLES */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Tes documents IA</h3>
+              <span className="text-sm text-gray-600"><span className="font-bold text-[#61f7a2]">{countGenerated()}</span> / {livrables.length}</span>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {livrables.map((item) => {
                 const Icon = item.icon;
+                const isGenerated = session?.[item.field];
                 return (
-                  <Link
-                    key={item.page}
-                    to={createPageUrl(item.page)}
-                    className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-[#61f7a2] hover:shadow-md transition-all"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-gray-700" />
+                  <Link key={item.page} to={createPageUrl(item.page)}
+                    className={`flex items-center gap-3 p-4 bg-white border rounded-xl transition-all ${
+                      isGenerated ? 'border-gray-300 hover:border-[#61f7a2] hover:shadow-md' : 'border-gray-200 opacity-60'
+                    }`}>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isGenerated ? 'bg-gray-100' : 'bg-gray-50'}`}>
+                      <Icon className={`w-5 h-5 ${isGenerated ? 'text-gray-700' : 'text-gray-400'}`} />
                     </div>
-                    <span className="font-medium text-gray-900 text-sm">{item.title}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-gray-900 text-sm truncate">{item.title}</span>
+                        {isGenerated ? <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" /> : <Loader2 className="w-4 h-4 text-gray-400 animate-spin flex-shrink-0" />}
+                      </div>
+                    </div>
                   </Link>
                 );
               })}
             </div>
           </motion.div>
 
-          {/* 5️⃣ PLAN 7 JOURS - APERÇU */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-gray-50 rounded-2xl border border-gray-200 p-6"
-          >
+          {/* PLAN 7 JOURS */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            className="bg-gray-50 rounded-2xl border border-gray-200 p-6">
             <p className="text-lg font-bold text-gray-900 mb-4">Tu es au jour {getCurrentStep()}</p>
-
-            {/* Mini timeline */}
             <div className="flex items-center gap-2 mb-6">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                <div
-                  key={day}
-                  className={`flex-1 h-2 rounded-full transition-all ${day < getCurrentStep()
-                    ? 'bg-[#61f7a2]'
-                    : day === getCurrentStep()
-                      ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30'
-                      : 'bg-gray-200'
-                    }`}
-                />
+                <div key={day} className={`flex-1 h-2 rounded-full transition-all ${
+                  day < getCurrentStep() ? 'bg-[#61f7a2]' : day === getCurrentStep() ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30' : 'bg-gray-200'
+                }`} />
               ))}
             </div>
-
-            <Link
-              to={createPageUrl('PlanAction')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 rounded-xl hover:border-[#61f7a2] hover:shadow-md transition-all font-medium text-gray-900"
-            >
+            <Link to={createPageUrl('PlanAction')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 rounded-xl hover:border-[#61f7a2] hover:shadow-md transition-all font-medium text-gray-900">
               Voir le plan complet
               <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
-
-
         </main>
       </div>
-
-      {/* Chat Bubble */}
       <ChatBubble />
     </div>
   );

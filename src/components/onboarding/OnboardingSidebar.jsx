@@ -220,13 +220,16 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                     )}>
                       {step.title}
                     </p>
-                    <span className={cn(
-                      "text-xs font-medium ml-2",
-                      isActive ? "text-[#61f7a2]" : "text-gray-400",
-                      isCompleted && "text-gray-300"
-                    )}>
-                      {isCompleted ? "100%" : isActive ? `${Math.round(progressInStep)}%` : "0%"}
-                    </span>
+                    {/* Pourcentage seulement pour Talents(1), Profil(2), Objectifs(3) */}
+                    {[1, 2, 3].includes(step.id) && (
+                      <span className={cn(
+                        "text-xs font-medium ml-2",
+                        isActive ? "text-[#61f7a2]" : "text-gray-400",
+                        isCompleted && "text-gray-300"
+                      )}>
+                        {isCompleted ? "100%" : isActive ? `${Math.round(progressInStep)}%` : "0%"}
+                      </span>
+                    )}
                   </div>
 
                   {/* Active indicator */}
@@ -234,7 +237,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                     isActive && (
                       <motion.div
                         layoutId="activeIndicator"
-                        className="absolute right-3 w-2 h-2 rounded-full bg-[#61f7a2]"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#61f7a2]" // Centré verticalement
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )
@@ -259,7 +262,8 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                 <h1 className="text-[12px] font-bold text-gray-900 leading-none">PASSION IA</h1>
                 <p className="text-[9px] text-gray-500 font-medium mt-0.5">
                   Étape {activeStepId}/8
-                  {totalPagesInStep > 1 && (
+                  {/* Pourcentage mobile aussi restreint aux etapes 1 2 3 */}
+                  {[1, 2, 3].includes(activeStepId) && totalPagesInStep > 1 && (
                     <span className="ml-1 text-[#61f7a2]">
                       • {Math.round(progressInStep)}%
                     </span>
@@ -329,21 +333,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
           </div>
         </div>
 
-        {/* Interactive Step Progress Bar (Bottom Line) */}
-        {totalPagesInStep > 1 && (
-          <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gray-100">
-            <motion.div
-              className="h-full bg-gray-900 relative"
-              initial={{ width: 0 }}
-              animate={{ width: `${progressInStep}%` }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            >
-              {/* Glowing Tip Effect */}
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-8 h-8 bg-gray-900/20 blur-md rounded-full pointer-events-none" />
-              <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(0,0,0,0.5)]" />
-            </motion.div>
-          </div>
-        )}
+        {/* Barre de progression noire du bas supprimee */}
       </div>
     </>
   );

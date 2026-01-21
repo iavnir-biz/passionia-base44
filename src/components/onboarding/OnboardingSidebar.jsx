@@ -73,7 +73,7 @@ const ONBOARDING_STEPS = [
   }
 ];
 
-export default function OnboardingSidebar({ currentPage, completedSteps = [] }) {
+export default function OnboardingSidebar({ currentPage, completedSteps = [], progressInStep = 0 }) {
   const scrollContainerRef = useRef(null);
 
   // Déterminer l'étape active basée sur la page courante
@@ -83,10 +83,16 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
 
   const activeStepId = activeStep?.id || 1;
 
-  // Calculer la progression dans l'étape courante
-  const currentPageIndexInStep = activeStep?.pages.indexOf(currentPage) ?? 0;
-  const totalPagesInStep = activeStep?.pages.length || 1;
-  const progressInStep = ((currentPageIndexInStep + 1) / totalPagesInStep) * 100;
+  // 🔥 MISSION 2 : Fix progression pour OnboardingDynamic
+  // Utiliser progressInStep passé en prop au lieu de calculer localement
+  let calculatedProgress = progressInStep;
+  
+  // Si progressInStep n'est pas fourni, calculer à partir de l'index de page
+  if (progressInStep === 0 && activeStep) {
+    const currentPageIndexInStep = activeStep.pages.indexOf(currentPage) ?? 0;
+    const totalPagesInStep = activeStep.pages.length || 1;
+    calculatedProgress = ((currentPageIndexInStep + 1) / totalPagesInStep) * 100;
+  }
 
   // Auto-scroll pour mobile
   useEffect(() => {
@@ -108,7 +114,6 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
       const lastCompleted = completedSteps[completedSteps.length - 1];
       const previousCompleted = JSON.parse(localStorage.getItem('onboarding_completed_steps') || '[]');
 
-      // Si c'est une nouvelle étape complétée (pas déjà dans le localStorage)
       if (!previousCompleted.includes(lastCompleted)) {
         confetti({
           particleCount: 100,
@@ -168,11 +173,11 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                         transition={{ duration: 0.5 }}
                       />
                     )}
-                    {isActive && progressInStep > 0 && (
+                    {isActive && calculatedProgress > 0 && (
                       <motion.div
                         className="absolute inset-0 bg-[#61f7a2]"
                         initial={{ height: 0 }}
-                        animate={{ height: `${progressInStep}%` }}
+                        animate={{ height: `${calculatedProgress}%` }}
                         transition={{ duration: 0.5 }}
                       />
                     )}
@@ -185,17 +190,24 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                   transition={{ delay: index * 0.1 }}
                   className={cn(
                     "relative flex items-center gap-3 p-3 rounded-xl transition-all duration-300",
+                    // 🔥 MISSION 3 : Étapes 4-8 toujours colorées
                     isActive && "bg-gray-900 shadow-md border border-gray-900 scale-105",
-                    isCompleted && "opacity-60 grayscale hover:grayscale-0 transition-all",
-                    isFuture && "opacity-30 blur-[0.5px]"
+                    isCompleted && step.id <= 3 && "opacity-60 grayscale hover:grayscale-0 transition-all",
+                    isCompleted && step.id > 3 && "opacity-100", // Pas de grayscale pour 4-8
+                    isFuture && step.id <= 3 && "opacity-30 blur-[0.5px]",
+                    isFuture && step.id > 3 && "opacity-100" // Pas de blur pour 4-8
                   )}
                 >
                   {/* Icon */}
                   <div className={cn(
                     "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all relative",
-                    isCompleted ? "bg-gray-100" : isActive ? `bg-gradient-to-br ${step.color}` : "bg-gray-100"
+                    // 🔥 MISSION 3 : Toujours coloré pour étapes 4-8
+                    isCompleted && step.id <= 3 ? "bg-gray-100" : 
+                    isActive ? `bg-gradient-to-br ${step.color}` : 
+                    step.id > 3 ? `bg-gradient-to-br ${step.color}` : // Toujours gradient pour 4-8
+                    "bg-gray-100"
                   )}>
-                    {isCompleted ? (
+                    {isCompleted && step.id <= 3 ? (
                       <>
                         <Icon className="w-5 h-5 text-gray-500" />
                         <motion.div
@@ -207,7 +219,10 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                         </motion.div>
                       </>
                     ) : (
-                      <Icon className={cn("w-5 h-5 text-white")} />
+                      <Icon className={cn(
+                        "w-5 h-5",
+                        step.id > 3 || isActive ? "text-white" : "text-gray-400"
+                      )} />
                     )}
                   </div>
 
@@ -215,11 +230,14 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                   <div className="flex-1 flex items-center justify-between">
                     <p className={cn(
                       "text-sm font-semibold transition-colors",
-                      isActive ? "text-white" : "text-gray-500",
-                      isCompleted && "line-through text-gray-400 decoration-gray-300"
+                      isActive ? "text-white" : 
+                      step.id > 3 ? "text-gray-900" : // Texte noir pour 4-8
+                      "text-gray-500",
+                      isCompleted && step.id <= 3 && "line-through text-gray-400 decoration-gray-300"
                     )}>
                       {step.title}
                     </p>
+                    {/* 🔥 MISSION 1 : Pourcentage SANS point vert */}
                     {/* Pourcentage seulement pour Talents(1), Profil(2), Objectifs(3) */}
                     {[1, 2, 3].includes(step.id) && (
                       <span className={cn(
@@ -227,21 +245,12 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                         isActive ? "text-[#61f7a2]" : "text-gray-400",
                         isCompleted && "text-gray-300"
                       )}>
-                        {isCompleted ? "100%" : isActive ? `${Math.round(progressInStep)}%` : "0%"}
+                        {isCompleted ? "100%" : isActive ? `${Math.round(calculatedProgress)}%` : "0%"}
                       </span>
                     )}
                   </div>
 
-                  {/* Active indicator */}
-                  {
-                    isActive && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#61f7a2]" // Centré verticalement
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )
-                  }
+                  {/* 🔥 MISSION 1 : Point vert SUPPRIMÉ (était ici avant) */}
                 </motion.div>
               </div>
             );
@@ -262,10 +271,10 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                 <h1 className="text-[12px] font-bold text-gray-900 leading-none">PASSION IA</h1>
                 <p className="text-[9px] text-gray-500 font-medium mt-0.5">
                   Étape {activeStepId}/8
-                  {/* Pourcentage mobile aussi restreint aux etapes 1 2 3 */}
-                  {[1, 2, 3].includes(activeStepId) && totalPagesInStep > 1 && (
+                  {/* 🔥 MISSION 2 : Fix progression mobile aussi */}
+                  {[1, 2, 3].includes(activeStepId) && (
                     <span className="ml-1 text-[#61f7a2]">
-                      • {Math.round(progressInStep)}%
+                      • {Math.round(calculatedProgress)}%
                     </span>
                   )}
                 </p>
@@ -303,27 +312,38 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                     "flex items-center gap-2 px-3 py-2 rounded-xl flex-shrink-0 transition-all snap-center border",
                     isActive
                       ? "bg-gray-900 border-gray-900 shadow-md transform scale-105"
-                      : "bg-white border-gray-100",
-                    isCompleted && "opacity-50 border-transparent bg-gray-50",
-                    isFuture && "opacity-30 border-transparent"
+                      : step.id > 3 
+                        ? `bg-gradient-to-br ${step.color} border-transparent` // 🔥 MISSION 3 : Coloré pour 4-8
+                        : "bg-white border-gray-100",
+                    isCompleted && step.id <= 3 && "opacity-50 border-transparent bg-gray-50",
+                    isFuture && step.id <= 3 && "opacity-30 border-transparent"
                   )}
                 >
                   <div className={cn(
                     "w-6 h-6 rounded-lg flex items-center justify-center relative",
-                    isCompleted
+                    isCompleted && step.id <= 3
                       ? "bg-gray-200"
-                      : isActive ? `bg-gradient-to-br ${step.color}` : "bg-gray-100"
+                      : isActive 
+                        ? `bg-gradient-to-br ${step.color}` 
+                        : step.id > 3 
+                          ? "bg-white/20" // Fond semi-transparent pour icône sur fond coloré
+                          : "bg-gray-100"
                   )}>
-                    {isCompleted ? (
+                    {isCompleted && step.id <= 3 ? (
                       <CheckCircle2 className="w-4 h-4 text-gray-500" />
                     ) : (
-                      <Icon className={cn("w-3 h-3", isActive ? "text-white" : "text-gray-400")} />
+                      <Icon className={cn(
+                        "w-3 h-3", 
+                        isActive || step.id > 3 ? "text-white" : "text-gray-400"
+                      )} />
                     )}
                   </div>
                   <span className={cn(
                     "text-xs font-bold whitespace-nowrap",
-                    isActive ? "text-white" : "text-gray-500",
-                    isCompleted && "line-through font-normal"
+                    isActive ? "text-white" : 
+                    step.id > 3 ? "text-white" : // Texte blanc sur fond coloré
+                    "text-gray-500",
+                    isCompleted && step.id <= 3 && "line-through font-normal"
                   )}>
                     {step.title}
                   </span>
@@ -332,8 +352,6 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
             })}
           </div>
         </div>
-
-        {/* Barre de progression noire du bas supprimee */}
       </div>
     </>
   );

@@ -300,7 +300,7 @@ export default function OnboardingDynamic() {
             {/* Intro */}
             <div className="flex justify-center w-full px-6 py-6">
               <p className="text-gray-400 text-[11px] md:text-xs text-center max-w-sm leading-relaxed font-medium uppercase tracking-wider opacity-70">
-                C'est un plaisir de t'aider à structurer ton projet ! <br /> Je vais te poser quelques questions pour comprendre ton univers.
+                Je vais te poser quelques questions pour comprendre ton univers.
               </p>
             </div>
 

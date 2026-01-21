@@ -22,51 +22,6 @@ import ProgressBar from '@/components/ui/ProgressBar';
 import GlowButton from '@/components/ui/GlowButton';
 import ChatBubble from '@/components/chat/ChatBubble';
 
-const dailyMissions = [
-  {
-    step: 1,
-    title: "Envoyer 10 messages de diagnostic à des prospects",
-    page: "SalesMessages",
-    description: "Utilise tes messages prêts pour contacter tes premiers prospects"
-  },
-  {
-    step: 2,
-    title: "Créer ton premier post avec ton avatar client idéal",
-    page: "AvatarClients",
-    description: "Partage du contenu qui attire ta cible parfaite"
-  },
-  {
-    step: 3,
-    title: "Publier ta page de vente et partager le lien",
-    page: "SalesPage",
-    description: "Ta page est prête, il ne reste qu'à la mettre en ligne"
-  },
-  {
-    step: 4,
-    title: "Envoyer ta première séquence email",
-    page: "EmailsMarketing",
-    description: "Active ta séquence automatique pour convertir"
-  },
-  {
-    step: 5,
-    title: "Faire ta première vente",
-    page: "MyOffers",
-    description: "Concentre-toi sur ton offre principale"
-  },
-  {
-    step: 6,
-    title: "Optimiser ton tunnel de vente",
-    page: "MyOffers",
-    description: "Ajoute ton order bump et tes upsells"
-  },
-  {
-    step: 7,
-    title: "Scaler ton business",
-    page: "PlanAction",
-    description: "Répète ce qui fonctionne, automatise le reste"
-  }
-];
-
 export default function Dashboard() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
@@ -122,6 +77,8 @@ export default function Dashboard() {
       const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
       if (sessions.length > 0) {
         setSession(sessions[0]);
+        console.log('[Dashboard] ✅ Session loaded:', sessions[0].id);
+        console.log('[Dashboard] ✅ plan_progress:', sessions[0].plan_progress);
       }
 
     } catch (error) {
@@ -132,28 +89,61 @@ export default function Dashboard() {
   };
 
   const calculateProgress = () => {
-    if (!profile?.plan_7days_progress) return 0;
-    const completedDays = Object.keys(profile.plan_7days_progress).filter(
-      key => profile.plan_7days_progress[key]?.completed
+    if (!session?.plan_progress) return 0;
+    const completedDays = Object.keys(session.plan_progress).filter(
+      key => session.plan_progress[key]?.completed
     ).length;
     return Math.round((completedDays / 7) * 100);
   };
 
   const getCurrentStep = () => {
-    if (!profile?.plan_7days_progress) return 1;
-    const completedDays = Object.keys(profile.plan_7days_progress).filter(
-      key => profile.plan_7days_progress[key]?.completed
+    if (!session?.plan_progress) return 1;
+    const completedDays = Object.keys(session.plan_progress).filter(
+      key => session.plan_progress[key]?.completed
     ).length;
     return Math.min(completedDays + 1, 7);
   };
 
   const getNextIncompleteTask = () => {
-    if (!profile?.plan_7days_progress) return dailyMissions[0];
-    const completedDays = Object.keys(profile.plan_7days_progress).filter(
-      key => profile.plan_7days_progress[key]?.completed
-    ).length;
-    const currentDayNum = Math.min(completedDays + 1, 7);
-    return dailyMissions[currentDayNum - 1] || dailyMissions[6];
+    if (!session?.plan_progress) {
+      return {
+        title: "Rejoindre la communauté et se présenter",
+        description: "Commence par te connecter avec d'autres entrepreneurs",
+        page: "PlanAction"
+      };
+    }
+
+    const currentDay = getCurrentStep();
+    const dayProgress = session.plan_progress[currentDay];
+    
+    // Si pas de checklist pour ce jour, retourner la première mission
+    if (!dayProgress?.checklist) {
+      return {
+        title: "Commencer le jour " + currentDay,
+        description: "Clique pour voir tes missions du jour",
+        page: "PlanAction"
+      };
+    }
+
+    // Trouver la première tâche non cochée et non auto-cochée
+    const firstUnchecked = dayProgress.checklist.find(
+      (item, idx) => !item.checked && !item.autoChecked
+    );
+
+    if (firstUnchecked) {
+      return {
+        title: firstUnchecked.text.replace(/^✅\s+/, ''),
+        description: firstUnchecked.details || "Clique pour plus de détails",
+        page: firstUnchecked.action?.page || "PlanAction"
+      };
+    }
+
+    // Si toutes les tâches du jour sont cochées mais le jour n'est pas marqué comme complété
+    return {
+      title: "Valider le jour " + currentDay,
+      description: "Tu as tout fait ! Marque ce jour comme terminé",
+      page: "PlanAction"
+    };
   };
 
   const livrables = [
@@ -177,6 +167,8 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  const currentMission = getNextIncompleteTask();
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -241,11 +233,11 @@ export default function Dashboard() {
                 Ta mission aujourd'hui
               </h2>
               <p className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
-                {getNextIncompleteTask()?.title}
+                {currentMission.title}
               </p>
-              <p className="text-white/90 text-lg">{getNextIncompleteTask()?.description}</p>
+              <p className="text-white/90 text-lg line-clamp-2">{currentMission.description}</p>
             </div>
-            <GlowButton onClick={() => navigate(createPageUrl(getNextIncompleteTask()?.page))} size="lg"
+            <GlowButton onClick={() => navigate(createPageUrl(currentMission.page))} size="lg"
               className="bg-white text-gray-900 hover:bg-gray-100 w-full md:w-auto px-6 md:px-12 py-3 md:py-4 text-lg md:text-xl font-bold">
               👉 Lancer cette mission
             </GlowButton>

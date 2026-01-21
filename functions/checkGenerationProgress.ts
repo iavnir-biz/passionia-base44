@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     const allAssetsReady = session.all_assets_ready || false;
 
     // Calculer le progrès global (0-100%)
-    const steps = ['completeMarketAnalysis', 'avatars', 'detailedOffers', 'salesMessages', 'marketingEmails'];
+    const steps = ['completeMarketAnalysis', 'avatars', 'detailedOffers', 'salesMessages', 'marketingEmails', 'salesPage', 'planDeRoute'];
     const completedSteps = steps.filter(step => generationStatus[step]?.status === 'done').length;
     const totalSteps = steps.length;
     const globalProgress = Math.round((completedSteps / totalSteps) * 100);

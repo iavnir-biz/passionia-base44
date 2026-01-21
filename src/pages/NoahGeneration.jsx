@@ -7,39 +7,29 @@ import { Loader2, CheckCircle, Brain } from 'lucide-react';
 
 const generationSteps = [
   { 
-    id: 'market',
-    label: 'Validation marché avec données réelles',
+    id: 'completeMarketAnalysis',
+    label: 'Analyse de marché SWOT complète',
     duration: 8000
   },
   { 
     id: 'avatars',
-    label: 'Profils clients exploitables pour vendre',
+    label: '3 Avatars clients ultra-détaillés',
     duration: 10000
   },
   { 
-    id: 'offers',
-    label: 'Offres structurées avec prix et positionnement',
+    id: 'detailedOffers',
+    label: '4 Offres complètes avec prix',
     duration: 15000
   },
   { 
-    id: 'messages',
-    label: 'Messages prêts à envoyer pour premières ventes',
+    id: 'salesMessages',
+    label: '8 Messages de vente prêts',
     duration: 12000
   },
   { 
-    id: 'emails',
-    label: 'Séquence email automatique (5 types)',
+    id: 'marketingEmails',
+    label: '5 Emails marketing en séquence',
     duration: 18000
-  },
-  { 
-    id: 'salespage',
-    label: 'Page de vente prête à convertir',
-    duration: 20000
-  },
-  { 
-    id: 'plan',
-    label: 'Plan d\'action personnalisé 7 jours',
-    duration: 8000
   }
 ];
 
@@ -85,59 +75,65 @@ export default function NoahGeneration() {
   };
 
   const startGeneration = async (currentUser, userSession) => {
-    console.log('[NoahGeneration] 🚀 START - Orchestrated generation');
+    console.log('[NoahGeneration] 🚀 Monitoring generation progress (already started)');
     
     try {
-      // 🔥 P0-3: Appel UNIQUE à l'orchestrateur avec sessionId
       setCurrentStep(0);
       
-      // Démarrer l'orchestrateur en arrière-plan
-      const sessionId = currentUser.sessionId;
-      const generationPromise = base44.functions.invoke('generateAllAssets', { sessionId });
+      // 🔥 NE PAS lancer generateAllAssets ici (déjà lancé dans SetupProfile)
+      // On va juste MONITORER la progression via polling
       
-      // Simuler la progression visuelle pendant l'orchestration
-      let visualProgress = 0;
-      const visualInterval = setInterval(() => {
-        if (visualProgress < generationSteps.length) {
-          setCurrentStep(visualProgress);
-          setCompletedSteps(prev => [...prev, generationSteps[visualProgress].id]);
-          visualProgress++;
+      // Démarrer le polling
+      const pollInterval = setInterval(async () => {
+        try {
+          const { data } = await base44.functions.invoke('checkGenerationProgress', {
+            sessionId: currentUser.sessionId
+          });
+          
+          if (data.success) {
+            // Mettre à jour la progression visuelle
+            const status = data.status || {};
+            
+            // Compter les étapes complétées
+            let completedCount = 0;
+            generationSteps.forEach(step => {
+              if (status[step.id]?.status === 'done') {
+                if (!completedSteps.includes(step.id)) {
+                  setCompletedSteps(prev => [...prev, step.id]);
+                }
+                completedCount++;
+              }
+            });
+            
+            setCurrentStep(completedCount);
+            
+            // Si tout est prêt, arrêter le polling et redirect
+            if (data.allReady) {
+              clearInterval(pollInterval);
+              setIsGenerating(false);
+              
+              setTimeout(() => {
+                navigate(createPageUrl('Dashboard'));
+              }, 1500);
+            }
+          }
+        } catch (pollError) {
+          console.error('[NoahGeneration] Polling error:', pollError);
         }
-      }, 3000);
-
-      // Attendre la fin de l'orchestration
-      const { data } = await generationPromise;
-      clearInterval(visualInterval);
-
-      console.log('[NoahGeneration] Generation complete', data);
+      }, 2000); // Poll toutes les 2 secondes
       
-      if (data.error) {
-        setError(data.error === 'missing_data' 
-          ? `Données manquantes : ${data.missing?.join(', ')}`
-          : data.error === 'generation_in_progress'
-            ? 'Génération déjà en cours'
-            : 'Erreur lors de la génération'
-        );
-        setIsGenerating(false);
-        return;
-      }
-
-      // Compléter visuellement les étapes restantes
-      for (let i = visualProgress; i < generationSteps.length; i++) {
-        setCompletedSteps(prev => [...prev, generationSteps[i].id]);
-        await new Promise(resolve => setTimeout(resolve, 300));
-      }
-      
-      setIsGenerating(false);
-      
-      // Redirection vers Dashboard
+      // Timeout de sécurité (5 minutes max)
       setTimeout(() => {
-        navigate(createPageUrl('Dashboard'));
-      }, 1500);
+        clearInterval(pollInterval);
+        if (isGenerating) {
+          setError('La génération prend plus de temps que prévu. Vérifie ton Dashboard dans quelques instants.');
+          setIsGenerating(false);
+        }
+      }, 300000);
       
     } catch (error) {
       console.error('[NoahGeneration] FATAL ERROR:', error);
-      setError('Une erreur est survenue lors de la génération');
+      setError('Une erreur est survenue. Vérifie ton Dashboard pour voir les documents générés.');
       setIsGenerating(false);
     }
   };

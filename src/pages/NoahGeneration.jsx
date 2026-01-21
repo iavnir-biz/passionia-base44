@@ -7,29 +7,39 @@ import { Loader2, CheckCircle, Brain } from 'lucide-react';
 
 const generationSteps = [
   { 
-    id: 'completeMarketAnalysis',
+    id: 'swot',
     label: 'Analyse de marché SWOT complète',
-    duration: 8000
+    key: 'completeMarketAnalysis'
   },
   { 
     id: 'avatars',
     label: '3 Avatars clients ultra-détaillés',
-    duration: 10000
+    key: 'avatars'
   },
   { 
-    id: 'detailedOffers',
+    id: 'offers',
     label: '4 Offres complètes avec prix',
-    duration: 15000
+    key: 'detailedOffers'
   },
   { 
-    id: 'salesMessages',
+    id: 'messages',
     label: '8 Messages de vente prêts',
-    duration: 12000
+    key: 'salesMessages'
   },
   { 
-    id: 'marketingEmails',
+    id: 'emails',
     label: '5 Emails marketing en séquence',
-    duration: 18000
+    key: 'marketingEmails'
+  },
+  {
+    id: 'salespage',
+    label: 'Page de vente prête à convertir',
+    key: 'salesPage'
+  },
+  {
+    id: 'plan',
+    label: 'Plan d\'action personnalisé',
+    key: 'planDeRoute'
   }
 ];
 
@@ -41,9 +51,16 @@ export default function NoahGeneration() {
   const [completedSteps, setCompletedSteps] = useState([]);
   const [isGenerating, setIsGenerating] = useState(true);
   const [error, setError] = useState(null);
+  const [pollIntervalId, setPollIntervalId] = useState(null);
 
   useEffect(() => {
     loadData();
+    
+    return () => {
+      if (pollIntervalId) {
+        clearInterval(pollIntervalId);
+      }
+    };
   }, []);
 
   const loadData = async () => {
@@ -56,84 +73,85 @@ export default function NoahGeneration() {
         return;
       }
 
-      // 🔥 P0-4: Session lookup par user.sessionId
-      const sessionId = currentUser.sessionId;
-      if (!sessionId) {
-        setError('Session introuvable');
-        return;
-      }
-
-      const sessions = await base44.entities.Session.filter({ id: sessionId });
+      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
       if (sessions.length > 0) {
         setSession(sessions[0]);
         startGeneration(currentUser, sessions[0]);
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('[NoahGeneration] Error loading data:', error);
       setError('Erreur de chargement');
     }
   };
 
   const startGeneration = async (currentUser, userSession) => {
-    console.log('[NoahGeneration] 🚀 Monitoring generation progress (already started)');
+    console.log('[NoahGeneration] 🚀 START - Launching generation for session:', userSession.id);
     
     try {
       setCurrentStep(0);
       
-      // 🔥 NE PAS lancer generateAllAssets ici (déjà lancé dans SetupProfile)
-      // On va juste MONITORER la progression via polling
+      // 🔥 LANCER startGeneration (orchestrateur)
+      console.log('[NoahGeneration] Calling startGeneration...');
       
-      // Démarrer le polling
-      const pollInterval = setInterval(async () => {
+      base44.functions.invoke('startGeneration', {
+        sessionId: userSession.id
+      }).then(({ data: startData }) => {
+        console.log('[NoahGeneration] startGeneration response:', startData);
+        
+        if (startData?.error) {
+          setError(startData.error === 'missing_data' 
+            ? `Données manquantes : ${startData.missing?.join(', ')}`
+            : 'Erreur lors de la génération'
+          );
+          setIsGenerating(false);
+        }
+      }).catch(err => {
+        console.error('[NoahGeneration] startGeneration error:', err);
+      });
+      
+      // 🔥 POLLING temps réel
+      const intervalId = setInterval(async () => {
         try {
-          const { data } = await base44.functions.invoke('checkGenerationProgress', {
-            sessionId: currentUser.sessionId
+          const { data: progressData } = await base44.functions.invoke('checkGenerationProgress', {
+            sessionId: userSession.id
           });
           
-          if (data.success) {
-            // Mettre à jour la progression visuelle
-            const status = data.status || {};
+          console.log('[NoahGeneration] Progress:', progressData);
+          
+          if (progressData?.success) {
+            const { completedSteps: numCompleted, totalSteps, allReady, inProgress } = progressData;
             
-            // Compter les étapes complétées
-            let completedCount = 0;
-            generationSteps.forEach(step => {
-              if (status[step.id]?.status === 'done') {
-                if (!completedSteps.includes(step.id)) {
-                  setCompletedSteps(prev => [...prev, step.id]);
-                }
-                completedCount++;
-              }
-            });
+            setCurrentStep(numCompleted || 0);
             
-            setCurrentStep(completedCount);
+            const newCompleted = [];
+            for (let i = 0; i < Math.min(numCompleted, generationSteps.length); i++) {
+              newCompleted.push(generationSteps[i].id);
+            }
+            setCompletedSteps(newCompleted);
             
-            // Si tout est prêt, arrêter le polling et redirect
-            if (data.allReady) {
-              clearInterval(pollInterval);
+            if (allReady || !inProgress) {
+              console.log('[NoahGeneration] ✅ Generation complete!');
+              clearInterval(intervalId);
+              
+              setCompletedSteps(generationSteps.map(s => s.id));
+              setCurrentStep(generationSteps.length);
               setIsGenerating(false);
               
               setTimeout(() => {
                 navigate(createPageUrl('Dashboard'));
-              }, 1500);
+              }, 2000);
             }
           }
         } catch (pollError) {
           console.error('[NoahGeneration] Polling error:', pollError);
         }
-      }, 2000); // Poll toutes les 2 secondes
+      }, 3000);
       
-      // Timeout de sécurité (5 minutes max)
-      setTimeout(() => {
-        clearInterval(pollInterval);
-        if (isGenerating) {
-          setError('La génération prend plus de temps que prévu. Vérifie ton Dashboard dans quelques instants.');
-          setIsGenerating(false);
-        }
-      }, 300000);
+      setPollIntervalId(intervalId);
       
     } catch (error) {
       console.error('[NoahGeneration] FATAL ERROR:', error);
-      setError('Une erreur est survenue. Vérifie ton Dashboard pour voir les documents générés.');
+      setError('Une erreur est survenue lors de la génération');
       setIsGenerating(false);
     }
   };
@@ -143,7 +161,6 @@ export default function NoahGeneration() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
-        {/* Noah Avatar */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -163,7 +180,6 @@ export default function NoahGeneration() {
           >
             <Brain className="w-12 h-12 text-white" />
             
-            {/* Ondes d'énergie */}
             {[...Array(3)].map((_, i) => (
               <motion.div
                 key={i}
@@ -194,7 +210,6 @@ export default function NoahGeneration() {
           </p>
         </motion.div>
 
-        {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-900">Progression</span>
@@ -211,15 +226,14 @@ export default function NoahGeneration() {
           <p className="text-xs text-gray-600 mt-2 text-center">
             {completedSteps.length < generationSteps.length 
               ? `Étape ${completedSteps.length + 1} sur ${generationSteps.length} en cours`
-              : "Chaque élément est généré une seule fois, pour toi"}
+              : "Tous les documents sont générés !"}
           </p>
         </div>
 
-        {/* Steps List */}
         <div className="space-y-3 mb-8">
           {generationSteps.map((step, index) => {
             const isCompleted = completedSteps.includes(step.id);
-            const isCurrent = index === currentStep;
+            const isCurrent = index === currentStep && !isCompleted;
             const isPending = index > currentStep;
 
             return (
@@ -290,7 +304,6 @@ export default function NoahGeneration() {
           })}
         </div>
 
-        {/* Projection Finale */}
         {!isGenerating && !error ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -305,7 +318,7 @@ export default function NoahGeneration() {
               Redirection vers ton dashboard...
             </p>
           </motion.div>
-        ) : (
+        ) : error ? null : (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -319,14 +332,19 @@ export default function NoahGeneration() {
           </motion.div>
         )}
 
-        {/* Error Message */}
         {error && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="bg-red-50 border border-red-200 rounded-xl p-4 text-center"
           >
-            <p className="text-red-800 font-medium">{error}</p>
+            <p className="text-red-800 font-medium mb-2">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-sm text-red-600 hover:text-red-800 underline"
+            >
+              Réessayer
+            </button>
           </motion.div>
         )}
       </div>

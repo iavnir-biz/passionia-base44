@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
@@ -13,55 +13,51 @@ import {
   Shield,
   Sparkles,
   DollarSign,
-  Package,
-  BarChart3,
-  Sprout,
-  Map,
-  ShoppingBag,
-  Gift,
-  TrendingUp,
-  Crown
+  Trophy,
+  Calendar
 } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import OfferTransition from '@/components/offer/OfferTransition';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
 
-function parsePrice(priceStr) {
-  if (!priceStr) return 0;
-  const cleaned = priceStr.replace(/[^0-9]/g, '');
-  return parseInt(cleaned, 10) || 0;
-}
-
-function PhaseCard({ number, title, objective, plan, result, delay = 0, color = 'green' }) {
+function PhaseCard({ number, title, objective, plan, result, delay = 0, color = 'green', isPriority = false, weekLabel = null }) {
   const colorSchemes = {
     green: {
       bg: 'from-green-500',
       border: 'border-green-200',
       text: 'text-green-600',
       resultBg: 'from-green-50 to-green-100',
-      resultBorder: 'border-green-200'
+      resultBorder: 'border-green-200',
+      badgeBg: 'bg-green-100',
+      badgeText: 'text-green-700'
     },
     blue: {
       bg: 'from-blue-500',
       border: 'border-blue-200',
       text: 'text-blue-600',
       resultBg: 'from-blue-50 to-blue-100',
-      resultBorder: 'border-blue-200'
+      resultBorder: 'border-blue-200',
+      badgeBg: 'bg-blue-100',
+      badgeText: 'text-blue-700'
     },
     purple: {
       bg: 'from-purple-500',
       border: 'border-purple-200',
       text: 'text-purple-600',
       resultBg: 'from-purple-50 to-purple-100',
-      resultBorder: 'border-purple-200'
+      resultBorder: 'border-purple-200',
+      badgeBg: 'bg-purple-100',
+      badgeText: 'text-purple-700'
     },
     orange: {
       bg: 'from-orange-500',
       border: 'border-orange-200',
       text: 'text-orange-600',
       resultBg: 'from-orange-50 to-orange-100',
-      resultBorder: 'border-orange-200'
+      resultBorder: 'border-orange-200',
+      badgeBg: 'bg-orange-100',
+      badgeText: 'text-orange-700'
     }
   };
 
@@ -72,13 +68,38 @@ function PhaseCard({ number, title, objective, plan, result, delay = 0, color = 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={cn("bg-white rounded-2xl border p-6 shadow-sm hover:shadow-md transition-all", scheme.border)}
+      className={cn(
+        "rounded-2xl border p-6 shadow-sm hover:shadow-md transition-all",
+        isPriority 
+          ? "bg-gradient-to-br from-[#61f7a2]/10 to-green-50 border-[#61f7a2] ring-2 ring-[#61f7a2]/30" 
+          : "bg-white",
+        !isPriority && scheme.border
+      )}
     >
-      <div className="flex items-center gap-3 mb-6">
-        <div className={cn("w-12 h-12 rounded-xl bg-gradient-to-br to-white flex items-center justify-center shadow-sm", scheme.bg)}>
-          <span className="text-xl font-bold text-white">{number}</span>
+      {/* Header avec badges */}
+      <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className={cn("w-12 h-12 rounded-xl bg-gradient-to-br to-white flex items-center justify-center shadow-sm", scheme.bg)}>
+            <span className="text-xl font-bold text-white">{number}</span>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+          </div>
         </div>
-        <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+        
+        {/* 🔥 BADGES TEMPORELS */}
+        {isPriority && (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-xl shadow-md">
+            <Trophy className="w-4 h-4 text-white" />
+            <span className="text-xs font-bold text-white uppercase tracking-wide">7 JOURS</span>
+          </div>
+        )}
+        {weekLabel && !isPriority && (
+          <div className={cn("px-3 py-1.5 rounded-lg flex items-center gap-1.5", scheme.badgeBg)}>
+            <Calendar className="w-3.5 h-3.5" />
+            <span className={cn("text-xs font-bold uppercase tracking-wide", scheme.badgeText)}>{weekLabel}</span>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -194,10 +215,10 @@ export default function OfferConcretement() {
   }
 
   const phases = [
-    { number: 1, ...planDeRoute.phase1, color: 'green' },
-    { number: 2, ...planDeRoute.phase2, color: 'blue' },
-    { number: 3, ...planDeRoute.phase3, color: 'purple' },
-    { number: 4, ...planDeRoute.phase4, color: 'orange' }
+    { number: 1, ...planDeRoute.phase1, color: 'green', isPriority: true, weekLabel: null },
+    { number: 2, ...planDeRoute.phase2, color: 'blue', isPriority: false, weekLabel: 'SEMAINE 2' },
+    { number: 3, ...planDeRoute.phase3, color: 'purple', isPriority: false, weekLabel: 'SEMAINE 3' },
+    { number: 4, ...planDeRoute.phase4, color: 'orange', isPriority: false, weekLabel: 'SEMAINE 4' }
   ];
 
   const advantageIcons = [Rocket, DollarSign, Shield, Sparkles];
@@ -206,50 +227,33 @@ export default function OfferConcretement() {
     ...adv
   }));
 
-  const completedSteps = [1, 2, 3, 4, 5, 6]; // Jusqu'à Ta vie future complété
+  const completedSteps = [1, 2, 3, 4, 5, 6];
 
-  // 🔥 P0-1: Récap offres + potentiel (Source: session.finalized_offer)
-  const finalizedOffer = session?.finalized_offer || {};
-  const products = [
-    {
-      label: 'Produit Principal',
-      data: finalizedOffer.mainProduct,
-      icon: ShoppingBag,
-      iconColor: 'text-orange-500',
-      bgColor: 'bg-orange-50',
-      priceColor: 'text-orange-600',
-      badge: 'Low-ticket'
-    },
-    {
-      label: 'Order Bump',
-      data: finalizedOffer.orderBump,
-      icon: Gift,
-      iconColor: 'text-blue-500',
-      bgColor: 'bg-blue-50',
-      priceColor: 'text-blue-600',
-      badge: 'Extra-Produit'
-    },
-    {
-      label: 'Upsell',
-      data: finalizedOffer.upsell1,
-      icon: TrendingUp,
-      iconColor: 'text-purple-500',
-      bgColor: 'bg-purple-50',
-      priceColor: 'text-purple-600',
-      badge: 'Mid-ticket'
-    },
-    {
-      label: 'Premium',
-      data: finalizedOffer.upsell3,
-      icon: Crown,
-      iconColor: 'text-amber-500',
-      bgColor: 'bg-amber-50',
-      priceColor: 'text-amber-600',
-      badge: 'High-ticket'
+  // 🔥 Fonction pour aérer et ajouter émojis au texte d'intro
+  const enhanceIntroText = (text) => {
+    if (!text) return '';
+    
+    let enhanced = text;
+    
+    // Ajouter émojis stratégiques
+    if (!enhanced.includes('🎯') && enhanced.includes('vision claire')) {
+      enhanced = enhanced.replace('vision claire', '🎯 vision claire');
     }
-  ].filter(p => p.data);
-
-  const potentialRevenue = session?.potential_revenue || 0;
+    
+    if (!enhanced.includes('😌') && enhanced.includes('sans stress')) {
+      enhanced = enhanced.replace('sans stress', 'sans stress 😌');
+    }
+    
+    if (!enhanced.includes('✨') && enhanced.toLowerCase().includes('pas de miracle')) {
+      enhanced = enhanced.replace(/pas de miracle/i, 'pas de miracle ✨');
+    }
+    
+    if (!enhanced.includes('💪') && enhanced.toLowerCase().includes('système complet')) {
+      enhanced = enhanced.replace(/système complet/i, 'système complet 💪');
+    }
+    
+    return enhanced;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
@@ -257,37 +261,21 @@ export default function OfferConcretement() {
 
       <div className="flex-1 flex flex-col lg:ml-80">
         <div className="max-w-4xl mx-auto px-6 pt-52 pb-12 lg:py-12">
-          {/* Hero Section avec visuel */}
+          {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-10"
           >
             <div className="bg-gradient-to-br from-[#61f7a2]/20 via-blue-50 to-purple-50 rounded-3xl border-2 border-[#61f7a2]/40 p-10 relative overflow-hidden shadow-lg">
-              {/* Éléments décoratifs flottants */}
               <motion.div
-                animate={{
-                  y: [0, -20, 0],
-                  rotate: [0, 10, 0]
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
+                animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute top-8 right-8 w-24 h-24 bg-gradient-to-br from-[#61f7a2]/30 to-blue-300/30 rounded-2xl"
               />
               <motion.div
-                animate={{
-                  y: [0, 20, 0],
-                  rotate: [0, -10, 0]
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 1
-                }}
+                animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 className="absolute bottom-8 left-8 w-32 h-32 bg-gradient-to-br from-purple-300/30 to-[#61f7a2]/30 rounded-full"
               />
 
@@ -324,16 +312,16 @@ export default function OfferConcretement() {
             </GlowButton>
           </motion.div>
 
-          {/* Intro Box */}
+          {/* 🔥 Intro Box - AÉRÉ avec ÉMOJIS */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
           >
-            <p className="text-gray-700 leading-relaxed text-center text-base">
-              {planDeRoute.introduction}
-            </p>
+            <div className="text-gray-700 leading-relaxed text-center text-base space-y-4 whitespace-pre-line">
+              {enhanceIntroText(planDeRoute.introduction)}
+            </div>
           </motion.div>
 
           {/* Parcours Guidé Header */}
@@ -351,7 +339,7 @@ export default function OfferConcretement() {
             </p>
           </motion.div>
 
-          {/* 4 Phases */}
+          {/* 🔥 4 Phases avec BADGES et HIGHLIGHT */}
           <div className="grid gap-6 mb-8">
             {phases.map((phase, index) => (
               <PhaseCard
@@ -413,7 +401,7 @@ export default function OfferConcretement() {
             </p>
           </motion.div>
 
-          {/* 🔥 P0-2: Transformation Avant/Après */}
+          {/* Transformation Avant/Après */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -446,7 +434,6 @@ export default function OfferConcretement() {
         </div>
       </div>
 
-      {/* Transition Animation */}
       {showTransition && (
         <OfferTransition
           onComplete={handleTransitionComplete}

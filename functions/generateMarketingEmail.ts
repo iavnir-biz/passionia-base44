@@ -1,233 +1,456 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import OpenAI from 'npm:openai';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
 
-const openai = new OpenAI({
-    apiKey: Deno.env.get("OPENAI_API_KEY"),
+const anthropic = new Anthropic({
+  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
 
-const EMAIL_PROMPTS = {
-    contraste: {
-        title: "Le Contraste",
-        objective: "Faire prendre conscience de l'écart entre aujourd'hui et demain"
-    },
-    validation: {
-        title: "La Validation",
-        objective: "Créer la connexion émotionnelle"
-    },
-    calcul: {
-        title: "Le Calcul",
-        objective: "Rassurer le cerveau logique"
-    },
-    impact: {
-        title: "L'Impact",
-        objective: "Donner du sens à l'action"
-    },
-    urgence: {
-        title: "L'Urgence",
-        objective: "Déclencher la décision"
-    }
-};
+const SYSTEM_PROMPT = `Tu es Noah, expert en email marketing conversationnel et copywriting humain pour créateurs de produits d'information.
 
-Deno.serve(async (req) => {
-    try {
-        const base44 = createClientFromRequest(req);
-        const user = await base44.auth.me();
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TA MISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        if (!user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+Créer une SÉQUENCE COMPLÈTE de 5 EMAILS MARKETING pour vendre UN SEUL PRODUIT : le produit LOW TICKET (produit d'entrée, 27-97€).
 
-        const body = await req.json().catch(() => ({}));
-        console.log('[generateMarketingEmail] body received:', body);
+⚠️ IMPORTANT :
+- Ces emails vendent UN produit simple et accessible
+- PAS une marque, PAS une offre premium
+- Objectif : conversion douce vers le produit d'appel
+- Ton relationnel, pas agressif
 
-        const sessionId = body.sessionId || body.session?.id || user.sessionId;
-        const { generateAll } = body;
-        console.log('[generateMarketingEmail] resolved sessionId:', sessionId, 'generateAll:', generateAll);
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 STRUCTURE DE LA SÉQUENCE (5 EMAILS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        if (!sessionId) {
-            return Response.json({ error: 'sessionId required' }, { status: 400 });
-        }
-
-        // 🔥 P0-5: DB-first
-        const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
-        if (!sessions || sessions.length === 0) {
-            return Response.json({ error: 'Session not found' }, { status: 404 });
-        }
-
-        const session = sessions[0];
-
-        // Check cache
-        if (session.generated_marketing_emails && Object.keys(session.generated_marketing_emails).length === 5) {
-            return Response.json({
-                success: true,
-                emails: session.generated_marketing_emails,
-                fromCache: true
-            });
-        }
-
-        // 🔥 EXTRACTION DONNÉES (LOW TICKET UNIQUEMENT)
-        const finalizedOffer = session.finalized_offer || {};
-        const lowTicketOffer = session.my_generated_offers?.low || finalizedOffer.mainProduct || {};
-        const avatars = session.generated_avatars || {};
-        const onboardingSummary = session.onboarding_summary || {};
-        const onboardingFull = session.onboarding_full || {};
-
-        // Vérification critique
-        if (!lowTicketOffer.title || !lowTicketOffer.price) {
-            return Response.json({ 
-                error: 'Offre LOW TICKET incomplète. Complète d\'abord ton onboarding d\'offres.' 
-            }, { status: 400 });
-        }
-
-        // PROMPT SYSTÈME COMPLET (3 prompts fusionnés)
-        const systemMessage = `TU ES UN EXPERT EN EMAIL MARKETING CONVERSATIONNEL ET COPYWRITING HUMAIN.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 MISSION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Générer une SÉQUENCE DE 5 EMAILS MARKETING destinés à vendre UN SEUL PRODUIT :
-→ le PRODUIT LOW TICKET validé par l'utilisateur.
-
-IMPORTANT :
-- Ces emails ne vendent PAS une marque
-- Ils ne vendent PAS une offre premium
-- Ils vendent UN PRODUIT SIMPLE, ACCESSIBLE, D'ENTRÉE DE GAMME
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎨 STYLE & TON
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-- Tutoiement obligatoire
-- Ton humain, simple, direct
-- Langage parlé, naturel
-- Pas de jargon marketing
-- Pas de promesses exagérées
-- Pas de storytelling bullshit
-
-FORMAT STRICT :
-- TEXTE BRUT (plain text)
-- AUCUN Markdown
-- Paragraphes courts (2 lignes max)
-- Copiable tel quel dans Gmail/Notion/Mailchimp
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 STRUCTURE GLOBALE DE LA SÉQUENCE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-EMAIL 1 — LE CONTRASTE
-Objectif : Faire prendre conscience de l'écart entre aujourd'hui et demain
-- Situation actuelle frustrante
-- Ce qui pourrait changer
-- Aucune vente directe
+**EMAIL 1 : LE CONTRASTE** (Jour 1)
+**Objectif :** Faire prendre conscience de l'écart entre aujourd'hui et demain
+**Timing :** Premier contact
+**Structure :**
+- Sujet accrocheur (question ou constat)
+- Situation actuelle frustrante (2-3 paragraphes)
+- Vision de ce qui pourrait changer
+- AUCUNE vente directe
 - Invitation à réfléchir
+- PS optionnel (renforce la réflexion)
+**Longueur :** 200-300 mots
 
-EMAIL 2 — LA VALIDATION
-Objectif : Créer la connexion émotionnelle
-- "Tu n'es pas seul"
-- Situation vécue/observée
+**EMAIL 2 : LA VALIDATION** (Jour 3)
+**Objectif :** Créer la connexion émotionnelle
+**Timing :** 2 jours après email 1
+**Structure :**
+- Sujet empathique
+- "Tu n'es pas seul·e"
+- Histoire personnelle OU cas client (storytelling court)
 - Normalisation du problème
-- Toujours pas de pression commerciale
+- Validation des émotions
+- TOUJOURS pas de pression commerciale
+- PS réconfortant
+**Longueur :** 250-350 mots
 
-EMAIL 3 — LE CALCUL
-Objectif : Rassurer le cerveau logique
+**EMAIL 3 : LE CALCUL** (Jour 5)
+**Objectif :** Rassurer le cerveau logique
+**Timing :** 2 jours après email 2
+**Structure :**
+- Sujet pragmatique
 - Montrer que c'est faisable
-- Montrer que ce produit est simple
+- Décomposer le chemin en étapes simples
+- Introduction DOUCE du produit low ticket
 - Expliquer pourquoi c'est une bonne première étape
-- Introduction douce du produit LOW TICKET
+- Bénéfices concrets et mesurables
+- Lien vers le produit (sans pression)
+- PS avec mini-FAQ ou objection
+**Longueur :** 300-400 mots
 
-EMAIL 4 — L'IMPACT
-Objectif : Donner du sens à l'action
-- Fierté
-- Impact personnel
-- Sentiment d'avancer enfin
-- Le produit est présenté comme un levier, pas une fin
+**EMAIL 4 : L'IMPACT** (Jour 7)
+**Objectif :** Donner du sens à l'action
+**Timing :** 2 jours après email 3
+**Structure :**
+- Sujet inspirant
+- Vision de transformation
+- Impact personnel (fierté, accomplissement)
+- Sentiment d'avancer ENFIN
+- Le produit présenté comme un LEVIER, pas une fin
+- Témoignage ou résultat client (si disponible)
+- CTA clair mais sans pression
+- PS motivant
+**Longueur :** 300-400 mots
 
-EMAIL 5 — L'URGENCE
-Objectif : Déclencher la décision
-- Coût de l'inaction
-- Rappel du bénéfice
-- Invitation claire à passer à l'action
-- CTA simple, sans pression
+**EMAIL 5 : L'URGENCE** (Jour 10)
+**Objectif :** Déclencher la décision
+**Timing :** 3 jours après email 4 (dernier email)
+**Structure :**
+- Sujet urgent (mais pas manipulateur)
+- Coût de l'inaction (ce qui se passe si tu ne fais rien)
+- Rappel des bénéfices du produit
+- Raison légitime de l'urgence (date limite, places, etc.)
+- CTA direct et clair
+- Garantie ou réassurance
+- PS final (dernière chance, ton bienveillant)
+**Longueur :** 250-350 mots
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚫 INTERDICTIONS ABSOLUES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎨 STYLE & TON (CRITIQUE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- Ne JAMAIS mentionner offre premium, upsell, coaching, programme avancé
-- Ne PAS dire "plus tard"
-- Ne PAS vendre autre chose que le produit LOW TICKET
-- Ne jamais inventer une nouvelle offre
-- Ne jamais changer le prix
-- Ne jamais modifier la promesse
+**FORMAT ABSOLU :**
+- TEXTE BRUT (plain text, pas de HTML)
+- ZÉRO markdown (pas de **, pas de ##, pas de - pour les listes)
+- Paragraphes courts (2-3 lignes max)
+- Sauts de ligne généreux (lisibilité)
+- Copiable tel quel dans Gmail/Mailchimp/Notion
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 SORTIE ATTENDUE (JSON)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**TON & VOIX :**
+- Tutoiement EXCLUSIF
+- Langage parlé et naturel
+- Comme si tu écrivais à un ami
+- Simple et accessible
+- Zéro jargon marketing
+- Zéro promesses exagérées
+- Authenticité totale
 
-{
-  "contraste": "...",
-  "validation": "...",
-  "calcul": "...",
-  "impact": "...",
-  "urgence": "..."
-}
+**PHRASES NATURELLES (exemples) :**
+✅ "Écoute, je vais être honnête avec toi"
+✅ "Je vois plein de gens dans ta situation"
+✅ "C'est vraiment pas sorcier"
+✅ "Tu sais ce qui marche bien ?"
+
+**PHRASES À ÉVITER :**
+❌ "Opportunité unique"
+❌ "Changez votre vie"
+❌ "Système révolutionnaire"
+❌ "Offre exclusive"
+❌ "Garantie 100%"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 STRUCTURE DE CHAQUE EMAIL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Chaque email doit contenir :
-- Objet (ligne 1 : "Objet: ...")
-- Corps de texte (texte brut, paragraphes courts)
-- CTA clair`;
 
-        const userContext = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📦 DONNÉES PRODUIT (SOURCE DE VÉRITÉ)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{
+  "subject": "Ligne de sujet (40-60 caractères, accrocheur sans clickbait)",
+  "preheader": "Texte de prévisualisation (50-100 caractères, complète le sujet)",
+  "body": "Corps de l'email (texte brut, paragraphes courts, sauts de ligne)",
+  "ps": "Post-scriptum optionnel (1-2 phrases percutantes)"
+}
 
-OFFRE LOW TICKET (OBLIGATOIRE) :
-${JSON.stringify(lowTicketOffer, null, 2)}
+**RÈGLES SUJETS :**
+- Court (40-60 caractères max)
+- Question OU constat OU curiosité
+- Personnalisé au problème
+- ZÉRO clickbait manipulateur
+- Doit donner envie d'ouvrir
 
-AVATARS CLIENTS :
+**Exemples de BONS sujets :**
+✅ "Tu galères avec [problème] ?"
+✅ "Ce qui bloque vraiment..."
+✅ "3 jours pour [résultat]"
+✅ "Pourquoi ça ne marche pas"
+
+**Exemples de MAUVAIS sujets :**
+❌ "OFFRE EXCLUSIVE 🔥"
+❌ "Tu ne vas pas en croire tes yeux"
+❌ "Dernier jour !!!"
+❌ "RE: RE: RE: Important"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ RÈGLES CRITIQUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. **CONSERVER EXACTEMENT :**
+   - Titre du produit (ne PAS inventer)
+   - Prix du produit (ne PAS changer)
+   - Promesse du produit (ne PAS exagérer)
+
+2. **PERSONNALISATION :**
+   - Utiliser le problème spécifique
+   - Utiliser la transformation promise
+   - Utiliser le vocabulaire de l'avatar
+   - Être spécifique (pas générique)
+
+3. **PROGRESSION :**
+   - Email 1 & 2 : Zéro mention du produit
+   - Email 3 : Introduction douce du produit
+   - Email 4 : Le produit comme solution
+   - Email 5 : Appel à l'action clair
+
+4. **CTA (Call-to-Action) :**
+   - Email 1 & 2 : Pas de CTA produit
+   - Email 3 : CTA soft "Si tu veux en savoir plus..."
+   - Email 4 : CTA moyen "Tu peux commencer ici..."
+   - Email 5 : CTA fort "C'est le dernier jour..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📤 FORMAT DE SORTIE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Retourne UNIQUEMENT un JSON valide :
+
+{
+  "email1_contraste": {
+    "title": "Email 1 : Le Contraste",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  },
+  "email2_validation": {
+    "title": "Email 2 : La Validation",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  },
+  "email3_calcul": {
+    "title": "Email 3 : Le Calcul",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  },
+  "email4_impact": {
+    "title": "Email 4 : L'Impact",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  },
+  "email5_urgence": {
+    "title": "Email 5 : L'Urgence",
+    "subject": "...",
+    "preheader": "...",
+    "body": "...",
+    "ps": "..."
+  }
+}
+
+Pas de markdown, pas de texte avant/après, juste le JSON pur.`;
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const sessionId = body.sessionId || body.session?.id || user.sessionId;
+
+    if (!sessionId) {
+      return Response.json({ error: 'sessionId required' }, { status: 400 });
+    }
+
+    // Get session
+    const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
+    if (!sessions || sessions.length === 0) {
+      return Response.json({ error: 'Session not found' }, { status: 404 });
+    }
+
+    const session = sessions[0];
+
+    // Check cache
+    if (session.generated_marketing_emails && Object.keys(session.generated_marketing_emails).length === 5) {
+      return Response.json({
+        success: true,
+        emails: session.generated_marketing_emails,
+        fromCache: true
+      });
+    }
+
+    const finalizedOffer = session.finalized_offer || {};
+    const onboardingSummary = session.onboarding_summary || {};
+    const onboardingFull = session.onboarding_full || {};
+    const avatars = session.generated_avatars || {};
+
+    // Get main product (low ticket)
+    const mainProduct = finalizedOffer.mainProduct || {};
+    
+    if (!mainProduct.title || !mainProduct.price) {
+      return Response.json({
+        error: 'Produit principal incomplet'
+      }, { status: 400 });
+    }
+
+    const userPrompt = `CONTEXTE DU PROJET :
+
+**Créateur :**
+Prénom : ${user.firstName || user.full_name || 'le créateur'}
+
+**Compétence enseignée :**
+${session.skill || onboardingSummary.who_to_teach || 'Non défini'}
+
+**Audience cible :**
+${onboardingSummary.learner_profile || 'Non défini'}
+
+**Problème principal :**
+${onboardingSummary.main_learning_problem || 'Non défini'}
+
+**Quick win promis :**
+${onboardingSummary.quick_win || 'Non défini'}
+
+**Grande transformation :**
+${onboardingSummary.big_transformation || 'Non défini'}
+
+**Méthode/Angle unique :**
+${onboardingSummary.method_angle || 'Non défini'}
+
+**Erreur typique à éviter :**
+${onboardingSummary.common_mistake || 'Non défini'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRODUIT À VENDRE (PRODUIT PRINCIPAL - LOW TICKET) :
+
+**Titre :** ${mainProduct.title}
+**Prix :** ${mainProduct.price}
+**Format :** ${mainProduct.productType || 'Formation'}
+**Description :** ${mainProduct.description || mainProduct.subtitle || ''}
+
+⚠️ CRITIQUE : TU DOIS utiliser EXACTEMENT ce titre et ce prix.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AVATARS CLIENTS (pour personnalisation) :
 ${JSON.stringify(avatars, null, 2)}
 
-ONBOARDING SUMMARY :
-${JSON.stringify(onboardingSummary, null, 2)}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TA MISSION :
 
-ONBOARDING FULL :
-- Prénom créateur : ${user.full_name || user.firstName || 'Non renseigné'}
-- Compétence : ${session.skill || 'Non renseigné'}
-- Problème principal : ${onboardingSummary.main_learning_problem || 'Non renseigné'}
-- Transformation : ${onboardingSummary.big_transformation || 'Non renseigné'}
-- Coût de l'inaction : ${onboardingFull.if_nothing_changes || 'Non renseigné'}
-- Vie future souhaitée : ${onboardingFull.life_change || 'Non renseigné'}
-- Obstacles : ${JSON.stringify(onboardingFull.obstacles || [])}`;
+Génère une SÉQUENCE COMPLÈTE de 5 EMAILS selon la structure définie.
 
-        // Générer les 5 emails en une fois
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                { role: "system", content: systemMessage },
-                { role: "user", content: userContext }
-            ],
-            temperature: 0.8,
-            response_format: { type: "json_object" }
+**RÈGLES CRITIQUES :**
+
+1. **Utilise les vraies données :**
+   - Titre exact : "${mainProduct.title}"
+   - Prix exact : ${mainProduct.price}
+   - Problème réel : "${onboardingSummary.main_learning_problem}"
+   - Transformation réelle : "${onboardingSummary.big_transformation}"
+
+2. **Progression naturelle :**
+   - Email 1 : Contraste (pas de vente)
+   - Email 2 : Validation (pas de vente)
+   - Email 3 : Calcul (introduction douce)
+   - Email 4 : Impact (le produit comme levier)
+   - Email 5 : Urgence (appel à l'action)
+
+3. **Style conversationnel :**
+   - Texte brut (pas de markdown)
+   - Paragraphes courts
+   - Langage naturel
+   - Tutoiement exclusif
+
+4. **Personnalisation :**
+   - Vocabulaire des avatars
+   - Situations concrètes
+   - Frustrations spécifiques
+
+**Exemple de BON email 1 (Contraste) :**
+
+Sujet : Tu galères avec [problème] ?
+
+Tu sais ce moment où tu te dis :
+"J'ai l'idée, mais je ne sais pas par où commencer" ?
+
+C'est exactement là où sont coincés la plupart des [audience].
+
+L'idée est là.
+La motivation aussi.
+
+Mais entre l'idée et le résultat, y'a ce truc énorme qui bloque.
+
+[développement 2-3 paragraphes]
+
+Bref, je voulais juste te dire : tu n'es pas seul·e.
+
+À bientôt,
+[Prénom]
+
+P.S. : Demain, je te raconte comment j'ai débloqué ça.
+
+---
+
+Génère maintenant les 5 emails complets en JSON.`;
+
+    console.log('ANTHROPIC_CALL start', {
+      fn: 'generateMarketingEmail',
+      sessionId,
+      model: 'claude-sonnet-4-20250514'
+    });
+
+    // 🔥 RETRY LOGIC pour gérer rate limits (429)
+    let message;
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        message = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 12000,
+          system: SYSTEM_PROMPT,
+          messages: [
+            { role: "user", content: userPrompt }
+          ]
         });
-
-        const generatedEmails = JSON.parse(completion.choices[0].message.content);
-
-        // 🔥 Save to Session
-        await base44.asServiceRole.entities.Session.update(sessionId, {
-            generated_marketing_emails: generatedEmails
-        });
-
-        return Response.json({
-            success: true,
-            emails: generatedEmails,
-            fromCache: false
-        });
-
-    } catch (error) {
-        console.error('Error generating marketing email:', error);
-        return Response.json({ 
-            error: error.message 
-        }, { status: 500 });
+        break; // Success, sortir de la boucle
+      } catch (error) {
+        if (error.status === 429 && retryCount < maxRetries - 1) {
+          retryCount++;
+          const waitTime = retryCount * 5000; // 5s, 10s, 15s
+          console.log(`[generateMarketingEmail] Rate limit hit, retry ${retryCount}/${maxRetries} in ${waitTime}ms`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        } else {
+          throw error; // Si ce n'est pas une 429 ou dernière tentative, throw
+        }
+      }
     }
+
+    console.log('ANTHROPIC_CALL end', {
+      fn: 'generateMarketingEmail',
+      sessionId,
+      usage: message.usage,
+      retries: retryCount
+    });
+
+    const responseText = message.content[0].type === 'text'
+      ? message.content[0].text.trim()
+      : '{}';
+
+    // Clean potential markdown
+    const cleanedResponse = responseText
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    let marketingEmails;
+    try {
+      marketingEmails = JSON.parse(cleanedResponse);
+    } catch (e) {
+      console.error('JSON parse error:', e);
+      return Response.json({
+        error: 'Failed to parse marketing emails',
+        details: e.message
+      }, { status: 500 });
+    }
+
+    // Save to session
+    await base44.asServiceRole.entities.Session.update(sessionId, {
+      generated_marketing_emails: marketingEmails
+    });
+
+    console.log('✅ [generateMarketingEmail] Saved to session', { sessionId });
+
+    return Response.json({
+      success: true,
+      emails: marketingEmails
+    });
+
+  } catch (error) {
+    console.error('Error in generateMarketingEmail:', error);
+    return Response.json({
+      error: error.message,
+      details: error.stack
+    }, { status: 500 });
+  }
 });

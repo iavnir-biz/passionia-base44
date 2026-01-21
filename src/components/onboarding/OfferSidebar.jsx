@@ -12,11 +12,22 @@ const OFFER_STEPS = [
   { id: 5, label: 'Résumé', page: 'OfferResume', icon: FileCheck }
 ];
 
-export default function OfferSidebar({ currentPage }) {
+export default function OfferSidebar({ currentPage, currentStep: propStep }) {
   const navigate = useNavigate();
 
-  // Déterminer l'étape active en fonction de la page actuelle
-  const activeStepObj = OFFER_STEPS.find(step => step.page === currentPage) || OFFER_STEPS[0];
+  // Déterminer l'étape active en fonction de la page actuelle ou currentStep (prop)
+  let activeStepObj = OFFER_STEPS.find(step => step.page === currentPage);
+
+  // Fallback sur le propStep si currentPage ne correspond à rien
+  if (!activeStepObj && propStep) {
+    activeStepObj = OFFER_STEPS.find(step => step.id === propStep);
+  }
+
+  // Fallback final
+  if (!activeStepObj) {
+    activeStepObj = OFFER_STEPS[0];
+  }
+
   const currentStep = activeStepObj.id;
 
   const stepColors = {

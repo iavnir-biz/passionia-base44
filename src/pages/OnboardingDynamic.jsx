@@ -3,16 +3,43 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, Mic, StopCircle, Brain, Send, User as UserIcon, Zap } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, Mic, StopCircle, Brain, Send, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
 
-function OnboardingDynamic() {
+// 🔥 Hook pour l'effet typing
+const useTypingEffect = (text, speed = 30) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
+
+  useEffect(() => {
+    if (!text) return;
+    
+    setDisplayedText('');
+    setIsTyping(true);
+    let index = 0;
+
+    const timer = setInterval(() => {
+      if (index < text.length) {
+        setDisplayedText(text.slice(0, index + 1));
+        index++;
+      } else {
+        setIsTyping(false);
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return { displayedText, isTyping };
+};
+
+export default function OnboardingDynamic() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
@@ -20,7 +47,7 @@ function OnboardingDynamic() {
   const [value, setValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [questionCount, setQuestionCount] = useState(0);
+  const [isThinking, setIsThinking] = useState(false); // 🔥 Nouveau state
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -28,17 +55,23 @@ function OnboardingDynamic() {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
+  // 🔥 Question actuelle avec typing effect
+  const questionText = currentQuestion?.text || currentQuestion?.title || '';
+  const { displayedText, isTyping } = useTypingEffect(
+    isThinking ? '' : questionText, 
+    30
+  );
+
   useEffect(() => {
     initializeOnboarding();
   }, []);
 
   useEffect(() => {
-    // Scroll avec délai plus long pour laisser l'animation finir
     const timer = setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }, 300);
     return () => clearTimeout(timer);
-  }, [messages, currentQuestion]);
+  }, [messages, displayedText]);
 
   const buildMessagesFromHistory = (history) => {
     const msgs = [];
@@ -98,7 +131,7 @@ function OnboardingDynamic() {
     try {
       const firstName = localStorage.getItem('onboarding_firstName') || '';
       
-      // 🔥 AMÉLIORATION 1: Ajouter la réponse utilisateur IMMÉDIATEMENT (optimistic update)
+      // 🔥 ÉTAPE 1 : Ajouter réponse utilisateur immédiatement
       if (lastAnswer && currentQuestion) {
         const userMessage = {
           id: `temp-user-${Date.now()}`,
@@ -107,6 +140,10 @@ function OnboardingDynamic() {
         };
         setMessages(prev => [...prev, userMessage]);
       }
+
+      // 🔥 ÉTAPE 2 : Noah réfléchit (animation cerveau)
+      setIsThinking(true);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 secondes de réflexion
 
       const { data } = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId,
@@ -122,25 +159,27 @@ function OnboardingDynamic() {
         return;
       }
 
-      // 🔥 AMÉLIORATION 2: Récupérer la session mise à jour pour la synchronisation
+      // Récupérer session mise à jour
       const updatedSessions = await base44.entities.Session.filter({ id: sessionId });
       if (updatedSessions && updatedSessions.length > 0) {
         const freshSession = updatedSessions[0];
         setSession(freshSession);
-        setQuestionCount(Math.min(freshSession.onboarding_history?.length || 0, 11));
         
-        // 🔥 AMÉLIORATION 3: Reconstruire les messages depuis l'historique pour éviter les duplications
         const historicMessages = buildMessagesFromHistory(freshSession.onboarding_history || []);
         setMessages(historicMessages);
       }
 
-      // 🔥 AMÉLIORATION 4: Ajouter la nouvelle question de Noah IMMÉDIATEMENT
+      // 🔥 ÉTAPE 3 : Fin de la réflexion, début du typing
       if (data.nextQuestion) {
+        setIsThinking(false);
+        
+        // Ajouter la question aux messages (le typing se fait via le hook)
         const questionText = data.nextQuestion.text || data.nextQuestion.title;
         const noahMessage = {
           id: `noah-${Date.now()}`,
           sender: 'noah',
-          content: questionText
+          content: questionText,
+          isNew: true // Flag pour activer le typing
         };
         
         setMessages(prev => [...prev, noahMessage]);
@@ -150,6 +189,7 @@ function OnboardingDynamic() {
 
     } catch (error) {
       console.error('Error fetching next question:', error);
+      setIsThinking(false);
     } finally {
       setIsLoading(false);
       setIsSaving(false);
@@ -167,10 +207,7 @@ function OnboardingDynamic() {
     setIsSaving(true);
 
     const normalizedAnswer = typeof value === 'string' ? value : JSON.stringify(value);
-    
-    // Ne pas mettre isLoading à true ici pour garder l'input visible
     await fetchNextQuestion(session.id, normalizedAnswer);
-    
     setValue('');
   };
 
@@ -236,7 +273,7 @@ function OnboardingDynamic() {
       <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progress} />
 
       <div className="flex-1 flex flex-col lg:ml-80 h-screen relative">
-        {/* Header Parcours - Hidden on mobile as sidebar handles it */}
+        {/* Header */}
         <div className="hidden lg:block sticky top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
           <div className="px-6 py-4 flex items-center justify-end max-w-4xl mx-auto w-full">
             <div className="flex flex-col items-end">
@@ -255,10 +292,10 @@ function OnboardingDynamic() {
           </div>
         </div>
 
-        {/* Messaging Area */}
+        {/* Messages Area */}
         <div className="flex-1 overflow-y-auto pt-48 md:pt-32 pb-80 px-4 md:px-6">
           <div className="max-w-3xl mx-auto space-y-8">
-            {/* Intro Message */}
+            {/* Intro */}
             <div className="flex justify-center w-full px-6 py-6">
               <p className="text-gray-400 text-[11px] md:text-xs text-center max-w-sm leading-relaxed font-medium uppercase tracking-wider opacity-70">
                 C'est un plaisir de t'aider à structurer ton projet ! <br /> Je vais te poser quelques questions pour comprendre ton univers.
@@ -296,7 +333,53 @@ function OnboardingDynamic() {
               ))}
             </AnimatePresence>
 
-            {/* 🔥 AMÉLIORATION 5: Loader uniquement au premier chargement */}
+            {/* 🔥 ANIMATION RÉFLEXION (Cerveau qui pulse) */}
+            {isThinking && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex gap-4"
+              >
+                <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center flex-shrink-0 mt-1">
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                      rotate: [0, 5, -5, 0]
+                    }}
+                    transition={{ 
+                      duration: 1.5, 
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <Brain className="w-8 h-8 text-[#61f7a2]" />
+                  </motion.div>
+                </div>
+                <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-4 shadow-sm">
+                  <p className="text-gray-400 text-sm italic">Noah réfléchit...</p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* 🔥 TYPING EFFECT sur nouvelle question */}
+            {!isThinking && currentQuestion && displayedText && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex gap-4"
+              >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
+                  <Brain className="w-5 h-5 text-white" />
+                </div>
+                <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-4 shadow-sm text-sm md:text-base leading-relaxed text-gray-800 max-w-[85%]">
+                  {displayedText}
+                  {isTyping && <span className="inline-block w-0.5 h-4 bg-[#61f7a2] ml-0.5 animate-pulse" />}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Loader initial */}
             {isLoading && messages.length === 0 && (
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
@@ -312,7 +395,7 @@ function OnboardingDynamic() {
               </div>
             )}
 
-            {/* 🔥 AMÉLIORATION 6: Dernière question badge si c'est la 11ème */}
+            {/* Badge dernière question */}
             {currentQuestion && (session?.onboarding_history?.length || 0) === 10 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -335,7 +418,7 @@ function OnboardingDynamic() {
           <div className="max-w-3xl mx-auto">
             <motion.div layout className="bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden">
               <div className="p-4 md:p-6">
-                {currentQuestion && !isLoading ? (
+                {currentQuestion && !isLoading && !isThinking ? (
                   <div className="space-y-4">
                     {currentQuestion.type === 'text' && (
                       <div className="relative group">
@@ -471,18 +554,6 @@ function OnboardingDynamic() {
           </div>
         </div>
       </div>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .pulse-noah { animation: noahpulse 2s infinite; }
-        @keyframes noahpulse {
-          0% { box-shadow: 0 0 0 0px rgba(97, 247, 162, 0.4); }
-          70% { box-shadow: 0 0 0 12px rgba(97, 247, 162, 0); }
-          100% { box-shadow: 0 0 0 0px rgba(97, 247, 162, 0); }
-        }
-      `}} />
     </div>
   );
 }
-
-// Export par défaut requis pour React
-export default OnboardingDynamic;

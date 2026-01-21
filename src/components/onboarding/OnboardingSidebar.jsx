@@ -212,7 +212,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1">
+                  <div className="flex-1 flex items-center justify-between">
                     <p className={cn(
                       "text-sm font-semibold transition-colors",
                       isActive ? "text-white" : "text-gray-500",
@@ -220,6 +220,13 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [] }) 
                     )}>
                       {step.title}
                     </p>
+                    <span className={cn(
+                      "text-xs font-medium ml-2",
+                      isActive ? "text-[#61f7a2]" : "text-gray-400",
+                      isCompleted && "text-gray-300"
+                    )}>
+                      {isCompleted ? "100%" : isActive ? `${Math.round(progressInStep)}%` : "0%"}
+                    </span>
                   </div>
 
                   {/* Active indicator */}

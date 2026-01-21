@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Package, Gift, TrendingUp, Crown, FileCheck, Menu } from 'lucide-react'; // Ajout de Menu pour mobile si besoin
+import { Package, Gift, TrendingUp, Crown, FileCheck } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 const OFFER_STEPS = [
@@ -15,8 +15,8 @@ const OFFER_STEPS = [
 export default function OfferSidebar({ currentPage }) {
   const navigate = useNavigate();
 
-  // Déduire l'étape courante à partir de la prop currentPage
-  const activeStepObj = OFFER_STEPS.find(s => s.page === currentPage) || OFFER_STEPS[0];
+  // Déterminer l'étape active en fonction de la page actuelle
+  const activeStepObj = OFFER_STEPS.find(step => step.page === currentPage) || OFFER_STEPS[0];
   const currentStep = activeStepObj.id;
 
   const stepColors = {
@@ -29,7 +29,7 @@ export default function OfferSidebar({ currentPage }) {
 
   return (
     <>
-      {/* --- DESKTOP SIDEBAR --- */}
+      {/* Desktop Sidebar */}
       <div className="hidden lg:flex fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 p-6 flex-col z-40">
         {/* Header */}
         <div className="mb-8">
@@ -41,9 +41,12 @@ export default function OfferSidebar({ currentPage }) {
         <div className="flex-1 space-y-3">
           {OFFER_STEPS.map((step) => {
             const isActive = step.id === currentStep;
+            // On considère les étapes précédentes comme "passées".
+            // On peut aussi décider que toutes les étapes sont cliquables si on veut naviguer librement.
+            // Pour l'instant, rendons cliquable si c'est l'étape courante ou une précédente.
             const isPrevious = step.id < currentStep;
-            // On permet de cliquer sur les étapes précédentes OU l'étape courante
-            const isClickable = isPrevious || isActive; 
+            const isClickable = isPrevious || isActive;
+
             const colors = stepColors[step.id];
 
             return (
@@ -54,14 +57,16 @@ export default function OfferSidebar({ currentPage }) {
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left",
                   isActive && `bg-gradient-to-r ${colors.bg} text-white shadow-lg`,
-                  isPrevious && `${colors.light} ${colors.text} hover:opacity-80 cursor-pointer`,
+                  // Style pour les items précédents (accessibles mais pas actifs)
+                  isPrevious && `bg-white hover:bg-gray-50 text-gray-600 cursor-pointer border border-gray-100`,
+                  // Style pour les items futurs (inaccessibles)
                   !isActive && !isPrevious && "bg-gray-50 text-gray-400 cursor-not-allowed opacity-60"
                 )}
               >
                 <div className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                  "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
                   isActive && "bg-white/20",
-                  isPrevious && colors.iconBg,
+                  isPrevious && colors.iconBg, // Icone colorée pour les précédents
                   !isActive && !isPrevious && "bg-gray-100"
                 )}>
                   <step.icon className={cn(
@@ -75,8 +80,15 @@ export default function OfferSidebar({ currentPage }) {
                   <div className={cn(
                     "text-xs font-medium mb-0.5",
                     isActive ? "text-white/80" : "text-gray-500"
-                  )}>Étape {step.id}</div>
-                  <div className="font-semibold text-sm">{step.label}</div>
+                  )}>
+                    Étape {step.id}
+                  </div>
+                  <div className={cn(
+                    "font-semibold text-sm",
+                    isActive ? "text-white" : "text-gray-900"
+                  )}>
+                    {step.label}
+                  </div>
                 </div>
               </button>
             );
@@ -98,30 +110,28 @@ export default function OfferSidebar({ currentPage }) {
         </div>
       </div>
 
-      {/* --- MOBILE TOP BAR (Adaptation simple) --- */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 px-4 py-3">
+      {/* Mobile Sidebar (Version simplifiée sticky top) */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 px-4 py-3 shadow-sm">
         <div className="flex items-center gap-3">
-           {/* Icône de l'étape courante */}
-           <div className={cn(
-             "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-             `bg-gradient-to-br ${stepColors[currentStep]?.bg || 'from-gray-500 to-gray-600'}`
-           )}>
-             <activeStepObj.icon className="w-5 h-5 text-white" />
-           </div>
-           
-           <div className="flex-1">
-             <div className="flex justify-between items-center mb-1">
-               <h2 className="font-bold text-gray-900 text-sm">{activeStepObj.label}</h2>
-               <span className="text-xs font-medium text-[#61f7a2]">{currentStep}/{OFFER_STEPS.length}</span>
-             </div>
-             {/* Barre de progression mobile */}
-             <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
-                  style={{ width: `${(currentStep / OFFER_STEPS.length) * 100}%` }}
-                />
-             </div>
-           </div>
+          <div className={cn(
+            "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+            `bg-gradient-to-br ${stepColors[currentStep]?.bg}`
+          )}>
+            <activeStepObj.icon className="w-5 h-5 text-white" />
+          </div>
+
+          <div className="flex-1">
+            <div className="flex justify-between items-center mb-1">
+              <h2 className="font-bold text-gray-900 text-sm">{activeStepObj.label}</h2>
+              <span className="text-xs font-medium text-[#61f7a2]">{currentStep}/{OFFER_STEPS.length}</span>
+            </div>
+            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
+                style={{ width: `${(currentStep / OFFER_STEPS.length) * 100}%` }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </>

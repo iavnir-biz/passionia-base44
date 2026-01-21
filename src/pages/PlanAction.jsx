@@ -46,45 +46,43 @@ export default function PlanAction() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      console.log('[PlanAction] 🚀 Loading data...');
       
-      if (profiles.length > 0) {
-        const userProfile = profiles[0];
-        setProfile(userProfile);
-
-        let savedProgress = userProfile.plan_7days_progress;
-
-        if (savedProgress === undefined || savedProgress === null) {
-          savedProgress = {};
-          try {
-            await base44.entities.UserProfile.update(userProfile.id, {
-              plan_7days_progress: JSON.stringify({})
-            });
-          } catch (error) {
-            console.error('Erreur initialisation:', error);
-          }
-        } else if (typeof savedProgress === "string") {
+      // 🔥 Charger la Session (contient plan_progress)
+      const sessions = await base44.entities.Session.filter({ created_by: user.email });
+      
+      if (sessions.length > 0) {
+        const userSession = sessions[0];
+        setSession(userSession);
+        
+        console.log('[PlanAction] ✅ Session loaded:', userSession.id);
+        
+        // 🔥 Charger la progression depuis session.plan_progress
+        let savedProgress = userSession.plan_progress || {};
+        
+        console.log('[PlanAction] ✅ Raw plan_progress from DB:', savedProgress);
+        
+        // Pas besoin de parser si c'est déjà un object
+        if (typeof savedProgress === "string") {
           try {
             savedProgress = JSON.parse(savedProgress);
+            console.log('[PlanAction] ✅ Parsed JSON plan_progress');
           } catch (e) {
-            console.error('Erreur parsing JSON', e);
+            console.error('[PlanAction] ❌ Error parsing JSON', e);
             savedProgress = {};
           }
         }
 
         setDayProgress(savedProgress);
+        console.log('[PlanAction] ✅ Final dayProgress state:', savedProgress);
 
+        // Calculer le jour actuel
         const completedDays = Object.keys(savedProgress).filter(
           key => savedProgress[key]?.completed
         ).length;
         setCurrentDay(Math.min(completedDays + 1, 7));
-      }
-
-      const sessions = await base44.entities.Session.filter({ created_by: user.email });
-      if (sessions.length > 0) {
-        const userSession = sessions[0];
-        setSession(userSession);
         
+        // Vérifier si tous les docs sont prêts
         const allReady = !!(
           userSession.complete_market_analysis &&
           userSession.generated_avatars &&
@@ -95,16 +93,22 @@ export default function PlanAction() {
         setDocsReady(allReady);
       }
 
+      // Charger UserProfile séparément (juste pour has_paid)
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      if (profiles.length > 0) {
+        setProfile(profiles[0]);
+      }
+
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('[PlanAction] ❌ Error loading data:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleChecklistChange = async (day, itemIndex) => {
-    if (!profile?.id) {
-      console.error('⛔ Aucun profil chargé');
+    if (!session?.id) {
+      console.error('[PlanAction] ⛔ No session loaded');
       return;
     }
 
@@ -125,17 +129,18 @@ export default function PlanAction() {
     setDayProgress(newProgress);
 
     try {
-      await base44.entities.UserProfile.update(profile.id, {
-        plan_7days_progress: JSON.stringify(newProgress)
+      console.log('[PlanAction] ✅ Checkbox changed, saving...', newProgress);
+      await base44.entities.Session.update(session.id, {
+        plan_progress: newProgress
       });
-      console.log('✅ Sauvegardé');
+      console.log('[PlanAction] ✅ Progress saved to session');
     } catch (error) {
-      console.error('❌ Erreur sauvegarde:', error);
+      console.error('[PlanAction] ❌ Error saving progress:', error);
     }
   };
 
   const handleDayComplete = async (day) => {
-    if (!profile?.id) return;
+    if (!session?.id) return;
 
     const newProgress = {
       ...dayProgress,
@@ -150,13 +155,16 @@ export default function PlanAction() {
     setCurrentDay(Math.min(day + 1, 7));
 
     try {
-      await base44.entities.UserProfile.update(profile.id, {
-        plan_7days_progress: JSON.stringify(newProgress)
+      console.log('[PlanAction] ✅ Day completed, saving...', newProgress);
+      await base44.entities.Session.update(session.id, {
+        plan_progress: newProgress
       });
+      console.log('[PlanAction] ✅ Day completion saved');
     } catch (error) {
-      console.error('❌ Erreur:', error);
+      console.error('[PlanAction] ❌ Error saving day completion:', error);
     }
   };
+
   const getDayChecklist = (day) => {
     const mainProduct = session?.finalized_offer?.mainProduct;
     const orderBump = session?.finalized_offer?.orderBump;
@@ -468,6 +476,7 @@ export default function PlanAction() {
       };
     });
   };
+
   const days = [
     {
       number: 1,

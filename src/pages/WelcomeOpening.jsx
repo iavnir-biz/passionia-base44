@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { Sparkles, CheckCircle, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import GlowButton from '@/components/ui/GlowButton';
 
@@ -36,20 +36,20 @@ export default function WelcomeOpening() {
         return;
       }
 
-      // ✅ Assets déjà générés → on skip WelcomeOpening et va au Dashboard
+      // Vérifier si les assets sont déjà générés
       const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
       if (sessions.length > 0) {
-        const session = sessions[0];
-        setSession(session);
+        const userSession = sessions[0];
+        setSession(userSession);
         
-        if (session.assets_generation_completed_at) {
+        // Si tout est déjà prêt, redirect direct vers Dashboard
+        if (userSession.all_assets_ready) {
           console.log('✅ [WelcomeOpening] Assets déjà générés, redirect Dashboard');
           navigate(createPageUrl('Dashboard'));
           return;
         }
       }
       
-      // ✅ Sinon : rester sur WelcomeOpening pour afficher la page
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -57,22 +57,9 @@ export default function WelcomeOpening() {
     }
   };
 
-  const handleStart = async () => {
-    // Vérifier si profil minimal existe
-    const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-    if (profiles.length > 0) {
-      const profile = profiles[0];
-      if (!profile.first_name || !profile.avatar_url) {
-        navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
-        return;
-      }
-    } else {
-      navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
-      return;
-    }
-
-    // Profil complet → Dashboard direct
-    navigate(createPageUrl('Dashboard'));
+  const handleStart = () => {
+    // Redirect vers SetupProfile
+    navigate(createPageUrl('SetupProfile'));
   };
 
   if (isLoading) {
@@ -119,9 +106,35 @@ export default function WelcomeOpening() {
             <p className="text-xl text-gray-700 mb-6">
               Ton accès est activé.
             </p>
-            <p className="text-lg text-gray-600 mb-8">
-              Nova a préparé tous les outils pour transformer ton savoir-faire en business rentable.
+            <p className="text-lg text-gray-600 mb-4">
+              Noah va générer tous tes documents personnalisés :
             </p>
+            
+            {/* Liste de ce qui va être généré */}
+            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-6 mb-8 border border-green-100 text-left">
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold mt-0.5">✓</span>
+                  <span>Analyse de marché complète avec SWOT</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold mt-0.5">✓</span>
+                  <span>3 Avatars clients ultra-détaillés</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold mt-0.5">✓</span>
+                  <span>4 Offres complètes avec prix et positionnement</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold mt-0.5">✓</span>
+                  <span>8 Messages de vente prêts à envoyer</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold mt-0.5">✓</span>
+                  <span>5 Emails marketing en séquence</span>
+                </li>
+              </ul>
+            </div>
 
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -134,9 +147,13 @@ export default function WelcomeOpening() {
                 size="lg"
                 className="px-12"
               >
-                Accéder au dashboard
+                C'est parti ! 🚀
               </GlowButton>
             </motion.div>
+            
+            <p className="text-sm text-gray-500 mt-6">
+              Ça prend environ 1-2 minutes, tu verras la progression en temps réel.
+            </p>
           </motion.div>
         </motion.div>
       </div>

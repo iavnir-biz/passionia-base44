@@ -1,8 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
+
 const anthropic = new Anthropic({
   apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
+
 // Structure des questions (entre 6 et 11 questions maximum)
 const QUESTION_STRUCTURE = [
   {
@@ -109,25 +111,33 @@ const QUESTION_STRUCTURE = [
     subtitleTemplate: "Une anecdote, une histoire personnelle liée à ta compétence, ou un détail qui te rend unique ? Cela m'aidera à créer une offre qui te ressemble vraiment."
   }
 ];
+
 const SYSTEM_PROMPT = `Tu es Noah, un coach d'affaires bienveillant et pédagogue.
+
 Ta mission est d'aider un futur expert à transformer sa compétence en une offre commerciale pour **ENSEIGNER son savoir-faire**. Tu t'adresses à l'utilisateur avec "tu" et utilises son prénom de temps en temps.
+
 **ATTENTION - RÈGLE FONDAMENTALE :**
 L'objectif de l'utilisateur est de **TRANSMETTRE SON SAVOIR-FAIRE** pour créer des revenus en ligne (formations, coachings, ebooks, etc.). Tes questions doivent TOUJOURS être orientées pour l'aider à **ENSEIGNER** sa compétence, et NON à la vendre comme un service.
+
 Par exemple :
 - ❌ Si sa compétence est "photographe de mode", NE LUI DEMANDE PAS pour quel type de magazine il veut travailler
 - ✅ Au lieu de ça, demande-lui : "À quel type d'apprenti photographe aimerais-tu enseigner tes techniques ?"
+
 **TA MISSION :**
 - Tu ne remplis pas un formulaire, tu mènes une VRAIE conversation intelligente
 - **RÈGLE D'OR : SIMPLICITÉ ET CONCRET.** Chaque question doit être très facile à comprendre. Évite le jargon.
 - Ton but est de collecter assez d'informations sur (1) le **futur élève** (le client cible), (2) son problème principal **d'apprentissage**, et (3) la solution/transformation **qu'il obtiendra en apprenant**.
 - Tu reformules la question en t'appuyant sur ce que l'utilisateur vient de dire
 - Tu montres que tu as VRAIMENT compris sa réponse précédente
+
 **RÈGLE DE COHÉRENCE :**
 Chaque fois que tu donnes un exemple entre parenthèses pour guider l'utilisateur, cet exemple DOIT être directement et logiquement lié à sa compétence et à l'idée d'enseigner. N'utilise JAMAIS d'exemples génériques ou sans rapport.
+
 **STRUCTURE DE TA RÉPONSE :**
 1. Commence par montrer que tu as compris (1 phrase max, naturelle et encourageante)
 2. Pose UNE question claire qui découle logiquement de sa réponse
 3. Parle du PROBLÈME de ses futurs élèves ou de leur TRANSFORMATION, jamais de l'outil technique
+
 **TON & STYLE :**
 - Simple, clair, encourageant. Utilise "tu"
 - Langage simple, vivant, humain
@@ -135,45 +145,54 @@ Chaque fois que tu donnes un exemple entre parenthèses pour guider l'utilisateu
 - Sois curieux mais va droit au but
 - Questions qui pourraient être posées dans une vraie discussion
 - Zéro jargon, zéro formalisme
+
 **INTERDICTIONS :**
 ❌ Reformuler mot pour mot le template
 ❌ Répéter exactement ce que l'utilisateur a dit
 ❌ Être générique ou scolaire
 ❌ Ignorer le contexte de la réponse précédente
 ❌ Parler de vendre un service au lieu d'enseigner
+
 **TEST QUALITÉ :**
 "Est-ce que cette question pourrait être posée par un humain bienveillant dans une vraie conversation ?"
 Si non → reformule.
+
 **FORMAT DE SORTIE (JSON uniquement) :**
 {
   "text": "la question reformulée, naturelle et contextuelle",
   "subtitle": "1 phrase d'exemples concrets, spécifiques et pertinents par rapport à sa compétence"
 }`;
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { sessionId, userAnswer, firstName } = await req.json();
+
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
+
     // ÉTAPE 1 : Sauvegarder la réponse si présente
     if (userAnswer) {
       const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
       if (!sessions || sessions.length === 0) {
         return Response.json({ error: 'Session not found' }, { status: 404 });
       }
+
       const currentSession = sessions[0];
       const workingHistory = currentSession.onboarding_history || [];
       const workingSummary = currentSession.onboarding_summary || {};
+
       const normalizedAnswer = typeof userAnswer === 'string' ? userAnswer : JSON.stringify(userAnswer);
-      
+
       const currentQuestionConfig = QUESTION_STRUCTURE[workingHistory.length];
-      const questionText = currentQuestionConfig 
+      const questionText = currentQuestionConfig
         ? currentQuestionConfig.titleTemplate
-            .replace('{{firstName}}', firstName || '')
-            .replace('{{coreSkill}}', workingSummary.who_to_teach || 'cette compétence')
-            .replace('{{targetAudience}}', workingSummary.learner_profile || 'ces personnes')
+          .replace('{{firstName}}', firstName || '')
+          .replace('{{coreSkill}}', workingSummary.who_to_teach || 'cette compétence')
+          .replace('{{targetAudience}}', workingSummary.learner_profile || 'ces personnes')
         : `Question ${workingHistory.length + 1}`;
+
       const updatedHistory = [
         ...workingHistory,
         {
@@ -183,21 +202,23 @@ Deno.serve(async (req) => {
           at: new Date().toISOString()
         }
       ];
+
       const fullData = currentSession.onboarding_full || {};
-      const coreSkill = workingHistory.length === 0 
-        ? normalizedAnswer 
+      const coreSkill = workingHistory.length === 0
+        ? normalizedAnswer
         : (fullData.coreSkill || workingSummary.who_to_teach || '');
+
       const updatePayload = {
         onboarding_history: updatedHistory,
         skill: coreSkill
       };
-      
+
       // Mapping spécifique selon la question
       if (workingHistory.length === 0) {
         // Q1: coreSkill
-        updatePayload.onboarding_full = { 
+        updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
-          coreSkill: normalizedAnswer 
+          coreSkill: normalizedAnswer
         };
         updatePayload.onboarding_summary = {
           ...(currentSession.onboarding_summary || {}),
@@ -285,8 +306,9 @@ Deno.serve(async (req) => {
         };
         updatePayload.is_onboarding_done = true;
       }
+
       await base44.asServiceRole.entities.Session.update(sessionId, updatePayload);
-      
+
       // Si dernière question, pas de prochaine question
       if (workingHistory.length >= 10) {
         return Response.json({
@@ -295,30 +317,35 @@ Deno.serve(async (req) => {
         });
       }
     }
+
     // ÉTAPE 2 : Générer la prochaine question
     const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (!sessions || sessions.length === 0) {
       return Response.json({ error: 'Session not found' }, { status: 404 });
     }
+
     const session = sessions[0];
     const history = session.onboarding_history || [];
     const summary = session.onboarding_summary || {};
-    
+
     const nextQuestionIndex = history.length;
-    
+
     if (nextQuestionIndex >= QUESTION_STRUCTURE.length) {
       return Response.json({
         done: true,
         nextQuestionNumber: null
       });
     }
+
     const nextQuestion = QUESTION_STRUCTURE[nextQuestionIndex];
-    // Pour les questions de type choice, slider, OU la première question (pas de contexte), pas besoin d'appeler Claude
-    if (nextQuestion.type === 'single_choice' || nextQuestion.type === 'slider' || nextQuestionIndex === 0) {
+
+    // Pour la première question (pas de contexte), pas besoin d'appeler Claude
+    if (nextQuestionIndex === 0) {
       const staticTitle = nextQuestion.titleTemplate
         .replace('{{firstName}}', firstName || '')
         .replace('{{coreSkill}}', summary.who_to_teach || 'cette compétence')
         .replace('{{targetAudience}}', summary.learner_profile || 'ces personnes');
+
       return Response.json({
         done: false,
         nextQuestion: {
@@ -334,34 +361,45 @@ Deno.serve(async (req) => {
         }
       });
     }
-    // Pour les questions de type text, on appelle Claude pour reformulation contextuelle
+
+    // Pour TOUTES les autres questions (text, choice, slider), on appelle Claude pour reformulation contextuelle
     const lastAnswer = history.length > 0 ? history[history.length - 1].answer : null;
     const previousContext = history.map(h => `Q: ${h.question}\nR: ${h.answer}`).join('\n\n');
+
     const userPrompt = `Contexte de la conversation jusqu'à maintenant :
 ${previousContext}
+
 Dernière réponse de l'utilisateur : "${lastAnswer}"
+
 Catégorie de cette question : ${nextQuestion.category}
 Thème : ${nextQuestion.theme}
+
 Template de base (à reformuler de manière NATURELLE et CONTEXTUELLE) :
 Titre : ${nextQuestion.titleTemplate}
 Sous-titre : ${nextQuestion.subtitleTemplate}
+
 Variables disponibles :
 - firstName: ${firstName || 'non renseigné'}
 - coreSkill (ce qu'il veut enseigner): ${summary.who_to_teach || 'non renseigné'}
 - targetAudience (à qui il veut enseigner): ${summary.learner_profile || 'non renseigné'}
+
 MISSION :
 1. Reformule cette question de manière naturelle, en montrant que tu as compris sa dernière réponse
 2. Rends la question fluide, comme si tu étais dans une vraie conversation avec un ami
 3. CRUCIAL : Dans le sous-titre, donne des exemples concrets SPÉCIFIQUES à la compétence "${summary.who_to_teach || 'la compétence'}" et au contexte d'ENSEIGNER (pas de vendre un service)
+
 Par exemple, si la compétence est "photographie de portrait" et qu'on demande l'élève idéal :
 - ✅ BON exemple dans subtitle : "ex: quelqu'un qui débute en photo et veut apprendre à capturer l'émotion, ou un amateur qui veut progresser dans l'éclairage de portrait"
 - ❌ MAUVAIS exemple : "ex: les magazines de mode, les agences de publicité" (ça c'est vendre un service, pas enseigner)
+
 Retourne UNIQUEMENT un JSON avec cette structure :
 {
   "text": "la question reformulée, naturelle et contextuelle",
   "subtitle": "1 phrase d'exemples concrets et spécifiques à la compétence, orientés enseignement"
 }`;
+
     let reformulated;
+
     try {
       console.log("ANTHROPIC_CALL start", {
         fn: "onboardingNextQuestion",
@@ -369,6 +407,7 @@ Retourne UNIQUEMENT un JSON avec cette structure :
         model: "claude-sonnet-4-20250514",
         questionNumber: nextQuestionIndex + 1
       });
+
       const message = await anthropic.messages.create({
         model: "claude-sonnet-4-20250514",
         max_tokens: 1024,
@@ -377,13 +416,16 @@ Retourne UNIQUEMENT un JSON avec cette structure :
           { role: "user", content: userPrompt }
         ]
       });
-      console.log("ANTHROPIC_CALL end", { 
-        fn: "onboardingNextQuestion", 
+
+      console.log("ANTHROPIC_CALL end", {
+        fn: "onboardingNextQuestion",
         sessionId,
         usage: message.usage
       });
+
       const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
       reformulated = JSON.parse(responseText);
+
     } catch (e) {
       console.error("Anthropic API or Parse error, using fallback", e);
       reformulated = {
@@ -394,6 +436,7 @@ Retourne UNIQUEMENT un JSON avec cette structure :
         subtitle: nextQuestion.subtitleTemplate
       };
     }
+
     return Response.json({
       done: false,
       nextQuestion: {
@@ -401,14 +444,19 @@ Retourne UNIQUEMENT un JSON avec cette structure :
         field: nextQuestion.field,
         type: nextQuestion.type,
         title: reformulated.text,
-        subtitle: reformulated.subtitle
+        subtitle: reformulated.subtitle,
+        options: nextQuestion.options || null,
+        min: nextQuestion.min || null,
+        max: nextQuestion.max || null,
+        step: nextQuestion.step || null
       }
     });
+
   } catch (error) {
     console.error('Error in onboardingNextQuestion:', error);
-    return Response.json({ 
+    return Response.json({
       error: error.message,
-      stack: error.stack 
+      stack: error.stack
     }, { status: 500 });
   }
 });

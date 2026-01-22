@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Sparkles, Mic, StopCircle, Brain, Send, User as UserIcon, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -25,9 +25,7 @@ export default function OnboardingDynamic() {
   const [questionCount, setQuestionCount] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [prefilledAnswer, setPrefilledAnswer] = useState(''); // 🔥 NOUVEAU STATE
-  const messagesEndRef = useRef(null);
+  const [prefilledAnswer, setPrefilledAnswer] = useState(''); // 🔥 Passion pré-remplie
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
@@ -43,13 +41,6 @@ export default function OnboardingDynamic() {
     initializeOnboarding();
   }, []);
 
-  useEffect(() => {
-    // Scroll avec délai plus long pour laisser l'animation finir
-    const timer = setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [messages, currentQuestion]);
 
   // 🔥 Auto-remplir la première question si on a une passion pré-remplie
   useEffect(() => {
@@ -58,25 +49,6 @@ export default function OnboardingDynamic() {
       setValue(prefilledAnswer);
     }
   }, [currentQuestion, prefilledAnswer]);
-
-  const buildMessagesFromHistory = (history) => {
-    const msgs = [];
-    if (history && history.length > 0) {
-      history.forEach((item, index) => {
-        msgs.push({
-          id: `q-${index}`,
-          sender: 'noah',
-          content: item.question
-        });
-        msgs.push({
-          id: `a-${index}`,
-          sender: 'user',
-          content: item.answer
-        });
-      });
-    }
-    return msgs;
-  };
 
   const initializeOnboarding = async () => {
     try {
@@ -99,7 +71,7 @@ export default function OnboardingDynamic() {
 
       setUser({ firstName });
       setSession(loadedSession);
-      setMessages(buildMessagesFromHistory(loadedSession.onboarding_history || []));
+      setQuestionCount(loadedSession.onboarding_history?.length || 0);
 
       // 🔥 Si la session a déjà une skill enregistrée et qu'on n'a pas encore de prefilledAnswer, l'utiliser
       if (loadedSession.onboarding_full?.coreSkill && !prefilledAnswer) {
@@ -122,16 +94,6 @@ export default function OnboardingDynamic() {
   const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
     try {
       const firstName = localStorage.getItem('onboarding_firstName') || '';
-      
-      // Ajouter la réponse utilisateur IMMÉDIATEMENT (optimistic update)
-      if (lastAnswer && currentQuestion) {
-        const userMessage = {
-          id: `temp-user-${Date.now()}`,
-          sender: 'user',
-          content: typeof lastAnswer === 'string' ? lastAnswer : JSON.stringify(lastAnswer)
-        };
-        setMessages(prev => [...prev, userMessage]);
-      }
 
       const { data } = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId,
@@ -147,42 +109,23 @@ export default function OnboardingDynamic() {
         return;
       }
 
-      // Récupérer la session mise à jour pour la synchronisation
+      // Récupérer la session mise à jour
       const updatedSessions = await base44.entities.Session.filter({ id: sessionId });
       if (updatedSessions && updatedSessions.length > 0) {
         const freshSession = updatedSessions[0];
         setSession(freshSession);
         setQuestionCount(Math.min(freshSession.onboarding_history?.length || 0, MAX_QUESTIONS));
-        
-        // Reconstruire les messages depuis l'historique pour éviter les duplications
-        const historicMessages = buildMessagesFromHistory(freshSession.onboarding_history || []);
-        setMessages(historicMessages);
       }
 
-      // Ajouter la nouvelle question de Noah IMMÉDIATEMENT
+      // Afficher la nouvelle question
       if (data.nextQuestion) {
-        const questionText = data.nextQuestion.text || data.nextQuestion.title;
-        const noahMessage = {
-          id: `noah-${Date.now()}`,
-          sender: 'noah',
-          content: questionText
-        };
-        
-        setMessages(prev => [...prev, noahMessage]);
         setCurrentQuestion(data.nextQuestion);
         initializeValue(data.nextQuestion.type, data.nextQuestion);
       }
 
     } catch (error) {
       console.error('Error fetching next question:', error);
-
-      // Afficher un message d'erreur à l'utilisateur
-      const errorMessage = {
-        id: `error-${Date.now()}`,
-        sender: 'noah',
-        content: "Oups, j'ai rencontré un petit problème technique. Peux-tu rafraîchir la page ? Si le problème persiste, contacte le support."
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      alert("Oups, j'ai rencontré un petit problème technique. Peux-tu rafraîchir la page ?");
     } finally {
       setIsLoading(false);
       setIsSaving(false);
@@ -267,194 +210,162 @@ export default function OnboardingDynamic() {
     <div className="min-h-screen bg-[#f9fafb] flex overflow-hidden">
       <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progress} />
 
-      <div className="flex-1 flex flex-col lg:ml-80 h-screen relative">
-        {/* Header Parcours - Hidden on mobile as sidebar handles it */}
-        <div className="hidden lg:block sticky top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
-          <div className="px-6 py-4 flex items-center justify-end max-w-4xl mx-auto w-full">
-            <div className="flex flex-col items-end">
-              <span className="text-xs font-bold text-[#61f7a2] mb-1">
-                {Math.min(session?.onboarding_history?.length || 0, MAX_QUESTIONS)}/{MAX_QUESTIONS}
+      <div className="flex-1 flex flex-col lg:ml-80 h-screen">
+        {/* Header avec titre et progression */}
+        <div className="bg-white border-b border-gray-100 px-6 py-6">
+          <div className="max-w-4xl mx-auto flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">Tes talents</h1>
+            <div className="text-right">
+              <span className="text-sm font-medium text-[#61f7a2]">
+                {questionCount}/{MAX_QUESTIONS} questions
               </span>
-              <div className="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"
-                  initial={{ width: '0%' }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Messaging Area */}
-        <div className="flex-1 overflow-y-auto pt-48 md:pt-32 pb-80 px-4 md:px-6">
-          <div className="max-w-3xl mx-auto space-y-8">
-            {/* Intro Message */}
-            <div className="flex justify-center w-full px-6 py-6">
-              <p className="text-gray-400 text-[11px] md:text-xs text-center max-w-sm leading-relaxed font-medium uppercase tracking-wider opacity-70">
-                C'est un plaisir de t'accompagner ! <br /> Je vais te poser quelques questions pour bien comprendre ta compétence et comment tu veux l'enseigner.
-              </p>
-            </div>
-
-            <AnimatePresence mode="popLayout">
-              {messages.map((msg, idx) => (
-                <motion.div
-                  key={msg.id}
-                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.3, delay: idx * 0.05 }}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} gap-4`}
-                >
-                  {msg.sender === 'noah' && (
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
-                      <Brain className="w-5 h-5 text-white" />
-                    </div>
-                  )}
-                  <div className={cn(
-                    "max-w-[85%] p-4 shadow-sm text-sm md:text-base leading-relaxed whitespace-pre-line",
-                    msg.sender === 'user'
-                      ? "bg-gray-900 text-white rounded-2xl rounded-tr-none"
-                      : "bg-white border border-gray-100 rounded-2xl rounded-tl-none text-gray-800"
-                  )}>
-                    {msg.content}
-                  </div>
-                  {msg.sender === 'user' && (
-                    <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center flex-shrink-0 mt-1">
-                      <UserIcon className="w-5 h-5 text-gray-500" />
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-
-            {/* Loader uniquement au premier chargement */}
-            {isLoading && messages.length === 0 && (
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-sm mt-1">
-                  <Brain className="w-5 h-5 text-white" />
-                </div>
-                <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-none p-4 shadow-sm">
-                  <div className="flex gap-1.5 py-1">
-                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2 h-2 rounded-full bg-gray-300" />
-                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-2 h-2 rounded-full bg-gray-300" />
-                    <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-2 h-2 rounded-full bg-gray-300" />
-                  </div>
+        {/* Zone de contenu avec la question */}
+        <div className="flex-1 overflow-y-auto flex items-center justify-center px-4 py-8">
+          <div className="w-full max-w-4xl">
+            {isLoading && !currentQuestion ? (
+              <div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-12">
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
+                  <p className="text-gray-500">Chargement de la question...</p>
                 </div>
               </div>
-            )}
-
-            {/* Badge dernière question */}
-            {currentQuestion && (session?.onboarding_history?.length || 0) === MAX_QUESTIONS - 1 && (
+            ) : currentQuestion && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl flex gap-3 shadow-sm"
+                key={currentQuestion.number}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="bg-white rounded-3xl border border-gray-200 shadow-lg p-8 md:p-12"
               >
-                <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-orange-800 leading-relaxed font-medium">
-                  Dernière question ! N'hésite pas à être très précis, cela m'aidera à créer une offre qui te ressemble vraiment.
-                </p>
-              </motion.div>
-            )}
+                {/* Icône Noah */}
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
+                    <Sparkles className="w-6 h-6 text-white" />
+                  </div>
+                </div>
 
-            <div ref={messagesEndRef} className="h-4" />
-          </div>
-        </div>
+                {/* Titre de la question */}
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                  {currentQuestion.title || currentQuestion.text}
+                </h2>
 
-        {/* Sticky Input Area */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#f9fafb] via-[#f9fafb] to-transparent z-50">
-          <div className="max-w-3xl mx-auto">
-            <motion.div layout className="bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden">
-              <div className="p-4 md:p-6">
-                {currentQuestion && !isLoading ? (
-                  <div className="space-y-4">
-                    {currentQuestion.type === 'text' && (
-                      <div className="relative group">
-                        <Textarea
-                          value={value}
-                          onChange={(e) => setValue(e.target.value)}
-                          placeholder="Écris ton message ici..."
-                          className="w-full bg-gray-50 border-gray-200 text-gray-900 min-h-[80px] md:min-h-[100px] text-base p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2]/20 transition-all"
-                          autoFocus
-                          disabled={isSaving}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey && canProceed()) {
-                              e.preventDefault();
-                              handleNext();
-                            }
+                {/* Sous-titre */}
+                {currentQuestion.subtitle && (
+                  <p className="text-gray-500 text-base mb-8">
+                    {currentQuestion.subtitle}
+                  </p>
+                )}
+
+                {/* Badge dernière question */}
+                {questionCount === MAX_QUESTIONS - 1 && (
+                  <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl flex gap-3">
+                    <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-orange-800 leading-relaxed font-medium">
+                      Dernière question ! N'hésite pas à être très précis, cela m'aidera à créer une offre qui te ressemble vraiment.
+                    </p>
+                  </div>
+                )}
+
+                {/* Champ de réponse selon le type */}
+                <div className="space-y-6">
+                  {currentQuestion.type === 'text' && (
+                    <div className="relative">
+                      <Textarea
+                        value={value}
+                        onChange={(e) => setValue(e.target.value)}
+                        placeholder="Je suis fleuriste, et j'aimerais apprendre aux gens à composer des superbes bouquets"
+                        className="w-full bg-white border-gray-200 text-gray-900 min-h-[120px] text-base p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-2 focus:ring-[#61f7a2]/20 transition-all resize-none"
+                        autoFocus
+                        disabled={isSaving}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey && canProceed()) {
+                            e.preventDefault();
+                            handleNext();
+                          }
+                        }}
+                      />
+                      <div className="absolute bottom-4 right-4">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                            "h-10 w-10 rounded-full transition-all",
+                            isRecording ? "bg-red-50 text-red-500 animate-pulse" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                          )}
+                          onClick={isRecording ? stopRecording : startRecording}
+                          disabled={isTranscribing || isSaving}
+                        >
+                          {isTranscribing ? (
+                            <Loader2 className="w-5 h-5 animate-spin text-[#61f7a2]" />
+                          ) : isRecording ? (
+                            <StopCircle className="w-5 h-5" />
+                          ) : (
+                            <Mic className="w-5 h-5" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentQuestion.type === 'single_choice' && (
+                    <div className="flex flex-col gap-3">
+                      {(currentQuestion.options || []).map((option, idx) => (
+                        <motion.button
+                          key={idx}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
+                          className={cn(
+                            "px-6 py-4 rounded-2xl text-base font-medium transition-all shadow-sm border text-left",
+                            value === option
+                              ? "bg-black text-white border-black"
+                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                          )}
+                          onClick={() => {
+                            setValue(option);
+                            handleNextDirect(option);
                           }}
-                        />
-                        <div className="absolute bottom-3 right-3 flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className={cn(
-                              "h-10 w-10 rounded-full transition-all",
-                              isRecording ? "bg-red-50 text-red-500 animate-pulse" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                            )}
-                            onClick={isRecording ? stopRecording : startRecording}
-                            disabled={isTranscribing || isSaving}
-                          >
-                            {isTranscribing ? <Loader2 className="w-4 h-4 animate-spin text-[#61f7a2]" /> : isRecording ? <StopCircle className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+                          disabled={isSaving}
+                        >
+                          {option}
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
 
-                    {currentQuestion.type === 'single_choice' && (
-                      <div className="flex flex-wrap gap-2">
-                        {(currentQuestion.options || []).map((option, idx) => (
-                          <motion.button
-                            key={idx}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className={cn(
-                              "px-5 py-3 rounded-2xl text-sm font-semibold transition-all shadow-sm border",
-                              value === option
-                                ? "bg-black text-white border-black"
-                                : "bg-white text-gray-700 border-gray-200 hover:border-black"
-                            )}
-                            onClick={() => {
-                              setValue(option);
-                              handleNextDirect(option);
-                            }}
-                            disabled={isSaving}
-                          >
-                            {option}
-                          </motion.button>
-                        ))}
-                      </div>
-                    )}
+                  {currentQuestion.type === 'multiple_choice' && (
+                    <div className="flex flex-col gap-3">
+                      {(currentQuestion.options || []).map((option, idx) => (
+                        <motion.button
+                          key={idx}
+                          onClick={() => handleCheckboxChange(option, !value.includes(option))}
+                          className={cn(
+                            "px-6 py-4 rounded-2xl text-base font-medium transition-all border shadow-sm flex items-center gap-3 text-left",
+                            value.includes(option)
+                              ? "bg-[#1a1a1a] text-white border-black"
+                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                          )}
+                          disabled={isSaving}
+                        >
+                          <Checkbox checked={value.includes(option)} className="border-white/20" />
+                          {option}
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
 
-                    {currentQuestion.type === 'multiple_choice' && (
-                      <div className="flex flex-wrap gap-2">
-                        {(currentQuestion.options || []).map((option, idx) => (
-                          <motion.button
-                            key={idx}
-                            onClick={() => handleCheckboxChange(option, !value.includes(option))}
-                            className={cn(
-                              "px-5 py-3 rounded-2xl text-sm font-semibold transition-all border shadow-sm flex items-center gap-2",
-                              value.includes(option)
-                                ? "bg-[#1a1a1a] text-white border-black"
-                                : "bg-white text-gray-700 border-gray-200 hover:border-black"
-                            )}
-                            disabled={isSaving}
-                          >
-                            <Checkbox checked={value.includes(option)} className="border-white/20" />
-                            {option}
-                          </motion.button>
-                        ))}
-                      </div>
-                    )}
-
-                    {currentQuestion.type === 'slider' && (
-                      <div className="px-4 py-2 space-y-6">
-                        <div className="flex justify-between items-end">
-                          <span className="text-gray-400 text-sm font-medium">Expérience</span>
-                          <span className="text-3xl font-black text-gray-900">
-                            {value >= (currentQuestion.max || 10) ? `${value}+` : value} <span className="text-base text-gray-400">ans</span>
+                  {currentQuestion.type === 'slider' && (
+                    <div className="space-y-6">
+                      <div className="bg-gray-50 rounded-2xl p-6">
+                        <div className="flex justify-between items-baseline mb-4">
+                          <span className="text-gray-500 text-sm font-medium">Expérience</span>
+                          <span className="text-4xl font-black text-gray-900">
+                            {value >= (currentQuestion.max || 10) ? `${value}+` : value}
+                            <span className="text-lg text-gray-400 ml-2">ans</span>
                           </span>
                         </div>
                         <Slider
@@ -464,54 +375,43 @@ export default function OnboardingDynamic() {
                           max={currentQuestion.max || 10}
                           step={currentQuestion.step || 1}
                           disabled={isSaving}
+                          className="mt-2"
                         />
                       </div>
-                    )}
+                    </div>
+                  )}
 
-                    {currentQuestion.type !== 'single_choice' && (
-                      <button
-                        onClick={handleNext}
-                        disabled={!canProceed() || isSaving}
-                        className={cn(
-                          "w-full h-14 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-all duration-300",
-                          "bg-gradient-to-br from-[#1a1a1a] to-black text-white shadow-xl border border-white/10",
-                          "hover:shadow-[0_0_25px_rgba(97,247,162,0.5)] hover:brightness-110 hover:-translate-y-0.5 active:scale-95",
-                          (!canProceed() || isSaving) && "opacity-50 cursor-not-allowed shadow-none transform-none"
-                        )}
-                      >
-                        {isSaving ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            <span>Envoi en cours...</span>
-                          </>
-                        ) : (
-                          <>
-                            Envoyer ma réponse
-                            <Send className="w-5 h-5" />
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="h-20 flex items-center justify-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#61f7a2]" />
-                  </div>
-                )}
-              </div>
-            </motion.div>
+                  {/* Bouton Continuer (pas pour single_choice car auto-submit) */}
+                  {currentQuestion.type !== 'single_choice' && (
+                    <button
+                      onClick={handleNext}
+                      disabled={!canProceed() || isSaving}
+                      className={cn(
+                        "w-full h-14 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-all duration-300 mt-6",
+                        "bg-[#61f7a2] text-gray-900 shadow-lg",
+                        "hover:bg-[#4de88f] hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98]",
+                        (!canProceed() || isSaving) && "opacity-50 cursor-not-allowed shadow-none transform-none"
+                      )}
+                    >
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span>Envoi en cours...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Continuer</span>
+                          <ArrowRight className="w-5 h-5" />
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .pulse-noah { animation: noahpulse 2s infinite; }
-        @keyframes noahpulse {
-          0% { box-shadow: 0 0 0 0px rgba(97, 247, 162, 0.4); }
-          70% { box-shadow: 0 0 0 12px rgba(97, 247, 162, 0); }
-          100% { box-shadow: 0 0 0 0px rgba(97, 247, 162, 0); }
-        }
-      `}} />
     </div>
   );
 }

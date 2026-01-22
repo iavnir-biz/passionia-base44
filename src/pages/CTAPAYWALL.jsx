@@ -205,9 +205,7 @@ export default function CTAPAYWALL() {
             </p>
           </motion.div>
 
-
-
-          {/* Tu as maintenant */}
+          {/* Tu as maintenant - VERSION ACCOMPLISSEMENT */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -215,40 +213,91 @@ export default function CTAPAYWALL() {
             className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-              ✅ Tu as maintenant
+              ✅ Regarde ce que tu as maintenant
             </h2>
 
             <div className="space-y-3 mb-6">
-              {products.map((product, idx) => {
-                const ProductIcon = product.icon;
-                return (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.25 + idx * 0.05 }}
-                    className={cn("flex items-center gap-3 py-3 px-4 rounded-xl border transition-all", product.bgColor, product.bgColor.replace('bg-', 'border-').replace('50', '200'))}
-                  >
-                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm")}>
-                      <ProductIcon className={cn("w-5 h-5", product.iconColor)} />
-                    </div>
-                    <span className="text-gray-900 font-semibold flex-1">{product.data.title}</span>
-                    <span className={cn("font-bold", product.priceColor)}>{product.data.price}</span>
-                  </motion.div>
-                );
-              })}
+              {/* 1. Offres + Prix */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.25 }}
+                className="flex items-start gap-4 py-4 px-5 rounded-xl border-2 bg-orange-50 border-orange-200"
+              >
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm">
+                  <ShoppingBag className="w-6 h-6 text-orange-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-gray-900 font-bold mb-1">4 offres complètes + leurs prix</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Du petit produit à l'accompagnement premium, ton système d'offres est prêt
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* 2. Validation Marché */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-start gap-4 py-4 px-5 rounded-xl border-2 bg-green-50 border-green-200"
+              >
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm">
+                  <CheckCircle className="w-6 h-6 text-green-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-gray-900 font-bold mb-1">Validation que ta passion est viable</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Ton expertise a de la valeur et le marché est prêt à payer pour
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* 3. Potentiel calculé */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 }}
+                className="flex items-start gap-4 py-4 px-5 rounded-xl border-2 bg-blue-50 border-blue-200"
+              >
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm">
+                  <BarChart3 className="w-6 h-6 text-blue-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-gray-900 font-bold mb-1">Potentiel de revenus basé sur des milliers de données</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {potentialRevenue > 0 ? `${potentialRevenue.toLocaleString('fr-FR')} €/mois` : 'Calculé selon ton marché et ton positionnement'}
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* 4. Plan de route */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-start gap-4 py-4 px-5 rounded-xl border-2 bg-purple-50 border-purple-200"
+              >
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm">
+                  <Target className="w-6 h-6 text-purple-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-gray-900 font-bold mb-1">Plan d'action exact et éprouvé</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Le protocole étape par étape pour passer de 0 à tes premières ventes
+                  </p>
+                </div>
+              </motion.div>
             </div>
 
-            {potentialRevenue > 0 && (
-              <div className="bg-gradient-to-br from-[#61f7a2]/10 to-blue-50 rounded-2xl p-6 text-center mb-4">
-                <p className="text-gray-600 mb-2">Potentiel mensuel estimé</p>
-                <p className="text-4xl font-bold text-gray-900">{potentialRevenue.toLocaleString('fr-FR')} €</p>
-              </div>
-            )}
-
-            <p className="text-center text-gray-700 font-medium">
-              C'est déjà un excellent début.
-            </p>
+            <div className="bg-gradient-to-br from-[#61f7a2]/10 to-blue-50 rounded-2xl p-6 text-center">
+              <p className="text-gray-900 font-bold text-lg mb-2">
+                🎯 Tu as tout ce qu'il faut pour démarrer
+              </p>
+              <p className="text-gray-600">
+                Maintenant, on va t'aider à mettre tout ça en action
+              </p>
+            </div>
           </motion.div>
 
           {/* Bloc empathique */}

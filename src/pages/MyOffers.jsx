@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from 'framer-motion';
@@ -348,8 +349,8 @@ ${offer.benefits.join('\n')}
       </div>
 
       {/* Preview Modal */}
-      {showPreview && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      {showPreview && createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -369,7 +370,7 @@ ${offer.benefits.join('\n')}
                 {/* 1. L'IDENTITÉ DE L'OFFRE */}
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                   <h3 className="text-xs font-semibold text-[#61f7a2] mb-3">🧩 L'IDENTITÉ DE L'OFFRE</h3>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{showPreview.title}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{showPreview.title || "Mon Offre"}</h2>
                   {showPreview.subtitle && (
                     <p className="text-gray-600 text-sm mb-4">{showPreview.subtitle}</p>
                   )}
@@ -483,7 +484,8 @@ ${offer.benefits.join('\n')}
               </div>
             </div>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />

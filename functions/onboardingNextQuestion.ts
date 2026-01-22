@@ -398,9 +398,9 @@ Retourne UNIQUEMENT un JSON avec cette structure :
   "subtitle": "1 phrase d'exemples concrets et spécifiques à la compétence, orientés enseignement"
 }`;
 
-    console.log("ANTHROPIC_CALL start", { 
-      fn: "onboardingNextQuestion", 
-      sessionId, 
+    console.log("ANTHROPIC_CALL start", {
+      fn: "onboardingNextQuestion",
+      sessionId,
       model: "claude-sonnet-4-20250514",
       questionNumber: nextQuestionIndex + 1
     });

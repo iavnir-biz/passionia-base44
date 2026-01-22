@@ -398,15 +398,15 @@ Retourne UNIQUEMENT un JSON avec cette structure :
   "subtitle": "1 phrase d'exemples concrets et spécifiques à la compétence, orientés enseignement"
 }`;
 
-    console.log("ANTHROPIC_CALL start", { 
-      fn: "onboardingNextQuestion", 
-      sessionId, 
-      model: "claude-sonnet-4-20250514",
+    console.log("ANTHROPIC_CALL start", {
+      fn: "onboardingNextQuestion",
+      sessionId,
+      model: "claude-3-5-sonnet-20241022",
       questionNumber: nextQuestionIndex + 1
     });
 
     const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
       messages: [

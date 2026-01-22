@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
 
+const MAX_QUESTIONS = 11; // Nombre maximum de questions dans l'onboarding
+
 export default function OnboardingDynamic() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -150,7 +152,7 @@ export default function OnboardingDynamic() {
       if (updatedSessions && updatedSessions.length > 0) {
         const freshSession = updatedSessions[0];
         setSession(freshSession);
-        setQuestionCount(Math.min(freshSession.onboarding_history?.length || 0, 11));
+        setQuestionCount(Math.min(freshSession.onboarding_history?.length || 0, MAX_QUESTIONS));
         
         // Reconstruire les messages depuis l'historique pour éviter les duplications
         const historicMessages = buildMessagesFromHistory(freshSession.onboarding_history || []);
@@ -250,8 +252,8 @@ export default function OnboardingDynamic() {
     }
   };
 
-  const progress = Math.min(((session?.onboarding_history?.length || 0) / 11) * 100, 100);
-  const completedSteps = (session?.onboarding_history?.length || 0) >= 11 ? [1] : [];
+  const progress = Math.min(((session?.onboarding_history?.length || 0) / MAX_QUESTIONS) * 100, 100);
+  const completedSteps = (session?.onboarding_history?.length || 0) >= MAX_QUESTIONS ? [1] : [];
 
   return (
     <div className="min-h-screen bg-[#f9fafb] flex overflow-hidden">
@@ -263,7 +265,7 @@ export default function OnboardingDynamic() {
           <div className="px-6 py-4 flex items-center justify-end max-w-4xl mx-auto w-full">
             <div className="flex flex-col items-end">
               <span className="text-xs font-bold text-[#61f7a2] mb-1">
-                {Math.min(session?.onboarding_history?.length || 0, 11)}/11
+                {Math.min(session?.onboarding_history?.length || 0, MAX_QUESTIONS)}/{MAX_QUESTIONS}
               </span>
               <div className="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <motion.div
@@ -283,7 +285,7 @@ export default function OnboardingDynamic() {
             {/* Intro Message */}
             <div className="flex justify-center w-full px-6 py-6">
               <p className="text-gray-400 text-[11px] md:text-xs text-center max-w-sm leading-relaxed font-medium uppercase tracking-wider opacity-70">
-                C'est un plaisir de t'aider à structurer ton projet ! <br /> Je vais te poser quelques questions pour comprendre ton univers.
+                C'est un plaisir de t'accompagner ! <br /> Je vais te poser quelques questions pour bien comprendre ta compétence et comment tu veux l'enseigner.
               </p>
             </div>
 
@@ -334,8 +336,8 @@ export default function OnboardingDynamic() {
               </div>
             )}
 
-            {/* Dernière question badge si c'est la 11ème */}
-            {currentQuestion && (session?.onboarding_history?.length || 0) === 10 && (
+            {/* Badge dernière question */}
+            {currentQuestion && (session?.onboarding_history?.length || 0) === MAX_QUESTIONS - 1 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -343,7 +345,7 @@ export default function OnboardingDynamic() {
               >
                 <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-orange-800 leading-relaxed font-medium">
-                  C'est notre dernière étape ! N'hésite pas à être très précis, Noah adore les détails.
+                  Dernière question ! N'hésite pas à être très précis, cela m'aidera à créer une offre qui te ressemble vraiment.
                 </p>
               </motion.div>
             )}

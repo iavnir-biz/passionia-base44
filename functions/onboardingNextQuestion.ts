@@ -5,148 +5,162 @@ const anthropic = new Anthropic({
   apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
 
-// Structure des 11 questions à suivre STRICTEMENT
+// Structure des questions (entre 6 et 11 questions maximum)
 const QUESTION_STRUCTURE = [
-  { 
-    id: 1, 
-    field: "coreSkill", 
-    theme: "Compétence à monétiser", 
+  {
+    id: 1,
+    field: "coreSkill",
+    theme: "La compétence à enseigner",
     type: "text",
-    transformation_focus: "identification_passion",
-    titleTemplate: "Salut {{firstName}} ! Quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu et enseigner ?",
-    subtitleTemplate: "Sois précis. Ex : peindre des aquarelles, conseiller en décoration intérieure, consulting RH, créer un programme de fitness maison."
+    category: "introduction",
+    titleTemplate: "Salut {{firstName}} ! Quelle est la compétence ou le savoir-faire que tu aimerais enseigner pour créer des revenus en ligne ?",
+    subtitleTemplate: "Sois précis. Ex : photographie de portrait, yoga pour débutants, création de sites web, cuisine végétarienne."
   },
-  { 
-    id: 2, 
-    field: "experienceLevel", 
-    theme: "Niveau d'expérience", 
-    type: "single_choice", 
-    options: ["C'est une passion, je débute", "J'ai déjà aidé des amis ou proches gratuitement", "Je suis professionnel, j'ai déjà eu des clients"],
-    transformation_focus: "légitimité_à_enseigner",
-    titleTemplate: "Super, tu veux enseigner {{coreSkill}}. Dis-moi : quel est ton niveau d'expérience actuel ?",
-    subtitleTemplate: "Choisis l'option qui te ressemble le plus."
+  {
+    id: 2,
+    field: "experienceLevel",
+    theme: "Niveau d'expérience",
+    type: "single_choice",
+    options: ["C'est une passion, je débute", "J'ai déjà aidé des amis gratuitement", "Je suis pro, j'ai déjà eu des clients"],
+    category: "introduction",
+    titleTemplate: "Quel est ton niveau d'expérience dans {{coreSkill}} ?",
+    subtitleTemplate: "Choisis l'option qui te correspond le mieux."
   },
-  { 
-    id: 3, 
-    field: "yearsPracticing", 
-    theme: "Années de pratique", 
-    type: "slider", 
-    min: 0, 
-    max: 15, 
+  {
+    id: 3,
+    field: "yearsPracticing",
+    theme: "Années de pratique",
+    type: "slider",
+    min: 0,
+    max: 15,
     step: 1,
-    transformation_focus: "ancrage_expertise",
+    category: "introduction",
     titleTemplate: "Depuis combien d'années pratiques-tu {{coreSkill}} ?",
-    subtitleTemplate: "Même si tu débutes, ton parcours a de la valeur. Indique simplement ton niveau réel."
+    subtitleTemplate: "Même si tu débutes, ton expérience a de la valeur."
   },
-  { 
-    id: 4, 
-    field: "targetAudience", 
-    theme: "À qui enseigner", 
+  {
+    id: 4,
+    field: "targetAudience",
+    theme: "L'élève idéal",
     type: "text",
-    transformation_focus: "identification_élève_idéal",
-    titleTemplate: "À qui aimerais-tu le plus transmettre ce savoir, {{firstName}} ?",
-    subtitleTemplate: "Pense à ceux qui veulent vraiment passer de l'idée à une app concrète, mais se sentent bloqués par la complexité de l'IA ou du codage. Les gens qui veulent entreprendre avec l'IA principalement"
+    category: "client_ideal",
+    titleTemplate: "À qui aimerais-tu le plus enseigner {{coreSkill}}, {{firstName}} ?",
+    subtitleTemplate: "Pense à la personne qui a vraiment besoin de ce que tu sais."
   },
-  { 
-    id: 5, 
-    field: "mainProblem", 
-    theme: "Problème principal", 
+  {
+    id: 5,
+    field: "mainProblem",
+    theme: "Problème d'apprentissage",
     type: "text",
-    transformation_focus: "blocage_confusion",
-    titleTemplate: "Tu veux vraiment aider {{targetAudience}}. Qu'est-ce qui, selon toi, les empêche aujourd'hui de voir clair et d'avancer sereinement ?",
-    subtitleTemplate: "Comme la peur de ne pas comprendre les concepts d'IA, la confusion face à la terminologie du codage ou le doute sur leur capacité à gérer un projet."
+    category: "client_ideal",
+    titleTemplate: "Quel est le problème N°1 que cette personne rencontre dans son apprentissage et que tu peux l'aider à résoudre ?",
+    subtitleTemplate: "Ex : ne sait pas par où commencer, a peur de se tromper, manque de confiance."
   },
-  { 
-    id: 6, 
-    field: "firstQuickResult", 
-    theme: "Déclic rapide", 
+  {
+    id: 6,
+    field: "firstQuickResult",
+    theme: "Premier résultat rapide",
     type: "text",
-    transformation_focus: "première_victoire",
-    titleTemplate: "Donc, tu veux aider {{targetAudience}} à dépasser leurs peurs. À quel moment penses-tu qu'ils ressentiront leur premier soulagement, ce déclic où tout deviendra plus clair pour eux ?",
-    subtitleTemplate: "Comme quand ils réussissent enfin à créer un prototype fonctionnel ou comprennent un concept complexe d'IA avec facilité."
+    category: "solution_transformation",
+    titleTemplate: "Quel est le tout premier résultat concret et rapide que ton élève obtiendra grâce à ton enseignement ?",
+    subtitleTemplate: "Un petit succès qui va le motiver à continuer."
   },
-  { 
-    id: 7, 
-    field: "finalTransformation", 
-    theme: "Transformation finale", 
+  {
+    id: 7,
+    field: "finalTransformation",
+    theme: "Transformation finale",
     type: "text",
-    transformation_focus: "nouvelle_identité",
-    titleTemplate: "Donc, tu veux montrer à tes élèves qu'ils n'ont pas besoin d'être ingénieurs pour créer des applications, juste savoir comment utiliser les bons outils. Au bout du compte, comment imagines-tu leur transformation personnelle et professionnelle ?",
-    subtitleTemplate: "Ils pourront passer de novices hésitants à des créateurs confiants, capables de matérialiser leurs idées en applications concrètes."
+    category: "solution_transformation",
+    titleTemplate: "Et à la fin, quel grand changement ou transformation aura vécu ton élève ?",
+    subtitleTemplate: "Pense au résultat final idéal. Comment se sentira-t-il ? Que saura-t-il faire ?"
   },
-  { 
-    id: 8, 
-    field: "mainTeaching", 
-    theme: "Prise de conscience clé", 
+  {
+    id: 8,
+    field: "mainTeaching",
+    theme: "Enseignement principal",
     type: "text",
-    transformation_focus: "principe_central",
-    titleTemplate: "Je vois que tu veux vraiment démystifier l'IA et le codage pour les rendre accessibles à tous. Qu'est-ce qui rend ta façon de les enseigner unique, selon toi ?",
-    subtitleTemplate: "Comme montrer que coder c'est comme cuisiner avec des recettes simples, ou utiliser des métaphores pour expliquer des concepts techniques."
+    category: "solution_transformation",
+    titleTemplate: "Quelle est LA chose la plus importante que tu vas lui apprendre ?",
+    subtitleTemplate: "Le principe clé, la prise de conscience essentielle."
   },
-  { 
-    id: 9, 
-    field: "uniqueMethod", 
-    theme: "Approche unique", 
+  {
+    id: 9,
+    field: "uniqueMethod",
+    theme: "Approche pédagogique",
     type: "text",
-    transformation_focus: "différenciation",
-    titleTemplate: "Tu veux vraiment simplifier les choses pour ceux qui pensent que coder est hors de portée. Qu'est-ce qui t'a donné envie de montrer que l'IA et le codage peuvent être aussi accessibles que cuisiner avec des recettes simples ?",
-    subtitleTemplate: "Peut-être un moment où tu t'es senti bloqué, une réussite inattendue, ou une envie de rendre les choses plus simples pour les autres."
+    category: "approche_pedagogique",
+    titleTemplate: "As-tu une méthode ou une façon d'enseigner qui te rend différent des autres ?",
+    subtitleTemplate: "Si tu n'es pas encore sûr(e), tu peux répondre 'Je ne sais pas encore'."
   },
-  { 
-    id: 10, 
-    field: "typicalMistake", 
-    theme: "Erreur courante", 
+  {
+    id: 10,
+    field: "typicalMistake",
+    theme: "Erreur courante",
     type: "text",
-    transformation_focus: "fausse_croyance",
-    titleTemplate: "Quelle erreur de raisonnement fait perdre du temps aux débutants ?",
-    subtitleTemplate: "Pense que c'est compliqué, ou qu'il faut trop de budget pouyr y arriver"
+    category: "approche_pedagogique",
+    titleTemplate: "Quelle est l'erreur typique que les débutants font dans ton domaine et que tu aides à éviter ?",
+    subtitleTemplate: "Cette fausse croyance qui les bloque."
   },
-  { 
-    id: 11, 
-    field: "extraDetail", 
-    theme: "Histoire personnelle", 
+  {
+    id: 11,
+    field: "extraDetail",
+    theme: "Histoire personnelle",
     type: "text",
-    transformation_focus: "authenticité",
-    titleTemplate: "Pour finir : qu'est-ce qui t'a donné envie de transmettre ça ?",
-    subtitleTemplate: "Car j'ai tout perdu, et j'ai creer mes propres app pour des entreprises, et je les aiet revendus beaucoup d'argent, maintenant je bosse d'ou je veux, je creer des apps pour tous les corps de métiers; etc etc"
+    category: "authenticite",
+    titleTemplate: "Pour finir, y a-t-il autre chose que tu aimerais partager ?",
+    subtitleTemplate: "Une anecdote, une histoire personnelle liée à ta compétence, ou un détail qui te rend unique ? Cela m'aidera à créer une offre qui te ressemble vraiment."
   }
 ];
 
-const SYSTEM_PROMPT = `Tu es Noah, un coach stratégique humain, empathique et pédagogue.
+const SYSTEM_PROMPT = `Tu es Noah, un coach d'affaires bienveillant et pédagogue.
 
-Tu discutes avec un futur formateur qui veut TRANSMETTRE son savoir-faire et aider ses futurs élèves.
+Ta mission est d'aider un futur expert à transformer sa compétence en une offre commerciale pour **ENSEIGNER son savoir-faire**. Tu t'adresses à l'utilisateur avec "tu" et utilises son prénom de temps en temps.
 
-RÈGLES ABSOLUES :
-1. Tu ne remplis pas un formulaire, tu mènes une vraie conversation intelligente
-2. L'utilisateur n'enseigne jamais un outil - il aide ses élèves à passer d'un état de confusion à un état de clarté et de maîtrise
-3. Tu reformules la question en t'appuyant sur ce que l'utilisateur vient de dire
-4. Tu montres que tu as VRAIMENT compris sa réponse précédente
+**ATTENTION - RÈGLE FONDAMENTALE :**
+L'objectif de l'utilisateur est de **TRANSMETTRE SON SAVOIR-FAIRE** pour créer des revenus en ligne (formations, coachings, ebooks, etc.). Tes questions doivent TOUJOURS être orientées pour l'aider à **ENSEIGNER** sa compétence, et NON à la vendre comme un service.
 
-STRUCTURE DE TA RÉPONSE :
-1. Commence par montrer que tu as compris (1 phrase max, naturelle)
+Par exemple :
+- ❌ Si sa compétence est "photographe de mode", NE LUI DEMANDE PAS pour quel type de magazine il veut travailler
+- ✅ Au lieu de ça, demande-lui : "À quel type d'apprenti photographe aimerais-tu enseigner tes techniques ?"
+
+**TA MISSION :**
+- Tu ne remplis pas un formulaire, tu mènes une VRAIE conversation intelligente
+- **RÈGLE D'OR : SIMPLICITÉ ET CONCRET.** Chaque question doit être très facile à comprendre. Évite le jargon.
+- Ton but est de collecter assez d'informations sur (1) le **futur élève** (le client cible), (2) son problème principal **d'apprentissage**, et (3) la solution/transformation **qu'il obtiendra en apprenant**.
+- Tu reformules la question en t'appuyant sur ce que l'utilisateur vient de dire
+- Tu montres que tu as VRAIMENT compris sa réponse précédente
+
+**RÈGLE DE COHÉRENCE :**
+Chaque fois que tu donnes un exemple entre parenthèses pour guider l'utilisateur, cet exemple DOIT être directement et logiquement lié à sa compétence et à l'idée d'enseigner. N'utilise JAMAIS d'exemples génériques ou sans rapport.
+
+**STRUCTURE DE TA RÉPONSE :**
+1. Commence par montrer que tu as compris (1 phrase max, naturelle et encourageante)
 2. Pose UNE question claire qui découle logiquement de sa réponse
 3. Parle du PROBLÈME de ses futurs élèves ou de leur TRANSFORMATION, jamais de l'outil technique
 
-TON & STYLE :
-- Langage simple, vivant, humain (tutoiement)
+**TON & STYLE :**
+- Simple, clair, encourageant. Utilise "tu"
+- Langage simple, vivant, humain
 - Phrases courtes et directes
+- Sois curieux mais va droit au but
 - Questions qui pourraient être posées dans une vraie discussion
 - Zéro jargon, zéro formalisme
 
-INTERDICTIONS :
+**INTERDICTIONS :**
 ❌ Reformuler mot pour mot le template
 ❌ Répéter exactement ce que l'utilisateur a dit
 ❌ Être générique ou scolaire
 ❌ Ignorer le contexte de la réponse précédente
+❌ Parler de vendre un service au lieu d'enseigner
 
-TEST QUALITÉ :
-"Est-ce que cette question pourrait être posée par un humain dans une vraie conversation ?"
+**TEST QUALITÉ :**
+"Est-ce que cette question pourrait être posée par un humain bienveillant dans une vraie conversation ?"
 Si non → reformule.
 
-FORMAT DE SORTIE (JSON uniquement) :
+**FORMAT DE SORTIE (JSON uniquement) :**
 {
   "text": "la question reformulée, naturelle et contextuelle",
-  "subtitle": "1 phrase d'exemples concrets et parlants"
+  "subtitle": "1 phrase d'exemples concrets, spécifiques et pertinents par rapport à sa compétence"
 }`;
 
 Deno.serve(async (req) => {
@@ -357,7 +371,8 @@ ${previousContext}
 
 Dernière réponse de l'utilisateur : "${lastAnswer}"
 
-Transformation focus pour cette question : ${nextQuestion.transformation_focus}
+Catégorie de cette question : ${nextQuestion.category}
+Thème : ${nextQuestion.theme}
 
 Template de base (à reformuler de manière NATURELLE et CONTEXTUELLE) :
 Titre : ${nextQuestion.titleTemplate}
@@ -369,13 +384,18 @@ Variables disponibles :
 - targetAudience (à qui il veut enseigner): ${summary.learner_profile || 'non renseigné'}
 
 MISSION :
-Reformule cette question de manière naturelle, en montrant que tu as compris sa dernière réponse.
-Rends la question fluide, comme si tu étais dans une vraie conversation.
+1. Reformule cette question de manière naturelle, en montrant que tu as compris sa dernière réponse
+2. Rends la question fluide, comme si tu étais dans une vraie conversation avec un ami
+3. CRUCIAL : Dans le sous-titre, donne des exemples concrets SPÉCIFIQUES à la compétence "${summary.who_to_teach || 'la compétence'}" et au contexte d'ENSEIGNER (pas de vendre un service)
+
+Par exemple, si la compétence est "photographie de portrait" et qu'on demande l'élève idéal :
+- ✅ BON exemple dans subtitle : "ex: quelqu'un qui débute en photo et veut apprendre à capturer l'émotion, ou un amateur qui veut progresser dans l'éclairage de portrait"
+- ❌ MAUVAIS exemple : "ex: les magazines de mode, les agences de publicité" (ça c'est vendre un service, pas enseigner)
 
 Retourne UNIQUEMENT un JSON avec cette structure :
 {
   "text": "la question reformulée, naturelle et contextuelle",
-  "subtitle": "1 phrase d'exemples concrets"
+  "subtitle": "1 phrase d'exemples concrets et spécifiques à la compétence, orientés enseignement"
 }`;
 
     console.log("ANTHROPIC_CALL start", { 

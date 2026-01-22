@@ -10,7 +10,6 @@ import GlowButton from '@/components/ui/GlowButton';
 export default function WelcomeOpening() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -34,20 +33,6 @@ export default function WelcomeOpening() {
       if (!currentUser.has_purchased) {
         navigate(createPageUrl('CTAPAYWALL'));
         return;
-      }
-
-      // Vérifier si les assets sont déjà générés
-      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
-      if (sessions.length > 0) {
-        const userSession = sessions[0];
-        setSession(userSession);
-        
-        // Si tout est déjà prêt, redirect direct vers Dashboard
-        if (userSession.all_assets_ready) {
-          console.log('✅ [WelcomeOpening] Assets déjà générés, redirect Dashboard');
-          navigate(createPageUrl('Dashboard'));
-          return;
-        }
       }
       
       setIsLoading(false);
@@ -94,7 +79,7 @@ export default function WelcomeOpening() {
             transition={{ delay: 0.4 }}
             className="text-4xl font-bold text-gray-900 mb-4"
           >
-            Paiement réussi ✅
+            Bienvenue dans Passion IA ! 🎉
           </motion.h1>
           
           <motion.div
@@ -107,10 +92,10 @@ export default function WelcomeOpening() {
               Ton accès est activé.
             </p>
             <p className="text-lg text-gray-600 mb-4">
-              Noah va générer tous tes documents personnalisés :
+              Tu vas pouvoir générer tous tes documents personnalisés :
             </p>
             
-            {/* Liste de ce qui va être généré */}
+            {/* Liste de ce qui va être disponible */}
             <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-6 mb-8 border border-green-100 text-left">
               <ul className="space-y-2 text-gray-700">
                 <li className="flex items-start gap-2">
@@ -133,6 +118,10 @@ export default function WelcomeOpening() {
                   <span className="text-green-500 font-bold mt-0.5">✓</span>
                   <span>5 Emails marketing en séquence</span>
                 </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 font-bold mt-0.5">✓</span>
+                  <span>Page de vente prête à convertir</span>
+                </li>
               </ul>
             </div>
 
@@ -147,12 +136,12 @@ export default function WelcomeOpening() {
                 size="lg"
                 className="px-12"
               >
-                C'est parti ! 🚀
+                Accéder à mon dashboard 🚀
               </GlowButton>
             </motion.div>
             
             <p className="text-sm text-gray-500 mt-6">
-              Ça prend environ 1-2 minutes, tu verras la progression en temps réel.
+              Tu pourras générer chaque document quand tu en auras besoin.
             </p>
           </motion.div>
         </motion.div>

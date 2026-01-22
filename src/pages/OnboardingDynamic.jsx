@@ -175,6 +175,14 @@ export default function OnboardingDynamic() {
 
     } catch (error) {
       console.error('Error fetching next question:', error);
+
+      // Afficher un message d'erreur à l'utilisateur
+      const errorMessage = {
+        id: `error-${Date.now()}`,
+        sender: 'noah',
+        content: "Oups, j'ai rencontré un petit problème technique. Peux-tu rafraîchir la page ? Si le problème persiste, contacte le support."
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
       setIsSaving(false);

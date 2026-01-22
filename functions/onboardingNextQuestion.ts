@@ -338,14 +338,14 @@ Deno.serve(async (req) => {
     }
 
     const nextQuestion = QUESTION_STRUCTURE[nextQuestionIndex];
-    
-    // Pour les questions de type choice ou slider, pas besoin d'appeler Claude
-    if (nextQuestion.type === 'single_choice' || nextQuestion.type === 'slider') {
+
+    // Pour les questions de type choice, slider, OU la première question (pas de contexte), pas besoin d'appeler Claude
+    if (nextQuestion.type === 'single_choice' || nextQuestion.type === 'slider' || nextQuestionIndex === 0) {
       const staticTitle = nextQuestion.titleTemplate
         .replace('{{firstName}}', firstName || '')
         .replace('{{coreSkill}}', summary.who_to_teach || 'cette compétence')
         .replace('{{targetAudience}}', summary.learner_profile || 'ces personnes');
-      
+
       return Response.json({
         done: false,
         nextQuestion: {

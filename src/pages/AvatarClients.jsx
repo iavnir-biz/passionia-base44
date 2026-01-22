@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from 'framer-motion';
-import { 
-  Sparkles, 
-  Loader2, 
-  Copy, 
-  User, 
-  Target, 
-  Heart, 
-  AlertCircle, 
-  TrendingUp, 
+import {
+  Sparkles,
+  Loader2,
+  Copy,
+  User,
+  Target,
+  Heart,
+  AlertCircle,
+  TrendingUp,
   Lock,
   Users,
   Clock,
@@ -70,7 +70,7 @@ export default function AvatarClients() {
 
       const sessions = await base44.entities.Session.filter({ id: sessionId });
       const userSession = sessions?.[0];
-      
+
       if (!userSession) {
         console.error('[AvatarClients] Session not found');
         return;
@@ -79,14 +79,14 @@ export default function AvatarClients() {
       setSession(userSession);
       console.log('[AvatarClients] Session loaded:', userSession);
       console.log('[AvatarClients] Generated avatars:', userSession.generated_avatars);
-      
+
       // Vérifier si avatars existe et est non-vide
       if (isNonEmpty(userSession.generated_avatars)) {
         setAvatars(userSession.generated_avatars);
       }
 
-      const profiles = await base44.entities.UserProfile.filter({ 
-        created_by: currentUser.email 
+      const profiles = await base44.entities.UserProfile.filter({
+        created_by: currentUser.email
       });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
@@ -137,7 +137,7 @@ export default function AvatarClients() {
 
   const handleCopyAvatar = (avatar) => {
     let text = `${avatar.name}\n\n`;
-    
+
     if (avatar.identity) {
       text += `🎯 IDENTITÉ\n`;
       text += `Âge : ${avatar.identity.age_range}\n`;
@@ -145,7 +145,7 @@ export default function AvatarClients() {
       text += `Métier : ${avatar.identity.job_context}\n`;
       text += `Niveau : ${avatar.identity.experience_level}\n\n`;
     }
-    
+
     if (avatar.factual_analysis) {
       text += `📊 ANALYSE FACTUELLE\n`;
       text += `${avatar.factual_analysis.current_situation}\n`;
@@ -154,32 +154,32 @@ export default function AvatarClients() {
       text += `Canaux : ${avatar.factual_analysis.channels}\n`;
       text += `Formats : ${avatar.factual_analysis.preferred_formats}\n\n`;
     }
-    
+
     if (avatar.behavior_alternatives) {
       text += `🔄 COMPORTEMENTS\n`;
       text += `Déjà essayé : ${avatar.behavior_alternatives.already_tried}\n`;
       text += `Déceptions : ${avatar.behavior_alternatives.disappointments}\n\n`;
     }
-    
+
     if (avatar.in_his_head) {
       text += `🧠 DANS SA TÊTE\n`;
       text += `"${avatar.in_his_head.inner_phrase}"\n`;
       text += `Déclencheur : ${avatar.in_his_head.trigger_to_action}\n\n`;
     }
-    
+
     if (avatar.purchase_motivations) {
       text += `💰 MOTIVATIONS D'ACHAT\n`;
       text += `Formation : ${avatar.purchase_motivations.why_training}\n`;
       text += `Coaching : ${avatar.purchase_motivations.why_coaching}\n\n`;
     }
-    
+
     if (avatar.what_he_expects_from_expert) {
       text += `👤 CE QU'IL ATTEND DE TOI\n`;
       text += `Type d'expert : ${avatar.what_he_expects_from_expert.expert_type}\n`;
       text += `Ton : ${avatar.what_he_expects_from_expert.tone}\n`;
       text += `Confiance : ${avatar.what_he_expects_from_expert.trust_builders}\n`;
     }
-    
+
     navigator.clipboard.writeText(text.trim());
     toast.success('Avatar copié !');
   };
@@ -201,17 +201,17 @@ export default function AvatarClients() {
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="AvatarClients" progress={0} />
-      
+
       <div className="flex-1 ml-72">
-        <TopBar 
-          title="Avatars clients" 
+        <TopBar
+          title="Avatars clients"
           subtitle=""
           user={user}
         />
-        
+
         <main className="p-8">
           <div className="max-w-7xl mx-auto space-y-8">
-            
+
             {/* Header Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -317,7 +317,7 @@ export default function AvatarClients() {
                       {/* Full Content when expanded */}
                       {isExpanded && (
                         <div className="space-y-6 mb-6">
-                          
+
                           {/* 1. IDENTITÉ */}
                           {avatar.identity && (
                             <div>
@@ -545,7 +545,7 @@ export default function AvatarClients() {
                 transition={{ delay: 0.5 }}
                 className="flex justify-center pt-4"
               >
-                {avatars.length === 0 ? (
+                {(!avatars || avatars.length === 0 || !avatars[0]?.name) ? (
                   <GlowButton
                     onClick={() => handleGenerate()}
                     variant="primary"

@@ -200,13 +200,19 @@ Deno.serve(async (req) => {
 
     const session = sessions[0];
 
-    // Check cache
-    if (session.generated_avatars) {
-      return Response.json({
-        avatars: session.generated_avatars.avatars || session.generated_avatars,
-        generatedAt: session.generated_avatars.generatedAt || new Date().toISOString(),
-        fromCache: true
-      });
+    const regenerate = body.regenerate === true;
+
+    // Check cache (unless regenerating)
+    if (session.generated_avatars && !regenerate) {
+      // Validate that it's not empty/useless data
+      const cached = session.generated_avatars.avatars || session.generated_avatars;
+      if (Array.isArray(cached) && cached.length > 0 && cached[0].name) {
+        return Response.json({
+          avatars: cached,
+          generatedAt: session.generated_avatars.generatedAt || new Date().toISOString(),
+          fromCache: true
+        });
+      }
     }
 
     const finalizedOffer = session.finalized_offer || {};
@@ -298,8 +304,8 @@ Génère maintenant les 3 avatars en JSON.`;
     });
 
     const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 16000,
+      model: "claude-3-5-sonnet-20240620",
+      max_tokens: 8192,
       system: SYSTEM_PROMPT,
       messages: [
         { role: "user", content: userPrompt }

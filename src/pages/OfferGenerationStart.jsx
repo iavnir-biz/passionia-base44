@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { motion } from 'framer-motion';
-import { Brain, Sparkles, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Brain, Sparkles, Zap, Check, TrendingUp, Gift, Award, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function OfferGenerationStart() {
@@ -12,6 +12,81 @@ export default function OfferGenerationStart() {
   const [currentMessage, setCurrentMessage] = useState(0);
   const [error, setError] = useState(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  // Témoignages clients
+  const testimonials = [
+    {
+      name: "Sandra",
+      skill: "Yoga",
+      result: "2 500€ de ventes avec son petit produit",
+      icon: "🧘‍♀️"
+    },
+    {
+      name: "Jérôme",
+      skill: "Techniques de sommeil",
+      result: "A quitté son job pour enseigner aux sportifs",
+      icon: "😴"
+    },
+    {
+      name: "Marie",
+      skill: "Pâtisserie",
+      result: "4 200€ en 3 mois avec ses formations",
+      icon: "🍰"
+    },
+    {
+      name: "Thomas",
+      skill: "Photographie",
+      result: "15 clients en 2 semaines avec son offre starter",
+      icon: "📸"
+    },
+    {
+      name: "Léa",
+      skill: "Développement web",
+      result: "8 000€ le premier mois avec son système d'offres",
+      icon: "💻"
+    }
+  ];
+
+  // Étapes de préparation avec explications
+  const preparationSteps = [
+    {
+      title: "Produit Principal",
+      description: "Ton offre cœur qui transforme ton expertise en revenu stable",
+      icon: TrendingUp,
+      color: "from-blue-500 to-blue-600",
+      status: "completed"
+    },
+    {
+      title: "Low Ticket",
+      description: "Une petite offre pour attirer et convertir facilement tes premiers clients",
+      icon: Gift,
+      color: "from-green-500 to-green-600",
+      status: "in-progress"
+    },
+    {
+      title: "Order Bump",
+      description: "Un complément irrésistible qui booste ton panier moyen de 30-40%",
+      icon: Sparkles,
+      color: "from-purple-500 to-purple-600",
+      status: "pending"
+    },
+    {
+      title: "Offre Supérieure",
+      description: "Pour les clients prêts à aller plus loin avec toi (×2-3 ton revenu)",
+      icon: Award,
+      color: "from-orange-500 to-orange-600",
+      status: "pending"
+    },
+    {
+      title: "Offre Premium",
+      description: "Ton accompagnement VIP qui maximise ton revenu par client",
+      icon: Crown,
+      color: "from-yellow-500 to-yellow-600",
+      status: "pending"
+    }
+  ];
 
   const messages = [
     "J'analyse ton marché",
@@ -34,12 +109,27 @@ export default function OfferGenerationStart() {
     };
   }, []);
 
+  // Rotation des témoignages toutes les 4 secondes
   useEffect(() => {
-    const messageInterval = setInterval(() => {
-      setCurrentMessage(prev => (prev + 1) % messages.length);
-    }, 2000);
+    const testimonialInterval = setInterval(() => {
+      setCurrentTestimonial(prev => (prev + 1) % testimonials.length);
+    }, 4000);
 
-    return () => clearInterval(messageInterval);
+    return () => clearInterval(testimonialInterval);
+  }, []);
+
+  // Progression des étapes toutes les 3 secondes
+  useEffect(() => {
+    const stepInterval = setInterval(() => {
+      setCurrentStep(prev => {
+        if (prev < preparationSteps.length - 1) {
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, 3000);
+
+    return () => clearInterval(stepInterval);
   }, []);
 
   const generateOffer = async (retryCount = 0) => {
@@ -245,110 +335,236 @@ export default function OfferGenerationStart() {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center z-50">
-      <div className="text-center max-w-md px-6">
-        {/* Nova AI Avatar avec cerveau animé */}
-        <motion.div
-          animate={{ 
-            scale: [1, 1.08, 1],
-            rotate: [0, 3, -3, 0]
-          }}
-          transition={{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="relative mx-auto mb-8"
-        >
-          <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3ad87f] flex items-center justify-center shadow-2xl">
+    <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white overflow-hidden">
+      {/* Bandeau de témoignages en haut */}
+      <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] py-4 px-6 shadow-lg z-10">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentTestimonial}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <p className="text-white font-semibold text-lg">
+              <span className="text-2xl mr-2">{testimonials[currentTestimonial].icon}</span>
+              <span className="font-bold">{testimonials[currentTestimonial].name}</span>
+              {" · "}
+              <span className="opacity-90">{testimonials[currentTestimonial].skill}</span>
+              {" · "}
+              <span className="font-bold">{testimonials[currentTestimonial].result}</span>
+            </p>
+          </motion.div>
+        </AnimatePresence>
+        
+        {/* Indicateurs de pagination */}
+        <div className="flex justify-center gap-2 mt-2">
+          {testimonials.map((_, index) => (
+            <div
+              key={index}
+              className={`h-1 rounded-full transition-all duration-300 ${
+                index === currentTestimonial 
+                  ? 'w-6 bg-white' 
+                  : 'w-1 bg-white/40'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Contenu principal */}
+      <div className="h-full flex items-center justify-center pt-24 pb-8">
+        <div className="max-w-2xl w-full px-6">
+          {/* Nova AI Avatar avec cerveau animé */}
+          <motion.div
+            animate={{ 
+              scale: [1, 1.08, 1],
+              rotate: [0, 3, -3, 0]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="relative mx-auto mb-8 w-28 h-28"
+          >
+            <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3ad87f] flex items-center justify-center shadow-2xl">
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.15, 1],
+                  rotate: [0, 10, -10, 0]
+                }}
+                transition={{ 
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <Brain className="w-14 h-14 text-white" />
+              </motion.div>
+            </div>
+            
+            {/* Ondes d'énergie autour */}
+            {[...Array(3)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute inset-0 rounded-3xl border-2 border-[#61f7a2]"
+                initial={{ scale: 1, opacity: 0.6 }}
+                animate={{ 
+                  scale: [1, 1.4, 1.8],
+                  opacity: [0.6, 0.3, 0]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: i * 0.6,
+                  ease: "easeOut"
+                }}
+              />
+            ))}
+            
+            {/* Particules qui tournent */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+              className="absolute -inset-8"
+            >
+              <Zap className="absolute top-0 left-1/2 w-5 h-5 text-[#61f7a2] opacity-80" />
+              <Sparkles className="absolute top-1/2 right-0 w-5 h-5 text-[#4de88f] opacity-80" />
+            </motion.div>
+            
+            {/* Glow effect pulsant */}
             <motion.div
               animate={{ 
-                scale: [1, 1.15, 1],
-                rotate: [0, 10, -10, 0]
+                scale: [1, 1.3, 1],
+                opacity: [0.4, 0.7, 0.4]
               }}
               transition={{ 
                 duration: 1.5,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-            >
-              <Brain className="w-14 h-14 text-white" />
-            </motion.div>
-          </div>
-          
-          {/* Ondes d'énergie autour */}
-          {[...Array(3)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute inset-0 rounded-3xl border-2 border-[#61f7a2]"
-              initial={{ scale: 1, opacity: 0.6 }}
-              animate={{ 
-                scale: [1, 1.4, 1.8],
-                opacity: [0.6, 0.3, 0]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                delay: i * 0.6,
-                ease: "easeOut"
-              }}
+              className="absolute inset-0 rounded-3xl bg-[#61f7a2] blur-2xl -z-10"
             />
-          ))}
-          
-          {/* Particules qui tournent */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-8"
-          >
-            <Zap className="absolute top-0 left-1/2 w-5 h-5 text-[#61f7a2] opacity-80" />
-            <Sparkles className="absolute top-1/2 right-0 w-5 h-5 text-[#4de88f] opacity-80" />
           </motion.div>
-          
-          {/* Glow effect pulsant */}
-          <motion.div
-            animate={{ 
-              scale: [1, 1.3, 1],
-              opacity: [0.4, 0.7, 0.4]
-            }}
-            transition={{ 
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="absolute inset-0 rounded-3xl bg-[#61f7a2] blur-2xl"
-          />
-        </motion.div>
 
-        {/* Message */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-6"
-        >
-          <p className="text-xl font-semibold text-gray-800">
-            Noah construit ton offre…
-          </p>
-        </motion.div>
-        
-        {/* Loading dots */}
-        <div className="flex items-center justify-center gap-2">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              animate={{ 
-                scale: [1, 1.5, 1],
-                opacity: [0.3, 1, 0.3]
-              }}
-              transition={{
-                duration: 1,
-                repeat: Infinity,
-                delay: i * 0.2
-              }}
-              className="w-2.5 h-2.5 rounded-full bg-[#61f7a2]"
-            />
-          ))}
+          {/* Message */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mb-6 text-center"
+          >
+            <p className="text-xl font-semibold text-gray-800 mb-2">
+              Noah construit ton offre…
+            </p>
+            
+            {/* Loading dots */}
+            <div className="flex items-center justify-center gap-2">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  animate={{ 
+                    scale: [1, 1.5, 1],
+                    opacity: [0.3, 1, 0.3]
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    delay: i * 0.2
+                  }}
+                  className="w-2.5 h-2.5 rounded-full bg-[#61f7a2]"
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Étapes de préparation */}
+          <div className="space-y-3 mt-8">
+            {preparationSteps.map((step, index) => {
+              const Icon = step.icon;
+              const isCompleted = index < currentStep;
+              const isInProgress = index === currentStep;
+              
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ 
+                    opacity: index <= currentStep ? 1 : 0.4,
+                    x: 0 
+                  }}
+                  transition={{ 
+                    duration: 0.5,
+                    delay: index * 0.1 
+                  }}
+                  className={`relative rounded-xl p-4 transition-all duration-300 ${
+                    isCompleted 
+                      ? 'bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-200' 
+                      : isInProgress
+                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-200'
+                      : 'bg-white border-2 border-gray-200'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Icône */}
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center ${
+                      isInProgress ? 'animate-pulse' : ''
+                    }`}>
+                      {isCompleted ? (
+                        <Check className="w-6 h-6 text-white" />
+                      ) : (
+                        <Icon className="w-6 h-6 text-white" />
+                      )}
+                    </div>
+                    
+                    {/* Contenu */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                        {step.title}
+                        {isInProgress && (
+                          <motion.div
+                            animate={{ opacity: [0.5, 1, 0.5] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="flex gap-1"
+                          >
+                            <div className="w-1 h-1 rounded-full bg-blue-500" />
+                            <div className="w-1 h-1 rounded-full bg-blue-500" />
+                            <div className="w-1 h-1 rounded-full bg-blue-500" />
+                          </motion.div>
+                        )}
+                      </h3>
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
+                    
+                    {/* Statut */}
+                    {isCompleted && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="flex-shrink-0"
+                      >
+                        <span className="text-green-600 font-semibold text-sm">✓</span>
+                      </motion.div>
+                    )}
+                  </div>
+                  
+                  {/* Barre de progression pour l'étape en cours */}
+                  {isInProgress && (
+                    <motion.div
+                      className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-b-xl"
+                      initial={{ width: '0%' }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: 3, ease: 'linear' }}
+                    />
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

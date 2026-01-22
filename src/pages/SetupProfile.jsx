@@ -104,19 +104,9 @@ export default function SetupProfile() {
 
       toast.success('Profil enregistré !');
       
-      // 2. 🔥 LANCER LA GÉNÉRATION
-      console.log('[SetupProfile] Launching generation...');
-      
-      // Appel NON-BLOQUANT (on attend pas la fin)
-      base44.functions.invoke('startGeneration', {
-        sessionId: user.sessionId
-      }).catch(error => {
-        console.error('[SetupProfile] Generation error:', error);
-      });
-
-      // 3. Redirect immédiat vers NoahGeneration
-      // (qui va afficher la progression)
-      navigate(createPageUrl('NoahGeneration'));
+      // 🔥 NOUVEAU : Redirect direct vers Dashboard
+      console.log('[SetupProfile] Profil sauvegardé → Dashboard');
+      navigate(createPageUrl('Dashboard'));
       
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -126,16 +116,9 @@ export default function SetupProfile() {
   };
 
   const handleSkip = async () => {
-    // Même si skip, on lance la génération
-    console.log('[SetupProfile] Skip - Launching generation...');
-    
-    base44.functions.invoke('startGeneration', {
-      sessionId: user.sessionId
-    }).catch(error => {
-      console.error('[SetupProfile] Generation error:', error);
-    });
-    
-    navigate(createPageUrl('NoahGeneration'));
+    // 🔥 NOUVEAU : Redirect direct vers Dashboard
+    console.log('[SetupProfile] Skip → Dashboard');
+    navigate(createPageUrl('Dashboard'));
   };
 
   if (loading) {
@@ -166,7 +149,7 @@ export default function SetupProfile() {
             Complète ton profil
           </h1>
           <p className="text-gray-600 text-center mb-8">
-            Pendant ce temps, Noah prépare tes documents
+            Personnalise ton espace pour commencer
           </p>
 
           {/* Avatar Upload */}

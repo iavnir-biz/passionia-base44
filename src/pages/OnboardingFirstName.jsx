@@ -138,12 +138,16 @@ export default function OnboardingFirstName() {
 
   const handleNext = async () => {
     if (!firstName.trim()) return;
-    
+
     setIsLoading(true);
     try {
       // Sauvegarder le prénom dans localStorage
       localStorage.setItem('onboarding_firstName', firstName.trim());
-      
+
+      // 🔥 Récupérer la passion pré-remplie depuis Welcome
+      const prefilledSkill = localStorage.getItem('prefilledSkill');
+      console.log('[OnboardingFirstName] Passion récupérée:', prefilledSkill);
+
       // Initialiser les données d'onboarding
       const onboardingData = {
         history: [],
@@ -152,50 +156,49 @@ export default function OnboardingFirstName() {
         is_onboarding_done: false
       };
       localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
-      
+
       // CRÉER LA SESSION ICI (l'utilisateur est déjà authentifié)
       const currentUser = await base44.auth.me();
-      
+
       // Vérifier si une session existe déjà
-      const existingSessions = await base44.entities.Session.filter({ 
-        created_by: currentUser.email 
+      const existingSessions = await base44.entities.Session.filter({
+        created_by: currentUser.email
       });
-      
+
       let sessionId;
-      
+
+      // 🔥 Préparer les données initiales de la session avec la skill pré-remplie
+      const sessionData = {
+        onboarding_history: [],
+        onboarding_summary: prefilledSkill ? { who_to_teach: prefilledSkill } : {},
+        onboarding_full: prefilledSkill ? { coreSkill: prefilledSkill } : {},
+        skill: prefilledSkill || '',
+        is_onboarding_done: false
+      };
+
       if (existingSessions.length > 0) {
         console.log('✅ Session existe déjà:', existingSessions[0].id);
         sessionId = existingSessions[0].id;
-        
-        // Réinitialiser la session
-        await base44.entities.Session.update(sessionId, {
-          onboarding_history: [],
-          onboarding_summary: {},
-          onboarding_full: {},
-          skill: '',
-          is_onboarding_done: false
-        });
+
+        // Réinitialiser la session avec la skill pré-remplie
+        await base44.entities.Session.update(sessionId, sessionData);
+        console.log('✅ Skill pré-remplie enregistrée:', prefilledSkill);
       } else {
-        // Créer la session
-        const session = await base44.entities.Session.create({
-          onboarding_history: [],
-          onboarding_summary: {},
-          onboarding_full: {},
-          skill: '',
-          is_onboarding_done: false
-        });
+        // Créer la session avec la skill pré-remplie
+        const session = await base44.entities.Session.create(sessionData);
         sessionId = session.id;
-        console.log('✅ Session créée:', sessionId);
+        console.log('✅ Session créée avec skill:', prefilledSkill);
       }
-      
+
       // Sauvegarder le sessionId et le prénom sur le user
-      await base44.auth.updateMe({ 
+      await base44.auth.updateMe({
         firstName: firstName.trim(),
-        sessionId: sessionId
+        sessionId: sessionId,
+        coreSkill: prefilledSkill || '' // 🔥 Aussi sauvegarder sur le User
       });
-      
-      console.log('✅ User mis à jour avec prénom et sessionId:', sessionId);
-      
+
+      console.log('✅ User mis à jour avec prénom, sessionId et skill:', sessionId);
+
       // Navigation vers OnboardingDynamic
       navigate(createPageUrl('OnboardingDynamic'));
     } catch (error) {

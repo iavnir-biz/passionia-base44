@@ -35,9 +35,9 @@ export default function OnboardingDynamic() {
     if (savedSkill) {
       setPrefilledAnswer(savedSkill);
       localStorage.removeItem('prefilledSkill'); // Nettoyer après utilisation
-      console.log('[OnboardingDynamic] Passion récupérée:', savedSkill);
+      console.log('[OnboardingDynamic] Passion récupérée depuis localStorage:', savedSkill);
     }
-    
+
     initializeOnboarding();
   }, []);
 
@@ -98,6 +98,12 @@ export default function OnboardingDynamic() {
       setUser({ firstName });
       setSession(loadedSession);
       setMessages(buildMessagesFromHistory(loadedSession.onboarding_history || []));
+
+      // 🔥 Si la session a déjà une skill enregistrée et qu'on n'a pas encore de prefilledAnswer, l'utiliser
+      if (loadedSession.onboarding_full?.coreSkill && !prefilledAnswer) {
+        setPrefilledAnswer(loadedSession.onboarding_full.coreSkill);
+        console.log('[OnboardingDynamic] Passion récupérée depuis Session:', loadedSession.onboarding_full.coreSkill);
+      }
 
       if (loadedSession.is_onboarding_done) {
         navigate(createPageUrl('OnboardingTransition'));

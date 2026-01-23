@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from 'framer-motion';
 import {
   Sparkles,
@@ -212,7 +213,7 @@ export default function AIResources() {
   if (authLoading || loading) {
     return (
       <div className="flex h-screen bg-white">
-        <Sidebar currentPage="AIResources" progress={0} />
+        <Sidebar currentPage="AIResources" progress={0} user={user} />
         <div className="flex-1 ml-0 lg:ml-72 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
         </div>
@@ -224,7 +225,8 @@ export default function AIResources() {
     <div className="flex min-h-screen bg-white">
       <Sidebar
         currentPage="AIResources"
-        progress={0}
+        progress={calculateProgressFromSession(session)}
+        user={user}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />

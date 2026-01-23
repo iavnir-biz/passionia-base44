@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import UpgradeModal from '@/components/paywall/UpgradeModal';
@@ -248,7 +249,7 @@ export default function SalesPage() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="SalesPage" progress={0} />
+      <Sidebar currentPage="SalesPage" progress={calculateProgressFromSession(session)} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

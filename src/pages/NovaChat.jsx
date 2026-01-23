@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from 'framer-motion';
 import { Sparkles, Send, Zap, Target, TrendingUp, Lightbulb, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import ChatBubble from '@/components/chat/ChatBubble';
 export default function NoahChat() {
   const { isAuthenticated, hasPurchased, isLoading: authLoading } = useRequirePayment();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -41,6 +43,12 @@ export default function NoahChat() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      // Load session for progress
+      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+      if (sessions.length > 0) {
+        setSession(sessions[0]);
+      }
     } catch (error) {
       console.error('Error loading user:', error);
     }
@@ -54,7 +62,7 @@ export default function NoahChat() {
   if (authLoading) {
     return (
       <div className="flex min-h-screen bg-[#11112b]">
-        <Sidebar currentPage="NovaChat" progress={0} />
+        <Sidebar currentPage="NovaChat" progress={calculateProgressFromSession(session)} user={user} />
         <div className="flex-1 ml-72">
           <div className="flex items-center justify-center h-screen">
             <div className="animate-spin w-8 h-8 border-2 border-[#61f7a2] border-t-transparent rounded-full" />
@@ -66,7 +74,7 @@ export default function NoahChat() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      <Sidebar currentPage="NovaChat" progress={0} />
+      <Sidebar currentPage="NovaChat" progress={calculateProgressFromSession(session)} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
@@ -112,7 +113,7 @@ export default function MarketAnalysis() {
   if (loading) {
     return (
       <div className="flex min-h-screen bg-white">
-        <Sidebar currentPage="MarketAnalysis" />
+        <Sidebar currentPage="MarketAnalysis" progress={calculateProgressFromSession(session)} user={user} />
         <div className="flex-1 ml-72">
           <div className="flex items-center justify-center h-screen">
             <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
@@ -124,7 +125,7 @@ export default function MarketAnalysis() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="MarketAnalysis" />
+      <Sidebar currentPage="MarketAnalysis" progress={calculateProgressFromSession(session)} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from "framer-motion";
 import {
   User,
@@ -23,10 +24,10 @@ export default function Settings() {
   const { isAuthenticated, hasPurchased, isLoading: authLoading } = useRequirePayment();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -53,11 +54,10 @@ export default function Settings() {
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       let profileData = profiles.length > 0 ? profiles[0] : null;
 
-      // Load session for onboarding data
-      let sessionData = null;
+      // Load session for onboarding data and progress
       const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
       if (sessions.length > 0) {
-        sessionData = sessions[0];
+        setSession(sessions[0]);
       }
 
       if (profileData) {
@@ -69,15 +69,10 @@ export default function Settings() {
         first_name: profileData?.first_name || currentUser.firstName || '',
         last_name: profileData?.last_name || '',
         avatar_url: profileData?.avatar_url || currentUser.profile_picture || '',
-        passion: profileData?.passion || sessionData?.onboarding_summary?.who_to_teach || '',
-        target_audience: profileData?.target_audience || sessionData?.onboarding_summary?.learner_profile || '',
-        revenue_goal: profileData?.revenue_goal?.toString() || sessionData?.potential_revenue?.toString() || ''
+        passion: profileData?.passion || sessions[0]?.onboarding_summary?.who_to_teach || '',
+        target_audience: profileData?.target_audience || sessions[0]?.onboarding_summary?.learner_profile || '',
+        revenue_goal: profileData?.revenue_goal?.toString() || sessions[0]?.potential_revenue?.toString() || ''
       });
-
-      // Load plan steps for progress
-      const steps = await base44.entities.PlanStep.filter({ created_by: currentUser.email });
-      const completed = steps.filter(s => s.is_completed).length;
-      setProgress(steps.length > 0 ? Math.round((completed / steps.length) * 100) : 0);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -295,7 +290,7 @@ export default function Settings() {
     <div className="flex min-h-screen bg-white">
       <Sidebar
         currentPage="Settings"
-        progress={progress}
+        progress={calculateProgressFromSession(session)}
         user={user}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from 'framer-motion';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -147,7 +148,7 @@ export default function EmailsMarketing() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="EmailsMarketing" />
+      <Sidebar currentPage="EmailsMarketing" progress={calculateProgressFromSession(session)} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

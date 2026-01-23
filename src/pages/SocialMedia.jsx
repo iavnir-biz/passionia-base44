@@ -11,6 +11,7 @@ import GlowButton from '@/components/ui/GlowButton';
 import ChatBubble from '@/components/chat/ChatBubble';
 import { cn } from "@/lib/utils";
 import UpgradeModal from '@/components/paywall/UpgradeModal';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 
 const socialPlatforms = [
   { name: 'TikTok', icon: FaTiktok, color: 'text-white' },
@@ -24,6 +25,7 @@ const socialPlatforms = [
 export default function SocialMedia() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showBlur, setShowBlur] = useState(false);
 
@@ -45,6 +47,11 @@ export default function SocialMedia() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+      if (sessions.length > 0) {
+        setSession(sessions[0]);
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -95,7 +102,7 @@ export default function SocialMedia() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="SocialMedia" progress={0} />
+      <Sidebar currentPage="SocialMedia" progress={calculateProgressFromSession(session)} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

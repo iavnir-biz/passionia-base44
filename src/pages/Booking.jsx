@@ -6,10 +6,12 @@ import TopBar from '@/components/navigation/TopBar';
 import ChatBubble from '@/components/chat/ChatBubble';
 import { Calendar, Clock, Video, CheckCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 
 export default function Booking() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,6 +24,11 @@ export default function Booking() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+      if (sessions.length > 0) {
+        setSession(sessions[0]);
+      }
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
@@ -32,7 +39,7 @@ export default function Booking() {
   if (authLoading || loading) {
     return (
       <div className="flex min-h-screen bg-white">
-        <Sidebar currentPage="Booking" progress={0} />
+        <Sidebar currentPage="Booking" progress={calculateProgressFromSession(session)} user={user} />
         <div className="flex-1 ml-72">
           <div className="flex items-center justify-center h-screen">
             <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
@@ -44,7 +51,7 @@ export default function Booking() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="Dashboard" progress={0} />
+      <Sidebar currentPage="Dashboard" progress={calculateProgressFromSession(session)} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

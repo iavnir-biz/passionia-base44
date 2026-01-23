@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { base44 } from '@/api/base44Client';
 import { useRequireAuth } from '@/components/hooks/useRequireAuth';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import UpgradeModal from '@/components/paywall/UpgradeModal';
-import { Sparkles, Loader2, Eye, Copy, Package, ShoppingCart, TrendingUp, Crown, Brain } from 'lucide-react';
+import { Sparkles, Loader2, Copy, Package, ShoppingCart, TrendingUp, Crown, Brain, Download, FileText, Video, FileCheck, Users, Clock, Target } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
@@ -19,7 +18,6 @@ export default function MyOffers() {
   const [session, setSession] = useState(null);
   const [loadingOffers, setLoadingOffers] = useState({});
   const [generatedOffers, setGeneratedOffers] = useState(null);
-  const [showPreview, setShowPreview] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [hasPremium, setHasPremium] = useState(false);
 
@@ -178,10 +176,22 @@ export default function MyOffers() {
     }
   };
 
+  // Get icon for deliverable type
+  const getDeliverableIcon = (item) => {
+    const lowerItem = item.toLowerCase();
+    if (lowerItem.includes('vidéo') || lowerItem.includes('video')) return Video;
+    if (lowerItem.includes('pdf') || lowerItem.includes('document')) return FileText;
+    if (lowerItem.includes('template') || lowerItem.includes('modèle')) return FileCheck;
+    if (lowerItem.includes('session') || lowerItem.includes('coaching')) return Users;
+    return Package;
+  };
+
   const handleCopy = (offer) => {
     const text = `
 ${offer.title}
 ${offer.price}
+
+${offer.subtitle || ''}
 
 ${offer.description}
 
@@ -190,10 +200,21 @@ ${offer.deliverables.join('\n')}
 
 Bénéfices:
 ${offer.benefits.join('\n')}
+
+Pour qui:
+${offer.ideal_for?.slice(0, 3).join('\n') || ''}
+
+Rôle dans le funnel:
+${offer.ecosystem_role || ''}
     `.trim();
-    
+
     navigator.clipboard.writeText(text);
     toast.success('Offre copiée dans le presse-papier !');
+  };
+
+  const handleDownloadPDF = (offer, offerTypeName) => {
+    // TODO: Implement PDF generation
+    toast.info('Génération du PDF en cours...');
   };
 
   const offerTypes = [
@@ -344,43 +365,123 @@ ${offer.benefits.join('\n')}
                     {/* Generated Content or Generate Button */}
                     {offer ? (
                       <>
-                        <div className="mb-4">
-                          {/* Nom de l'offre en noir au-dessus du prix */}
-                          {offer.title && (
-                            <h4 className="text-base font-bold text-gray-900 mb-2">
-                              {offer.title}
-                            </h4>
+                        <div className="space-y-4 mb-4">
+                          {/* Nom de l'offre + Subtitle */}
+                          <div>
+                            {offer.title && (
+                              <h4 className="text-base font-bold text-gray-900 mb-1">
+                                {offer.title}
+                              </h4>
+                            )}
+                            {offer.subtitle && (
+                              <p className="text-gray-600 text-xs italic mb-2">
+                                {offer.subtitle}
+                              </p>
+                            )}
+                            <div className="text-2xl font-bold text-[#61f7a2]">
+                              {offer.price}
+                            </div>
+                          </div>
+
+                          {/* Avant → Après (Transformation) */}
+                          {(offer.before || offer.after) && (
+                            <div className="bg-gradient-to-r from-red-50 to-green-50 rounded-lg p-3 border border-gray-200">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs font-semibold text-gray-700">🔄 Transformation</span>
+                              </div>
+                              <div className="space-y-1 text-xs">
+                                {offer.before && (
+                                  <p className="text-gray-600">
+                                    <span className="text-red-600 font-semibold">❌ Avant:</span> {offer.before.split('.')[0]}.
+                                  </p>
+                                )}
+                                {offer.after && (
+                                  <p className="text-gray-700">
+                                    <span className="text-green-600 font-semibold">✅ Après:</span> {offer.after.split('.')[0]}.
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           )}
-                          <div className="text-2xl font-bold text-[#61f7a2] mb-2">
-                            {offer.price}
+
+                          {/* Top 3 Bénéfices */}
+                          {offer.benefits && offer.benefits.length > 0 && (
+                            <div className="bg-white rounded-lg p-3 border border-gray-200">
+                              <h4 className="text-gray-900 font-semibold text-xs mb-2">✨ Bénéfices clés</h4>
+                              <ul className="space-y-1">
+                                {offer.benefits.slice(0, 3).map((item, i) => (
+                                  <li key={i} className="text-gray-700 text-xs flex items-start gap-2">
+                                    <span className="text-[#61f7a2] mt-0.5">→</span>
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Livrables avec icônes */}
+                          {offer.deliverables && offer.deliverables.length > 0 && (
+                            <div className="bg-white rounded-lg p-3 border border-gray-200">
+                              <h4 className="text-gray-900 font-semibold text-xs mb-2">📦 Ce que tu reçois</h4>
+                              <ul className="space-y-1.5">
+                                {offer.deliverables.slice(0, 4).map((item, i) => {
+                                  const DeliverableIcon = getDeliverableIcon(item);
+                                  return (
+                                    <li key={i} className="text-gray-700 text-xs flex items-start gap-2">
+                                      <DeliverableIcon className="w-3.5 h-3.5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                                      <span>{item}</span>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Pour qui + Durée */}
+                          <div className="grid grid-cols-1 gap-2">
+                            {offer.ideal_for && offer.ideal_for.length > 0 && (
+                              <div className="bg-blue-50 rounded-lg p-2.5 border border-blue-200">
+                                <div className="flex items-center gap-1.5 mb-1">
+                                  <Target className="w-3.5 h-3.5 text-blue-600" />
+                                  <span className="text-xs font-semibold text-blue-900">Idéal pour</span>
+                                </div>
+                                <p className="text-xs text-blue-800">
+                                  {offer.ideal_for.slice(0, 2).join(' • ')}
+                                </p>
+                              </div>
+                            )}
+
+                            {offer.duration && (
+                              <div className="bg-purple-50 rounded-lg p-2.5 border border-purple-200">
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className="w-3.5 h-3.5 text-purple-600" />
+                                  <span className="text-xs font-semibold text-purple-900">Durée:</span>
+                                  <span className="text-xs text-purple-800">{offer.duration}</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          <p className="text-gray-700 text-sm mb-3">
-                            {offer.description}
-                          </p>
-                          
-                          <div className="bg-white rounded-lg p-3 border border-gray-200">
-                            <h4 className="text-gray-900 font-semibold text-xs mb-2">📦 Livrables</h4>
-                            <ul className="space-y-1">
-                              {(offer.deliverables || []).slice(0, 3).map((item, i) => (
-                                <li key={i} className="text-gray-600 text-xs flex items-start gap-2">
-                                  <span className="text-[#61f7a2] mt-0.5">✓</span>
-                                  <span>{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
+
+                          {/* Rôle dans le funnel */}
+                          {offer.ecosystem_role && (
+                            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-2.5 border border-yellow-200">
+                              <p className="text-xs text-gray-700">
+                                <span className="font-semibold">🔗 Rôle:</span> {offer.ecosystem_role.split('.')[0]}.
+                              </p>
+                            </div>
+                          )}
                         </div>
 
                         {/* Actions */}
                         <div className="flex gap-2">
                           <GlowButton
-                            onClick={() => setShowPreview(offer)}
+                            onClick={() => handleDownloadPDF(offer, offerType.title)}
                             variant="secondary"
                             size="sm"
-                            icon={Eye}
+                            icon={Download}
                             className="flex-1"
                           >
-                            Voir
+                            PDF
                           </GlowButton>
                           <GlowButton
                             onClick={() => handleCopy(offer)}
@@ -411,161 +512,6 @@ ${offer.benefits.join('\n')}
           </div>
         </main>
       </div>
-
-      {/* Preview Modal */}
-      {showPreview && createPortal(
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-gray-200 shadow-xl"
-          >
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-900">Détails de l'offre</h3>
-              <button
-                onClick={() => setShowPreview(null)}
-                className="text-gray-400 hover:text-gray-900 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
-              <div className="space-y-6">
-                {/* 1. L'IDENTITÉ DE L'OFFRE */}
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <h3 className="text-xs font-semibold text-[#61f7a2] mb-3">🧩 L'IDENTITÉ DE L'OFFRE</h3>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{showPreview.title || "Mon Offre"}</h2>
-                  {showPreview.subtitle && (
-                    <p className="text-gray-600 text-sm mb-4">{showPreview.subtitle}</p>
-                  )}
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    {showPreview.product_type && (
-                      <div><span className="text-gray-500">Type:</span> <span className="text-gray-900">{showPreview.product_type}</span></div>
-                    )}
-                    {showPreview.level && (
-                      <div><span className="text-gray-500">Niveau:</span> <span className="text-gray-900">{showPreview.level}</span></div>
-                    )}
-                    {showPreview.duration && (
-                      <div><span className="text-gray-500">Durée:</span> <span className="text-gray-900">{showPreview.duration}</span></div>
-                    )}
-                    <div className="flex items-center gap-3">
-                      {showPreview.original_value && (
-                        <span className="text-gray-500 line-through">{showPreview.original_value}</span>
-                      )}
-                      <span className="text-2xl font-bold text-[#61f7a2]">{showPreview.price}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. À QUEL PROBLÈME CETTE OFFRE RÉPOND */}
-                {showPreview.problem && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">🎯 À QUEL PROBLÈME CETTE OFFRE RÉPOND</h3>
-                    <p className="text-gray-700 text-sm leading-relaxed">{showPreview.problem}</p>
-                  </div>
-                )}
-
-                {/* 3. AVANT / APRÈS (TRANSFORMATION) */}
-                {(showPreview.before || showPreview.after) && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">🔄 AVANT / APRÈS</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {showPreview.before && (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                          <p className="text-xs font-semibold text-red-600 mb-2">Avant</p>
-                          <p className="text-gray-700 text-sm leading-relaxed">{showPreview.before}</p>
-                        </div>
-                      )}
-                      {showPreview.after && (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                          <p className="text-xs font-semibold text-[#61f7a2] mb-2">Après</p>
-                          <p className="text-gray-700 text-sm leading-relaxed">{showPreview.after}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. CE QUE CONTIENT EXACTEMENT L'OFFRE */}
-                {showPreview.deliverables && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">📦 CE QUE CONTIENT EXACTEMENT L'OFFRE</h3>
-                    <ul className="space-y-2">
-                      {showPreview.deliverables.map((item, i) => (
-                        <li key={i} className="text-gray-700 text-sm flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                          <span className="text-[#61f7a2] mt-0.5">✓</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* 4B. BÉNÉFICES CONCRETS */}
-                {showPreview.benefits && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">✨ BÉNÉFICES CONCRETS</h3>
-                    <ul className="space-y-2">
-                      {showPreview.benefits.map((item, i) => (
-                        <li key={i} className="text-gray-700 text-sm flex items-start gap-2 bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg border border-green-200">
-                          <span className="text-[#61f7a2] mt-0.5">→</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* 5. COMMENT UTILISER CETTE OFFRE */}
-                {showPreview.how_to_use && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">🛠 COMMENT UTILISER CETTE OFFRE</h3>
-                    <p className="text-gray-700 text-sm leading-relaxed">{showPreview.how_to_use}</p>
-                  </div>
-                )}
-
-                {/* 6 & 7. POUR QUI / PAS POUR QUI */}
-                {(showPreview.ideal_for || showPreview.not_for) && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">👤 CIBLAGE STRATÉGIQUE</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {showPreview.ideal_for && (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                          <p className="text-xs font-semibold text-green-700 mb-2">✅ Idéal pour</p>
-                          <ul className="space-y-1">
-                            {showPreview.ideal_for.map((item, i) => (
-                              <li key={i} className="text-gray-700 text-xs">• {item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {showPreview.not_for && (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                          <p className="text-xs font-semibold text-red-600 mb-2">❌ Pas adapté si</p>
-                          <ul className="space-y-1">
-                            {showPreview.not_for.map((item, i) => (
-                              <li key={i} className="text-gray-700 text-xs">• {item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 8. RÔLE DANS L'ÉCOSYSTÈME GLOBAL */}
-                {showPreview.ecosystem_role && (
-                  <div className="bg-gradient-to-br from-blue-50 to-green-50 border border-blue-200 rounded-xl p-4">
-                    <h3 className="text-sm font-semibold text-[#61f7a2] mb-2">🔗 RÔLE DANS L'ÉCOSYSTÈME GLOBAL</h3>
-                    <p className="text-gray-700 text-sm leading-relaxed">{showPreview.ecosystem_role}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        </div>,
-        document.body
-      )}
 
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
       <ChatBubble />

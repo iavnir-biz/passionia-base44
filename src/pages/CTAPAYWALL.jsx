@@ -761,16 +761,6 @@ export default function CTAPAYWALL() {
               Accès immédiat après paiement sécurisé
             </p>
 
-            {/* Dev/Test: Simulate Purchase Button */}
-            <div className="mt-6 pt-6 border-t border-white/20">
-              <button
-                onClick={handleSimulatePurchase}
-                disabled={isSimulating}
-                className="text-white/60 hover:text-white/80 text-xs transition-colors"
-              >
-                {isSimulating ? 'Simulation en cours...' : '🧪 Simuler achat (dev)'}
-              </button>
-            </div>
           </motion.div>
 
           {/* Garantie */}

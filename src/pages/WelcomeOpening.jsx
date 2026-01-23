@@ -11,9 +11,22 @@ export default function WelcomeOpening() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [verificationAttempts, setVerificationAttempts] = useState(0);
 
   useEffect(() => {
-    loadData();
+    // Vérifier si on vient d'un paiement réussi
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentSuccess = urlParams.get('payment') === 'success';
+
+    if (paymentSuccess) {
+      // Paiement réussi - attendre que le webhook traite le paiement
+      console.log('[WelcomeOpening] Payment success detected, waiting for webhook...');
+      loadDataWithRetry();
+    } else {
+      // Accès direct - vérifier immédiatement
+      loadData();
+    }
+
     triggerConfetti();
   }, []);
 
@@ -25,6 +38,44 @@ export default function WelcomeOpening() {
     });
   };
 
+  const loadDataWithRetry = async (attemptNumber = 0) => {
+    try {
+      const currentUser = await base44.auth.me();
+
+      if (currentUser.has_purchased) {
+        // Paiement confirmé !
+        console.log('[WelcomeOpening] Payment verified successfully');
+        setUser(currentUser);
+        setIsLoading(false);
+        return;
+      }
+
+      // Pas encore confirmé - retry jusqu'à 10 fois (20 secondes max)
+      if (attemptNumber < 10) {
+        console.log(`[WelcomeOpening] Payment not yet confirmed, retry ${attemptNumber + 1}/10...`);
+        setVerificationAttempts(attemptNumber + 1);
+        setTimeout(() => {
+          loadDataWithRetry(attemptNumber + 1);
+        }, 2000); // Attendre 2 secondes avant de réessayer
+      } else {
+        // Échec après 10 tentatives - rediriger avec message d'erreur
+        console.error('[WelcomeOpening] Payment verification failed after 10 attempts');
+        alert('Ton paiement a bien été reçu mais la confirmation prend plus de temps que prévu. Tu vas recevoir un email avec un lien d\'accès. Contacte le support si besoin.');
+        navigate(createPageUrl('CTAPAYWALL'));
+      }
+    } catch (error) {
+      console.error('[WelcomeOpening] Error verifying payment:', error);
+      // En cas d'erreur, continuer à retry
+      if (attemptNumber < 10) {
+        setTimeout(() => {
+          loadDataWithRetry(attemptNumber + 1);
+        }, 2000);
+      } else {
+        setIsLoading(false);
+      }
+    }
+  };
+
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
@@ -34,7 +85,7 @@ export default function WelcomeOpening() {
         navigate(createPageUrl('CTAPAYWALL'));
         return;
       }
-      
+
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -49,8 +100,20 @@ export default function WelcomeOpening() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-[#61f7a2] animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            {verificationAttempts > 0
+              ? 'Vérification de ton paiement...'
+              : 'Chargement...'}
+          </h2>
+          {verificationAttempts > 0 && (
+            <p className="text-gray-600 text-sm">
+              Confirmation en cours ({verificationAttempts}/10)... Cela prend généralement quelques secondes.
+            </p>
+          )}
+        </div>
       </div>
     );
   }

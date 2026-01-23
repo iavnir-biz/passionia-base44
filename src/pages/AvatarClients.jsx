@@ -82,7 +82,17 @@ export default function AvatarClients() {
 
       // Vérifier si avatars existe et est non-vide
       if (isNonEmpty(userSession.generated_avatars)) {
-        setAvatars(userSession.generated_avatars);
+        // 🔥 HANDLE BOTH FORMATS: array or object with { avatars: [...], generatedAt: "..." }
+        const avatarsData = userSession.generated_avatars;
+
+        // Si c'est un objet avec une clé 'avatars', extraire le tableau
+        if (avatarsData && typeof avatarsData === 'object' && avatarsData.avatars) {
+          setAvatars(avatarsData.avatars);
+        }
+        // Sinon, si c'est déjà un tableau, l'utiliser directement
+        else if (Array.isArray(avatarsData)) {
+          setAvatars(avatarsData);
+        }
       }
 
       const profiles = await base44.entities.UserProfile.filter({
@@ -111,15 +121,28 @@ export default function AvatarClients() {
         regenerate: isRegenerate
       });
 
-      const generatedAvatars = response.data.avatars;
+      console.log('[AvatarClients] Response from generateAvatars:', response);
 
-      // 🔥 Sauvegarder IMMÉDIATEMENT en base
+      // 🔥 HANDLE RESPONSE: backend returns { avatars: [...], generatedAt: "..." }
+      const avatarsData = response.data?.avatars || response.avatars;
+      const generatedAt = response.data?.generatedAt || response.generatedAt;
+
+      if (!avatarsData || !Array.isArray(avatarsData)) {
+        throw new Error('Format de réponse invalide: avatars manquants ou incorrect');
+      }
+
+      // 🔥 Sauvegarder IMMÉDIATEMENT en base (format cohérent avec backend)
+      const dataToSave = {
+        avatars: avatarsData,
+        generatedAt: generatedAt || new Date().toISOString()
+      };
+
       await base44.entities.Session.update(session.id, {
-        generated_avatars: generatedAvatars
+        generated_avatars: dataToSave
       });
 
       // 🔥 Mettre à jour l'état local pour affichage immédiat
-      setAvatars(generatedAvatars);
+      setAvatars(avatarsData);
 
       // 🔥 Recharger la session complète depuis la base
       const sessions = await base44.entities.Session.filter({ id: session.id });
@@ -129,8 +152,13 @@ export default function AvatarClients() {
 
       toast.success('Avatars générés avec succès et sauvegardés !');
     } catch (error) {
-      console.error('Error generating avatars:', error);
-      toast.error('Erreur lors de la génération');
+      console.error('[AvatarClients] Error generating avatars:', error);
+      console.error('[AvatarClients] Error details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response
+      });
+      toast.error('Erreur lors de la génération : ' + (error.message || 'Erreur inconnue'));
     } finally {
       setLoading(false);
     }

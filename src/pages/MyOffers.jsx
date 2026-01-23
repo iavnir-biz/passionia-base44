@@ -33,13 +33,22 @@ export default function MyOffers() {
 
     // Transform deliverables if they're objects {type, name, description, duration}
     let deliverables = offer.deliverables || [];
-    if (deliverables.length > 0 && typeof deliverables[0] === 'object') {
+    if (deliverables.length > 0 && typeof deliverables[0] === 'object' && deliverables[0] !== null) {
       deliverables = deliverables.map(d => {
         if (d.description && d.name) {
           return `${d.name}: ${d.description}`;
         }
-        return d.description || d.name || `${d.type}: ${d.name || ''}`;
+        return d.description || d.name || `${d.type || ''}: ${d.name || ''}`;
       });
+    }
+
+    // Transform benefits if needed
+    let benefits = offer.benefits || [];
+    if (benefits.length > 0 && typeof benefits[0] === 'object' && benefits[0] !== null) {
+      benefits = benefits.map(b => {
+        if (typeof b === 'string') return b;
+        return b.description || b.benefit || b.name || '';
+      }).filter(b => b);
     }
 
     // Transform ideal_for and not_for if needed
@@ -62,7 +71,7 @@ export default function MyOffers() {
       before: offer.before,
       after: offer.after,
       deliverables: deliverables,
-      benefits: offer.benefits || [],
+      benefits: benefits,
       how_to_use: offer.howToUse || offer.how_to_use,
       ideal_for: idealFor,
       not_for: notFor,
@@ -119,10 +128,10 @@ export default function MyOffers() {
         else if (userSession.finalized_offer) {
           console.log('[MyOffers] Using finalized_offer (base only)');
           const baseOffers = {
-            low: userSession.finalized_offer.mainProduct,
-            bump: userSession.finalized_offer.orderBump,
-            mid: userSession.finalized_offer.upsell1,
-            high: userSession.finalized_offer.upsell3
+            low: normalizeOffer(userSession.finalized_offer.mainProduct),
+            bump: normalizeOffer(userSession.finalized_offer.orderBump),
+            mid: normalizeOffer(userSession.finalized_offer.upsell1),
+            high: normalizeOffer(userSession.finalized_offer.upsell3)
           };
           setGeneratedOffers(baseOffers);
         }
@@ -378,9 +387,15 @@ ${offer.ecosystem_role || ''}
                                 {offer.subtitle}
                               </p>
                             )}
-                            <div className="text-2xl font-bold text-[#61f7a2]">
+                            <div className="text-2xl font-bold text-[#61f7a2] mb-2">
                               {offer.price}
                             </div>
+                            {/* Description si pas de données PSSO enrichies */}
+                            {offer.description && !offer.before && !offer.after && (
+                              <p className="text-gray-600 text-xs">
+                                {offer.description}
+                              </p>
+                            )}
                           </div>
 
                           {/* Avant → Après (Transformation) */}
@@ -437,6 +452,15 @@ ${offer.ecosystem_role || ''}
                             </div>
                           )}
 
+                          {/* Message si pas enrichi */}
+                          {(!offer.before && !offer.after && !offer.benefits?.length) && (
+                            <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+                              <p className="text-xs text-yellow-800">
+                                💡 <span className="font-semibold">Offre de base</span> - Clique sur "Enrichir avec l'IA" ci-dessous pour générer l'analyse PSSO complète (transformation, bénéfices, ciblage, etc.)
+                              </p>
+                            </div>
+                          )}
+
                           {/* Pour qui + Durée */}
                           <div className="grid grid-cols-1 gap-2">
                             {offer.ideal_for && offer.ideal_for.length > 0 && (
@@ -474,15 +498,29 @@ ${offer.ecosystem_role || ''}
 
                         {/* Actions */}
                         <div className="flex gap-2">
-                          <GlowButton
-                            onClick={() => handleDownloadPDF(offer, offerType.title)}
-                            variant="secondary"
-                            size="sm"
-                            icon={Download}
-                            className="flex-1"
-                          >
-                            PDF
-                          </GlowButton>
+                          {/* Si pas enrichi, proposer d'enrichir */}
+                          {(!offer.before && !offer.after && !offer.benefits?.length) ? (
+                            <GlowButton
+                              onClick={() => handleGenerateSingle(offerType.id)}
+                              variant="primary"
+                              size="sm"
+                              loading={loadingOffers[offerType.id]}
+                              icon={Sparkles}
+                              className="flex-1"
+                            >
+                              {loadingOffers[offerType.id] ? 'Enrichissement...' : 'Enrichir avec l\'IA'}
+                            </GlowButton>
+                          ) : (
+                            <GlowButton
+                              onClick={() => handleDownloadPDF(offer, offerType.title)}
+                              variant="secondary"
+                              size="sm"
+                              icon={Download}
+                              className="flex-1"
+                            >
+                              PDF
+                            </GlowButton>
+                          )}
                           <GlowButton
                             onClick={() => handleCopy(offer)}
                             variant="ghost"

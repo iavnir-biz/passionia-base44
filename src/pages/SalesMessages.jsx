@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from 'framer-motion';
 import { Sparkles, Loader2, Eye, Copy, Download, MessageSquare, Heart, Lightbulb, ShoppingBag, Lock, Brain } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
@@ -176,7 +177,7 @@ export default function SalesMessages() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="SalesMessages" progress={0} />
+      <Sidebar currentPage="SalesMessages" progress={calculateProgressFromSession(session)} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

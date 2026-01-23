@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from 'framer-motion';
 import {
   Sparkles,
@@ -229,7 +230,7 @@ export default function AvatarClients() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="AvatarClients" progress={0} />
+      <Sidebar currentPage="AvatarClients" progress={calculateProgressFromSession(session)} user={user} />
 
       <div className="flex-1 ml-72">
         <TopBar

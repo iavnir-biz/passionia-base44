@@ -9,10 +9,12 @@ import GlowButton from '@/components/ui/GlowButton';
 import ChatBubble from '@/components/chat/ChatBubble';
 import { cn } from "@/lib/utils";
 import UpgradeModal from '@/components/paywall/UpgradeModal';
+import { calculateProgressFromSession } from '@/utils/progressUtils';
 
 export default function AdCopies() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showBlur, setShowBlur] = useState(false);
 
@@ -34,6 +36,11 @@ export default function AdCopies() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
+
+      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+      if (sessions.length > 0) {
+        setSession(sessions[0]);
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -68,7 +75,7 @@ export default function AdCopies() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="AdCopies" progress={0} />
+      <Sidebar currentPage="AdCopies" progress={calculateProgressFromSession(session)} user={user} />
       
       <div className="flex-1 ml-72">
         <TopBar 

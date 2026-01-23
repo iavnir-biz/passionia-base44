@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { calculateProgressFromSession, getCurrentDay } from '@/utils/progressUtils';
 import { motion } from "framer-motion";
 import {
   Target,
@@ -88,21 +89,7 @@ export default function Dashboard() {
     }
   };
 
-  const calculateProgress = () => {
-    if (!session?.plan_progress) return 0;
-    const completedDays = Object.keys(session.plan_progress).filter(
-      key => session.plan_progress[key]?.completed
-    ).length;
-    return Math.round((completedDays / 7) * 100);
-  };
-
-  const getCurrentStep = () => {
-    if (!session?.plan_progress) return 1;
-    const completedDays = Object.keys(session.plan_progress).filter(
-      key => session.plan_progress[key]?.completed
-    ).length;
-    return Math.min(completedDays + 1, 7);
-  };
+  // Using shared utility functions from progressUtils.js
 
   const getNextIncompleteTask = () => {
     if (!session?.plan_progress) {
@@ -113,7 +100,7 @@ export default function Dashboard() {
       };
     }
 
-    const currentDay = getCurrentStep();
+    const currentDay = getCurrentDay(session);
     const dayProgress = session.plan_progress[currentDay];
     
     // Si pas de checklist pour ce jour, retourner la première mission
@@ -174,7 +161,7 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-white">
       <Sidebar
         currentPage="Dashboard"
-        progress={calculateProgress()}
+        progress={calculateProgressFromSession(session)}
         user={user}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
@@ -249,11 +236,11 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Ta progression</p>
-                <p className="text-2xl font-bold text-gray-900">Jour {getCurrentStep()} / 7</p>
+                <p className="text-2xl font-bold text-gray-900">Jour {getCurrentDay(session)} / 7</p>
               </div>
-              <p className="text-3xl font-bold text-[#61f7a2]">{calculateProgress()}%</p>
+              <p className="text-3xl font-bold text-[#61f7a2]">{calculateProgressFromSession(session)}%</p>
             </div>
-            <ProgressBar value={calculateProgress()} max={100} className="mb-3" />
+            <ProgressBar value={calculateProgressFromSession(session)} max={100} className="mb-3" />
             <p className="text-center text-gray-700 font-medium">Tu es exactement là où tu dois être.</p>
           </motion.div>
 
@@ -290,11 +277,11 @@ export default function Dashboard() {
           {/* PLAN 7 JOURS */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
             className="bg-gray-50 rounded-2xl border border-gray-200 p-6">
-            <p className="text-lg font-bold text-gray-900 mb-4">Tu es au jour {getCurrentStep()}</p>
+            <p className="text-lg font-bold text-gray-900 mb-4">Tu es au jour {getCurrentDay(session)}</p>
             <div className="flex items-center gap-2 mb-6">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <div key={day} className={`flex-1 h-2 rounded-full transition-all ${
-                  day < getCurrentStep() ? 'bg-[#61f7a2]' : day === getCurrentStep() ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30' : 'bg-gray-200'
+                  day < getCurrentDay(session) ? 'bg-[#61f7a2]' : day === getCurrentDay(session) ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30' : 'bg-gray-200'
                 }`} />
               ))}
             </div>

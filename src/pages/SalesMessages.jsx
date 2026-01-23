@@ -297,7 +297,7 @@ export default function SalesMessages() {
                         loading={isLoading}
                         icon={Sparkles}
                       >
-                        {isLoading ? 'Nova écrit ton message...' : 'Générer'}
+                        {isLoading ? 'Noah écrit ton message...' : 'Générer'}
                       </GlowButton>
                     )}
                   </motion.div>

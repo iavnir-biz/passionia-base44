@@ -30,13 +30,56 @@ export default function MyOffers() {
     }
   }, [isAuthenticated]);
 
+  // Normalize offer data from different sources to a common format
+  const normalizeOffer = (offer) => {
+    if (!offer) return null;
+
+    // Transform deliverables if they're objects {type, name, description, duration}
+    let deliverables = offer.deliverables || [];
+    if (deliverables.length > 0 && typeof deliverables[0] === 'object') {
+      deliverables = deliverables.map(d => {
+        if (d.description && d.name) {
+          return `${d.name}: ${d.description}`;
+        }
+        return d.description || d.name || `${d.type}: ${d.name || ''}`;
+      });
+    }
+
+    // Transform ideal_for and not_for if needed
+    const idealFor = Array.isArray(offer.idealFor || offer.ideal_for)
+      ? (offer.idealFor || offer.ideal_for)
+      : [];
+    const notFor = Array.isArray(offer.notFor || offer.not_for)
+      ? (offer.notFor || offer.not_for)
+      : [];
+
+    return {
+      title: offer.title,
+      price: offer.price,
+      subtitle: offer.subtitle,
+      description: offer.problem || offer.description || '',
+      product_type: offer.productType || offer.product_type,
+      level: offer.level,
+      duration: offer.duration || offer.timeline,
+      problem: offer.problem,
+      before: offer.before,
+      after: offer.after,
+      deliverables: deliverables,
+      benefits: offer.benefits || [],
+      how_to_use: offer.howToUse || offer.how_to_use,
+      ideal_for: idealFor,
+      not_for: notFor,
+      ecosystem_role: offer.ecosystemRole || offer.ecosystem_role
+    };
+  };
+
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      const profiles = await base44.entities.UserProfile.filter({ 
-        created_by: currentUser.email 
+      const profiles = await base44.entities.UserProfile.filter({
+        created_by: currentUser.email
       });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
@@ -50,19 +93,34 @@ export default function MyOffers() {
       }
 
       const sessions = await base44.entities.Session.filter({ id: sessionId });
-      
+
       if (sessions.length > 0) {
         const userSession = sessions[0];
         setSession(userSession);
         console.log('[MyOffers] Session loaded:', userSession);
+        console.log('[MyOffers] Detailed offers:', userSession.detailed_offers);
         console.log('[MyOffers] My generated offers:', userSession.my_generated_offers);
         console.log('[MyOffers] Finalized offer (base):', userSession.finalized_offer);
-        
-        // 🔥 DB-first: use enriched offers if available, fallback to finalized_offer
-        if (userSession.my_generated_offers) {
+
+        // 🔥 PRIORITY 1: detailed_offers (complete enriched offers from generateDetailedOffers)
+        if (userSession.detailed_offers) {
+          const mappedOffers = {
+            low: normalizeOffer(userSession.detailed_offers.mainProduct),
+            bump: normalizeOffer(userSession.detailed_offers.orderBump),
+            mid: normalizeOffer(userSession.detailed_offers.upsell),
+            high: normalizeOffer(userSession.detailed_offers.premium)
+          };
+          console.log('[MyOffers] Using detailed_offers (fully enriched):', mappedOffers);
+          setGeneratedOffers(mappedOffers);
+        }
+        // 🔥 PRIORITY 2: my_generated_offers (individually enriched offers)
+        else if (userSession.my_generated_offers) {
+          console.log('[MyOffers] Using my_generated_offers (individually enriched)');
           setGeneratedOffers(userSession.my_generated_offers);
-        } else if (userSession.finalized_offer) {
-          // Fallback to base offers from finalized_offer
+        }
+        // 🔥 PRIORITY 3: finalized_offer (base offers only)
+        else if (userSession.finalized_offer) {
+          console.log('[MyOffers] Using finalized_offer (base only)');
           const baseOffers = {
             low: userSession.finalized_offer.mainProduct,
             bump: userSession.finalized_offer.orderBump,

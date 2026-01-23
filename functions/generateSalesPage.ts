@@ -1,8 +1,13 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import OpenAI from 'npm:openai';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
 
 const openai = new OpenAI({
   apiKey: Deno.env.get("OPENAI_API_KEY"),
+});
+
+const anthropic = new Anthropic({
+  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
 
 Deno.serve(async (req) => {
@@ -18,8 +23,8 @@ Deno.serve(async (req) => {
     console.log('[generateSalesPage] body received:', body);
 
     const sessionId = body.sessionId || body.session?.id;
-    const { offerType, color, tone } = body;
-    console.log('[generateSalesPage] resolved - sessionId:', sessionId, 'offerType:', offerType, 'color:', color, 'tone:', tone);
+    const { offerType, color, tone, logoUrl } = body;
+    console.log('[generateSalesPage] resolved - sessionId:', sessionId, 'offerType:', offerType, 'color:', color, 'tone:', tone, 'logoUrl:', logoUrl);
 
     // 🔥 RULE 1: LOW TICKET ONLY
     if (offerType !== 'low') {
@@ -156,9 +161,15 @@ Règles :
 - HTML5 complet (<!DOCTYPE html>)
 - Tailwind CSS via CDN dans <head>
 - Couleur principale injectable : use color CSS variables
+- ${logoUrl ? `Logo fourni : ${logoUrl} (à placer dans le header)` : 'Pas de logo fourni'}
 - Sections bien aérées (py-16, py-20)
 - Typographie hiérarchisée (text-5xl, text-3xl, text-xl…)
 - Responsive mobile-first
+- Design moderne et professionnel avec gradients, ombres, et espaces blancs
+- Boutons CTA visuellement attractifs avec hover effects
+- Utilise des icônes (Lucide icons via CDN ou emojis)
+- Sections avec backgrounds alternés (blanc, gris clair, couleur primaire en transparence)
+- Cards avec ombres et bordures arrondies
 - Pas de Markdown, pas de texte brut
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -179,25 +190,29 @@ Règles :
 ✅ RETOURNE UNIQUEMENT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-HTML final complet, publiable, prêt à être utilisé. Aucune explication.`;
+HTML final complet, publiable, prêt à être copié-collé.
+- Structure claire avec header, sections distinctes, footer
+- Visuellement attractif avec couleurs, espacements, typographie
+- CTAs bien visibles et persuasifs
+- Sections avec icônes ou emojis pour la lisibilité
+- Design professionnel digne d'une vraie landing page
+- Aucune explication, aucun commentaire, seulement le HTML pur.`;
 
-    console.log('[generateSalesPage] Calling OpenAI for page content...');
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+    console.log('[generateSalesPage] Calling Claude Sonnet 4 for page content...');
+    const completion = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 16000,
+      temperature: 0.8,
+      system: "Tu es Nova, expert en copywriting de pages de vente et UX produit SaaS. Tu utilises UNIQUEMENT les données fournies sans les inventer. Aucun placeholder générique. Tu génères du HTML structuré, professionnel, et visuellement attractif.",
       messages: [
-        {
-          role: "system",
-          content: "Tu es Nova, expert en copywriting de pages de vente et UX produit SaaS. Tu utilises UNIQUEMENT les données fournies sans les inventer. Aucun placeholder générique."
-        },
         {
           role: "user",
           content: contentPrompt
         }
-      ],
-      temperature: 0.8
+      ]
     });
 
-    let htmlContent = completion.choices[0].message.content;
+    let htmlContent = completion.content[0].text;
 
     // Clean markdown if present
     htmlContent = htmlContent.replace(/```html\n?/g, '').replace(/```\n?/g, '');
@@ -205,6 +220,12 @@ HTML final complet, publiable, prêt à être utilisé. Aucune explication.`;
     // Inject hero image
     htmlContent = htmlContent.replace(/HERO_IMAGE_PLACEHOLDER/g, heroImageUrl);
     htmlContent = htmlContent.replace(/src="[^"]*hero[^"]*"/gi, `src="${heroImageUrl}"`);
+
+    // Inject logo if provided
+    if (logoUrl) {
+      htmlContent = htmlContent.replace(/LOGO_PLACEHOLDER/g, logoUrl);
+      htmlContent = htmlContent.replace(/src="[^"]*logo[^"]*"/gi, `src="${logoUrl}"`);
+    }
 
     // Inject color variable if needed
     if (color) {
@@ -239,6 +260,7 @@ HTML final complet, publiable, prêt à être utilisé. Aucune explication.`;
     const salesPage = {
       html: htmlContent,
       heroImage: heroImageUrl,
+      logoUrl: logoUrl || null,
       generatedAt: new Date().toISOString(),
       color: color || '#61f7a2',
       tone: tone || 'inspirant',

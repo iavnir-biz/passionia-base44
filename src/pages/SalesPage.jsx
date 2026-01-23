@@ -31,8 +31,10 @@ export default function SalesPage() {
   const [showCustomization, setShowCustomization] = useState(false);
   const [selectedColor, setSelectedColor] = useState('#61f7a2');
   const [selectedTone, setSelectedTone] = useState('inspirant');
+  const [selectedLogo, setSelectedLogo] = useState(null);
   const [generationStep, setGenerationStep] = useState(0);
   const [previewHtml, setPreviewHtml] = useState('');
+  const [lowTicketOffer, setLowTicketOffer] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -73,10 +75,17 @@ export default function SalesPage() {
       setSession(userSession);
       console.log('[SalesPage] Session loaded:', userSession);
       console.log('[SalesPage] Generated sales pages:', userSession.generated_sales_pages);
-      
+
       // Charger pages si présentes
       if (isNonEmpty(userSession.generated_sales_pages)) {
         setGeneratedPages(userSession.generated_sales_pages);
+      }
+
+      // Charger l'offre low ticket
+      const lowOffer = userSession.my_generated_offers?.low || userSession.finalized_offer?.mainProduct;
+      if (lowOffer) {
+        setLowTicketOffer(lowOffer);
+        console.log('[SalesPage] Low ticket offer loaded:', lowOffer);
       }
 
       const profiles = await base44.entities.UserProfile.filter({ 
@@ -132,7 +141,8 @@ export default function SalesPage() {
         sessionId: session.id,
         offerType: selectedType,
         color: selectedColor,
-        tone: selectedTone
+        tone: selectedTone,
+        logoUrl: selectedLogo
       });
 
       const salesPage = response.data.salesPage;
@@ -180,8 +190,9 @@ export default function SalesPage() {
   const offerTypes = [
     {
       id: 'low',
-      title: 'Produit d\'appel',
+      title: lowTicketOffer?.title || 'Produit low ticket',
       subtitle: 'Low ticket',
+      price: lowTicketOffer?.price || null,
       description: 'Page de vente pour ton offre d\'entrée de gamme',
       icon: Package,
       color: 'from-blue-500 to-blue-600',
@@ -309,6 +320,11 @@ export default function SalesPage() {
                       <h3 className="text-lg font-bold text-gray-900 mb-1">
                         {offer.title}
                       </h3>
+                      {offer.price && (
+                        <p className="text-2xl font-bold text-[#61f7a2] mb-2">
+                          {offer.price}
+                        </p>
+                      )}
                       <p className="text-gray-600 text-sm mb-6">
                         {offer.description}
                       </p>
@@ -350,7 +366,7 @@ export default function SalesPage() {
                           icon={Sparkles}
                           className="w-full"
                         >
-                          Ouvrir
+                          Générer
                         </GlowButton>
                       )
                     )}
@@ -389,7 +405,20 @@ export default function SalesPage() {
               className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-xl"
             >
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Personnalise ta page</h3>
-              <p className="text-gray-600 mb-6">Choisis la couleur et le ton de ta page de vente</p>
+              <p className="text-gray-600 mb-6">Choisis la couleur, le ton et ton logo (optionnel)</p>
+
+              {/* Logo Upload */}
+              <div className="mb-6">
+                <label className="text-sm font-semibold text-gray-900 mb-3 block">Logo (optionnel)</label>
+                <input
+                  type="url"
+                  placeholder="https://exemple.com/mon-logo.png"
+                  value={selectedLogo || ''}
+                  onChange={(e) => setSelectedLogo(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-gray-900 focus:outline-none transition-all"
+                />
+                <p className="text-xs text-gray-500 mt-2">URL de ton logo (facultatif)</p>
+              </div>
 
               {/* Color Selection */}
               <div className="mb-6">

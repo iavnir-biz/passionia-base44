@@ -6,12 +6,10 @@ import TopBar from '@/components/navigation/TopBar';
 import ChatBubble from '@/components/chat/ChatBubble';
 import { Calendar, Clock, Video, CheckCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { calculateProgressFromSession } from '@/utils/progressUtils';
 
 export default function Booking() {
   const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
   const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,11 +22,6 @@ export default function Booking() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-
-      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
-      if (sessions.length > 0) {
-        setSession(sessions[0]);
-      }
     } catch (error) {
       console.error('Error loading user:', error);
     } finally {
@@ -39,7 +32,7 @@ export default function Booking() {
   if (authLoading || loading) {
     return (
       <div className="flex min-h-screen bg-white">
-        <Sidebar currentPage="Booking" progress={calculateProgressFromSession(session)} user={user} />
+        <Sidebar currentPage="Booking" progress={0} />
         <div className="flex-1 ml-72">
           <div className="flex items-center justify-center h-screen">
             <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
@@ -51,18 +44,18 @@ export default function Booking() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="Dashboard" progress={calculateProgressFromSession(session)} user={user} />
-      
+      <Sidebar currentPage="Dashboard" progress={0} />
+
       <div className="flex-1 ml-72">
-        <TopBar 
-          title="Réserver un rendez-vous" 
+        <TopBar
+          title="Réserver un rendez-vous"
           subtitle="Choisis ton créneau avec un expert"
           user={user}
         />
-        
+
         <main className="p-8">
           <div className="max-w-7xl mx-auto">
-            
+
             {/* Header Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -73,7 +66,7 @@ export default function Booking() {
                 <Video className="w-4 h-4 text-[#61f7a2]" />
                 <span className="text-sm text-gray-700 font-medium">Appel de 30 minutes</span>
               </div>
-              
+
               <h1 className="text-4xl font-bold text-gray-900 mb-4">
                 Réserve ton créneau avec un expert
               </h1>
@@ -126,7 +119,6 @@ export default function Booking() {
               })}
             </motion.div>
 
-            {/* Calendar Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -146,21 +138,17 @@ export default function Booking() {
                   </div>
                 </div>
               </div>
-              
-              {/* Calendly Embed */}
-              <div className="min-h-[700px] bg-white">
-                <iframe
-                  src="https://calendly.com/votre-lien-calendly"
-                  width="100%"
-                  height="700"
-                  frameBorder="0"
-                  title="Calendrier de réservation"
-                  className="w-full"
-                />
+
+              <div className="p-12 flex items-center justify-center bg-white">
+                <a
+                  href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ33oiS8leJ0wc_B6b1wK5_n5mAJwsWmtdSZ5Qz0XmT0vSoI3IpkFRedNk8GmBjWXE53uBH8eK_2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-gray-900 transition-all duration-200 bg-[#61f7a2] border border-transparent rounded-xl hover:bg-[#4fe590] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#61f7a2]"
+                >
+                  Prendre rendez-vous
+                </a>
               </div>
-              
-              {/* Note: Remplace "votre-lien-calendly" par ton vrai lien Calendly */}
-              {/* Exemple: https://calendly.com/ton-compte/30min */}
             </motion.div>
 
             {/* Footer Info */}

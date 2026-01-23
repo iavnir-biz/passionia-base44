@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
@@ -23,6 +24,7 @@ import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
 
 export default function MarketAnalysis() {
+  const { isAuthenticated, hasPurchased, isLoading: authLoading, user: authUser } = useRequirePayment();
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [analysis, setAnalysis] = useState(null);
@@ -30,8 +32,10 @@ export default function MarketAnalysis() {
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
 
   const isNonEmpty = (value) => {
     if (value === null || value === undefined) return false;

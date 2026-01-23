@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { base44 } from '@/api/base44Client';
-import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import UpgradeModal from '@/components/paywall/UpgradeModal';
@@ -13,7 +13,7 @@ import ChatBubble from '@/components/chat/ChatBubble';
 import { cn } from "@/lib/utils";
 
 export default function MyOffers() {
-  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
+  const { isAuthenticated, hasPurchased, isLoading: authLoading } = useRequirePayment();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);

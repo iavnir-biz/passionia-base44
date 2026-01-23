@@ -79,18 +79,22 @@ Deno.serve(async (req) => {
 - level: "${baseOffer.level || 'non spécifié'}" (inchangé si présent)
 - duration: "${baseOffer.duration || 'non spécifié'}" (inchangé si présent)
 
-Ta SEULE mission : ENRICHIR les champs manquants avec :
-- subtitle: "Pour qui + résultat attendu"
-- problem: "Problème précis que cette offre résout"
-- before: "Situation actuelle (2-3 phrases)"
-- after: "Situation après (2-3 phrases)"
-- deliverables: [liste détaillée des livrables avec format et durée]
-- how_to_use: "Quand et comment utiliser cette offre"
-- ideal_for: [liste de personas/situations idéales]
-- not_for: [cas où ce produit n'est pas adapté]
-- ecosystem_role: "Rôle de cette offre dans le funnel"
+Ta SEULE mission : ENRICHIR les champs manquants avec une analyse détaillée type PSSO (Problème-Solution-Stratégie-Opportunité) :
+- subtitle: "Pour qui + résultat attendu (une phrase accrocheuse)"
+- description: "Description détaillée de l'offre, sa valeur unique et ce qui la différencie (3-4 phrases)"
+- problem: "Problème précis et émotionnel que cette offre résout (4-5 phrases avec impact émotionnel)"
+- before: "Situation actuelle détaillée : frustrations, blocages, conséquences (3-4 phrases)"
+- after: "Situation après transformation : résultats concrets, émotions positives, nouveau quotidien (3-4 phrases)"
+- deliverables: [liste très détaillée des livrables avec format, durée, et bénéfice de chaque élément - minimum 5-8 items]
+- benefits: [liste de 5-7 bénéfices concrets et émotionnels]
+- how_to_use: "Stratégie d'utilisation : quand proposer cette offre, à qui, dans quel contexte, comment la positionner (4-5 phrases)"
+- ideal_for: [liste de 5-7 personas/situations très précises avec contexte]
+- not_for: [5-6 cas précis où ce produit n'est pas adapté]
+- ecosystem_role: "Analyse stratégique : rôle dans le funnel, synergie avec les autres offres, objectif business (4-5 phrases)"
 
-STYLE : Coach pédagogique, tutoiement, français naturel, zero marketing bullshit.
+STYLE : Coach pédagogique, tutoiement, français naturel, précis et détaillé, zero fluff marketing.
+
+IMPORTANT : Chaque champ doit être riche en détails, contexte et nuances. Utilise le contexte business fourni pour personnaliser au maximum.
 
 SORTIE ATTENDUE (JSON strict, une seule offre) :
 {
@@ -100,10 +104,12 @@ SORTIE ATTENDUE (JSON strict, une seule offre) :
   "level": "${baseOffer.level || ''}",
   "duration": "${baseOffer.duration || ''}",
   "subtitle": "...",
+  "description": "...",
   "problem": "...",
   "before": "...",
   "after": "...",
   "deliverables": [...],
+  "benefits": [...],
   "how_to_use": "...",
   "ideal_for": [...],
   "not_for": [...],

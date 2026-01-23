@@ -287,6 +287,12 @@ ${offer.benefits.join('\n')}
                     {offer ? (
                       <>
                         <div className="mb-4">
+                          {/* Nom de l'offre en noir au-dessus du prix */}
+                          {offer.title && (
+                            <h4 className="text-base font-bold text-gray-900 mb-2">
+                              {offer.title}
+                            </h4>
+                          )}
                           <div className="text-2xl font-bold text-[#61f7a2] mb-2">
                             {offer.price}
                           </div>
@@ -430,6 +436,21 @@ ${offer.benefits.join('\n')}
                       {showPreview.deliverables.map((item, i) => (
                         <li key={i} className="text-gray-700 text-sm flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
                           <span className="text-[#61f7a2] mt-0.5">✓</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 4B. BÉNÉFICES CONCRETS */}
+                {showPreview.benefits && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">✨ BÉNÉFICES CONCRETS</h3>
+                    <ul className="space-y-2">
+                      {showPreview.benefits.map((item, i) => (
+                        <li key={i} className="text-gray-700 text-sm flex items-start gap-2 bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg border border-green-200">
+                          <span className="text-[#61f7a2] mt-0.5">→</span>
                           <span>{item}</span>
                         </li>
                       ))}

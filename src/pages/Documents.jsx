@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import { motion } from "framer-motion";
 import { 
   FileText, 
@@ -84,7 +84,7 @@ const categories = [
 ];
 
 export default function Documents() {
-  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
+  const { isAuthenticated, hasPurchased, isLoading: authLoading } = useRequirePayment();
   const [user, setUser] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');

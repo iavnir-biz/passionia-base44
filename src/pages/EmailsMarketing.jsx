@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import { motion } from 'framer-motion';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -54,7 +54,7 @@ const emailTypes = [
 ];
 
 export default function EmailsMarketing() {
-  const { isLoading: authLoading, user } = useRequireAuth();
+  const { isLoading: authLoading, hasPurchased, user } = useRequirePayment();
   const [loading, setLoading] = useState(false);
   const [generatedEmails, setGeneratedEmails] = useState(null);
   const [previewEmail, setPreviewEmail] = useState(null);

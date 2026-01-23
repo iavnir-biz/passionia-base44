@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import DayCard from '@/components/plan/DayCard';
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 
 export default function PlanAction() {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading: authLoading, user } = useRequireAuth();
+  const { isAuthenticated, hasPurchased, isLoading: authLoading, user } = useRequirePayment();
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);
   const [currentDay, setCurrentDay] = useState(1);
@@ -23,25 +23,10 @@ export default function PlanAction() {
   const [docsReady, setDocsReady] = useState(false);
 
   useEffect(() => {
-    if (user && user.email) {
-      const timer = setTimeout(() => { checkAccess(); }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [user]);
-
-  const checkAccess = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      if (!currentUser.has_purchased) {
-        navigate(createPageUrl('CTAPAYWALL'));
-        return;
-      }
+    if (isAuthenticated) {
       loadData();
-    } catch (error) {
-      console.error('Error checking access:', error);
-      navigate(createPageUrl('CTAPAYWALL'));
     }
-  };
+  }, [isAuthenticated]);
 
   const loadData = async () => {
     setIsLoading(true);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import { motion } from 'framer-motion';
 import { Sparkles, Send, Zap, Target, TrendingUp, Lightbulb, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import TopBar from '@/components/navigation/TopBar';
 import ChatBubble from '@/components/chat/ChatBubble';
 
 export default function NoahChat() {
-  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
+  const { isAuthenticated, hasPurchased, isLoading: authLoading } = useRequirePayment();
   const [user, setUser] = useState(null);
   const [messages, setMessages] = useState([
     {

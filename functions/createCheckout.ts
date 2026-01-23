@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     const referer = req.headers.get('referer') || '';
     const origin = referer ? new URL(referer).origin : 'https://6930250f9337193d59c1dcf5.base44.app';
     const successUrl = `${origin}/WelcomeOpening?payment=success`;
-    const cancelUrl = `${origin}/PlanAction`;
+    const cancelUrl = `${origin}/CTAPAYWALL`;
 
     // Créer la session de paiement
     const sessionConfig = {

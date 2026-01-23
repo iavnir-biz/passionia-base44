@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useRequireAuth } from '@/components/hooks/useRequireAuth';
+import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import { motion } from 'framer-motion';
 import {
   Sparkles,
@@ -30,7 +30,7 @@ import UpgradeModal from '@/components/paywall/UpgradeModal';
 import ChatBubble from '@/components/chat/ChatBubble';
 
 export default function AvatarClients() {
-  const { isAuthenticated, isLoading: authLoading } = useRequireAuth();
+  const { isAuthenticated, hasPurchased, isLoading: authLoading } = useRequirePayment();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);

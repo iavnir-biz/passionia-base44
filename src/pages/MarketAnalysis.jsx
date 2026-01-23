@@ -252,8 +252,8 @@ export default function MarketAnalysis() {
                   </p>
                 </motion.div>
 
-                {/* 1. Résumé Express */}
-                {analysis?.resume_express && (
+                {/* 1. Vue d'ensemble du marché */}
+                {analysis?.marketOverview && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -264,26 +264,43 @@ export default function MarketAnalysis() {
                       <div className="w-12 h-12 rounded-xl bg-[#61f7a2] flex items-center justify-center">
                         <CheckCircle className="w-6 h-6 text-white" />
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-900">Validation rapide</h2>
+                      <h2 className="text-2xl font-bold text-gray-900">Vue d'ensemble du marché</h2>
                     </div>
-                    
+
                     <div className="space-y-4">
                       <div>
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Le problème</p>
-                        <p className="text-gray-900">{analysis.resume_express.probleme_principal}</p>
+                        <p className="text-sm font-semibold text-gray-700 mb-1">Définition</p>
+                        <p className="text-gray-900">{analysis.marketOverview.definition}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Qui le vit</p>
-                        <p className="text-gray-900">{analysis.resume_express.qui_vit_ce_probleme}</p>
+                        <p className="text-sm font-semibold text-gray-700 mb-1">Taille du marché cible</p>
+                        <p className="text-gray-900">{analysis.marketOverview.targetMarketSize}</p>
                       </div>
+                      {analysis.marketOverview.trends && analysis.marketOverview.trends.length > 0 && (
+                        <div>
+                          <p className="text-sm font-semibold text-gray-700 mb-2">Tendances actuelles</p>
+                          <ul className="space-y-1">
+                            {analysis.marketOverview.trends.map((trend, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-gray-900">
+                                <span className="text-[#61f7a2] mt-1">•</span>
+                                <span>{trend}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                       <div>
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Pourquoi c'est réel</p>
-                        <p className="text-gray-900">{analysis.resume_express.pourquoi_reel}</p>
+                        <p className="text-sm font-semibold text-gray-700 mb-1">Niveau de maturité</p>
+                        <span className="inline-flex px-3 py-1 bg-white rounded-lg text-gray-900 font-medium">
+                          {analysis.marketOverview.maturityLevel}
+                        </span>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Pourquoi c'est monétisable</p>
-                        <p className="text-gray-900">{analysis.resume_express.pourquoi_monetisable}</p>
-                      </div>
+                      {analysis.marketOverview.summary && (
+                        <div>
+                          <p className="text-sm font-semibold text-gray-700 mb-1">Résumé</p>
+                          <p className="text-gray-900 whitespace-pre-line">{analysis.marketOverview.summary}</p>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -299,123 +316,243 @@ export default function MarketAnalysis() {
                       <BarChart3 className="w-6 h-6 text-[#61f7a2]" />
                       Analyse SWOT
                     </h2>
-                    
+
                     <div className="grid md:grid-cols-2 gap-6">
                       {/* Forces */}
-                      <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
-                            <TrendingUp className="w-5 h-5 text-white" />
+                      {analysis.swot.strengths && analysis.swot.strengths.length > 0 && (
+                        <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
+                              <TrendingUp className="w-5 h-5 text-white" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900">Forces</h3>
                           </div>
-                          <h3 className="text-lg font-bold text-gray-900">Forces</h3>
+                          <div className="space-y-4">
+                            {analysis.swot.strengths.map((strength, idx) => (
+                              <div key={idx} className="space-y-1">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-green-600 mt-1 font-bold">✓</span>
+                                  <div className="flex-1">
+                                    <p className="font-semibold text-gray-900">{strength.title}</p>
+                                    <p className="text-sm text-gray-700 mt-1">{strength.description}</p>
+                                    {strength.impact && (
+                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${
+                                        strength.impact === 'Fort' ? 'bg-green-200 text-green-800' :
+                                        strength.impact === 'Moyen' ? 'bg-green-100 text-green-700' :
+                                        'bg-green-50 text-green-600'
+                                      }`}>
+                                        Impact: {strength.impact}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <ul className="space-y-2">
-                          {analysis.swot.forces?.map((force, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-gray-700">
-                              <span className="text-green-600 mt-1">✓</span>
-                              <span>{force}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      )}
 
                       {/* Faiblesses */}
-                      <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
-                            <TrendingDown className="w-5 h-5 text-white" />
+                      {analysis.swot.weaknesses && analysis.swot.weaknesses.length > 0 && (
+                        <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
+                              <TrendingDown className="w-5 h-5 text-white" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900">Faiblesses</h3>
                           </div>
-                          <h3 className="text-lg font-bold text-gray-900">Faiblesses</h3>
+                          <div className="space-y-4">
+                            {analysis.swot.weaknesses.map((weakness, idx) => (
+                              <div key={idx} className="space-y-1">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-red-600 mt-1 font-bold">!</span>
+                                  <div className="flex-1">
+                                    <p className="font-semibold text-gray-900">{weakness.title}</p>
+                                    <p className="text-sm text-gray-700 mt-1">{weakness.description}</p>
+                                    {weakness.impact && (
+                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${
+                                        weakness.impact === 'Fort' ? 'bg-red-200 text-red-800' :
+                                        weakness.impact === 'Moyen' ? 'bg-red-100 text-red-700' :
+                                        'bg-red-50 text-red-600'
+                                      }`}>
+                                        Impact: {weakness.impact}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <ul className="space-y-2">
-                          {analysis.swot.faiblesses?.map((faiblesse, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-gray-700">
-                              <span className="text-red-600 mt-1">!</span>
-                              <span>{faiblesse}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      )}
 
                       {/* Opportunités */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
-                            <Zap className="w-5 h-5 text-white" />
+                      {analysis.swot.opportunities && analysis.swot.opportunities.length > 0 && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
+                              <Zap className="w-5 h-5 text-white" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900">Opportunités</h3>
                           </div>
-                          <h3 className="text-lg font-bold text-gray-900">Opportunités</h3>
+                          <div className="space-y-4">
+                            {analysis.swot.opportunities.map((opportunity, idx) => (
+                              <div key={idx} className="space-y-1">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-blue-600 mt-1 font-bold">→</span>
+                                  <div className="flex-1">
+                                    <p className="font-semibold text-gray-900">{opportunity.title}</p>
+                                    <p className="text-sm text-gray-700 mt-1">{opportunity.description}</p>
+                                    {opportunity.impact && (
+                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${
+                                        opportunity.impact === 'Fort' ? 'bg-blue-200 text-blue-800' :
+                                        opportunity.impact === 'Moyen' ? 'bg-blue-100 text-blue-700' :
+                                        'bg-blue-50 text-blue-600'
+                                      }`}>
+                                        Impact: {opportunity.impact}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <ul className="space-y-2">
-                          {analysis.swot.opportunites?.map((opp, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-gray-700">
-                              <span className="text-blue-600 mt-1">→</span>
-                              <span>{opp}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      )}
 
                       {/* Menaces */}
-                      <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center">
-                            <Shield className="w-5 h-5 text-white" />
+                      {analysis.swot.threats && analysis.swot.threats.length > 0 && (
+                        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center">
+                              <Shield className="w-5 h-5 text-white" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900">Menaces</h3>
                           </div>
-                          <h3 className="text-lg font-bold text-gray-900">Menaces</h3>
+                          <div className="space-y-4">
+                            {analysis.swot.threats.map((threat, idx) => (
+                              <div key={idx} className="space-y-1">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-orange-600 mt-1 font-bold">⚠</span>
+                                  <div className="flex-1">
+                                    <p className="font-semibold text-gray-900">{threat.title}</p>
+                                    <p className="text-sm text-gray-700 mt-1">{threat.description}</p>
+                                    {threat.impact && (
+                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${
+                                        threat.impact === 'Fort' ? 'bg-orange-200 text-orange-800' :
+                                        threat.impact === 'Moyen' ? 'bg-orange-100 text-orange-700' :
+                                        'bg-orange-50 text-orange-600'
+                                      }`}>
+                                        Impact: {threat.impact}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <ul className="space-y-2">
-                          {analysis.swot.menaces?.map((menace, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-gray-700">
-                              <span className="text-orange-600 mt-1">⚠</span>
-                              <span>{menace}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      )}
                     </div>
                   </motion.div>
                 )}
 
-                {/* 3. Positionnement */}
-                {analysis?.positionnement && (
+                {/* 3. Positionnement et Concurrence */}
+                {analysis?.competition && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8"
+                    className="space-y-6"
                   >
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center">
-                        <Target className="w-6 h-6 text-white" />
-                      </div>
-                      <h2 className="text-2xl font-bold text-gray-900">Ton positionnement optimal</h2>
-                    </div>
-                    
-                    {analysis.positionnement.angle_unique && (
-                      <div className="mb-4">
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Angle unique</p>
-                        <p className="text-gray-900 text-lg">{analysis.positionnement.angle_unique}</p>
-                      </div>
-                    )}
-                    
-                    {analysis.positionnement.differentiation && (
-                      <div className="mb-4">
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Comment te différencier</p>
-                        <p className="text-gray-900">{analysis.positionnement.differentiation}</p>
+                    {/* Positionnement recommandé */}
+                    {analysis.competition.positioning && (
+                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8">
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center">
+                            <Target className="w-6 h-6 text-white" />
+                          </div>
+                          <h2 className="text-2xl font-bold text-gray-900">Ton positionnement optimal</h2>
+                        </div>
+                        <p className="text-gray-900 whitespace-pre-line leading-relaxed">
+                          {analysis.competition.positioning}
+                        </p>
                       </div>
                     )}
 
-                    {analysis.positionnement.message_cle && (
-                      <div>
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Message clé</p>
-                        <p className="text-gray-900 font-medium">{analysis.positionnement.message_cle}</p>
+                    {/* Concurrents directs */}
+                    {analysis.competition.directCompetitors && analysis.competition.directCompetitors.length > 0 && (
+                      <div className="bg-white border border-gray-200 rounded-2xl p-8">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <Users className="w-5 h-5 text-[#61f7a2]" />
+                          Concurrents directs
+                        </h3>
+                        <div className="space-y-4">
+                          {analysis.competition.directCompetitors.map((competitor, idx) => (
+                            <div key={idx} className="p-4 bg-gray-50 rounded-xl">
+                              <div className="flex items-start justify-between mb-2">
+                                <p className="font-bold text-gray-900">{competitor.name}</p>
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                  competitor.marketShare === 'Importante' ? 'bg-red-100 text-red-700' :
+                                  competitor.marketShare === 'Moyenne' ? 'bg-yellow-100 text-yellow-700' :
+                                  'bg-green-100 text-green-700'
+                                }`}>
+                                  Part de marché: {competitor.marketShare}
+                                </span>
+                              </div>
+                              <p className="text-gray-700 text-sm mb-2">{competitor.offering}</p>
+                              <p className="text-gray-600 text-sm mb-2">
+                                <span className="font-semibold">Prix:</span> {competitor.priceRange}
+                              </p>
+                              <div className="grid md:grid-cols-2 gap-3 mt-3">
+                                <div>
+                                  <p className="text-xs font-semibold text-green-700 mb-1">Forces:</p>
+                                  <ul className="space-y-1">
+                                    {competitor.strengths?.map((str, i) => (
+                                      <li key={i} className="text-xs text-gray-700 flex items-start gap-1">
+                                        <span className="text-green-600">+</span>
+                                        <span>{str}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <p className="text-xs font-semibold text-red-700 mb-1">Faiblesses:</p>
+                                  <ul className="space-y-1">
+                                    {competitor.weaknesses?.map((weak, i) => (
+                                      <li key={i} className="text-xs text-gray-700 flex items-start gap-1">
+                                        <span className="text-red-600">-</span>
+                                        <span>{weak}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Concurrents indirects */}
+                    {analysis.competition.indirectCompetitors && analysis.competition.indirectCompetitors.length > 0 && (
+                      <div className="bg-white border border-gray-200 rounded-2xl p-8">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Solutions alternatives</h3>
+                        <div className="space-y-3">
+                          {analysis.competition.indirectCompetitors.map((competitor, idx) => (
+                            <div key={idx} className="p-4 bg-gray-50 rounded-xl">
+                              <p className="font-semibold text-gray-900 mb-1">{competitor.type}</p>
+                              <p className="text-sm text-gray-700">{competitor.description}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </motion.div>
                 )}
 
-                {/* 4. Stratégies concrètes */}
-                {analysis?.strategies && (
+                {/* 4. Public Cible */}
+                {analysis?.targetAudience?.segments && analysis.targetAudience.segments.length > 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -423,21 +560,307 @@ export default function MarketAnalysis() {
                     className="bg-white border border-gray-200 rounded-2xl p-8"
                   >
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center">
+                        <UserIcon className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900">Segments de public cible</h2>
+                    </div>
+
+                    <div className="space-y-4">
+                      {analysis.targetAudience.segments.map((segment, idx) => (
+                        <div key={idx} className={`p-4 rounded-xl border-2 ${
+                          segment.priority === 'Primaire' ? 'bg-green-50 border-green-300' :
+                          segment.priority === 'Secondaire' ? 'bg-blue-50 border-blue-300' :
+                          'bg-gray-50 border-gray-300'
+                        }`}>
+                          <div className="flex items-start justify-between mb-3">
+                            <h3 className="font-bold text-gray-900">{segment.name}</h3>
+                            <div className="flex gap-2">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                segment.priority === 'Primaire' ? 'bg-green-200 text-green-800' :
+                                segment.priority === 'Secondaire' ? 'bg-blue-200 text-blue-800' :
+                                'bg-gray-200 text-gray-800'
+                              }`}>
+                                {segment.priority}
+                              </span>
+                              <span className={`px-2 py-1 rounded text-xs font-medium bg-white text-gray-700`}>
+                                Taille: {segment.size}
+                              </span>
+                            </div>
+                          </div>
+
+                          {segment.characteristics && segment.characteristics.length > 0 && (
+                            <div className="mb-3">
+                              <p className="text-xs font-semibold text-gray-700 mb-1">Caractéristiques:</p>
+                              <ul className="space-y-1">
+                                {segment.characteristics.map((char, i) => (
+                                  <li key={i} className="text-sm text-gray-700 flex items-start gap-1">
+                                    <span className="text-[#61f7a2]">•</span>
+                                    <span>{char}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-2 gap-4 mt-3">
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700">Niveau de douleur</p>
+                              <span className={`inline-block mt-1 px-2 py-1 rounded text-xs font-medium ${
+                                segment.painLevel === 'Élevé' ? 'bg-red-100 text-red-700' :
+                                segment.painLevel === 'Moyen' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                {segment.painLevel}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700">Disposition à payer</p>
+                              <span className={`inline-block mt-1 px-2 py-1 rounded text-xs font-medium ${
+                                segment.willingnessToPay === 'Élevée' ? 'bg-green-100 text-green-700' :
+                                segment.willingnessToPay === 'Moyenne' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {segment.willingnessToPay}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* 5. Barrières à l'entrée */}
+                {analysis?.barriers && analysis.barriers.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-white border border-gray-200 rounded-2xl p-8"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 rounded-xl bg-orange-500 flex items-center justify-center">
+                        <AlertCircle className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900">Barrières à l'entrée</h2>
+                    </div>
+
+                    <div className="space-y-4">
+                      {analysis.barriers.map((barrier, idx) => (
+                        <div key={idx} className="p-4 bg-gray-50 rounded-xl">
+                          <div className="flex items-start justify-between mb-2">
+                            <p className="font-bold text-gray-900">{barrier.barrier}</p>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              barrier.difficulty === 'Difficile' ? 'bg-red-100 text-red-700' :
+                              barrier.difficulty === 'Modérée' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-green-100 text-green-700'
+                            }`}>
+                              {barrier.difficulty}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-700 mb-2">{barrier.description}</p>
+                          <div className="mt-3 p-3 bg-white rounded-lg border border-gray-200">
+                            <p className="text-xs font-semibold text-gray-700 mb-1">Comment surmonter:</p>
+                            <p className="text-sm text-gray-900">{barrier.mitigation}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* 6. Stratégie de Prix */}
+                {analysis?.pricingStrategy && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 rounded-2xl p-8"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 rounded-xl bg-yellow-500 flex items-center justify-center">
+                        <Target className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900">Stratégie de Prix</h2>
+                    </div>
+
+                    {analysis.pricingStrategy.marketRanges && (
+                      <div className="space-y-4 mb-6">
+                        <div className="p-4 bg-white rounded-xl">
+                          <p className="font-bold text-gray-900 mb-1">Fourchette basse</p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Prix:</span> {analysis.pricingStrategy.marketRanges.low?.range}
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Exemples:</span> {analysis.pricingStrategy.marketRanges.low?.examples}
+                          </p>
+                        </div>
+                        <div className="p-4 bg-white rounded-xl">
+                          <p className="font-bold text-gray-900 mb-1">Fourchette moyenne</p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Prix:</span> {analysis.pricingStrategy.marketRanges.mid?.range}
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Exemples:</span> {analysis.pricingStrategy.marketRanges.mid?.examples}
+                          </p>
+                        </div>
+                        <div className="p-4 bg-white rounded-xl">
+                          <p className="font-bold text-gray-900 mb-1">Fourchette haute</p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Prix:</span> {analysis.pricingStrategy.marketRanges.high?.range}
+                          </p>
+                          <p className="text-sm text-gray-700">
+                            <span className="font-semibold">Exemples:</span> {analysis.pricingStrategy.marketRanges.high?.examples}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {analysis.pricingStrategy.recommendedPositioning && (
+                      <div className="p-4 bg-white rounded-xl mb-4">
+                        <p className="font-bold text-gray-900 mb-2">Positionnement recommandé</p>
+                        <p className="text-sm text-gray-700 whitespace-pre-line">
+                          {analysis.pricingStrategy.recommendedPositioning}
+                        </p>
+                      </div>
+                    )}
+
+                    {analysis.pricingStrategy.priceSensitivity && (
+                      <div className="p-4 bg-white rounded-xl">
+                        <p className="font-bold text-gray-900 mb-1">Sensibilité au prix</p>
+                        <span className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${
+                          analysis.pricingStrategy.priceSensitivity === 'Élevée' ? 'bg-red-100 text-red-700' :
+                          analysis.pricingStrategy.priceSensitivity === 'Moyenne' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-green-100 text-green-700'
+                        }`}>
+                          {analysis.pricingStrategy.priceSensitivity}
+                        </span>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+
+                {/* 7. Canaux de Distribution */}
+                {analysis?.distributionChannels && analysis.distributionChannels.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="bg-white border border-gray-200 rounded-2xl p-8"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 rounded-xl bg-[#61f7a2] flex items-center justify-center">
                         <Sparkles className="w-6 h-6 text-white" />
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-900">Stratégies concrètes</h2>
+                      <h2 className="text-2xl font-bold text-gray-900">Canaux de Distribution Recommandés</h2>
                     </div>
-                    
+
                     <div className="space-y-4">
-                      {analysis.strategies.map((strategie, idx) => (
-                        <div key={idx} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                          <div className="w-8 h-8 rounded-lg bg-[#61f7a2] flex items-center justify-center flex-shrink-0">
-                            <span className="text-white font-bold text-sm">{idx + 1}</span>
+                      {analysis.distributionChannels
+                        .sort((a, b) => {
+                          const priorityOrder = { 'Haute': 1, 'Moyenne': 2, 'Basse': 3 };
+                          return priorityOrder[a.priority] - priorityOrder[b.priority];
+                        })
+                        .map((channel, idx) => (
+                        <div key={idx} className={`p-4 rounded-xl border-2 ${
+                          channel.priority === 'Haute' ? 'bg-green-50 border-green-300' :
+                          channel.priority === 'Moyenne' ? 'bg-blue-50 border-blue-300' :
+                          'bg-gray-50 border-gray-300'
+                        }`}>
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">{idx + 1}</span>
+                              <h3 className="font-bold text-gray-900">{channel.channel}</h3>
+                            </div>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              channel.priority === 'Haute' ? 'bg-green-200 text-green-800' :
+                              channel.priority === 'Moyenne' ? 'bg-blue-200 text-blue-800' :
+                              'bg-gray-200 text-gray-800'
+                            }`}>
+                              {channel.priority}
+                            </span>
                           </div>
-                          <div>
-                            <p className="text-gray-900 font-medium mb-1">{strategie.titre}</p>
-                            <p className="text-gray-600 text-sm">{strategie.description}</p>
+                          <p className="text-sm text-gray-700 mb-3">{channel.description}</p>
+
+                          <div className="grid grid-cols-3 gap-3">
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700 mb-1">Difficulté</p>
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                channel.difficulty === 'Difficile' ? 'bg-red-100 text-red-700' :
+                                channel.difficulty === 'Modérée' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                {channel.difficulty}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700 mb-1">Coût</p>
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                channel.cost === 'Coûteux' ? 'bg-red-100 text-red-700' :
+                                channel.cost === 'Peu coûteux' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                {channel.cost}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700 mb-1">Délai</p>
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                channel.timeToResults === 'Long terme' ? 'bg-red-100 text-red-700' :
+                                channel.timeToResults === 'Moyen terme' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                {channel.timeToResults}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* 8. Risques et Mitigation */}
+                {analysis?.risks && analysis.risks.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                    className="bg-white border border-gray-200 rounded-2xl p-8"
+                  >
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center">
+                        <Shield className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900">Risques et Plan d'Atténuation</h2>
+                    </div>
+
+                    <div className="space-y-4">
+                      {analysis.risks.map((risk, idx) => (
+                        <div key={idx} className="p-4 bg-gray-50 rounded-xl">
+                          <div className="flex items-start justify-between mb-2">
+                            <p className="font-bold text-gray-900 flex-1">{risk.risk}</p>
+                            <div className="flex gap-2">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                risk.probability === 'Élevée' ? 'bg-red-100 text-red-700' :
+                                risk.probability === 'Moyenne' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                P: {risk.probability}
+                              </span>
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                risk.impact === 'Élevé' ? 'bg-red-100 text-red-700' :
+                                risk.impact === 'Moyen' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                I: {risk.impact}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="mt-3 p-3 bg-white rounded-lg border border-gray-200">
+                            <p className="text-xs font-semibold text-gray-700 mb-1">Plan d'atténuation:</p>
+                            <p className="text-sm text-gray-900">{risk.mitigation}</p>
                           </div>
                         </div>
                       ))}

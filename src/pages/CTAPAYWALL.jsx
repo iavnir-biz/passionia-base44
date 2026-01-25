@@ -189,11 +189,11 @@ export default function CTAPAYWALL() {
   const potentialRevenue = session?.potential_revenue || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex overflow-x-hidden w-full max-w-[100vw]">
       <OnboardingSidebar currentPage="CTAPAYWALL" completedSteps={completedSteps} progressInStep={0} />
 
-      <div className="flex-1 flex flex-col lg:ml-80 overflow-x-hidden">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 py-12 pt-28 md:pt-12">
+      <div className="flex-1 flex flex-col lg:ml-80 overflow-x-hidden w-full min-w-0">
+        <div className="w-full max-w-4xl mx-auto px-4 md:px-6 py-12 pt-28 md:pt-12 box-border">
 
           {/* Header */}
           <motion.div
@@ -222,7 +222,7 @@ export default function CTAPAYWALL() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
+            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-4 md:p-8 mb-8 overflow-hidden"
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               ✅ Regarde ce que tu as maintenant
@@ -317,7 +317,7 @@ export default function CTAPAYWALL() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-blue-50 rounded-3xl border border-blue-200 p-8 mb-8"
+            className="bg-blue-50 rounded-3xl border border-blue-200 p-4 md:p-8 mb-8 overflow-hidden"
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
               On s'est mis à ta place
@@ -409,7 +409,7 @@ export default function CTAPAYWALL() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-10 mb-8 text-white shadow-2xl"
+            className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-4 md:p-10 mb-8 text-white shadow-2xl overflow-hidden"
           >
             {/* 🔥 P0-2: Ce qui t'attend après paiement */}
             <div className="bg-[#61f7a2]/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#61f7a2]/30">
@@ -551,7 +551,7 @@ export default function CTAPAYWALL() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 rounded-3xl border-2 border-[#61f7a2]/40 p-10 mb-8"
+            className="bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 rounded-3xl border-2 border-[#61f7a2]/40 p-4 md:p-10 mb-8 overflow-hidden"
           >
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
               Imagine dans quelques jours…
@@ -608,7 +608,7 @@ export default function CTAPAYWALL() {
             </div>
 
             {/* Ancrage émotionnel */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-gray-200 text-center mb-6">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-8 border border-gray-200 text-center mb-6">
               <p className="text-gray-700 leading-relaxed mb-4 text-lg">
                 Ce que tu achètes ici, ce n'est pas "un pack".
               </p>
@@ -651,7 +651,7 @@ export default function CTAPAYWALL() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.65 }}
-            className="bg-white rounded-3xl border border-gray-200 p-8 mb-8"
+            className="bg-white rounded-3xl border border-gray-200 p-4 md:p-8 mb-8 overflow-hidden"
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
               💡 Soyons clairs
@@ -699,7 +699,7 @@ export default function CTAPAYWALL() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.68 }}
-            className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl border border-blue-200 p-8 mb-8"
+            className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl border border-blue-200 p-4 md:p-8 mb-8 overflow-hidden"
           >
             <div className="grid md:grid-cols-2 gap-6">
               {/* Fait pour toi */}
@@ -1050,7 +1050,7 @@ export default function CTAPAYWALL() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.7 }}
-            className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 rounded-3xl border-2 border-yellow-600 p-8 mb-8 shadow-2xl text-center"
+            className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 rounded-3xl border-2 border-yellow-600 p-4 md:p-8 mb-8 shadow-2xl text-center overflow-hidden"
           >
             <div className="mb-4">
               <span className="text-white/90 text-lg block mb-2">Prix normal</span>
@@ -1111,7 +1111,7 @@ export default function CTAPAYWALL() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl border-2 border-green-200 p-8 mb-8 text-center"
+            className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl border-2 border-green-200 p-4 md:p-8 mb-8 text-center overflow-hidden"
           >
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500 mb-4">
               <Shield className="w-8 h-8 text-white" />

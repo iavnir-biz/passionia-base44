@@ -89,6 +89,10 @@ export default function CTAPAYWALL() {
 
     setIsCreatingCheckout(true);
     try {
+      console.log('=== Calling createCheckout ===');
+      console.log('hasOrderBump value:', hasOrderBump);
+      console.log('Sending to createCheckout:', { hasOrderBump });
+
       const { data } = await base44.functions.invoke('createCheckout', {
         hasOrderBump: hasOrderBump
       });

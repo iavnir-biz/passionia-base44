@@ -295,7 +295,7 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
           {/* Horizontal Scrollable Steps - Auto Centering */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-2 px-2"
+            className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory"
           >
             {ONBOARDING_STEPS.map((step) => {
               const Icon = step.icon;

@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@base44/sdk@0.8.6';
+import { createClient } from 'npm:@base44/sdk@0.8.4';
 import Stripe from 'npm:stripe@17.5.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
         });
 
         console.log('User updated successfully:', { userId, hasOrderBump });
-        
+
         // 📧 Envoyer l'email de bienvenue avec magic link
         const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';
         const magicLinkResponse = await fetch(`https://api.base44.com/v1/auth/magic-link`, {
@@ -75,10 +75,10 @@ Deno.serve(async (req) => {
             redirectTo: `${APP_URL}/WelcomeOpening`
           })
         });
-        
+
         const magicLinkData = await magicLinkResponse.json();
         const magicLink = magicLinkData.magicLink;
-        
+
         await base44.integrations.Core.SendEmail({
           to: user.email,
           from_name: 'Passion IA',
@@ -163,13 +163,13 @@ Deno.serve(async (req) => {
             </div>
           `
         });
-        
+
         console.log(`✅ Existing user ${userId} marked as purchased + email sent`);
       } else if (customerEmail) {
         // Nouvel utilisateur - création automatique
         try {
           const firstName = customerEmail.split('@')[0];
-          
+
           // Créer l'utilisateur
           const newUser = await base44.entities.User.create({
             email: customerEmail,
@@ -182,7 +182,7 @@ Deno.serve(async (req) => {
           });
 
           console.log('New user created:', { email: customerEmail, hasOrderBump });
-          
+
           // Générer un lien de connexion magique
           const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';
           const magicLinkResponse = await fetch(`https://api.base44.com/v1/auth/magic-link`, {
@@ -196,10 +196,10 @@ Deno.serve(async (req) => {
               redirectTo: `${APP_URL}/WelcomeOpening`
             })
           });
-          
+
           const magicLinkData = await magicLinkResponse.json();
           const magicLink = magicLinkData.magicLink;
-          
+
           // Envoyer le même email
           await base44.integrations.Core.SendEmail({
             to: customerEmail,
@@ -260,7 +260,7 @@ Deno.serve(async (req) => {
               </div>
             `
           });
-          
+
           console.log(`✅ New user created and email sent to ${customerEmail}`);
         } catch (error) {
           console.error('Error creating new user:', error);
@@ -272,8 +272,8 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Webhook error:', error);
-    return Response.json({ 
-      error: error.message 
+    return Response.json({
+      error: error.message
     }, { status: 400 });
   }
 });

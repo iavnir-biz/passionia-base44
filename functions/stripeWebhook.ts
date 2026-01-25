@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import { createClient } from 'npm:@base44/sdk@0.8.6';
 import Stripe from 'npm:stripe@17.5.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
@@ -7,17 +7,23 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
 
 const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
 
+// Créer le client base44 avec la clé de service (pas depuis la requête)
+const base44 = createClient({
+  appId: Deno.env.get('BASE44_APP_ID'),
+  serviceRoleKey: Deno.env.get('BASE44_SERVICE_ROLE_KEY')
+});
+
 Deno.serve(async (req) => {
   const signature = req.headers.get('stripe-signature');
-  
+
   if (!signature) {
+    console.error('No Stripe signature');
     return Response.json({ error: 'No signature' }, { status: 400 });
   }
 
   try {
     const body = await req.text();
-    const base44 = createClientFromRequest(req);
-    
+
     // Vérifier la signature du webhook
     const event = await stripe.webhooks.constructEventAsync(
       body,
@@ -25,23 +31,36 @@ Deno.serve(async (req) => {
       webhookSecret
     );
 
-    console.log('Webhook event:', event.type);
+    console.log('=== Webhook event received ===');
+    console.log('Event type:', event.type);
 
     // Traiter les événements de paiement réussi
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const customerEmail = session.customer_details?.email || session.metadata.user_email;
-      const userId = session.metadata.user_id;
-      
+      const customerEmail = session.customer_details?.email || session.metadata?.user_email;
+      const userId = session.metadata?.user_id;
+      const hasOrderBump = session.metadata?.has_order_bump === 'true';
+
+      console.log('Session metadata:', { userId, customerEmail, hasOrderBump });
+
       if (userId) {
         // Utilisateur existant - mettre à jour
-        const users = await base44.asServiceRole.entities.User.filter({ id: userId });
+        console.log('Updating existing user:', userId);
+        const users = await base44.entities.User.filter({ id: userId });
         const user = users[0];
-        
-        await base44.asServiceRole.entities.User.update(userId, {
+
+        if (!user) {
+          console.error('User not found:', userId);
+          return Response.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        await base44.entities.User.update(userId, {
           has_purchased: true,
+          has_order_bump: hasOrderBump,
           purchased_at: new Date().toISOString()
         });
+
+        console.log('User updated successfully:', { userId, hasOrderBump });
         
         // 📧 Envoyer l'email de bienvenue avec magic link
         const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';
@@ -60,7 +79,7 @@ Deno.serve(async (req) => {
         const magicLinkData = await magicLinkResponse.json();
         const magicLink = magicLinkData.magicLink;
         
-        await base44.asServiceRole.integrations.Core.SendEmail({
+        await base44.integrations.Core.SendEmail({
           to: user.email,
           from_name: 'Passion IA',
           subject: '🎉 Paiement confirmé - Ton accès est activé',
@@ -152,14 +171,17 @@ Deno.serve(async (req) => {
           const firstName = customerEmail.split('@')[0];
           
           // Créer l'utilisateur
-          const newUser = await base44.asServiceRole.entities.User.create({
+          const newUser = await base44.entities.User.create({
             email: customerEmail,
             full_name: firstName,
             firstName: firstName,
             has_purchased: true,
+            has_order_bump: hasOrderBump,
             stripe_customer_id: session.customer,
             purchased_at: new Date().toISOString()
           });
+
+          console.log('New user created:', { email: customerEmail, hasOrderBump });
           
           // Générer un lien de connexion magique
           const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';
@@ -179,7 +201,7 @@ Deno.serve(async (req) => {
           const magicLink = magicLinkData.magicLink;
           
           // Envoyer le même email
-          await base44.asServiceRole.integrations.Core.SendEmail({
+          await base44.integrations.Core.SendEmail({
             to: customerEmail,
             from_name: 'Passion IA',
             subject: '🎉 Paiement confirmé - Ton accès est activé',

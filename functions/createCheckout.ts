@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import Stripe from 'npm:stripe@17.5.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
@@ -9,16 +9,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Récupérer les paramètres du body (hasOrderBump)
-    let hasOrderBump = false;
-    try {
-      const body = await req.json();
-      console.log('Body received:', JSON.stringify(body));
-      hasOrderBump = body?.hasOrderBump === true;
-      console.log('Order Bump received:', hasOrderBump);
-    } catch (e) {
-      console.log('No body or invalid body, proceeding without order bump:', e);
-    }
+    // Récupérer les paramètres du body (hasOrderBump) - même pattern que les autres fonctions
+    const { hasOrderBump } = await req.json().catch(() => ({ hasOrderBump: false }));
+    console.log('=== createCheckout called ===');
+    console.log('hasOrderBump:', hasOrderBump);
 
     // Récupérer l'utilisateur s'il est authentifié
     let user = null;
@@ -78,7 +72,7 @@ Deno.serve(async (req) => {
     ];
 
     // Ajouter l'Order Bump si sélectionné
-    if (hasOrderBump) {
+    if (hasOrderBump === true) {
       lineItems.push({
         price_data: {
           currency: 'eur',

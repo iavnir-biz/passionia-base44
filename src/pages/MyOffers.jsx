@@ -145,12 +145,17 @@ export default function MyOffers() {
   };
 
   const handleGenerateSingle = async (offerType) => {
-    // Check if already enriched (not base offer)
-    const isFromFinalized = session?.finalized_offer && 
-      !session?.my_generated_offers?.[offerType];
-    
-    if (!isFromFinalized && generatedOffers?.[offerType]) {
-      return; // Already enriched
+    // Check if already enriched by verifying PSSO fields exist
+    const offer = generatedOffers?.[offerType];
+    const isAlreadyEnriched = offer && (
+      (offer.before && offer.after) ||
+      (offer.benefits && offer.benefits.length > 0)
+    );
+
+    if (isAlreadyEnriched) {
+      console.log('[MyOffers] Offer already enriched, skipping:', offerType);
+      toast.info('Cette offre est déjà enrichie !');
+      return;
     }
 
     setLoadingOffers(prev => ({ ...prev, [offerType]: true }));

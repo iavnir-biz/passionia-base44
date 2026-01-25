@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
         price_data: {
           currency: 'eur',
           product_data: {
-            name: 'Pack Clé en Main Passion IA',
+            name: 'Pack Clé en Main Passion IA®',
             description: "Tout ce dont tu as besoin pour créer et vendre ton premier produit. Inclus : Analyse de marché, Avatars, Page de vente, Messages & Emails, Plan d'action 7 jours et Dashboard.",
             images: []
           },
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
           currency: 'eur',
           product_data: {
             name: 'Pack Réseaux Sociaux',
-            description: '100+ Templates prêts à poster : Reels, Stories, Carrousels, LinkedIn, Ads',
+            description: '100+ Templates prêts à poster : Reels, Stories, Carrousels, LinkedIn, Ads, 100% personnalisé à tes offres.',
             images: []
           },
           unit_amount: 3700,

@@ -189,10 +189,10 @@ export default function CTAPAYWALL() {
   const potentialRevenue = session?.potential_revenue || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex overflow-x-hidden">
       <OnboardingSidebar currentPage="CTAPAYWALL" completedSteps={completedSteps} progressInStep={0} />
 
-      <div className="flex-1 flex flex-col lg:ml-80">
+      <div className="flex-1 flex flex-col lg:ml-80 overflow-x-hidden">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-12 pt-28 md:pt-12">
 
           {/* Header */}

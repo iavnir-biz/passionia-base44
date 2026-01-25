@@ -88,13 +88,13 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    
+
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { sessionId } = await req.json();
-    
+
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
     }
 
     const session = sessions[0];
-    
+
     // Check if already generated
     if (session.market_validation && session.market_validation_scores) {
       console.log("✅ [generateMarketValidation] Cache hit");
@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
     const onboardingHistory = session.onboarding_history || [];
     const onboardingFull = session.onboarding_full || {};
     const onboardingSummary = session.onboarding_summary || {};
-    
+
     console.log('📊 [generateMarketValidation] Data sources:', {
       historyLength: onboardingHistory.length,
       hasOnboardingFull: !!Object.keys(onboardingFull).length,
@@ -133,13 +133,13 @@ Deno.serve(async (req) => {
 
     // 🔥 EXTRACTION INTELLIGENTE
     const firstName = user.firstName || onboardingFull.firstName || 'toi';
-    
+
     // Skill - Priorité aux sources les plus fiables
-    let skill = session.skill || 
-                onboardingSummary.who_to_teach || 
-                onboardingFull.coreSkill || 
-                onboardingFull.skill;
-    
+    let skill = session.skill ||
+      onboardingSummary.who_to_teach ||
+      onboardingFull.coreSkill ||
+      onboardingFull.skill;
+
     // Si pas de skill, chercher dans l'historique
     if (!skill && onboardingHistory.length > 0) {
       const firstQ = onboardingHistory[0];
@@ -147,37 +147,37 @@ Deno.serve(async (req) => {
         skill = firstQ.answer;
       }
     }
-    
+
     skill = skill || 'cette compétence';
-    
+
     // Audience
-    const learnerProfile = onboardingSummary.learner_profile || 
-                          onboardingFull.targetAudience || 
-                          onboardingFull.learner_profile || 
-                          'ton audience';
-    
+    const learnerProfile = onboardingSummary.learner_profile ||
+      onboardingFull.targetAudience ||
+      onboardingFull.learner_profile ||
+      'ton audience';
+
     // Problème
-    const mainProblem = onboardingSummary.main_learning_problem || 
-                       onboardingFull.mainProblem || 
-                       onboardingFull.main_problem || 
-                       'ce blocage';
-    
+    const mainProblem = onboardingSummary.main_learning_problem ||
+      onboardingFull.mainProblem ||
+      onboardingFull.main_problem ||
+      'ce blocage';
+
     // Transformation
-    const bigTransformation = onboardingSummary.big_transformation || 
-                             onboardingFull.finalTransformation || 
-                             onboardingFull.big_transformation || 
-                             'cette transformation';
-    
+    const bigTransformation = onboardingSummary.big_transformation ||
+      onboardingFull.finalTransformation ||
+      onboardingFull.big_transformation ||
+      'cette transformation';
+
     // Quick win
-    const quickWin = onboardingSummary.quick_win || 
-                    onboardingFull.firstQuickResult || 
-                    onboardingFull.quick_win || 
-                    '';
-    
+    const quickWin = onboardingSummary.quick_win ||
+      onboardingFull.firstQuickResult ||
+      onboardingFull.quick_win ||
+      '';
+
     // Method
-    const methodAngle = onboardingSummary.method_angle || 
-                       onboardingFull.uniqueMethod || 
-                       '';
+    const methodAngle = onboardingSummary.method_angle ||
+      onboardingFull.uniqueMethod ||
+      '';
 
     console.log('✅ [generateMarketValidation] Extracted data:', {
       firstName,
@@ -221,7 +221,8 @@ Génère un texte de validation de marché ULTRA-PERSONNALISÉ pour ${firstName}
 ⚠️ CONTRAINTES :
 - Maximum 200 mots
 - Reprendre le skill EXACT "${skill}" (pas "création de contenu")
-- Citer des chiffres précis avec années (ex: "+340% en 2 ans")
+- Utiliser des fourchettes réalistes (ex: "une augmentation estimée entre 15% et 25%") ou des tendances qualitatives fortes (ex: "une demande qui explose depuis 6 mois")
+- NE PAS inventer de chiffre précis s'il n'est pas vérifiable
 - Ton direct, factuel, rassurant
 - Texte brut (pas de markdown)
 
@@ -269,8 +270,8 @@ Génère maintenant (JSON pur uniquement, pas de texte).`;
         ]
       });
 
-      validationText = validationMessage.content[0].type === 'text' 
-        ? validationMessage.content[0].text.trim() 
+      validationText = validationMessage.content[0].type === 'text'
+        ? validationMessage.content[0].text.trim()
         : '';
 
       console.log('✅ [generateMarketValidation] Validation text generated');
@@ -296,8 +297,8 @@ Génère maintenant (JSON pur uniquement, pas de texte).`;
         ]
       });
 
-      const responseText = indicatorsMessage.content[0].type === 'text' 
-        ? indicatorsMessage.content[0].text.trim() 
+      const responseText = indicatorsMessage.content[0].type === 'text'
+        ? indicatorsMessage.content[0].text.trim()
         : '{}';
 
       const cleanedResponse = responseText
@@ -333,9 +334,9 @@ Génère maintenant (JSON pur uniquement, pas de texte).`;
 
   } catch (error) {
     console.error('❌ [generateMarketValidation] Fatal error:', error);
-    return Response.json({ 
+    return Response.json({
       error: error.message,
-      stack: error.stack 
+      stack: error.stack
     }, { status: 500 });
   }
 });

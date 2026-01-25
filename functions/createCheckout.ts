@@ -7,16 +7,20 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
 
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
+    // Cloner la requête pour pouvoir lire le body ET le passer au SDK
+    const reqClone = req.clone();
 
-    // Récupérer les paramètres du body (hasOrderBump)
+    // Récupérer les paramètres du body (hasOrderBump) AVANT de passer au SDK
     let hasOrderBump = false;
     try {
-      const body = await req.json();
+      const body = await reqClone.json();
       hasOrderBump = body?.hasOrderBump === true;
-    } catch {
-      // Pas de body ou body invalide, on continue sans order bump
+      console.log('Order Bump received:', hasOrderBump);
+    } catch (e) {
+      console.log('No body or invalid body, proceeding without order bump');
     }
+
+    const base44 = createClientFromRequest(req);
 
     // Récupérer l'utilisateur s'il est authentifié
     let user = null;

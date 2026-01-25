@@ -101,8 +101,8 @@ export default function CTAPAYWALL() {
           paywall_clicked_at: new Date().toISOString()
         });
 
-        // Rediriger vers Stripe Checkout
-        window.location.href = data.url;
+        // Rediriger vers Stripe Checkout (au niveau top pour éviter l'iframe)
+        window.top.location.href = data.url;
       } else {
         alert('Erreur: impossible de créer la session de paiement');
       }

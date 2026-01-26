@@ -110,7 +110,18 @@ export default function Settings() {
     }
   };
 
-  const handleRestartOnboarding = () => {
+  const handleRestartOnboarding = async () => {
+    if (session?.id) {
+      try {
+        // Reset onboarding state - Only reset the done flag to avoid breaking backend with empty history
+        await base44.entities.Session.update(session.id, {
+          is_onboarding_done: false,
+          // onboarding_history: [], // COMMENTED OUT: clearing history might be causing backend 500 error
+        });
+      } catch (e) {
+        console.error("Error resetting onboarding:", e);
+      }
+    }
     navigate(createPageUrl('OnboardingDynamic'));
   };
 

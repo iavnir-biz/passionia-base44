@@ -23,6 +23,7 @@ export default function NoahChat() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -62,8 +63,14 @@ export default function NoahChat() {
   if (authLoading) {
     return (
       <div className="flex min-h-screen bg-[#11112b]">
-        <Sidebar currentPage="NovaChat" progress={calculateProgressFromSession(session)} user={user} />
-        <div className="flex-1 ml-72">
+        <Sidebar
+          currentPage="NovaChat"
+          progress={calculateProgressFromSession(session)}
+          user={user}
+          isOpen={false}
+          onClose={() => { }}
+        />
+        <div className="flex-1 w-full lg:ml-72">
           <div className="flex items-center justify-center h-screen">
             <div className="animate-spin w-8 h-8 border-2 border-[#61f7a2] border-t-transparent rounded-full" />
           </div>
@@ -74,23 +81,28 @@ export default function NoahChat() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      <Sidebar currentPage="NovaChat" progress={calculateProgressFromSession(session)} user={user} />
-      
-      <div className="flex-1 ml-72">
-        <TopBar 
-          title="Discuter avec Noah" 
-          subtitle=""
+      <Sidebar
+        currentPage="NovaChat"
+        progress={calculateProgressFromSession(session)}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <div className="flex-1 w-full lg:ml-72 transition-all duration-300 relative">
+        <TopBar
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
-        
-        <main className="p-8 max-w-5xl mx-auto relative">
+
+        <main className="p-4 md:p-8 max-w-5xl mx-auto relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={`space-y-6 ${showPaywall ? 'blur-lg pointer-events-none' : ''}`}
           >
             {/* Header avec description */}
-            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl p-8 border border-green-200 shadow-sm">
+            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl p-4 md:p-8 border border-green-200 shadow-sm">
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-16 h-16 bg-[#61f7a2] rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0">
                   <Sparkles className="w-8 h-8 text-white" />
@@ -128,7 +140,7 @@ export default function NoahChat() {
             {/* Chat Interface */}
             <div className="bg-white rounded-3xl border border-gray-200 shadow-lg overflow-hidden">
               {/* Messages */}
-              <div className="h-[500px] overflow-y-auto p-8 space-y-6">
+              <div className="h-[500px] overflow-y-auto p-4 md:p-8 space-y-6">
                 {messages.map((msg, idx) => (
                   <motion.div
                     key={idx}
@@ -143,11 +155,10 @@ export default function NoahChat() {
                       </div>
                     )}
                     <div
-                      className={`max-w-[70%] rounded-2xl p-5 ${
-                        msg.role === 'user'
-                          ? 'bg-[#61f7a2] text-white'
-                          : 'bg-gray-100 text-gray-900'
-                      }`}
+                      className={`max-w-[70%] rounded-2xl p-5 ${msg.role === 'user'
+                        ? 'bg-[#61f7a2] text-white'
+                        : 'bg-gray-100 text-gray-900'
+                        }`}
                     >
                       <p className="text-base whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     </div>
@@ -170,7 +181,7 @@ export default function NoahChat() {
               </div>
 
               {/* Input */}
-              <div className="p-6 border-t border-gray-200 bg-gray-50">
+              <div className="p-4 md:p-6 border-t border-gray-200 bg-gray-50">
                 <div className="flex gap-4">
                   <Textarea
                     value={input}

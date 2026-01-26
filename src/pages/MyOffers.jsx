@@ -307,6 +307,14 @@ ${offer.ecosystem_role || ''}
     }
   ];
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
+
   if (authLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
@@ -317,17 +325,24 @@ ${offer.ecosystem_role || ''}
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="MyOffers" progress={calculateProgressFromSession(session)} user={user} />
+      <Sidebar
+        currentPage="MyOffers"
+        progress={calculateProgressFromSession(session)}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
-      <div className="flex-1 ml-72">
+      <div className="flex-1 ml-0 lg:ml-72">
         <TopBar
           title="Offres"
           subtitle=""
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
 
-        <main className="p-8">
-          <div className="max-w-6xl mx-auto space-y-8">
+        <main className="p-4 lg:p-8">
+          <div className="max-w-6xl mx-auto space-y-6 lg:space-y-8">
 
             {/* Header */}
             <motion.div
@@ -339,10 +354,10 @@ ${offer.ecosystem_role || ''}
                 <Brain className="w-4 h-4 text-[#61f7a2]" />
                 <span className="text-xs font-medium text-gray-700">Générateur d'offres</span>
               </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-3">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
                 Tes offres complètes
               </h1>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 text-base lg:text-lg">
                 4 offres détaillées pour ton funnel de vente complet
               </p>
             </motion.div>
@@ -352,9 +367,9 @@ ${offer.ecosystem_role || ''}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
+              className="bg-blue-50 border border-blue-200 rounded-2xl p-4 lg:p-6"
             >
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                   <Package className="w-6 h-6 text-blue-600" />
                 </div>
@@ -362,7 +377,7 @@ ${offer.ecosystem_role || ''}
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
                     📌 À quoi servent ces offres ?
                   </h3>
-                  <div className="grid md:grid-cols-2 gap-3 text-sm text-gray-700">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
                     <div className="flex items-center gap-2">
                       <span className="text-[#61f7a2]">✓</span>
                       <span>Structurer ton écosystème de revenus</span>
@@ -385,7 +400,7 @@ ${offer.ecosystem_role || ''}
             </motion.div>
 
             {/* Offer Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {offerTypes.map((offerType, index) => {
                 const offer = generatedOffers?.[offerType.id];
                 const Icon = offerType.icon;

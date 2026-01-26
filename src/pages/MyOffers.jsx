@@ -109,33 +109,42 @@ export default function MyOffers() {
         console.log('[MyOffers] My generated offers:', userSession.my_generated_offers);
         console.log('[MyOffers] Finalized offer (base):', userSession.finalized_offer);
 
-        // 🔥 PRIORITY 1: detailed_offers (complete enriched offers from generateDetailedOffers)
-        if (userSession.detailed_offers) {
-          const mappedOffers = {
-            low: normalizeOffer(userSession.detailed_offers.mainProduct),
-            bump: normalizeOffer(userSession.detailed_offers.orderBump),
-            mid: normalizeOffer(userSession.detailed_offers.upsell),
-            high: normalizeOffer(userSession.detailed_offers.premium)
-          };
-          console.log('[MyOffers] Using detailed_offers (fully enriched):', mappedOffers);
-          setGeneratedOffers(mappedOffers);
-        }
-        // 🔥 PRIORITY 2: my_generated_offers (individually enriched offers)
-        else if (userSession.my_generated_offers) {
-          console.log('[MyOffers] Using my_generated_offers (individually enriched)');
-          setGeneratedOffers(userSession.my_generated_offers);
-        }
-        // 🔥 PRIORITY 3: finalized_offer (base offers only)
-        else if (userSession.finalized_offer) {
-          console.log('[MyOffers] Using finalized_offer (base only)');
-          const baseOffers = {
+        let baseOffers = {};
+
+        // 1. Start with finalized_offer (bare minimum)
+        if (userSession.finalized_offer) {
+          baseOffers = {
             low: normalizeOffer(userSession.finalized_offer.mainProduct),
             bump: normalizeOffer(userSession.finalized_offer.orderBump),
             mid: normalizeOffer(userSession.finalized_offer.upsell1),
             high: normalizeOffer(userSession.finalized_offer.upsell3)
           };
-          setGeneratedOffers(baseOffers);
         }
+
+        // 2. Override with detailed_offers if available (bulk generation)
+        if (userSession.detailed_offers) {
+          const detailOffers = {
+            low: normalizeOffer(userSession.detailed_offers.mainProduct),
+            bump: normalizeOffer(userSession.detailed_offers.orderBump),
+            mid: normalizeOffer(userSession.detailed_offers.upsell),
+            high: normalizeOffer(userSession.detailed_offers.premium)
+          };
+
+          // Only merge if detailed_offers has content
+          if (Object.keys(detailOffers).length > 0) {
+            baseOffers = { ...baseOffers, ...detailOffers };
+          }
+        }
+
+        // 3. Override with my_generated_offers (individual generation - HIGHEST PRIORITY)
+        // This ensures that when a user manually enriches an offer, they see THAT version
+        if (userSession.my_generated_offers) {
+          console.log('[MyOffers] Merging manual updates:', userSession.my_generated_offers);
+          baseOffers = { ...baseOffers, ...userSession.my_generated_offers };
+        }
+
+        console.log('[MyOffers] Final merged offers:', baseOffers);
+        setGeneratedOffers(baseOffers);
       } else {
         console.error('No session found for user');
       }

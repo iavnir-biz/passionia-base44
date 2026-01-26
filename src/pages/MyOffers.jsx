@@ -161,18 +161,37 @@ export default function MyOffers() {
     setLoadingOffers(prev => ({ ...prev, [offerType]: true }));
 
     try {
-      console.log('[MyOffers] Invoking generateMyOffers:', { sessionId: session.id, offerType });
+      // FIX: Mapping offerType to backend expected keys (matching finalized_offer structure)
+      const mapping = {
+        low: 'mainProduct',
+        bump: 'orderBump',
+        mid: 'upsell1',
+        high: 'upsell3'
+      };
+
+      const backendOfferType = mapping[offerType] || offerType;
+
+      console.log('[MyOffers] Invoking generateMyOffers:', {
+        sessionId: session.id,
+        offerType: backendOfferType,
+        originalType: offerType
+      });
+
       const response = await base44.functions.invoke('generateMyOffers', {
         sessionId: session.id,
-        offerType
+        offerType: backendOfferType
       });
+
+      if (!response.data) {
+        throw new Error('No data received from backend');
+      }
 
       const enrichedOffer = response.data;
       const updatedOffers = {
         ...generatedOffers,
         [offerType]: enrichedOffer
       };
-      
+
       setGeneratedOffers(updatedOffers);
 
       await base44.entities.Session.update(session.id, {
@@ -278,17 +297,17 @@ ${offer.ecosystem_role || ''}
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="MyOffers" progress={calculateProgressFromSession(session)} user={user} />
-      
+
       <div className="flex-1 ml-72">
-        <TopBar 
-          title="Offres" 
+        <TopBar
+          title="Offres"
           subtitle=""
           user={user}
         />
-        
+
         <main className="p-8">
           <div className="max-w-6xl mx-auto space-y-8">
-            
+
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -350,7 +369,7 @@ ${offer.ecosystem_role || ''}
                 const offer = generatedOffers?.[offerType.id];
                 const Icon = offerType.icon;
                 const isLoading = loadingOffers[offerType.id];
-                
+
                 return (
                   <motion.div
                     key={offerType.id}
@@ -538,17 +557,17 @@ ${offer.ecosystem_role || ''}
                         </div>
                       </>
                     ) : (
-                       <GlowButton
-                         onClick={() => handleGenerateSingle(offerType.id)}
-                         variant="primary"
-                         size="default"
-                         loading={isLoading}
-                         icon={Sparkles}
-                         className="w-full"
-                       >
-                         {isLoading ? 'Nova enrichit ton offre...' : 'Détailler avec l\'IA'}
-                       </GlowButton>
-                     )}
+                      <GlowButton
+                        onClick={() => handleGenerateSingle(offerType.id)}
+                        variant="primary"
+                        size="default"
+                        loading={isLoading}
+                        icon={Sparkles}
+                        className="w-full"
+                      >
+                        {isLoading ? 'Nova enrichit ton offre...' : 'Détailler avec l\'IA'}
+                      </GlowButton>
+                    )}
                   </motion.div>
                 );
               })}

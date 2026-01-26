@@ -22,6 +22,7 @@ export default function SalesMessages() {
   const [showPreview, setShowPreview] = useState(null);
   const [hasPremium, setHasPremium] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -53,7 +54,7 @@ export default function SalesMessages() {
 
       const sessions = await base44.entities.Session.filter({ id: sessionId });
       const userSession = sessions?.[0];
-      
+
       if (!userSession) {
         console.error('[SalesMessages] Session not found');
         return;
@@ -62,14 +63,14 @@ export default function SalesMessages() {
       setSession(userSession);
       console.log('[SalesMessages] Session loaded:', userSession);
       console.log('[SalesMessages] Generated sales messages:', userSession.generated_sales_messages);
-      
+
       // Charger messages si présents
       if (isNonEmpty(userSession.generated_sales_messages)) {
         setGeneratedMessages(userSession.generated_sales_messages);
       }
 
-      const profiles = await base44.entities.UserProfile.filter({ 
-        created_by: currentUser.email 
+      const profiles = await base44.entities.UserProfile.filter({
+        created_by: currentUser.email
       });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
@@ -177,18 +178,23 @@ export default function SalesMessages() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="SalesMessages" progress={calculateProgressFromSession(session)} user={user} />
-      
-      <div className="flex-1 ml-72">
-        <TopBar 
-          title="Messages de vente" 
-          subtitle=""
+      <Sidebar
+        currentPage="SalesMessages"
+        progress={calculateProgressFromSession(session)}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <div className="flex-1 w-full lg:ml-72 transition-all duration-300 relative">
+        <TopBar
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
-        
-        <main className="p-8">
+
+        <main className="p-4 md:p-8">
           <div className="max-w-6xl mx-auto space-y-8">
-            
+
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -223,7 +229,7 @@ export default function SalesMessages() {
                     💬 Comment utiliser ces messages ?
                   </h3>
                   <p className="text-sm text-gray-700 leading-relaxed">
-                    Si tu envoies ces messages aux bonnes personnes, ils peuvent accélérer tes premières ventes sans pression ni manipulation. 
+                    Si tu envoies ces messages aux bonnes personnes, ils peuvent accélérer tes premières ventes sans pression ni manipulation.
                     Utilise-les en DM Instagram/LinkedIn, par email, ou adapte-les en vocal.
                   </p>
                 </div>
@@ -236,7 +242,7 @@ export default function SalesMessages() {
                 const Icon = msgType.icon;
                 const isGenerated = generatedMessages[msgType.id];
                 const isLoading = loading[msgType.id];
-                
+
                 return (
                   <motion.div
                     key={msgType.id}

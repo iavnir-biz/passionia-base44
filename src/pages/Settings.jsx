@@ -111,25 +111,7 @@ export default function Settings() {
   };
 
   const handleRestartOnboarding = () => {
-    navigate(createPageUrl('Onboarding'));
-  };
-
-  const handleRegenerateDocuments = async () => {
-    setRegenerating(true);
-    try {
-      // Delete all existing documents
-      const docs = await base44.entities.Document.filter({ created_by: user.email });
-      for (const doc of docs) {
-        await base44.entities.Document.delete(doc.id);
-      }
-
-      // Navigate to documents page to regenerate
-      navigate(createPageUrl('Documents'));
-    } catch (error) {
-      console.error('Error regenerating:', error);
-    } finally {
-      setRegenerating(false);
-    }
+    navigate(createPageUrl('OnboardingDynamic'));
   };
 
   const handleLogout = async () => {
@@ -244,20 +226,6 @@ export default function Settings() {
           </p>
           <GlowButton variant="secondary" onClick={handleRestartOnboarding} icon={RefreshCw}>
             Reprendre l'onboarding
-          </GlowButton>
-        </div>
-      )
-    },
-    {
-      title: 'Documents IA',
-      icon: FileText,
-      content: (
-        <div>
-          <p className="text-gray-600 mb-4">
-            Régénère tous tes documents IA avec tes nouvelles informations de profil.
-          </p>
-          <GlowButton variant="secondary" onClick={handleRegenerateDocuments} loading={regenerating} icon={Sparkles}>
-            Régénérer tous les documents
           </GlowButton>
         </div>
       )

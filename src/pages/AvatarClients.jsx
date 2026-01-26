@@ -109,28 +109,48 @@ export default function AvatarClients() {
   };
 
   const handleGenerate = async (isRegenerate = false) => {
+    console.log('🔵 [AvatarClients] handleGenerate called, regenerate:', isRegenerate);
+
     if (isRegenerate && !hasPremium) {
       setShowUpgradeModal(true);
+      return;
+    }
+
+    if (!session || !session.id) {
+      console.error('❌ [AvatarClients] No session available');
+      toast.error('Session non disponible. Veuillez recharger la page.');
       return;
     }
 
     setLoading(true);
 
     try {
+      console.log('📤 [AvatarClients] Invoking generateAvatars, sessionId:', session.id);
+
       const response = await base44.functions.invoke('generateAvatars', {
         sessionId: session.id,
         regenerate: isRegenerate
       });
 
-      console.log('[AvatarClients] Response from generateAvatars:', response);
+      console.log('📥 [AvatarClients] Response received:', response);
+
+      // Handle both direct data (if client unwraps it) and wrapped response
+      const responseData = response.data || response;
+
+      if (responseData.error) {
+        throw new Error(responseData.error);
+      }
 
       // 🔥 HANDLE RESPONSE: backend returns { avatars: [...], generatedAt: "..." }
-      const avatarsData = response.data?.avatars || response.avatars;
-      const generatedAt = response.data?.generatedAt || response.generatedAt;
+      const avatarsData = responseData.avatars;
+      const generatedAt = responseData.generatedAt;
 
       if (!avatarsData || !Array.isArray(avatarsData)) {
+        console.error('❌ [AvatarClients] Invalid format:', responseData);
         throw new Error('Format de réponse invalide: avatars manquants ou incorrect');
       }
+
+      console.log('✨ [AvatarClients] Avatars received:', avatarsData.length);
 
       // 🔥 Sauvegarder IMMÉDIATEMENT en base (format cohérent avec backend)
       const dataToSave = {
@@ -153,8 +173,8 @@ export default function AvatarClients() {
 
       toast.success('Avatars générés avec succès et sauvegardés !');
     } catch (error) {
-      console.error('[AvatarClients] Error generating avatars:', error);
-      console.error('[AvatarClients] Error details:', {
+      console.error('❌ [AvatarClients] Error generating avatars:', error);
+      console.error('❌ [AvatarClients] Error details:', {
         message: error.message,
         stack: error.stack,
         response: error.response

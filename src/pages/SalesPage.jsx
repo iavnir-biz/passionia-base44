@@ -66,7 +66,7 @@ export default function SalesPage() {
 
       const sessions = await base44.entities.Session.filter({ id: sessionId });
       const userSession = sessions?.[0];
-      
+
       if (!userSession) {
         console.error('[SalesPage] Session not found');
         return;
@@ -88,8 +88,8 @@ export default function SalesPage() {
         console.log('[SalesPage] Low ticket offer loaded:', lowOffer);
       }
 
-      const profiles = await base44.entities.UserProfile.filter({ 
-        created_by: currentUser.email 
+      const profiles = await base44.entities.UserProfile.filter({
+        created_by: currentUser.email
       });
       if (profiles.length > 0) {
         setProfile(profiles[0]);
@@ -110,7 +110,7 @@ export default function SalesPage() {
     if (generatedPages[type]) {
       return;
     }
-    
+
     setSelectedType(type);
     setShowCustomization(true);
   };
@@ -149,7 +149,7 @@ export default function SalesPage() {
 
       const updatedPages = { ...generatedPages, [selectedType]: salesPage };
       setGeneratedPages(updatedPages);
-      
+
       await base44.entities.Session.update(session.id, {
         generated_sales_pages: updatedPages
       });
@@ -170,14 +170,14 @@ export default function SalesPage() {
 
   const handleCopy = (page) => {
     if (!page?.html) return;
-    
+
     navigator.clipboard.writeText(page.html);
     toast.success('Copié dans le presse-papier !');
   };
 
   const handleDownload = (page, filename) => {
     if (!page?.html) return;
-    
+
     const blob = new Blob([page.html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -261,17 +261,17 @@ export default function SalesPage() {
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar currentPage="SalesPage" progress={calculateProgressFromSession(session)} user={user} />
-      
+
       <div className="flex-1 ml-72">
-        <TopBar 
-          title="Pages de vente" 
+        <TopBar
+          title="Pages de vente"
           subtitle=""
           user={user}
         />
-        
+
         <main className="p-8">
           <div className="max-w-6xl mx-auto space-y-8">
-            
+
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -295,7 +295,7 @@ export default function SalesPage() {
               {offerTypes.map((offer, index) => {
                 const Icon = offer.icon;
                 const isGenerated = generatedPages[offer.id];
-                
+
                 return (
                   <motion.div
                     key={offer.id}
@@ -496,52 +496,50 @@ export default function SalesPage() {
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-white rounded-2xl max-w-6xl w-full h-[85vh] overflow-hidden shadow-2xl"
+              className="bg-white rounded-2xl max-w-6xl w-full h-[90vh] lg:h-[85vh] overflow-hidden shadow-2xl flex flex-col lg:flex-row"
             >
-              <div className="h-full flex">
-                {/* Left: Steps */}
-                <div className="w-80 bg-gray-50 p-6 border-r border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-6">Génération en cours</h3>
-                  <div className="space-y-4">
-                    {generationSteps.map((step, index) => (
-                      <div
-                        key={index}
-                        className={cn(
-                          "flex items-center gap-3 p-3 rounded-lg transition-all",
-                          index === generationStep && "bg-white shadow-sm",
-                          index < generationStep && "opacity-50"
-                        )}
-                      >
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold",
-                          index < generationStep && "bg-[#61f7a2] text-white",
-                          index === generationStep && "bg-[#61f7a2] text-white animate-pulse",
-                          index > generationStep && "bg-gray-200 text-gray-400"
-                        )}>
-                          {index < generationStep ? '✓' : index + 1}
-                        </div>
-                        <span className={cn(
-                          "text-sm font-medium",
-                          index === generationStep && "text-gray-900",
-                          index !== generationStep && "text-gray-600"
-                        )}>
-                          {step}
-                        </span>
-                        {index === generationStep && (
-                          <Loader2 className="w-4 h-4 animate-spin text-[#61f7a2] ml-auto" />
-                        )}
+              {/* Left: Steps (Top on mobile) */}
+              <div className="w-full lg:w-80 bg-gray-50 p-4 lg:p-6 border-b lg:border-b-0 lg:border-r border-gray-200 overflow-y-auto max-h-[30vh] lg:max-h-full">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 lg:mb-6">Génération en cours</h3>
+                <div className="space-y-3 lg:space-y-4">
+                  {generationSteps.map((step, index) => (
+                    <div
+                      key={index}
+                      className={cn(
+                        "flex items-center gap-3 p-2 lg:p-3 rounded-lg transition-all",
+                        index === generationStep && "bg-white shadow-sm",
+                        index < generationStep && "opacity-50"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-xs lg:text-sm font-semibold flex-shrink-0",
+                        index < generationStep && "bg-[#61f7a2] text-white",
+                        index === generationStep && "bg-[#61f7a2] text-white animate-pulse",
+                        index > generationStep && "bg-gray-200 text-gray-400"
+                      )}>
+                        {index < generationStep ? '✓' : index + 1}
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Right: Preview */}
-                <div className="flex-1 p-6 overflow-hidden">
-                  <div className="h-full bg-gray-100 rounded-xl flex items-center justify-center">
-                    <div className="text-center">
-                      <Loader2 className="w-12 h-12 animate-spin text-[#61f7a2] mx-auto mb-4" />
-                      <p className="text-gray-600">Création de ta page de vente...</p>
+                      <span className={cn(
+                        "text-xs lg:text-sm font-medium",
+                        index === generationStep && "text-gray-900",
+                        index !== generationStep && "text-gray-600"
+                      )}>
+                        {step}
+                      </span>
+                      {index === generationStep && (
+                        <Loader2 className="w-3 h-3 lg:w-4 lg:h-4 animate-spin text-[#61f7a2] ml-auto" />
+                      )}
                     </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right: Preview (Bottom on mobile) */}
+              <div className="flex-1 p-4 lg:p-6 overflow-hidden flex flex-col">
+                <div className="flex-1 bg-gray-100 rounded-xl flex items-center justify-center min-h-[200px]">
+                  <div className="text-center p-4">
+                    <Loader2 className="w-10 h-10 lg:w-12 lg:h-12 animate-spin text-[#61f7a2] mx-auto mb-4" />
+                    <p className="text-gray-600 text-sm lg:text-base">Création de ta page de vente...</p>
                   </div>
                 </div>
               </div>
@@ -563,24 +561,26 @@ export default function SalesPage() {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+              className="bg-white rounded-2xl max-w-5xl w-full h-[90vh] overflow-hidden shadow-2xl flex flex-col"
             >
-              <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="text-xl font-bold text-gray-900">Aperçu de la page</h3>
+              <div className="p-4 lg:p-6 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+                <h3 className="text-lg lg:text-xl font-bold text-gray-900">Aperçu de la page</h3>
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="text-gray-400 hover:text-gray-900 transition-colors"
+                  className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
                 >
                   ✕
                 </button>
               </div>
-              <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
-                <iframe
-                  srcDoc={showPreview.html || ''}
-                  sandbox="allow-same-origin allow-popups allow-forms allow-scripts"
-                  className="w-full h-[800px] border-0 bg-white"
-                  title="Sales Page Preview"
-                />
+              <div className="flex-1 bg-gray-100 p-2 lg:p-4 overflow-hidden">
+                <div className="w-full h-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <iframe
+                    srcDoc={showPreview.html || ''}
+                    sandbox="allow-same-origin allow-popups allow-forms allow-scripts"
+                    className="w-full h-full border-0"
+                    title="Sales Page Preview"
+                  />
+                </div>
               </div>
             </motion.div>
           </motion.div>

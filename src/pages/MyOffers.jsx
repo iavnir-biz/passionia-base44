@@ -145,48 +145,59 @@ export default function MyOffers() {
   };
 
   const handleGenerateSingle = async (offerType) => {
+    console.log('🔵 [MyOffers] handleGenerateSingle called with offerType:', offerType);
+
     // Check if already enriched by verifying PSSO fields exist
     const offer = generatedOffers?.[offerType];
+    console.log('🔵 [MyOffers] Current offer data:', offer);
+
     const isAlreadyEnriched = offer && (
       (offer.before && offer.after) ||
       (offer.benefits && offer.benefits.length > 0)
     );
+    console.log('🔵 [MyOffers] isAlreadyEnriched:', isAlreadyEnriched);
 
     if (isAlreadyEnriched) {
-      console.log('[MyOffers] Offer already enriched, skipping:', offerType);
+      console.log('⚠️ [MyOffers] Offer already enriched, skipping:', offerType);
       toast.info('Cette offre est déjà enrichie !');
       return;
     }
 
+    if (!session || !session.id) {
+      console.error('❌ [MyOffers] No session available');
+      toast.error('Session non disponible. Veuillez recharger la page.');
+      return;
+    }
+
+    console.log('✅ [MyOffers] Starting enrichment for:', offerType);
+    console.log('✅ [MyOffers] Session ID:', session.id);
     setLoadingOffers(prev => ({ ...prev, [offerType]: true }));
 
     try {
-      // FIX: Mapping offerType to backend expected keys (matching finalized_offer structure)
-      const mapping = {
-        low: 'mainProduct',
-        bump: 'orderBump',
-        mid: 'upsell1',
-        high: 'upsell3'
-      };
-
-      const backendOfferType = mapping[offerType] || offerType;
-
-      console.log('[MyOffers] Invoking generateMyOffers:', {
-        sessionId: session.id,
-        offerType: backendOfferType,
-        originalType: offerType
-      });
-
+      console.log('📤 [MyOffers] Invoking generateMyOffers:', { sessionId: session.id, offerType });
       const response = await base44.functions.invoke('generateMyOffers', {
         sessionId: session.id,
-        offerType: backendOfferType
+        offerType
       });
 
-      if (!response.data) {
-        throw new Error('No data received from backend');
+      console.log('📥 [MyOffers] Response received:', response);
+
+      // The backend returns { success: true, ...enrichedOffer } directly
+      // base44.functions.invoke wraps it in { data: ... }
+      const responseData = response.data || response;
+
+      if (responseData.error) {
+        throw new Error(responseData.error);
       }
 
-      const enrichedOffer = response.data;
+      if (!responseData.success && !responseData.title) {
+        throw new Error('Invalid response format from backend');
+      }
+
+      // Remove the 'success' field if present, keep only offer data
+      const { success, ...enrichedOffer } = responseData;
+      console.log('✨ [MyOffers] Enriched offer:', enrichedOffer);
+
       const updatedOffers = {
         ...generatedOffers,
         [offerType]: enrichedOffer
@@ -203,8 +214,9 @@ export default function MyOffers() {
 
       toast.success('Offre enrichie !');
     } catch (error) {
-      console.error('Error enriching offer:', error);
-      toast.error('Erreur lors de l\'enrichissement');
+      console.error('❌ [MyOffers] Error enriching offer:', error);
+      console.error('❌ [MyOffers] Error details:', error.message, error.stack);
+      toast.error(`Erreur: ${error.message || 'Erreur lors de l\'enrichissement'}`);
     } finally {
       setLoadingOffers(prev => ({ ...prev, [offerType]: false }));
     }

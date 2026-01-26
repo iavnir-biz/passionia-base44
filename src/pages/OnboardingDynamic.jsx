@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import { ArrowRight, Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -95,13 +96,32 @@ export default function OnboardingDynamic() {
     try {
       const firstName = localStorage.getItem('onboarding_firstName') || '';
 
-      const { data } = await base44.functions.invoke('onboardingNextQuestion', {
+      console.log('🏁 [Onboarding] Fetching next question...', { sessionId, lastAnswer, firstName });
+
+      const payload = {
         sessionId,
-        userAnswer: lastAnswer,
         firstName
-      });
+      };
+
+      // Only include userAnswer if it's an actual answer (submission)
+      // If lastAnswer is null, it means we are fetching the current/next question without answering
+      if (lastAnswer !== null) {
+        payload.userAnswer = lastAnswer;
+      }
+
+      console.log('📦 [Onboarding] Sending payload:', payload);
+
+      const { data } = await base44.functions.invoke('onboardingNextQuestion', payload);
+
+      console.log('✅ [Onboarding] Response received:', data);
+
+      if (data.error) {
+        console.error('❌ [Onboarding] Backend returned error:', data.error);
+        throw new Error(data.error);
+      }
 
       if (data.done || data.isDone) {
+        console.log('🎉 [Onboarding] Onboarding complete!');
         await base44.entities.Session.update(sessionId, {
           is_onboarding_done: true
         });
@@ -109,7 +129,8 @@ export default function OnboardingDynamic() {
         return;
       }
 
-      // Récupérer la session mise à jour
+      // Récupérer la session mise à jour seulement si nécessaire (optimisation)
+      // Mais pour la barre de progression, on recharge
       const updatedSessions = await base44.entities.Session.filter({ id: sessionId });
       if (updatedSessions && updatedSessions.length > 0) {
         const freshSession = updatedSessions[0];
@@ -121,11 +142,20 @@ export default function OnboardingDynamic() {
       if (data.nextQuestion) {
         setCurrentQuestion(data.nextQuestion);
         initializeValue(data.nextQuestion.type, data.nextQuestion);
+      } else {
+        console.warn('⚠️ [Onboarding] No nextQuestion in data, but not done?', data);
       }
 
     } catch (error) {
-      console.error('Error fetching next question:', error);
-      alert("Oups, j'ai rencontré un petit problème technique. Peux-tu rafraîchir la page ?");
+      console.error('❌ [Onboarding] Critical error fetching next question:', error);
+      console.error('Stack:', error.stack);
+
+      // Afficher l'erreur à l'utilisateur si possible
+      if (error.response?.status === 500) {
+        toast.error("Erreur serveur (500). Nos ingénieurs ont été notifiés.");
+      } else {
+        // alert("Oups, petit souci. On réessaie ?");
+      }
     } finally {
       setIsLoading(false);
       setIsSaving(false);

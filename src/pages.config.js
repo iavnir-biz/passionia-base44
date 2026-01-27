@@ -62,6 +62,7 @@ import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
+import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
 
@@ -131,6 +132,7 @@ export const PAGES = {
     "Settings": Settings,
     "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
+    "UpsellCoaching": UpsellCoaching,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
 }

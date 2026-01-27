@@ -34,14 +34,62 @@ Deno.serve(async (req) => {
     console.log('=== Webhook event received ===');
     console.log('Event type:', event.type);
 
-    // Traiter les événements de paiement réussi
+    // Traiter les evenements de paiement reussi
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const customerEmail = session.customer_details?.email || session.metadata?.user_email;
       const userId = session.metadata?.user_id;
       const hasOrderBump = session.metadata?.has_order_bump === 'true';
+      const paymentType = session.metadata?.type;
 
-      console.log('Session metadata:', { userId, customerEmail, hasOrderBump });
+      console.log('Session metadata:', { userId, customerEmail, hasOrderBump, paymentType });
+
+      // --- TRAITEMENT UPSELL COACHING ---
+      if (paymentType === 'upsell_coaching') {
+        console.log('Processing upsell coaching payment');
+
+        if (userId) {
+          try {
+            // Mettre a jour l'utilisateur avec le flag coaching
+            await base44.entities.User.update(userId, {
+              has_coaching: true,
+              coaching_purchased_at: new Date().toISOString()
+            });
+
+            // Mettre a jour la Session si on a un session_id
+            const userSessionId = session.metadata?.session_id;
+            if (userSessionId) {
+              await base44.entities.Session.update(userSessionId, {
+                has_seen_upsell: true,
+                upsell_accepted: true,
+                has_coaching: true
+              });
+            } else {
+              // Trouver la session par email de l'utilisateur
+              const users = await base44.entities.User.filter({ id: userId });
+              if (users.length > 0) {
+                const userEmail = users[0].email;
+                const sessions = await base44.entities.Session.filter({ created_by: userEmail });
+                if (sessions.length > 0) {
+                  await base44.entities.Session.update(sessions[0].id, {
+                    has_seen_upsell: true,
+                    upsell_accepted: true,
+                    has_coaching: true
+                  });
+                }
+              }
+            }
+
+            console.log(`Upsell coaching payment processed for user ${userId}`);
+          } catch (error) {
+            console.error('Error processing upsell coaching:', error);
+          }
+        }
+
+        return Response.json({ received: true });
+      }
+
+      // --- TRAITEMENT ACHAT INITIAL (existant) ---
 
       if (userId) {
         // Utilisateur existant - mettre à jour

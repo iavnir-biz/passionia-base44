@@ -103,10 +103,10 @@ export default function SetupProfile() {
       });
 
       toast.success('Profil enregistré !');
-      
-      // 🔥 NOUVEAU : Redirect direct vers Dashboard
-      console.log('[SetupProfile] Profil sauvegardé → Dashboard');
-      navigate(createPageUrl('Dashboard'));
+
+      // Redirect vers UpsellCoaching (page d'upsell coaching)
+      console.log('[SetupProfile] Profil sauvegardé → UpsellCoaching');
+      navigate(createPageUrl('UpsellCoaching'));
       
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -116,9 +116,9 @@ export default function SetupProfile() {
   };
 
   const handleSkip = async () => {
-    // 🔥 NOUVEAU : Redirect direct vers Dashboard
-    console.log('[SetupProfile] Skip → Dashboard');
-    navigate(createPageUrl('Dashboard'));
+    // Redirect vers UpsellCoaching (page d'upsell coaching)
+    console.log('[SetupProfile] Skip → UpsellCoaching');
+    navigate(createPageUrl('UpsellCoaching'));
   };
 
   if (loading) {

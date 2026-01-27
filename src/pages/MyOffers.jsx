@@ -432,7 +432,7 @@ ${offer.ecosystem_role || ''}
                                 {offer.subtitle}
                               </p>
                             )}
-                            <div className="text-2xl font-bold text-[#61f7a2] mb-2">
+                            <div className="text-2xl font-bold text-gray-900 mb-2">
                               {offer.price}
                             </div>
                             {/* Description si pas de données PSSO enrichies */}

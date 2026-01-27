@@ -60,6 +60,7 @@ export default function EmailsMarketing() {
   const [generatedEmails, setGeneratedEmails] = useState(null);
   const [previewEmail, setPreviewEmail] = useState(null);
   const [session, setSession] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -69,14 +70,14 @@ export default function EmailsMarketing() {
 
   const loadUserData = async () => {
     try {
-      const sessionRes = await base44.entities.Session.filter({ 
-        created_by: user.email 
+      const sessionRes = await base44.entities.Session.filter({
+        created_by: user.email
       });
 
       if (sessionRes.length > 0) {
         const userSession = sessionRes[0];
         setSession(userSession);
-        
+
         // Charger les emails générés depuis la session
         if (userSession.generated_marketing_emails) {
           console.log('Emails loaded from session:', userSession.generated_marketing_emails);
@@ -97,7 +98,7 @@ export default function EmailsMarketing() {
     setLoading(true);
     try {
       console.log('Generating all emails for session:', session.id);
-      
+
       const response = await base44.functions.invoke('generateMarketingEmail', {
         sessionId: session.id
       });
@@ -107,7 +108,7 @@ export default function EmailsMarketing() {
       if (response.data?.success && response.data?.emails) {
         setGeneratedEmails(response.data.emails);
         toast.success('Les 5 emails ont été générés !');
-        
+
         // Recharger pour confirmer
         await loadUserData();
       } else {
@@ -148,18 +149,23 @@ export default function EmailsMarketing() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="EmailsMarketing" progress={calculateProgressFromSession(session)} user={user} />
-      
-      <div className="flex-1 ml-72">
-        <TopBar 
-          title="Emails Marketing" 
-          subtitle="Séquence de 5 emails pour vendre ton produit"
+      <Sidebar
+        currentPage="EmailsMarketing"
+        progress={calculateProgressFromSession(session)}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <div className="flex-1 ml-0 lg:ml-72 w-full">
+        <TopBar
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
 
-        <main className="p-8">
+        <main className="p-4 lg:p-8">
           <div className="max-w-6xl mx-auto space-y-8">
-            
+
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -247,10 +253,10 @@ export default function EmailsMarketing() {
                       <div className="space-y-3">
                         <div className="flex gap-2">
                           <button
-                            onClick={() => setPreviewEmail({ 
-                              type: email.id, 
-                              content: emailContent, 
-                              title: email.title 
+                            onClick={() => setPreviewEmail({
+                              type: email.id,
+                              content: emailContent,
+                              title: email.title
                             })}
                             className="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 text-gray-900"
                           >

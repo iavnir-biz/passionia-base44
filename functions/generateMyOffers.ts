@@ -44,11 +44,18 @@ Deno.serve(async (req) => {
 
         const session = sessions[0];
 
-        // Check cache: if this specific offer is already enriched
-        if (session.my_generated_offers?.[offerType]) {
+        // Check cache: if this specific offer is already enriched with REAL data
+        const cachedOffer = session.my_generated_offers?.[offerType];
+        const isReallyEnriched = cachedOffer && (
+            (cachedOffer.before && cachedOffer.after) ||
+            (cachedOffer.benefits && cachedOffer.benefits.length > 0) ||
+            (cachedOffer.deliverables && cachedOffer.deliverables.length > 3)
+        );
+        
+        if (isReallyEnriched) {
             console.log(`[generateMyOffers] ${offerType} already enriched, returning from cache`);
             return Response.json({
-                ...session.my_generated_offers[offerType],
+                ...cachedOffer,
                 fromCache: true
             });
         }

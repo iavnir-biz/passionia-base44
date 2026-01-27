@@ -1,6 +1,26 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import { jsPDF } from 'npm:jspdf@2.5.2';
 
+// Fonction pour nettoyer les caractères spéciaux
+const cleanText = (text) => {
+  if (!text) return '';
+  return String(text)
+    .replace(/[àáâãäå]/g, 'a')
+    .replace(/[èéêë]/g, 'e')
+    .replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôõö]/g, 'o')
+    .replace(/[ùúûü]/g, 'u')
+    .replace(/[ýÿ]/g, 'y')
+    .replace(/[ñ]/g, 'n')
+    .replace(/[ç]/g, 'c')
+    .replace(/[À-ÿ]/g, (char) => {
+      const accents = 'ÀÁÂÃÄÅàáâãäåÈÉÊËèéêëÌÍÎÏìíîïÒÓÔÕÖòóôõöÙÚÛÜùúûüÝýÿÑñÇç';
+      const noAccents = 'AAAAAAaaaaaaEEEEeeeeIIIIiiiiOOOOOoooooUUUUuuuuYyyNnCc';
+      const index = accents.indexOf(char);
+      return index !== -1 ? noAccents[index] : char;
+    });
+};
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -26,12 +46,14 @@ Deno.serve(async (req) => {
     const addText = (text, fontSize, isBold = false, color = [0, 0, 0], align = 'left') => {
       if (!text) return;
       
+      const cleanedText = cleanText(text);
+      
       doc.setFontSize(fontSize);
       doc.setTextColor(...color);
       doc.setFont('helvetica', isBold ? 'bold' : 'normal');
       
       const maxWidth = pageWidth - (2 * margin);
-      const lines = doc.splitTextToSize(String(text), maxWidth);
+      const lines = doc.splitTextToSize(cleanedText, maxWidth);
       
       lines.forEach((line) => {
         if (y > 270) {
@@ -63,7 +85,7 @@ Deno.serve(async (req) => {
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text(String(title), margin + 8, y);
+      doc.text(cleanText(title), margin + 8, y);
       y += 10;
     };
 
@@ -81,19 +103,19 @@ Deno.serve(async (req) => {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(String(offerTypeName || 'Mon Offre'), margin, 15);
+    doc.text(cleanText(offerTypeName || 'Mon Offre'), margin, 15);
     
     if (offer.title) {
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      const titleLines = doc.splitTextToSize(String(offer.title), pageWidth - (2 * margin));
+      const titleLines = doc.splitTextToSize(cleanText(offer.title), pageWidth - (2 * margin));
       doc.text(titleLines, margin, 28);
     }
     
     if (offer.price) {
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
-      doc.text(String(offer.price), margin, 42);
+      doc.text(cleanText(offer.price), margin, 42);
     }
     
     y = 65;
@@ -134,9 +156,19 @@ Deno.serve(async (req) => {
     if (offer.deliverables && offer.deliverables.length > 0) {
       addSection('Ce que tu recois');
       offer.deliverables.forEach((item, i) => {
-        doc.setFillColor(240, 240, 240);
-        doc.roundedRect(margin, y - 3, pageWidth - (2 * margin), 8, 2, 2, 'F');
-        addText(String(item), 10);
+        if (y > 265) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.setFillColor(245, 245, 245);
+        doc.roundedRect(margin, y - 4, pageWidth - (2 * margin), 10, 2, 2, 'F');
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(0, 0, 0);
+        const cleanedItem = cleanText(item);
+        const itemLines = doc.splitTextToSize(cleanedItem, pageWidth - (2 * margin) - 10);
+        doc.text(itemLines, margin + 5, y);
+        y += itemLines.length * 5 + 8;
       });
     }
 

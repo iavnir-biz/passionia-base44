@@ -302,7 +302,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { sessionId } = await req.json();
+    const { sessionId, force = false } = await req.json();
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
@@ -316,8 +316,8 @@ Deno.serve(async (req) => {
 
     const session = sessions[0];
 
-    // Check cache
-    if (session.complete_market_analysis) {
+    // Check cache (skip if force=true)
+    if (session.complete_market_analysis && !force) {
       console.log('[generateCompleteMarketAnalysis] Already exists, returning from cache');
       return Response.json({
         success: true,

@@ -80,7 +80,7 @@ export default function MarketAnalysis() {
     }
   };
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (forceRegenerate = false) => {
     if (!session?.id) {
       console.error('No session ID available');
       return;
@@ -88,9 +88,10 @@ export default function MarketAnalysis() {
 
     setGenerating(true);
     try {
-      console.log('[MarketAnalysis] Generating analysis for session:', session.id);
+      console.log('[MarketAnalysis] Generating analysis for session:', session.id, 'force:', forceRegenerate);
       const { data } = await base44.functions.invoke('generateMarketAnalysisV2', {
-        sessionId: session.id
+        sessionId: session.id,
+        force: forceRegenerate
       });
 
       console.log('[MarketAnalysis] Generation response:', data);
@@ -865,7 +866,7 @@ export default function MarketAnalysis() {
                   className="text-center pt-4"
                 >
                   <button
-                    onClick={handleGenerate}
+                    onClick={() => handleGenerate(true)}
                     disabled={generating}
                     className="text-gray-500 hover:text-gray-700 text-sm underline transition-colors"
                   >

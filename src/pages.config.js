@@ -8,6 +8,7 @@ import CTAPAYWALL from './pages/CTAPAYWALL';
 import DailyActions from './pages/DailyActions';
 import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
+import DownsellSession from './pages/DownsellSession';
 import EmailsMarketing from './pages/EmailsMarketing';
 import GenerationProgress from './pages/GenerationProgress';
 import Home from './pages/Home';
@@ -78,6 +79,7 @@ export const PAGES = {
     "DailyActions": DailyActions,
     "Dashboard": Dashboard,
     "Documents": Documents,
+    "DownsellSession": DownsellSession,
     "EmailsMarketing": EmailsMarketing,
     "GenerationProgress": GenerationProgress,
     "Home": Home,

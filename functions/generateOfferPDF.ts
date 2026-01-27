@@ -17,50 +17,91 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Offer data required' }, { status: 400 });
     }
 
-    const doc = new jsPDF();
+    const doc = new jsPDF('p', 'mm', 'a4', true);
+    const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 20;
     let y = margin;
 
     // Helper to add text with word wrap
-    const addText = (text, fontSize, isBold = false, color = [0, 0, 0]) => {
+    const addText = (text, fontSize, isBold = false, color = [0, 0, 0], align = 'left') => {
+      if (!text) return;
+      
       doc.setFontSize(fontSize);
       doc.setTextColor(...color);
-      if (isBold) doc.setFont(undefined, 'bold');
-      else doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', isBold ? 'bold' : 'normal');
       
-      const lines = doc.splitTextToSize(text, 170);
-      doc.text(lines, margin, y);
-      y += lines.length * (fontSize * 0.5) + 5;
+      const maxWidth = pageWidth - (2 * margin);
+      const lines = doc.splitTextToSize(String(text), maxWidth);
       
-      if (y > 270) {
-        doc.addPage();
-        y = margin;
-      }
+      lines.forEach((line) => {
+        if (y > 270) {
+          doc.addPage();
+          y = margin;
+        }
+        
+        let xPos = margin;
+        if (align === 'center') {
+          const lineWidth = doc.getTextWidth(line);
+          xPos = (pageWidth - lineWidth) / 2;
+        }
+        
+        doc.text(line, xPos, y);
+        y += fontSize * 0.5 + 2;
+      });
+      
+      y += 3;
     };
 
     const addSection = (title) => {
-      y += 5;
-      addText(title, 14, true, [97, 247, 162]);
-      y += 3;
+      if (y > 250) {
+        doc.addPage();
+        y = margin;
+      }
+      y += 8;
+      doc.setFillColor(97, 247, 162);
+      doc.rect(margin, y - 5, 4, 8, 'F');
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text(String(title), margin + 8, y);
+      y += 10;
     };
 
-    // Title
-    addText(offerTypeName || 'Mon Offre', 20, true);
-    y += 3;
-
-    // Offer Title & Price
-    if (offer.title) {
-      addText(offer.title, 16, true);
-    }
-    if (offer.price) {
-      addText(offer.price, 14, false, [34, 139, 34]);
+    const addDivider = () => {
       y += 3;
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 5;
+    };
+
+    // Header avec fond coloré
+    doc.setFillColor(97, 247, 162);
+    doc.rect(0, 0, pageWidth, 50, 'F');
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(offerTypeName || 'Mon Offre'), margin, 15);
+    
+    if (offer.title) {
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      const titleLines = doc.splitTextToSize(String(offer.title), pageWidth - (2 * margin));
+      doc.text(titleLines, margin, 28);
     }
+    
+    if (offer.price) {
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text(String(offer.price), margin, 42);
+    }
+    
+    y = 65;
 
     // Subtitle
     if (offer.subtitle) {
-      addText(offer.subtitle, 11, false, [100, 100, 100]);
-      y += 5;
+      addText(offer.subtitle, 11, false, [80, 80, 80]);
+      addDivider();
     }
 
     // Description
@@ -71,7 +112,7 @@ Deno.serve(async (req) => {
 
     // Problem
     if (offer.problem) {
-      addSection('Problème résolu');
+      addSection('Probleme resolu');
       addText(offer.problem, 10);
     }
 
@@ -79,54 +120,60 @@ Deno.serve(async (req) => {
     if (offer.before || offer.after) {
       addSection('Transformation');
       if (offer.before) {
-        addText('❌ Avant : ' + offer.before, 10);
+        doc.setTextColor(200, 50, 50);
+        addText('AVANT : ' + String(offer.before), 10);
       }
       if (offer.after) {
-        addText('✅ Après : ' + offer.after, 10);
+        doc.setTextColor(50, 150, 50);
+        addText('APRES : ' + String(offer.after), 10);
       }
+      doc.setTextColor(0, 0, 0);
     }
 
     // Deliverables
     if (offer.deliverables && offer.deliverables.length > 0) {
-      addSection('Ce que tu reçois');
+      addSection('Ce que tu recois');
       offer.deliverables.forEach((item, i) => {
-        addText(`• ${item}`, 10);
+        doc.setFillColor(240, 240, 240);
+        doc.roundedRect(margin, y - 3, pageWidth - (2 * margin), 8, 2, 2, 'F');
+        addText(String(item), 10);
       });
     }
 
     // Benefits
     if (offer.benefits && offer.benefits.length > 0) {
-      addSection('Bénéfices clés');
+      addSection('Benefices cles');
       offer.benefits.slice(0, 5).forEach((item) => {
-        addText(`→ ${item}`, 10);
+        addText('→ ' + String(item), 10);
       });
     }
 
     // Ideal For
     if (offer.ideal_for && offer.ideal_for.length > 0) {
-      addSection('Idéal pour');
+      addSection('Ideal pour');
       offer.ideal_for.slice(0, 5).forEach((item) => {
-        addText(`• ${item}`, 10);
+        addText('• ' + String(item), 10);
       });
     }
 
     // Duration
     if (offer.duration) {
-      addSection('Durée');
+      addSection('Duree');
       addText(offer.duration, 10);
     }
 
     // Ecosystem Role
     if (offer.ecosystem_role) {
-      addSection('Rôle dans ton funnel');
+      addSection('Role dans ton funnel');
       addText(offer.ecosystem_role, 10);
     }
 
     // Footer
-    y = 280;
+    const footerY = doc.internal.pageSize.getHeight() - 15;
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')}`, margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Genere le ' + new Date().toLocaleDateString('fr-FR'), margin, footerY);
 
     const pdfBytes = doc.output('arraybuffer');
 

@@ -47,26 +47,31 @@ export default function WelcomeOpening() {
         console.log('[WelcomeOpening] Payment verified successfully');
         setUser(currentUser);
         setIsLoading(false);
+        
+        // Rediriger automatiquement vers SetupProfile après 2 secondes
+        setTimeout(() => {
+          navigate(createPageUrl('SetupProfile'));
+        }, 2000);
         return;
       }
 
-      // Pas encore confirmé - retry jusqu'à 10 fois (20 secondes max)
-      if (attemptNumber < 10) {
-        console.log(`[WelcomeOpening] Payment not yet confirmed, retry ${attemptNumber + 1}/10...`);
+      // Pas encore confirmé - retry jusqu'à 15 fois (30 secondes max)
+      if (attemptNumber < 15) {
+        console.log(`[WelcomeOpening] Payment not yet confirmed, retry ${attemptNumber + 1}/15...`);
         setVerificationAttempts(attemptNumber + 1);
         setTimeout(() => {
           loadDataWithRetry(attemptNumber + 1);
         }, 2000); // Attendre 2 secondes avant de réessayer
       } else {
-        // Échec après 10 tentatives - rediriger avec message d'erreur
-        console.error('[WelcomeOpening] Payment verification failed after 10 attempts');
+        // Échec après 15 tentatives - rediriger avec message d'erreur
+        console.error('[WelcomeOpening] Payment verification failed after 15 attempts');
         alert('Ton paiement a bien été reçu mais la confirmation prend plus de temps que prévu. Tu vas recevoir un email avec un lien d\'accès. Contacte le support si besoin.');
         navigate(createPageUrl('CTAPAYWALL'));
       }
     } catch (error) {
       console.error('[WelcomeOpening] Error verifying payment:', error);
       // En cas d'erreur, continuer à retry
-      if (attemptNumber < 10) {
+      if (attemptNumber < 15) {
         setTimeout(() => {
           loadDataWithRetry(attemptNumber + 1);
         }, 2000);
@@ -110,7 +115,7 @@ export default function WelcomeOpening() {
           </h2>
           {verificationAttempts > 0 && (
             <p className="text-gray-600 text-sm">
-              Confirmation en cours ({verificationAttempts}/10)... Cela prend généralement quelques secondes.
+              Confirmation en cours ({verificationAttempts}/15)... Cela prend généralement quelques secondes.
             </p>
           )}
         </div>

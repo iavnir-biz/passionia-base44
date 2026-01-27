@@ -67,13 +67,10 @@ export default function PlanAction() {
         ).length;
         setCurrentDay(Math.min(completedDays + 1, 7));
         
-        // Vérifier si tous les docs sont prêts
+        // Vérifier si les docs JOUR 1 sont prêts
         const allReady = !!(
-          userSession.complete_market_analysis &&
-          userSession.generated_avatars &&
           userSession.detailed_offers &&
-          userSession.generated_sales_messages &&
-          userSession.generated_marketing_emails
+          userSession.generated_sales_messages
         );
         setDocsReady(allReady);
       }
@@ -154,7 +151,6 @@ export default function PlanAction() {
     const mainProduct = session?.finalized_offer?.mainProduct;
     const orderBump = session?.finalized_offer?.orderBump;
     const upsell = session?.finalized_offer?.upsell1;
-    const avatars = session?.generated_avatars;
     
     const defaults = {
       1: [
@@ -177,25 +173,7 @@ export default function PlanAction() {
           action: { type: "external", label: "Aller dans la communauté", url: "https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa" }
         },
         {
-          text: session?.complete_market_analysis ? "✅ Analyse de marché générée" : "Générer mon analyse de marché SWOT",
-          checked: !!session?.complete_market_analysis,
-          autoChecked: !!session?.complete_market_analysis,
-          details: session?.complete_market_analysis
-            ? "Ton analyse de marché est prête. Consulte-la pour comprendre ton positionnement et valider la demande."
-            : "L'analyse de marché t'aide à comprendre ton positionnement, identifier tes concurrents et valider la demande.",
-          action: { type: "link", label: "Voir mon analyse", page: "MarketAnalysis" }
-        },
-        {
-          text: session?.generated_avatars ? `✅ ${Object.keys(avatars || {}).length} Avatars clients générés` : "Générer mes 3 avatars clients",
-          checked: !!session?.generated_avatars,
-          autoChecked: !!session?.generated_avatars,
-          details: session?.generated_avatars
-            ? "Tes avatars clients sont prêts. Ce sont des profils ultra-détaillés de tes clients idéaux."
-            : "Définis précisément qui sont tes clients idéaux : leurs problèmes, leurs rêves, leur vocabulaire.",
-          action: { type: "link", label: "Voir mes avatars", page: "AvatarClients" }
-        },
-        {
-          text: session?.detailed_offers ? `✅ Mes offres générées (${mainProduct?.title || 'Produit principal'} + upsells)` : "Générer mes 4 offres complètes",
+          text: session?.detailed_offers ? `✅ Mes 4 offres générées (${mainProduct?.title || 'Produit principal'} + upsells)` : "Générer mes 4 offres complètes",
           checked: !!session?.detailed_offers,
           autoChecked: !!session?.detailed_offers,
           details: session?.detailed_offers
@@ -204,39 +182,20 @@ export default function PlanAction() {
           action: { type: "link", label: "Voir mes offres", page: "MyOffers" }
         },
         {
-          text: session?.generated_sales_pages ? "✅ Page de vente générée" : "Générer ma page de vente",
-          checked: !!session?.generated_sales_pages,
-          autoChecked: !!session?.generated_sales_pages,
-          details: session?.generated_sales_pages
-            ? "Ta page de vente est prête. Elle présente ton offre de manière convaincante."
-            : "Une page de vente professionnelle pour présenter ton offre et convertir tes prospects.",
-          action: { type: "link", label: "Voir ma page", page: "SalesPage" }
-        },
-        {
-          text: session?.generated_sales_messages ? "✅ 8 Messages de vente générés" : "Générer mes messages de vente",
+          text: session?.generated_sales_messages ? "✅ Messages de vente générés" : "Générer mes messages de vente",
           checked: !!session?.generated_sales_messages,
           autoChecked: !!session?.generated_sales_messages,
           details: session?.generated_sales_messages
-            ? "Tes 8 messages de vente sont prêts : diagnostic, empathie, solution, achat, objections, etc."
+            ? "Tes messages de vente sont prêts : diagnostic, empathie, solution, achat. Tu es prêt à contacter tes prospects."
             : "Des messages prêts à l'emploi pour approcher tes prospects avec confiance en DM.",
           action: { type: "link", label: "Voir mes messages", page: "SalesMessages" }
-        },
-        {
-          text: session?.generated_marketing_emails ? "✅ 5 Emails marketing générés" : "Générer mes 5 emails marketing",
-          checked: !!session?.generated_marketing_emails,
-          autoChecked: !!session?.generated_marketing_emails,
-          details: session?.generated_marketing_emails
-            ? "Ta séquence de 5 emails est prête : contraste, validation, calcul, impact, urgence."
-            : "Une séquence d'emails automatiques pour nurturer tes prospects et les convertir.",
-          action: { type: "link", label: "Voir mes emails", page: "EmailsMarketing" }
         }
       ],
       2: [
         {
           text: "Identifier où se trouve mon avatar (groupes, forums, réseaux)",
           checked: false,
-          details: `Pense aux groupes Facebook de niche, forums Reddit, communautés LinkedIn, Discord spécialisés. Où ton avatar ${avatars?.avatar1?.identity?.situation || 'idéal'} pose-t-il des questions sur ses problèmes ?`,
-          action: { type: "link", label: "Consulter mes avatars", page: "AvatarClients" }
+          details: "Pense aux groupes Facebook de niche, forums Reddit, communautés LinkedIn, Discord spécialisés. Où ton client idéal pose-t-il des questions sur ses problèmes ?"
         },
         {
           text: "Créer une liste de 50 prospects potentiels",
@@ -244,7 +203,7 @@ export default function PlanAction() {
           details: "Note leurs noms, où tu les as trouvés, et pourquoi ils correspondent à ton avatar. Un Google Sheet simple suffit : Nom | Canal | Notes."
         },
         {
-          text: "Envoyer 10 messages de diagnostic (pas de vente)",
+          text: "Envoyer 50 messages de diagnostic (pas de vente)",
           checked: false,
           details: `Utilise ton message de diagnostic généré. Objectif : comprendre leurs problèmes. Pose des questions ouvertes : "Qu'est-ce qui te bloque le plus en ce moment avec ${session?.skill || 'ta compétence'} ?"`,
           action: { type: "link", label: "Copier mes messages de diagnostic", page: "SalesMessages" }
@@ -255,7 +214,7 @@ export default function PlanAction() {
           details: "Note les mots EXACTS qu'ils utilisent pour décrire leur problème. Ce vocabulaire sera crucial pour leur parler de ta solution demain."
         },
         {
-          text: "Identifier au moins 3 conversations prometteuses",
+          text: "Identifier au moins 10 conversations prometteuses",
           checked: false,
           details: "Repère les personnes qui ont un vrai problème urgent et qui semblent ouvertes à une solution. Ce sont tes prospects prioritaires pour demain."
         },
@@ -465,24 +424,24 @@ export default function PlanAction() {
   const days = [
     {
       number: 1,
-      title: "Tout préparer (sans vendre)",
-      objective: "Mettre en place ton environnement et générer tous tes documents IA personnalisés.",
+      title: "Mise en place essentielle",
+      objective: "Prépare ton environnement et génère tes offres + messages. Rien d'autre.",
       keyMessage: docsReady 
         ? "✅ Tes documents sont prêts ! Concentre-toi sur les tâches communautaires." 
-        : "Aujourd'hui, tu ne vends RIEN. Tu prépares tout ce dont tu as besoin.",
-      completionMessage: "Parfait. Tout est prêt. Demain, tu vas parler à de vraies personnes.",
+        : "Aujourd'hui, tu ne vends RIEN. Tu te prépares à contacter demain.",
+      completionMessage: "Parfait. Tout est prêt. Demain, tu vas parler à 50 personnes.",
       buttons: [
-        { label: "Dashboard", onClick: () => navigate(createPageUrl('Dashboard')) }
+        { label: "Mes offres", onClick: () => navigate(createPageUrl('MyOffers')) },
+        { label: "Mes messages", onClick: () => navigate(createPageUrl('SalesMessages')) }
       ]
     },
     {
       number: 2,
-      title: "Ouvrir des conversations",
-      objective: "Parler à 10 personnes. Comprendre leurs vrais problèmes. Sans vendre.",
+      title: "Ouvrir 50 conversations",
+      objective: "Parler à 50 personnes. Comprendre leurs vrais problèmes. Sans vendre.",
       keyMessage: "Tu es là pour ÉCOUTER et COMPRENDRE, pas pour convaincre.",
       completionMessage: "Bravo ! Tu as écouté de vraies personnes. Demain, tu vas proposer.",
       buttons: [
-        { label: "Mes avatars", onClick: () => navigate(createPageUrl('AvatarClients')) },
         { label: "Mes messages", onClick: () => navigate(createPageUrl('SalesMessages')) }
       ]
     },

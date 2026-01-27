@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
       metadata: {
         user_id: user.id,
         user_email: user.email,
-        product_type: 'coaching_upsell',
+        type: 'upsell_coaching',
         session_id: sessionId
       }
     });

@@ -156,19 +156,7 @@ Deno.serve(async (req) => {
     if (offer.deliverables && offer.deliverables.length > 0) {
       addSection('Ce que tu recois');
       offer.deliverables.forEach((item, i) => {
-        if (y > 265) {
-          doc.addPage();
-          y = margin;
-        }
-        doc.setFillColor(245, 245, 245);
-        doc.roundedRect(margin, y - 4, pageWidth - (2 * margin), 10, 2, 2, 'F');
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(0, 0, 0);
-        const cleanedItem = cleanText(item);
-        const itemLines = doc.splitTextToSize(cleanedItem, pageWidth - (2 * margin) - 10);
-        doc.text(itemLines, margin + 5, y);
-        y += itemLines.length * 5 + 8;
+        addText('• ' + String(item), 10);
       });
     }
 

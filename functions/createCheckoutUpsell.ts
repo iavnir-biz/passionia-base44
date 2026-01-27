@@ -8,87 +8,70 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    const { sessionId, upsellPrice } = await req.json();
 
-    // Recuperer les parametres du body
-    const { sessionId, upsellPrice = 49700 } = await req.json().catch(() => ({ sessionId: null, upsellPrice: 49700 }));
-    console.log('=== createCheckoutUpsell called ===');
-    console.log('sessionId:', sessionId, 'upsellPrice:', upsellPrice);
-
-    // Recuperer l'utilisateur authentifie
-    let user = null;
-    let customerId = null;
-
-    try {
-      user = await base44.auth.me();
-
-      if (!user) {
-        return Response.json({
-          error: 'Unauthorized',
-          message: 'Vous devez etre connecte pour acceder a cette offre.'
-        }, { status: 401 });
-      }
-
-      // Recuperer ou creer le client Stripe
-      customerId = user.stripe_customer_id;
-      if (!customerId) {
-        const customer = await stripe.customers.create({
-          email: user.email,
-          name: user.firstName || user.full_name,
-          metadata: {
-            user_id: user.id,
-            app_user: 'true'
-          }
-        });
-        customerId = customer.id;
-        await base44.auth.updateMe({ stripe_customer_id: customerId });
-      }
-    } catch (error) {
-      console.error('Auth error:', error);
-      return Response.json({
-        error: 'Authentication required',
-        message: 'Veuillez vous connecter pour continuer.'
-      }, { status: 401 });
+    const user = await base44.auth.me();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Recuperer l'URL de l'app depuis les headers
+    // Vérifier que l'utilisateur a bien acheté le pack principal
+    if (!user.has_purchased) {
+      return Response.json({ 
+        error: 'Main pack not purchased',
+        message: 'Tu dois acheter le pack principal avant d\'accéder au coaching.'
+      }, { status: 400 });
+    }
+
+    // Créer ou récupérer le client Stripe
+    let customerId = user.stripe_customer_id;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.firstName || user.full_name,
+        metadata: {
+          user_id: user.id,
+          app_user: 'true'
+        }
+      });
+      customerId = customer.id;
+      await base44.auth.updateMe({ stripe_customer_id: customerId });
+    }
+
+    // Récupérer l'URL de l'app
     const referer = req.headers.get('referer') || '';
     const origin = referer ? new URL(referer).origin : 'https://6930250f9337193d59c1dcf5.base44.app';
-    const successUrl = `${origin}/Dashboard?upsell=success`;
+    const successUrl = `${origin}/Dashboard?coaching=success`;
     const cancelUrl = `${origin}/UpsellCoaching`;
 
-    // Creer la session de paiement pour l'upsell coaching
+    // Créer la session de paiement pour le coaching
     const stripeSession = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       customer: customerId,
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            product_data: {
-              name: 'Pack 3 Sessions Coaching 1-1 Personnalise',
-              description: '3 sessions de coaching personnalise (3x30min), support WhatsApp/Telegram 30 jours, revue de vos documents, et plan d\'action sur-mesure.',
-              images: []
-            },
-            unit_amount: upsellPrice, // 497 EUR = 49700 centimes
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: 'Pack 3 Sessions Coaching 1-1 Personnalisé',
+            description: '3 sessions de 30 min + Support WhatsApp/Telegram 30 jours + Revue personnalisée de tes documents + Plan d\'action sur-mesure',
+            images: []
           },
-          quantity: 1,
-        }
-      ],
+          unit_amount: upsellPrice || 49700, // 497 EUR
+        },
+        quantity: 1,
+      }],
       mode: 'payment',
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
-        type: 'upsell_coaching',
         user_id: user.id,
         user_email: user.email,
-        session_id: sessionId || '',
-        upsell_price: upsellPrice.toString()
+        product_type: 'coaching_upsell',
+        session_id: sessionId
       }
     });
 
-    console.log('Stripe checkout session created:', stripeSession.id);
-
-    return Response.json({
+    return Response.json({ 
       success: true,
       sessionId: stripeSession.id,
       url: stripeSession.url
@@ -96,9 +79,9 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Checkout upsell error:', error);
-    return Response.json({
+    return Response.json({ 
       success: false,
-      error: error.message
+      error: error.message 
     }, { status: 500 });
   }
 });

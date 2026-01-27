@@ -31,7 +31,7 @@ const resources = [
   {
     id: 'sales-messages',
     title: 'Messages de vente',
-    description: '8 messages prêts à copier-coller pour démarrer tes conversations',
+    description: '4 messages prêts à copier-coller pour démarrer tes conversations',
     icon: MessageCircle,
     color: 'from-indigo-500 to-purple-500',
     bgColor: 'bg-indigo-50',

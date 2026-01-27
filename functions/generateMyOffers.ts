@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
+import Anthropic from 'npm:@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
     apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
@@ -141,27 +141,32 @@ AVATARS CLIENTS (référence):
 ${JSON.stringify(avatars, null, 2)}`;
 
         console.log(`[generateMyOffers] Enriching ${offerType}...`);
-        const message = await anthropic.messages.create({
+        
+        // Appel API Anthropic Claude Sonnet 4
+        const completion = await anthropic.messages.create({
             model: "claude-sonnet-4-20250514",
-            max_tokens: 8000,
+            max_tokens: 4096,
             temperature: 0.7,
             system: systemMessage,
             messages: [
-                { role: "user", content: userContext }
+                {
+                    role: "user",
+                    content: userContext
+                }
             ]
         });
 
-        const responseText = message.content[0].type === 'text'
-            ? message.content[0].text.trim()
-            : '{}';
-
-        // Clean potential markdown
-        const cleanedResponse = responseText
-            .replace(/```json\n?/g, '')
-            .replace(/```\n?/g, '')
-            .trim();
-
-        const enrichedOffer = JSON.parse(cleanedResponse);
+        // Extraction du JSON depuis la réponse de Claude
+        let enrichedOffer;
+        const responseText = completion.content[0].text;
+        
+        // Claude peut parfois wrapper le JSON dans des balises, on les retire
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            enrichedOffer = JSON.parse(jsonMatch[0]);
+        } else {
+            enrichedOffer = JSON.parse(responseText);
+        }
 
         // 🔥 MERGE & SAVE to Session
         const currentOffers = session.my_generated_offers || {};

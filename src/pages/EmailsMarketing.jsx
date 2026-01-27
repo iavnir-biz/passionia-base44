@@ -184,18 +184,17 @@ export default function EmailsMarketing() {
               </p>
 
               {/* Generate All Button */}
-              {!generatedEmails && (
+              <div className="flex items-center gap-3 mb-8">
                 <GlowButton
                   onClick={handleGenerateAll}
                   variant="primary"
                   size="lg"
                   loading={loading}
                   icon={Sparkles}
-                  className="mb-8"
                 >
-                  {loading ? 'Génération en cours...' : 'Générer les 5 emails'}
+                  {loading ? 'Génération en cours...' : (generatedEmails ? 'Régénérer les 5 emails' : 'Générer les 5 emails')}
                 </GlowButton>
-              )}
+              </div>
 
               {generatedEmails && (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-8 flex items-center gap-3">

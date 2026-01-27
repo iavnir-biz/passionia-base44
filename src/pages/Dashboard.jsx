@@ -136,7 +136,7 @@ export default function Dashboard() {
   const livrables = [
     { title: "Analyse SWOT", page: "MarketAnalysis", icon: Target, field: "complete_market_analysis" },
     { title: "3 Avatars", page: "AvatarClients", icon: Users, field: "generated_avatars" },
-    { title: "4 Offres", page: "MyOffers", icon: Package, field: "detailed_offers" },
+    { title: "4 Offres", page: "MyOffers", icon: Package, field: "my_generated_offers" },
     { title: "Messages", page: "SalesMessages", icon: MessageCircle, field: "generated_sales_messages" },
     { title: "Emails", page: "EmailsMarketing", icon: Send, field: "generated_marketing_emails" },
     { title: "Page de vente", page: "SalesPage", icon: FileText, field: "generated_sales_pages" }

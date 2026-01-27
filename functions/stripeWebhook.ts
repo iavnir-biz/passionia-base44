@@ -102,17 +102,41 @@ Deno.serve(async (req) => {
           return Response.json({ error: 'User not found' }, { status: 404 });
         }
 
-        await base44.entities.User.update(userId, {
-          has_purchased: true,
-          has_order_bump: hasOrderBump,
-          purchased_at: new Date().toISOString()
-        });
+        // Vérifier le type de produit
+        if (productType === 'coaching_upsell') {
+          // Achat du coaching - mettre à jour User et Session
+          await base44.entities.User.update(userId, {
+            has_coaching: true,
+            coaching_purchased_at: new Date().toISOString()
+          });
 
-        console.log('User updated successfully:', { userId, hasOrderBump });
+          // Mettre à jour la Session
+          if (sessionId) {
+            const sessions = await base44.entities.Session.filter({ id: sessionId });
+            if (sessions.length > 0) {
+              await base44.entities.Session.update(sessionId, {
+                has_coaching: true,
+                coaching_purchased_at: new Date().toISOString()
+              });
+            }
+          }
 
-        // 📧 Envoyer l'email de bienvenue avec magic link
-        const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';
-        const magicLinkResponse = await fetch(`https://api.base44.com/v1/auth/magic-link`, {
+          console.log('Coaching purchased:', { userId, sessionId });
+        } else {
+          // Achat du pack principal
+          await base44.entities.User.update(userId, {
+            has_purchased: true,
+            has_order_bump: hasOrderBump,
+            purchased_at: new Date().toISOString()
+          });
+
+          console.log('Main pack purchased:', { userId, hasOrderBump });
+        }
+
+        // 📧 Envoyer l'email seulement pour le pack principal (pas pour coaching)
+        if (productType !== 'coaching_upsell') {
+          const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';
+          const magicLinkResponse = await fetch(`https://api.base44.com/v1/auth/magic-link`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -210,9 +234,12 @@ Deno.serve(async (req) => {
               </div>
             </div>
           `
-        });
+          });
 
-        console.log(`✅ Existing user ${userId} marked as purchased + email sent`);
+          console.log(`✅ Existing user ${userId} marked as purchased + email sent`);
+        } else {
+          console.log(`✅ Coaching purchased for user ${userId} - no email sent`);
+        }
       } else if (customerEmail) {
         // Nouvel utilisateur - création automatique
         try {

@@ -18,6 +18,7 @@ export default function SalesPage() {
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [generatedPages, setGeneratedPages] = useState({
     low: null,
     bump: null,
@@ -260,16 +261,21 @@ export default function SalesPage() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="SalesPage" progress={calculateProgressFromSession(session)} user={user} />
+      <Sidebar
+        currentPage="SalesPage"
+        progress={calculateProgressFromSession(session)}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
-      <div className="flex-1 ml-72">
+      <div className="flex-1 ml-0 lg:ml-72 w-full">
         <TopBar
-          title="Pages de vente"
-          subtitle=""
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
 
-        <main className="p-8">
+        <main className="p-4 lg:p-8">
           <div className="max-w-6xl mx-auto space-y-8">
 
             {/* Header */}

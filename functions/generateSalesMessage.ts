@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
+import Anthropic from 'npm:@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
     apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
@@ -9,22 +9,26 @@ const MESSAGE_PROMPTS = {
     diagnostic: {
         title: "Le Diagnostic",
         objective: "Ouvrir la conversation sans vendre",
-        tone: "Curiosité professionnelle"
+        tone: "Curiosité professionnelle",
+        wordCount: "60-80 mots MAX"
     },
     empathy: {
         title: "L'Empathie",
         objective: "Créer un lien humain et de confiance",
-        tone: "Chaleureux, vécu réel"
+        tone: "Chaleureux, vécu réel",
+        wordCount: "70-90 mots MAX"
     },
     solution: {
         title: "La Solution",
         objective: "Introduire le produit comme une évidence",
-        tone: "Calme, sûr, sans push"
+        tone: "Calme, sûr, sans push",
+        wordCount: "80-100 mots MAX"
     },
     purchase: {
         title: "L'Achat",
         objective: "Transformer l'échange en opportunité concrète",
-        tone: "Clair, assumé, simple"
+        tone: "Clair, assumé, simple",
+        wordCount: "90-110 mots MAX"
     }
 };
 
@@ -82,17 +86,18 @@ Deno.serve(async (req) => {
             }, { status: 400 });
         }
 
-        // PROMPT SYSTÈME COMPLET (3 prompts fusionnés)
+        // PROMPT SYSTÈME COMPLET (optimisé pour DM courts)
         const systemMessage = `TU ES UN EXPERT EN COPYWRITING CONVERSATIONNEL POUR CRÉATEURS QUI VENDENT LEUR SAVOIR.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 CONTEXTE PRODUIT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Tu écris des messages utilisés en DM, email ou vocal pour vendre un PRODUIT LOW TICKET.
+Tu écris des messages utilisés en DM Instagram/Facebook/LinkedIn pour vendre un PRODUIT LOW TICKET.
 Ce n'est PAS du marketing agressif. Ce sont de vraies conversations humaines.
 
-Inspiration : webinaires de vente, messages Instagram/LinkedIn, ton naturel, oral, fluide.
+FORMAT CRITIQUE : Messages COURTS optimisés pour mobile et DM.
+Les gens scrollent vite. Pas de pavés. Phrases courtes. Paragraphes aérés.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📝 MESSAGE ${messageType.toUpperCase()} — ${promptConfig.title}
@@ -100,37 +105,52 @@ Inspiration : webinaires de vente, messages Instagram/LinkedIn, ton naturel, ora
 
 Objectif : ${promptConfig.objective}
 Ton : ${promptConfig.tone}
+LONGUEUR MAXIMALE : ${promptConfig.wordCount}
 
 ${messageType === 'diagnostic' ? `
-- Question intelligente
-- Curiosité sincère
-- Aucune mention d'offre
-- Fait parler la personne
-- Longueur : 120-180 mots
-` : ''}${messageType === 'empathy' ? `
-- Validation de la douleur
-- "Je comprends"
-- Vécu personnel ou accompagnement client
-- Ton humain, calme
-- Longueur : 120-180 mots
-` : ''}${messageType === 'solution' ? `
-- Pivot doux vers la solution
-- Présentation courte du produit LOW TICKET
-- Positionné comme un "coup de main"
-- Pas de pitch agressif
-- Longueur : 150-220 mots
-` : ''}${messageType === 'purchase' ? `
-- Offre claire avec prix exact
-- Cadre simple (beta / test / accès limité)
-- Garantie ou réassurance
+STRUCTURE (60-80 mots MAX) :
+- Salut + prénom
+- Question intelligente ET COURTE sur leur situation
+- Pourquoi tu leur poses cette question (lien avec ta compétence)
 - Question finale ouverte
-- Longueur : 150-220 mots
+- Aucune mention d'offre
+- Format : 3-4 phrases courtes max
+- 2 sauts de ligne maximum
+` : ''}${messageType === 'empathy' ? `
+STRUCTURE (70-90 mots MAX) :
+- "Je comprends [prénom]"
+- Validation courte de leur douleur (1 phrase)
+- Mini-vécu personnel OU client (1-2 phrases)
+- Lien avec ta passion/compétence
+- Question finale
+- Format : 4-5 phrases courtes max
+- 2-3 sauts de ligne maximum
+` : ''}${messageType === 'solution' ? `
+STRUCTURE (80-100 mots MAX) :
+- Transition douce (1 phrase)
+- Présentation ULTRA COURTE du produit LOW TICKET (nom + promesse)
+- Format + bénéfice clé + timing
+- Mini-preuve sociale OU résultat
+- Question finale ouverte
+- Pas de pitch agressif
+- Format : 4-5 phrases courtes max
+- 2-3 sauts de ligne maximum
+` : ''}${messageType === 'purchase' ? `
+STRUCTURE (90-110 mots MAX) :
+- "Ok parfait [prénom]"
+- Nom produit + prix exact
+- Liste à puces COURTE (3 éléments max)
+- Garantie OU cadre limité (1 phrase)
+- Question finale d'action
+- Format : 5-6 phrases courtes max
+- 3 sauts de ligne maximum pour liste
 ` : ''}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🚫 INTERDICTIONS ABSOLUES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+- NE JAMAIS dépasser ${promptConfig.wordCount}
 - Ne jamais inventer une nouvelle offre
 - Ne jamais changer le prix
 - Ne jamais changer la promesse
@@ -139,9 +159,11 @@ ${messageType === 'diagnostic' ? `
 - Pas de CTA agressif
 - Pas de pression
 - Pas de storytelling émotionnel forcé
+- Pas de bloc de texte (phrases courtes obligatoires)
+- Maximum 3 sauts de ligne dans tout le message
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 RÈGLES DE FORMAT
+📋 RÈGLES DE FORMAT DM
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 - Tutoiement strict
@@ -150,8 +172,10 @@ ${messageType === 'diagnostic' ? `
 - Pas de titres visibles
 - Pas de signature
 - Ton calme, posé, sûr
-- Texte brut, paragraphes aérés
-- Message prêt à être envoyé tel quel
+- Phrases COURTES (10-15 mots max par phrase)
+- Paragraphes AÉRÉS (1-2 phrases par bloc)
+- Message prêt à copier-coller dans Instagram/Facebook
+- Optimisé pour lecture mobile rapide
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔐 GARDE-FOU PRODUIT
@@ -163,7 +187,17 @@ Ce message doit vendre EXACTEMENT la même chose que la page de vente.
 1 promesse = répétée partout
 
 Tu utilises UNIQUEMENT l'offre LOW TICKET validée lors de l'onboarding.
-AUCUNE dérive créative autorisée.`;
+AUCUNE dérive créative autorisée.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✂️ RÈGLE DE CONCISION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Si ton message dépasse ${promptConfig.wordCount}, COUPE.
+Chaque mot doit avoir un rôle précis.
+Supprime tout ce qui n'est pas essentiel.
+Phrases courtes > phrases longues.
+Direct > détours.`;
 
         const userContext = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📦 DONNÉES PRODUIT (SOURCE DE VÉRITÉ)
@@ -184,22 +218,33 @@ ONBOARDING FULL :
 - Problème principal : ${onboardingSummary.main_learning_problem || 'Non renseigné'}
 - Transformation : ${onboardingSummary.big_transformation || 'Non renseigné'}
 - Coût de l'inaction : ${onboardingFull.if_nothing_changes || 'Non renseigné'}
-- Obstacles : ${JSON.stringify(onboardingFull.obstacles || [])}`;
+- Obstacles : ${JSON.stringify(onboardingFull.obstacles || [])}
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 RAPPEL CRITIQUE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        const message = await anthropic.messages.create({
+MESSAGE TYPE : ${messageType}
+LONGUEUR MAX : ${promptConfig.wordCount}
+FORMAT : DM Instagram/Facebook (mobile-first)
+
+Écris maintenant le message en respectant STRICTEMENT la longueur maximale.`;
+
+        // Appel API Anthropic Claude Sonnet 4
+        const completion = await anthropic.messages.create({
             model: "claude-sonnet-4-20250514",
-            max_tokens: 2000,
+            max_tokens: 400,
             temperature: 0.8,
             system: systemMessage,
             messages: [
-                { role: "user", content: userContext }
+                {
+                    role: "user",
+                    content: userContext
+                }
             ]
         });
 
-        const messageContent = message.content[0].type === 'text'
-            ? message.content[0].text.trim()
-            : '';
+        const messageContent = completion.content[0].text;
 
         const result = {
             messageType: messageType,

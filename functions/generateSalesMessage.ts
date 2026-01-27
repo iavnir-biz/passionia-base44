@@ -1,8 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import OpenAI from 'npm:openai';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
 
-const openai = new OpenAI({
-    apiKey: Deno.env.get("OPENAI_API_KEY"),
+const anthropic = new Anthropic({
+    apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
 
 const MESSAGE_PROMPTS = {
@@ -187,17 +187,19 @@ ONBOARDING FULL :
 - Obstacles : ${JSON.stringify(onboardingFull.obstacles || [])}`;
 
 
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                { role: "system", content: systemMessage },
-                { role: "user", content: userContext }
-            ],
+        const message = await anthropic.messages.create({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 2000,
             temperature: 0.8,
-            max_tokens: 800
+            system: systemMessage,
+            messages: [
+                { role: "user", content: userContext }
+            ]
         });
 
-        const messageContent = completion.choices[0].message.content;
+        const messageContent = message.content[0].type === 'text'
+            ? message.content[0].text.trim()
+            : '';
 
         const result = {
             messageType: messageType,

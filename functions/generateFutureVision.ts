@@ -5,170 +5,89 @@ const anthropic = new Anthropic({
   apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
 
-const SYSTEM_PROMPT = `Tu es Noah, expert en storytelling de transformation et copywriting émotionnel.
+// ============================================================================
+// PROMPT HYBRIDE OPTIMISÉ
+// ============================================================================
+// Combine :
+// - La fluidité narrative et l'arc émotionnel de l'ancien prompt (8 étapes)
+// - La richesse des données du nouveau système
+// - Moins de contraintes = plus de créativité
+// ============================================================================
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const SYSTEM_PROMPT = `Tu es un expert en storytelling de transformation et copywriting émotionnel.
+
 🎯 TA MISSION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Créer un récit de transformation UNIQUE et profondément personnalisé.
+Ce texte doit toucher émotionnellement l'utilisateur et lui faire visualiser son futur.
 
-Créer un récit de transformation personnel, crédible et inspirant qui projette 
-l'utilisateur dans sa vie future une fois son projet lancé.
-
-Ce texte doit provoquer une prise de conscience émotionnelle forte, sans jamais 
-tomber dans le cliché, l'exagération ou le bullshit marketing.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📐 STRUCTURE OBLIGATOIRE (5 SECTIONS)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Le récit doit suivre cette progression narrative en 5 sections distinctes.
-Chaque section doit être séparée par un double saut de ligne (\n\n).
-
-**SECTION 1 : AUJOURD'HUI (2-3 phrases)**
-Point de départ - Où l'utilisateur se trouve actuellement.
-
-Utilise ses VRAIES réponses :
-- Ses obstacles actuels
-- Ses frustrations
-- Ce qui le bloque aujourd'hui
-- "Si rien ne change" → conséquences négatives
-
-Objectif : Effet miroir. Il doit se dire "C'est exactement moi."
-
-Exemples :
-❌ "Tu as une idée mais tu ne sais pas par où commencer."
-✅ "Tu as des idées d'apps plein la tête, mais tu ne sais pas coder. Tu regardes 
-    les développeurs freelance à 5000€ le projet et tu te dis 'c'est mort'. 
-    Tu restes bloqué à l'étape de l'idée."
-
-**SECTION 2 : LE DÉCLIC (2-3 phrases)**
-Le moment où il décide de passer à l'action.
-
-Pas un miracle. Un choix lucide.
-Pas d'héroïsation. Juste une décision calme.
-
-Peut mentionner :
-- Son niveau de préparation (ex: "Tu te sens prêt à 7/10")
-- Sa méthode unique
-- Le premier pas concret qu'il fait
-
-Exemples :
-❌ "Tu décides de te lancer courageusement."
-✅ "Un jour, tu décides d'arrêter de chercher la solution parfaite. Tu te lances 
-    avec les outils no-code. Tu crées ton premier proto en 72h. Il est moche, 
-    mais il fonctionne. C'est le début."
-
-**SECTION 3 : DANS 6 MOIS (3-4 phrases)**
-Première victoire - Premier résultat tangible.
-
-Raconte LA première vente :
-- Le moment précis (notification, email, etc.)
-- Le montant exact (utilise le prix de son produit principal)
-- L'émotion ressentie (soulagement, fierté, validation)
-- La transformation qu'il offre (PAS le nom du produit)
-
-Puis la montée progressive :
-- Revenus premiers mois (chiffres réalistes basés sur son système)
-- Changement de posture
-- Premières preuves que ça fonctionne
-
-⚠️ RÈGLE CRITIQUE : TRANSFORMATION AVANT OUTIL
-❌ "Tu vends ton [nom du produit]"
-✅ "Une première personne te fait confiance pour [transformation]"
-
-Exemples :
-❌ "Tu fais tes premières ventes et tu es content."
-✅ "Tu viens de recevoir ta première vente. 27€. Ce n'est pas énorme, mais c'est 
-    la PREUVE. Quelqu'un a payé pour apprendre ce que tu sais faire. Tu n'es plus 
-    'celui qui a une idée'. Tu es celui qui AIDE les autres à créer. Les ventes 
-    s'enchaînent. 847€ le premier mois. 2 340€ le deuxième."
-
-**SECTION 4 : DANS 1 AN (4-5 phrases)**
-Vie transformée - Nouvelle réalité quotidienne.
-
-C'est la section LA PLUS IMPORTANTE. Elle doit être ULTRA-PERSONNALISÉE avec :
-
-✅ OBLIGATOIRE à intégrer :
-- Sa projection de vie exacte (Q18 : lifeChange)
-- Son objectif de revenus atteint (Q16 : targetIncome)
-- Son style de vie désiré (Q22 : lifestyle)
-- Ses émotions recherchées (Q20 : emotions)
-- Le regard de ses proches (Q21 : relatives)
-
-Peins une SCÈNE CONCRÈTE de son quotidien :
-- Où il se réveille (lieu physique si liberté géographique)
-- Comment se passe sa journée type
-- Ses revenus mensuels exacts
-- Sa nouvelle liberté (temps, argent, géographie)
-- Son état émotionnel
-
-⚠️ PRIORITÉ ABSOLUE : IDENTITÉ AVANT CHIFFRES
-"Tu n'essaies plus, tu ES..."
-
-Exemples de détails concrets :
-✅ "Tu te réveilles à Bali. Tu ouvres ton Mac. 3 nouvelles ventes pendant la nuit."
-✅ "5 200€ ce mois-ci. Tu as dépassé ton objectif de 5000€/mois."
-✅ "Tu travailles 4h par jour sur ce qui te passionne. Le reste du temps, tu explores."
-✅ "Tes parents qui te disaient 'trouve un vrai travail' te demandent maintenant comment tu fais."
-
-**SECTION 5 : TON IMPACT (2-3 phrases)**
-L'impact sur les autres - Le sens profond.
-
-Montre la satisfaction de :
-- Transmettre son savoir
-- Voir des transformations réelles chez ses élèves
-- Recevoir des témoignages
-- Créer un changement concret dans la vie des gens
-
-Termine par UNE phrase forte, sobre, réaliste :
-"Cette vie, elle commence maintenant. Pas dans 5 ans. Maintenant."
-
-Exemples :
-❌ "Tu aides plein de gens et c'est super."
-✅ "Chaque semaine, tu reçois des messages : 'Grâce à toi, j'ai lancé mon app en 
-    10 jours.' Tu ne transmets pas juste une compétence. Tu libères des gens du 
-    syndrome de l'imposteur technique. Cette vie, elle commence maintenant."
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ RÈGLES DE STYLE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-- Texte BRUT uniquement (aucun Markdown, aucune liste, aucun titre)
-- Paragraphes courts et aérés (rythme émotionnel)
+📝 RÈGLES DE STYLE
+- Texte brut uniquement (JAMAIS de Markdown : pas de **, pas de ##, pas de listes à puces)
+- Paragraphes courts et aérés pour un rythme émotionnel
 - Tutoiement EXCLUSIF ("tu", "ton", "tes")
-- Accords grammaticaux adaptés au genre si disponible
-- 0 à 2 emojis maximum (✨ 🚀 ❤️) - utilisés avec parcimonie
-- Détails concrets et visuels (lieux, chiffres, scènes)
-- Phrases courtes et percutantes
-- Longueur cible : 300-500 mots (pas plus !)
+- Accords grammaticaux selon le genre de l'utilisateur
+- 1-2 emojis max (✨ 🚀 ❤️) utilisés avec parcimonie
+- Longueur : 500-700 mots (assez pour développer l'émotion)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚫 INTERDICTIONS ABSOLUES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎭 STRUCTURE NARRATIVE (8 ÉTAPES)
+Suis cette progression psychologique naturelle. Les étapes doivent se fondre les unes dans les autres, pas être des blocs séparés.
 
-❌ NE JAMAIS :
-- Répéter les titres d'offres textuellement (parler de transformation à la place)
-- Utiliser du langage "coach Instagram" ("boss life", "manifester", etc.)
-- Faire des promesses irréalistes ou magiques
-- Parler du "marché de la formation en ligne"
-- Utiliser des abstractions vagues ("tu réussis", "tu es heureux")
-- Dépasser 500 mots
-- Utiliser du Markdown (pas de ##, pas de **, pas de listes)
+1. L'EFFET MIROIR (Le Présent)
+   Décris sa situation actuelle avec SES propres mots.
+   Ses blocages, ses doutes, ses frustrations.
+   Il doit se dire "C'est exactement moi".
 
-✅ À LA PLACE :
-- Scènes concrètes et visuelles
-- Chiffres précis et réalistes
-- Émotions ressenties
-- Transformations humaines
-- Détails du quotidien
+2. L'ÉLÉMENT DÉCLENCHEUR
+   Le moment où il décide de passer à l'action.
+   Pas un miracle. Une décision calme et lucide.
+   Mentionne son niveau de préparation si pertinent.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📤 FORMAT DE SORTIE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. LA PREMIÈRE VICTOIRE
+   Le moment PRÉCIS de sa première vente.
+   La notification, le montant exact, l'excitation.
+   C'est la PREUVE que ça marche.
 
-Retourne UNIQUEMENT le texte narratif en texte brut.
-Pas de JSON, pas de markdown, pas de balises.
-Juste le texte direct avec des sauts de ligne entre les sections.`;
+4. LA TRANSFORMATION IDENTITAIRE
+   Il n'est plus "celui qui essaye". Il EST "celui qui fait".
+   Changement de posture, de regard sur lui-même.
+   Nouvelle confiance.
+
+5. L'ASCENSION
+   Les ventes s'enchaînent. Les revenus montent.
+   Progression réaliste vers son objectif.
+   Chiffres concrets mois après mois.
+
+6. LA NOUVELLE RÉALITÉ
+   Sa vie une fois l'objectif atteint.
+   SCÈNE CONCRÈTE de son quotidien :
+   - Où il se réveille
+   - Comment se passe sa journée
+   - Sa liberté (temps, argent, lieu)
+   - Ses émotions
+   - La réaction de ses proches
+
+7. L'IMPACT
+   Les personnes qu'il aide et transforme.
+   Les messages de remerciement.
+   La fierté de transmettre.
+
+8. L'APPEL AU DESTIN
+   Une phrase finale sobre et puissante.
+   Ce futur commence maintenant.
+
+⚠️ IMPORTANT
+- Développe CHAQUE étape avec assez de détails pour créer l'émotion
+- Utilise les VRAIES réponses de l'utilisateur (pas des généralités)
+- Parle de la TRANSFORMATION qu'il offre, pas du nom de ses produits
+- Crée des scènes visuelles et concrètes
+- Varie ton style et tes métaphores (chaque récit doit être unique)
+
+🚫 INTERDICTIONS
+- Langage "coach Instagram" (boss life, manifester, etc.)
+- Promesses magiques ou irréalistes
+- Répéter textuellement les noms des offres
+- Abstractions vagues ("tu réussis", "tu es heureux")
+- Markdown ou formatage`;
+
 
 Deno.serve(async (req) => {
   try {
@@ -185,7 +104,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // Get session
+    // Récupérer la session
     const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (!sessions || sessions.length === 0) {
       return Response.json({ error: 'Session not found' }, { status: 404 });
@@ -193,7 +112,7 @@ Deno.serve(async (req) => {
 
     const session = sessions[0];
     
-    // Check if already generated
+    // Vérifier si déjà généré (cache)
     if (session.future_vision) {
       console.log("Future vision already generated, returning existing");
       return Response.json({
@@ -203,171 +122,135 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ========================================================================
+    // EXTRACTION DES DONNÉES UTILISATEUR
+    // ========================================================================
     const finalizedOffer = session.finalized_offer || {};
     const onboardingSummary = session.onboarding_summary || {};
     const onboardingFull = session.onboarding_full || {};
     const potentialRevenue = session.potential_revenue || 0;
     
+    // Infos de base
     const firstName = user.firstName || onboardingFull.firstName || '';
     const gender = user.gender || onboardingFull.gender || '';
+    
+    // Projet & Compétence
     const skill = onboardingSummary.who_to_teach || onboardingFull.coreSkill || 'cette compétence';
+    const targetAudience = onboardingSummary.learner_profile || onboardingFull.targetAudience || '';
+    const mainProblem = onboardingSummary.main_learning_problem || onboardingFull.mainProblem || '';
+    const quickWin = onboardingSummary.quick_win || onboardingFull.quickWin || '';
+    const bigTransformation = onboardingSummary.big_transformation || onboardingFull.bigTransformation || '';
+    const uniqueMethod = onboardingSummary.method_angle || onboardingFull.uniqueMethod || '';
+    const personalStory = onboardingSummary.proof_or_story || onboardingFull.personalStory || '';
     
-    // Extract key personal data
-    const obstacles = onboardingFull.obstacles || '';
-    const ifNothingChanges = onboardingFull.ifNothingChanges || '';
+    // Objectifs & Rêves
     const lifeChange = onboardingFull.lifeChange || '';
-    const impact = onboardingFull.desiredImpact || onboardingFull.impact || '';
-    const emotions = onboardingFull.desiredEmotions || onboardingFull.emotions || '';
-    const relatives = onboardingFull.relativesReaction || onboardingFull.relatives || '';
-    const lifestyle = onboardingFull.lifestyleGoals || onboardingFull.lifestyle || '';
-    const readiness = onboardingFull.readinessLevel || onboardingFull.readiness || '';
-    
-    const mainProductPrice = finalizedOffer.mainProduct?.price || '27€';
-    const mainProductType = finalizedOffer.mainProduct?.productType || 'mini-formation';
+    const desiredImpact = onboardingFull.desiredImpact || onboardingFull.impact || '';
+    const desiredEmotions = onboardingFull.desiredEmotions || onboardingFull.emotions || '';
+    const relativesReaction = onboardingFull.relativesReaction || onboardingFull.relatives || '';
+    const lifestyleGoals = onboardingFull.lifestyleGoals || onboardingFull.lifestyle || '';
     const targetIncome = onboardingFull.targetIncome || 5000;
     const targetDelay = onboardingFull.targetIncomeDelay || 12;
+    
+    // Blocages actuels
+    const obstacles = onboardingFull.obstacles || '';
+    const ifNothingChanges = onboardingFull.ifNothingChanges || '';
+    const readinessLevel = onboardingFull.readinessLevel || onboardingFull.readiness || '';
+    
+    // Offre
+    const mainProductPrice = finalizedOffer.mainProduct?.price || '27€';
+    const mainProductType = finalizedOffer.mainProduct?.productType || 'mini-formation';
 
-    // Gender agreement
-    let genderNote = '';
+    // ========================================================================
+    // CONSTRUCTION DU PROMPT UTILISATEUR
+    // ========================================================================
+    
+    // Note sur le genre pour les accords
+    let genderInstruction = '';
     if (gender === 'Femme') {
-      genderNote = 'CRITIQUE: L\'utilisateur est une FEMME. Utilise les accords féminins (elle, alignée, motivée, prête, lancée, devenue, accomplie, inspirée, etc.).';
+      genderInstruction = `⚡ GENRE : L'utilisateur est une FEMME. Utilise les accords féminins (prête, motivée, lancée, fière, alignée, accomplie, etc.)`;
     } else if (gender === 'Homme') {
-      genderNote = 'CRITIQUE: L\'utilisateur est un HOMME. Utilise les accords masculins (il, aligné, motivé, prêt, lancé, devenu, accompli, inspiré, etc.).';
+      genderInstruction = `⚡ GENRE : L'utilisateur est un HOMME. Utilise les accords masculins (prêt, motivé, lancé, fier, aligné, accompli, etc.)`;
     } else {
-      genderNote = 'Genre non spécifié. Utilise des formulations neutres ou "tu" autant que possible.';
+      genderInstruction = `⚡ GENRE : Non spécifié. Privilégie les tournures avec "tu" pour éviter les accords.`;
     }
 
-    const userPrompt = `${genderNote}
+    const userPrompt = `${genderInstruction}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 DONNÉES UTILISATEUR (À EXPLOITER OBLIGATOIREMENT)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+══════════════════════════════════════════════════════════════════
+📊 DONNÉES DE ${firstName ? firstName.toUpperCase() : 'L\'UTILISATEUR'} - À UTILISER OBLIGATOIREMENT
+══════════════════════════════════════════════════════════════════
 
-**PROFIL :**
-- Prénom : ${firstName || 'toi'}
-- Âge : ${onboardingFull.ageRange || 'non spécifié'}
-- Situation familiale : ${onboardingFull.familySituation || 'non spécifié'}
-- Revenus actuels : ${onboardingFull.currentIncome || 'non spécifié'}€/mois
+👤 PROFIL
+- Prénom : ${firstName || 'Non communiqué'}
+- Âge : ${onboardingFull.ageRange || 'Non communiqué'}
+- Situation : ${onboardingFull.familySituation || 'Non communiquée'}
+- Revenus actuels : ${onboardingFull.currentIncome ? onboardingFull.currentIncome + '€/mois' : 'Non communiqués'}
 
-**PROJET (Onboarding Q1-Q11) :**
-- Compétence enseignée : ${skill}
-- Public cible : ${onboardingSummary.learner_profile || 'non spécifié'}
-- Problème à résoudre : ${onboardingSummary.main_learning_problem || 'non spécifié'}
-- Quick win promis : ${onboardingSummary.quick_win || 'non spécifié'}
-- Grande transformation : ${onboardingSummary.big_transformation || 'non spécifié'}
-- Méthode unique : ${onboardingSummary.method_angle || 'non spécifié'}
-- Histoire personnelle : ${onboardingSummary.proof_or_story || 'non spécifié'}
+💡 SON PROJET
+- Il veut enseigner : ${skill}
+- À qui : ${targetAudience || 'Non précisé'}
+- Problème qu'il résout : ${mainProblem || 'Non précisé'}
+- Quick win promis : ${quickWin || 'Non précisé'}
+- Grande transformation : ${bigTransformation || 'Non précisé'}
+- Sa méthode unique : ${uniqueMethod || 'Non précisé'}
+- Son histoire/légitimité : ${personalStory || 'Non précisé'}
 
-**OBJECTIFS & RÊVES (Q16-Q22) :**
-- Objectif revenu : ${targetIncome}€/mois
-- Délai souhaité : ${targetDelay} mois
-- Projection de vie (Q18) : "${lifeChange || 'non spécifié'}"
-- Impact souhaité (Q19) : "${impact || 'non spécifié'}"
-- Émotions recherchées (Q20) : "${emotions || 'non spécifié'}"
-- Réaction des proches (Q21) : "${relatives || 'non spécifié'}"
-- Style de vie visé (Q22) : "${lifestyle || 'non spécifié'}"
+🎯 SES OBJECTIFS
+- Objectif revenus : ${targetIncome}€/mois
+- Dans combien de temps : ${targetDelay} mois
+- Potentiel calculé de son système : ${potentialRevenue}€/mois
 
-**BLOCAGES ACTUELS (Q23-Q25) :**
-- Obstacles perçus (Q23) : "${obstacles || 'non spécifié'}"
-- Si rien ne change (Q24) : "${ifNothingChanges || 'non spécifié'}"
-- Niveau de préparation (Q25) : ${readiness || 'non spécifié'}/10
+✨ CE QU'IL VEUT VRAIMENT (SES MOTS)
+- Comment sa vie changerait : "${lifeChange || 'Non précisé'}"
+- L'impact qu'il veut avoir : "${desiredImpact || 'Non précisé'}"
+- Les émotions qu'il recherche : "${desiredEmotions || 'Non précisé'}"
+- Ce que ses proches diraient : "${relativesReaction || 'Non précisé'}"
+- Son style de vie idéal : "${lifestyleGoals || 'Non précisé'}"
 
-**OFFRES CRÉÉES :**
-- Produit principal : ${mainProductPrice} (Format: ${mainProductType})
-- Potentiel système : ${potentialRevenue}€/mois
+😰 SES BLOCAGES ACTUELS (SES MOTS)
+- Ce qui le bloque : "${obstacles || 'Non précisé'}"
+- Si rien ne change : "${ifNothingChanges || 'Non précisé'}"
+- Niveau de préparation : ${readinessLevel || 'Non précisé'}/10
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 TA MISSION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 SON OFFRE
+- Premier produit : ${mainProductPrice} (${mainProductType})
 
-Génère un récit de transformation en 5 SECTIONS pour ${firstName || 'cet utilisateur'}.
+══════════════════════════════════════════════════════════════════
+🎬 GÉNÈRE SON RÉCIT DE TRANSFORMATION
+══════════════════════════════════════════════════════════════════
 
-**SECTION 1 : AUJOURD'HUI (2-3 phrases)**
-Point de départ actuel.
-Utilise :
-- Obstacles : "${obstacles}"
-- Si rien ne change : "${ifNothingChanges}"
-- Problème à résoudre : "${onboardingSummary.main_learning_problem}"
+Écris maintenant le récit de transformation de ${firstName || 'cet utilisateur'} en suivant les 8 étapes du système.
 
-Crée un effet miroir puissant. ${firstName || 'L\'utilisateur'} doit se reconnaître exactement.
+RAPPELS CRITIQUES :
+• Utilise SES vraies réponses (entre guillemets ci-dessus), pas des généralités
+• Crée des SCÈNES VISUELLES concrètes (lieux, moments, sensations)
+• Dans "La Nouvelle Réalité", intègre OBLIGATOIREMENT :
+  - Sa projection de vie : "${lifeChange}"
+  - Son objectif : ${targetIncome}€/mois
+  - Son style de vie : "${lifestyleGoals}"
+  - Ses émotions : "${desiredEmotions}"
+  - Ses proches : "${relativesReaction}"
+• Prix de sa première vente : ${mainProductPrice}
+• Parle de la TRANSFORMATION qu'il offre, pas du nom du produit
 
-**SECTION 2 : LE DÉCLIC (2-3 phrases)**
-Moment où ${firstName || 'il/elle'} décide de passer à l'action.
-Décision calme, pas de dramatisation.
-Peut mentionner : niveau préparation ${readiness}/10, méthode unique.
+Génère le récit maintenant (texte brut, paragraphes aérés, 500-700 mots) :`;
 
-**SECTION 3 : DANS 6 MOIS (3-4 phrases)**
-Première vente !
-- Montant : ${mainProductPrice}
-- Format : ${mainProductType}
-- Transformation offerte (PAS le nom du produit)
-- Premières ventes mensuelles réalistes
-- Changement de posture
-
-⚠️ RÈGLE : Parle de la TRANSFORMATION qu'il offre, pas du produit
-
-**SECTION 4 : DANS 1 AN (4-5 phrases) - LA PLUS IMPORTANTE**
-Vie transformée complète.
-
-⚡ OBLIGATOIRE à intégrer :
-- Projection de vie : "${lifeChange}"
-- Objectif atteint : ${targetIncome}€/mois (vs potentiel ${potentialRevenue}€)
-- Style de vie : "${lifestyle}"
-- Émotions : "${emotions}"
-- Proches : "${relatives}"
-
-Peins une SCÈNE CONCRÈTE :
-- Où se réveille ${firstName || 'il/elle'} (lieu physique si applicable)
-- Journée type
-- Revenus mensuels exacts
-- Liberté (temps/argent/géographie)
-- État émotionnel
-
-Exemples de détails concrets à inclure :
-✅ "Tu te réveilles à [lieu]. Tu ouvres ton Mac. X ventes pendant la nuit."
-✅ "${targetIncome}€ ce mois-ci. Tu as atteint/dépassé ton objectif."
-✅ "Tu travailles Xh par jour. Le reste du temps, [activité]."
-✅ "Tes proches [réaction basée sur Q21]."
-
-**SECTION 5 : TON IMPACT (2-3 phrases)**
-Impact sur les élèves.
-Transformation : "${onboardingSummary.big_transformation}"
-Témoignages, fierté, transmission.
-
-Termine par : "Cette vie, elle commence maintenant."
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ CONTRAINTES STRICTES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-✅ OBLIGATOIRE :
-- Longueur : 300-500 mots (PAS PLUS !)
-- 5 sections développées (pas résumées)
-- Réinjecter les VRAIES réponses de ${firstName || 'l\'utilisateur'}
-- Détails concrets et visuels
-- Scènes vivantes et tangibles
-- Tutoiement exclusif
-- Texte brut (pas de markdown)
-
-❌ INTERDIT :
-- Répéter les titres d'offres
-- Langage marketing hype
-- Promesses irréalistes
-- Abstractions vagues
-- Dépasser 500 mots
-- Utiliser du Markdown
-
-Génère maintenant le récit (texte brut, paragraphes courts, zéro markdown).`;
-
+    // ========================================================================
+    // APPEL ANTHROPIC
+    // ========================================================================
     console.log("ANTHROPIC_CALL start", { 
       fn: "generateFutureVision", 
       sessionId, 
-      model: "claude-sonnet-4-20250514" 
+      model: "claude-sonnet-4-20250514",
+      firstName,
+      targetIncome
     });
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 2048,
+      temperature: 0.8, // Un peu plus de créativité
       system: SYSTEM_PROMPT,
       messages: [
         { role: "user", content: userPrompt }
@@ -384,12 +267,17 @@ Génère maintenant le récit (texte brut, paragraphes courts, zéro markdown).`
       ? message.content[0].text.trim() 
       : '';
 
-    // Save to session
+    // ========================================================================
+    // SAUVEGARDE EN BASE
+    // ========================================================================
     await base44.asServiceRole.entities.Session.update(sessionId, {
       future_vision: narrativeText
     });
 
-    console.log('✅ [generateFutureVision] Sauvegardé dans session', { sessionId });
+    console.log('✅ [generateFutureVision] Sauvegardé dans session', { 
+      sessionId,
+      wordCount: narrativeText.split(/\s+/).length
+    });
 
     return Response.json({
       success: true,
@@ -399,20 +287,34 @@ Génère maintenant le récit (texte brut, paragraphes courts, zéro markdown).`
   } catch (error) {
     console.error('Error in generateFutureVision:', error);
     
-    // Fallback text
-    const skill = error.session?.skill || 'ta compétence';
-    const fallbackText = `Imagine-toi, dans quelques mois… Tu te réveilles le matin en sachant que des personnes comptent sur toi pour progresser en ${skill}.
+    // ========================================================================
+    // FALLBACK EN CAS D'ERREUR
+    // ========================================================================
+    const fallbackText = `Tu es là, à ce moment précis où tout peut basculer.
 
-Tu as réussi à structurer ton savoir-faire en une offre claire, accessible, et qui résonne avec ton audience. Chaque jour, de nouvelles personnes découvrent ton travail et décident de te faire confiance.
+Peut-être que tu doutes encore. Peut-être que tu te demandes si tu es vraiment légitime pour transmettre ce que tu sais. Cette petite voix qui te dit "qui suis-je pour enseigner ça ?"... elle est normale. Tout le monde l'a eue.
 
-Tu n'es plus seul(e) à avancer. Ta communauté grandit, tes témoignages s'accumulent, et tu ressens cette fierté profonde d'avoir osé franchir le pas.
+Mais imagine un instant.
 
-Cette vie, elle t'attend. Il te suffit maintenant de passer à l'action, étape par étape.`;
+Imagine que tu décides aujourd'hui de passer à l'action. Pas demain. Pas "quand tu seras prêt". Aujourd'hui.
+
+Tu structures ton savoir. Tu crées ta première offre. Et un matin, tu te réveilles avec une notification. Quelqu'un vient de payer pour apprendre ce que tu sais faire. Ce n'est peut-être que quelques dizaines d'euros. Mais c'est la preuve. La preuve que ton expertise a de la valeur. La preuve que des gens sont prêts à investir pour ce que tu peux leur apporter.
+
+Les semaines passent. Les ventes s'accumulent. Tu n'es plus "celui qui a une idée". Tu es celui qui transforme des vies avec son savoir.
+
+Et dans quelques mois ? Tu te réveilles avec une liberté que tu n'avais jamais connue. Tu travailles sur ce qui te passionne. Tu aides des personnes qui te remercient chaque semaine. Tu as créé quelque chose qui te ressemble.
+
+Tes proches te regardent différemment. "Comment tu as fait ?" te demandent-ils. Et toi, tu souris. Parce que tu sais que tout a commencé par une simple décision.
+
+Cette décision, c'est maintenant.
+
+Cette vie t'attend. ✨`;
 
     return Response.json({
       success: true,
       narrativeText: fallbackText,
-      warning: 'Fallback text used due to error'
+      warning: 'Fallback text used due to error',
+      error: error.message
     });
   }
 });

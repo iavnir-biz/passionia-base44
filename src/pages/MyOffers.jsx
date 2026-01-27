@@ -251,9 +251,28 @@ ${offer.ecosystem_role || ''}
     toast.success('Offre copiée dans le presse-papier !');
   };
 
-  const handleDownloadPDF = (offer, offerTypeName) => {
-    // TODO: Implement PDF generation
-    toast.info('Génération du PDF en cours...');
+  const handleDownloadPDF = async (offer, offerTypeName) => {
+    try {
+      const response = await base44.functions.invoke('generateOfferPDF', {
+        offer,
+        offerTypeName
+      });
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${offerTypeName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+
+      toast.success('PDF téléchargé !');
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      toast.error('Erreur lors de la génération du PDF');
+    }
   };
 
   const offerTypes = [

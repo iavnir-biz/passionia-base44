@@ -858,21 +858,7 @@ export default function MarketAnalysis() {
                   </motion.div>
                 )}
 
-                {/* Bouton regénérer (optionnel) */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-center pt-4"
-                >
-                  <button
-                    onClick={() => handleGenerate(true)}
-                    disabled={generating}
-                    className="text-gray-500 hover:text-gray-700 text-sm underline transition-colors"
-                  >
-                    {generating ? 'Régénération en cours...' : 'Régénérer l\'analyse'}
-                  </button>
-                </motion.div>
+
               </div>
             )}
           </div>

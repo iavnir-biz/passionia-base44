@@ -62,7 +62,7 @@ const resources = [
     page: 'SalesPage',
     field: 'generated_sales_pages',
     isBeta: false,
-    isHighPriority: true
+    isHighPriority: false
   },
   // Priorité moyenne
   {

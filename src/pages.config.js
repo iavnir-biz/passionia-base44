@@ -9,6 +9,7 @@ import DailyActions from './pages/DailyActions';
 import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
 import EmailsMarketing from './pages/EmailsMarketing';
+import GenerationProgress from './pages/GenerationProgress';
 import Home from './pages/Home';
 import MarketAnalysis from './pages/MarketAnalysis';
 import MyOffers from './pages/MyOffers';
@@ -77,6 +78,7 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "Documents": Documents,
     "EmailsMarketing": EmailsMarketing,
+    "GenerationProgress": GenerationProgress,
     "Home": Home,
     "MarketAnalysis": MarketAnalysis,
     "MyOffers": MyOffers,

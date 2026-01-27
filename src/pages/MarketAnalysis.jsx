@@ -3,12 +3,12 @@ import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, 
-  Users, 
-  Search, 
-  AlertCircle, 
-  CheckCircle, 
+import {
+  TrendingUp,
+  Users,
+  Search,
+  AlertCircle,
+  CheckCircle,
   Target,
   Loader2,
   Sparkles,
@@ -31,6 +31,7 @@ export default function MarketAnalysis() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -58,10 +59,10 @@ export default function MarketAnalysis() {
         if (sessions.length > 0) {
           const userSession = sessions[0];
           setSession(userSession);
-          
+
           console.log('[MarketAnalysis] Session loaded:', userSession);
           console.log('[MarketAnalysis] complete_market_analysis:', userSession.complete_market_analysis);
-          
+
           // 🔥 Lire depuis Session.complete_market_analysis (persistance garantie)
           if (isNonEmpty(userSession.complete_market_analysis)) {
             setAnalysis(userSession.complete_market_analysis);
@@ -84,7 +85,7 @@ export default function MarketAnalysis() {
       console.error('No session ID available');
       return;
     }
-    
+
     setGenerating(true);
     try {
       console.log('[MarketAnalysis] Generating analysis for session:', session.id);
@@ -112,30 +113,30 @@ export default function MarketAnalysis() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-white">
-        <Sidebar currentPage="MarketAnalysis" progress={calculateProgressFromSession(session)} user={user} />
-        <div className="flex-1 ml-72">
-          <div className="flex items-center justify-center h-screen">
-            <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-          </div>
-        </div>
+      <div className="flex items-center justify-center h-screen bg-white">
+        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="MarketAnalysis" progress={calculateProgressFromSession(session)} user={user} />
-      
-      <div className="flex-1 ml-72">
-        <TopBar 
-          title="Analyse de marché" 
-          subtitle="Comprendre qui a besoin de ton savoir, pourquoi, et comment ces personnes achètent aujourd'hui"
+    <div className="flex min-h-screen bg-white overflow-x-hidden">
+      <Sidebar
+        currentPage="MarketAnalysis"
+        progress={calculateProgressFromSession(session)}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <div className="flex-1 ml-0 lg:ml-72 w-full">
+        <TopBar
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
-        
-        <main className="p-8">
-          <div className="max-w-5xl mx-auto space-y-8">
+
+        <main className="p-4 lg:p-8">
+          <div className="max-w-5xl mx-auto space-y-6 lg:space-y-8">
             {!analysis ? (
               // 🔥 État vide - Bouton de génération
               <div className="py-20">
@@ -146,11 +147,11 @@ export default function MarketAnalysis() {
                 >
                   {/* Icon Noah */}
                   <motion.div
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.05, 1],
                       rotate: [0, 2, -2, 0]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
                       ease: "easeInOut"
@@ -158,17 +159,17 @@ export default function MarketAnalysis() {
                     className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] shadow-2xl mb-6 relative"
                   >
                     <Brain className="w-12 h-12 text-white" />
-                    
+
                     {[...Array(3)].map((_, i) => (
                       <motion.div
                         key={i}
                         className="absolute inset-0 rounded-3xl border-2 border-[#61f7a2]"
                         initial={{ scale: 1, opacity: 0.6 }}
-                        animate={{ 
+                        animate={{
                           scale: [1, 1.4, 1.8],
                           opacity: [0.6, 0.3, 0]
                         }}
-                        transition={{ 
+                        transition={{
                           duration: 2,
                           repeat: Infinity,
                           delay: i * 0.6,
@@ -182,7 +183,7 @@ export default function MarketAnalysis() {
                     Comprends ton marché en profondeur
                   </h1>
                   <p className="text-gray-600 mb-8 max-w-2xl mx-auto text-lg leading-relaxed">
-                    Noah va analyser qui a besoin de ton savoir, pourquoi ces personnes sont prêtes à payer, 
+                    Noah va analyser qui a besoin de ton savoir, pourquoi ces personnes sont prêtes à payer,
                     et comment structurer ton offre pour maximiser tes chances de succès.
                   </p>
 
@@ -220,6 +221,7 @@ export default function MarketAnalysis() {
                       disabled={generating}
                       size="lg"
                       icon={Brain}
+                      className=""
                     >
                       {generating ? 'Noah analyse ton marché...' : 'Générer avec Noah'}
                     </GlowButton>
@@ -322,12 +324,12 @@ export default function MarketAnalysis() {
                       Analyse SWOT
                     </h2>
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Forces */}
                       {analysis.swot.strengths && analysis.swot.strengths.length > 0 && (
                         <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
                           <div className="flex items-center gap-2 mb-4">
-                            <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center flex-shrink-0">
                               <TrendingUp className="w-5 h-5 text-white" />
                             </div>
                             <h3 className="text-lg font-bold text-gray-900">Forces</h3>
@@ -341,11 +343,10 @@ export default function MarketAnalysis() {
                                     <p className="font-semibold text-gray-900">{strength.title}</p>
                                     <p className="text-sm text-gray-700 mt-1">{strength.description}</p>
                                     {strength.impact && (
-                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${
-                                        strength.impact === 'Fort' ? 'bg-green-200 text-green-800' :
+                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${strength.impact === 'Fort' ? 'bg-green-200 text-green-800' :
                                         strength.impact === 'Moyen' ? 'bg-green-100 text-green-700' :
-                                        'bg-green-50 text-green-600'
-                                      }`}>
+                                          'bg-green-50 text-green-600'
+                                        }`}>
                                         Impact: {strength.impact}
                                       </span>
                                     )}
@@ -361,7 +362,7 @@ export default function MarketAnalysis() {
                       {analysis.swot.weaknesses && analysis.swot.weaknesses.length > 0 && (
                         <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
                           <div className="flex items-center gap-2 mb-4">
-                            <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center flex-shrink-0">
                               <TrendingDown className="w-5 h-5 text-white" />
                             </div>
                             <h3 className="text-lg font-bold text-gray-900">Faiblesses</h3>
@@ -375,11 +376,10 @@ export default function MarketAnalysis() {
                                     <p className="font-semibold text-gray-900">{weakness.title}</p>
                                     <p className="text-sm text-gray-700 mt-1">{weakness.description}</p>
                                     {weakness.impact && (
-                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${
-                                        weakness.impact === 'Fort' ? 'bg-red-200 text-red-800' :
+                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${weakness.impact === 'Fort' ? 'bg-red-200 text-red-800' :
                                         weakness.impact === 'Moyen' ? 'bg-red-100 text-red-700' :
-                                        'bg-red-50 text-red-600'
-                                      }`}>
+                                          'bg-red-50 text-red-600'
+                                        }`}>
                                         Impact: {weakness.impact}
                                       </span>
                                     )}
@@ -409,11 +409,10 @@ export default function MarketAnalysis() {
                                     <p className="font-semibold text-gray-900">{opportunity.title}</p>
                                     <p className="text-sm text-gray-700 mt-1">{opportunity.description}</p>
                                     {opportunity.impact && (
-                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${
-                                        opportunity.impact === 'Fort' ? 'bg-blue-200 text-blue-800' :
+                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${opportunity.impact === 'Fort' ? 'bg-blue-200 text-blue-800' :
                                         opportunity.impact === 'Moyen' ? 'bg-blue-100 text-blue-700' :
-                                        'bg-blue-50 text-blue-600'
-                                      }`}>
+                                          'bg-blue-50 text-blue-600'
+                                        }`}>
                                         Impact: {opportunity.impact}
                                       </span>
                                     )}
@@ -443,11 +442,10 @@ export default function MarketAnalysis() {
                                     <p className="font-semibold text-gray-900">{threat.title}</p>
                                     <p className="text-sm text-gray-700 mt-1">{threat.description}</p>
                                     {threat.impact && (
-                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${
-                                        threat.impact === 'Fort' ? 'bg-orange-200 text-orange-800' :
+                                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs font-medium ${threat.impact === 'Fort' ? 'bg-orange-200 text-orange-800' :
                                         threat.impact === 'Moyen' ? 'bg-orange-100 text-orange-700' :
-                                        'bg-orange-50 text-orange-600'
-                                      }`}>
+                                          'bg-orange-50 text-orange-600'
+                                        }`}>
                                         Impact: {threat.impact}
                                       </span>
                                     )}
@@ -497,11 +495,10 @@ export default function MarketAnalysis() {
                             <div key={idx} className="p-4 bg-gray-50 rounded-xl">
                               <div className="flex items-start justify-between mb-2">
                                 <p className="font-bold text-gray-900">{competitor.name}</p>
-                                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                  competitor.marketShare === 'Importante' ? 'bg-red-100 text-red-700' :
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${competitor.marketShare === 'Importante' ? 'bg-red-100 text-red-700' :
                                   competitor.marketShare === 'Moyenne' ? 'bg-yellow-100 text-yellow-700' :
-                                  'bg-green-100 text-green-700'
-                                }`}>
+                                    'bg-green-100 text-green-700'
+                                  }`}>
                                   Part de marché: {competitor.marketShare}
                                 </span>
                               </div>
@@ -573,19 +570,17 @@ export default function MarketAnalysis() {
 
                     <div className="space-y-4">
                       {analysis.targetAudience.segments.map((segment, idx) => (
-                        <div key={idx} className={`p-4 rounded-xl border-2 ${
-                          segment.priority === 'Primaire' ? 'bg-green-50 border-green-300' :
+                        <div key={idx} className={`p-4 rounded-xl border-2 ${segment.priority === 'Primaire' ? 'bg-green-50 border-green-300' :
                           segment.priority === 'Secondaire' ? 'bg-blue-50 border-blue-300' :
-                          'bg-gray-50 border-gray-300'
-                        }`}>
+                            'bg-gray-50 border-gray-300'
+                          }`}>
                           <div className="flex items-start justify-between mb-3">
                             <h3 className="font-bold text-gray-900">{segment.name}</h3>
                             <div className="flex gap-2">
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                segment.priority === 'Primaire' ? 'bg-green-200 text-green-800' :
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${segment.priority === 'Primaire' ? 'bg-green-200 text-green-800' :
                                 segment.priority === 'Secondaire' ? 'bg-blue-200 text-blue-800' :
-                                'bg-gray-200 text-gray-800'
-                              }`}>
+                                  'bg-gray-200 text-gray-800'
+                                }`}>
                                 {segment.priority}
                               </span>
                               <span className={`px-2 py-1 rounded text-xs font-medium bg-white text-gray-700`}>
@@ -611,21 +606,19 @@ export default function MarketAnalysis() {
                           <div className="grid grid-cols-2 gap-4 mt-3">
                             <div>
                               <p className="text-xs font-semibold text-gray-700">Niveau de douleur</p>
-                              <span className={`inline-block mt-1 px-2 py-1 rounded text-xs font-medium ${
-                                segment.painLevel === 'Élevé' ? 'bg-red-100 text-red-700' :
+                              <span className={`inline-block mt-1 px-2 py-1 rounded text-xs font-medium ${segment.painLevel === 'Élevé' ? 'bg-red-100 text-red-700' :
                                 segment.painLevel === 'Moyen' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-green-100 text-green-700'
-                              }`}>
+                                  'bg-green-100 text-green-700'
+                                }`}>
                                 {segment.painLevel}
                               </span>
                             </div>
                             <div>
                               <p className="text-xs font-semibold text-gray-700">Disposition à payer</p>
-                              <span className={`inline-block mt-1 px-2 py-1 rounded text-xs font-medium ${
-                                segment.willingnessToPay === 'Élevée' ? 'bg-green-100 text-green-700' :
+                              <span className={`inline-block mt-1 px-2 py-1 rounded text-xs font-medium ${segment.willingnessToPay === 'Élevée' ? 'bg-green-100 text-green-700' :
                                 segment.willingnessToPay === 'Moyenne' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                              }`}>
+                                  'bg-red-100 text-red-700'
+                                }`}>
                                 {segment.willingnessToPay}
                               </span>
                             </div>
@@ -656,11 +649,10 @@ export default function MarketAnalysis() {
                         <div key={idx} className="p-4 bg-gray-50 rounded-xl">
                           <div className="flex items-start justify-between mb-2">
                             <p className="font-bold text-gray-900">{barrier.barrier}</p>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              barrier.difficulty === 'Difficile' ? 'bg-red-100 text-red-700' :
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${barrier.difficulty === 'Difficile' ? 'bg-red-100 text-red-700' :
                               barrier.difficulty === 'Modérée' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-green-100 text-green-700'
-                            }`}>
+                                'bg-green-100 text-green-700'
+                              }`}>
                               {barrier.difficulty}
                             </span>
                           </div>
@@ -734,11 +726,10 @@ export default function MarketAnalysis() {
                     {analysis.pricingStrategy.priceSensitivity && (
                       <div className="p-4 bg-white rounded-xl">
                         <p className="font-bold text-gray-900 mb-1">Sensibilité au prix</p>
-                        <span className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${
-                          analysis.pricingStrategy.priceSensitivity === 'Élevée' ? 'bg-red-100 text-red-700' :
+                        <span className={`inline-block px-3 py-1 rounded-lg text-sm font-medium ${analysis.pricingStrategy.priceSensitivity === 'Élevée' ? 'bg-red-100 text-red-700' :
                           analysis.pricingStrategy.priceSensitivity === 'Moyenne' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
+                            'bg-green-100 text-green-700'
+                          }`}>
                           {analysis.pricingStrategy.priceSensitivity}
                         </span>
                       </div>
@@ -768,60 +759,55 @@ export default function MarketAnalysis() {
                           return priorityOrder[a.priority] - priorityOrder[b.priority];
                         })
                         .map((channel, idx) => (
-                        <div key={idx} className={`p-4 rounded-xl border-2 ${
-                          channel.priority === 'Haute' ? 'bg-green-50 border-green-300' :
-                          channel.priority === 'Moyenne' ? 'bg-blue-50 border-blue-300' :
-                          'bg-gray-50 border-gray-300'
-                        }`}>
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">{idx + 1}</span>
-                              <h3 className="font-bold text-gray-900">{channel.channel}</h3>
-                            </div>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              channel.priority === 'Haute' ? 'bg-green-200 text-green-800' :
-                              channel.priority === 'Moyenne' ? 'bg-blue-200 text-blue-800' :
-                              'bg-gray-200 text-gray-800'
+                          <div key={idx} className={`p-4 rounded-xl border-2 ${channel.priority === 'Haute' ? 'bg-green-50 border-green-300' :
+                            channel.priority === 'Moyenne' ? 'bg-blue-50 border-blue-300' :
+                              'bg-gray-50 border-gray-300'
                             }`}>
-                              {channel.priority}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-700 mb-3">{channel.description}</p>
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">{idx + 1}</span>
+                                <h3 className="font-bold text-gray-900">{channel.channel}</h3>
+                              </div>
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${channel.priority === 'Haute' ? 'bg-green-200 text-green-800' :
+                                channel.priority === 'Moyenne' ? 'bg-blue-200 text-blue-800' :
+                                  'bg-gray-200 text-gray-800'
+                                }`}>
+                                {channel.priority}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-700 mb-3">{channel.description}</p>
 
-                          <div className="grid grid-cols-3 gap-3">
-                            <div>
-                              <p className="text-xs font-semibold text-gray-700 mb-1">Difficulté</p>
-                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                                channel.difficulty === 'Difficile' ? 'bg-red-100 text-red-700' :
-                                channel.difficulty === 'Modérée' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-green-100 text-green-700'
-                              }`}>
-                                {channel.difficulty}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-xs font-semibold text-gray-700 mb-1">Coût</p>
-                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                                channel.cost === 'Coûteux' ? 'bg-red-100 text-red-700' :
-                                channel.cost === 'Peu coûteux' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-green-100 text-green-700'
-                              }`}>
-                                {channel.cost}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-xs font-semibold text-gray-700 mb-1">Délai</p>
-                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                                channel.timeToResults === 'Long terme' ? 'bg-red-100 text-red-700' :
-                                channel.timeToResults === 'Moyen terme' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-green-100 text-green-700'
-                              }`}>
-                                {channel.timeToResults}
-                              </span>
+                            <div className="grid grid-cols-3 gap-3">
+                              <div>
+                                <p className="text-xs font-semibold text-gray-700 mb-1">Difficulté</p>
+                                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${channel.difficulty === 'Difficile' ? 'bg-red-100 text-red-700' :
+                                  channel.difficulty === 'Modérée' ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-green-100 text-green-700'
+                                  }`}>
+                                  {channel.difficulty}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-gray-700 mb-1">Coût</p>
+                                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${channel.cost === 'Coûteux' ? 'bg-red-100 text-red-700' :
+                                  channel.cost === 'Peu coûteux' ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-green-100 text-green-700'
+                                  }`}>
+                                  {channel.cost}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-gray-700 mb-1">Délai</p>
+                                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${channel.timeToResults === 'Long terme' ? 'bg-red-100 text-red-700' :
+                                  channel.timeToResults === 'Moyen terme' ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-green-100 text-green-700'
+                                  }`}>
+                                  {channel.timeToResults}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </motion.div>
                 )}
@@ -847,18 +833,16 @@ export default function MarketAnalysis() {
                           <div className="flex items-start justify-between mb-2">
                             <p className="font-bold text-gray-900 flex-1">{risk.risk}</p>
                             <div className="flex gap-2">
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                risk.probability === 'Élevée' ? 'bg-red-100 text-red-700' :
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${risk.probability === 'Élevée' ? 'bg-red-100 text-red-700' :
                                 risk.probability === 'Moyenne' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-green-100 text-green-700'
-                              }`}>
+                                  'bg-green-100 text-green-700'
+                                }`}>
                                 P: {risk.probability}
                               </span>
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                risk.impact === 'Élevé' ? 'bg-red-100 text-red-700' :
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${risk.impact === 'Élevé' ? 'bg-red-100 text-red-700' :
                                 risk.impact === 'Moyen' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-green-100 text-green-700'
-                              }`}>
+                                  'bg-green-100 text-green-700'
+                                }`}>
                                 I: {risk.impact}
                               </span>
                             </div>

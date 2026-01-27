@@ -15,7 +15,7 @@ export default function DayCard({
   onChecklistChange,
   checklist = []
 }) {
-  const [isExpanded, setIsExpanded] = useState(isActive);
+  const [isExpanded, setIsExpanded] = useState(isActive || isCompleted);
   const [showCelebration, setShowCelebration] = useState(false);
 
   const allChecked = checklist.every(item => item.checked);
@@ -48,9 +48,9 @@ export default function DayCard({
     >
       {/* Header */}
       <button
-        onClick={() => !isLocked && setIsExpanded(!isExpanded)}
+        onClick={() => setIsExpanded(!isExpanded)}
         disabled={isLocked}
-        className="w-full p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
+        className="w-full p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors disabled:cursor-not-allowed"
       >
         <div className="flex items-center gap-4">
           {/* Icon */}
@@ -121,30 +121,35 @@ export default function DayCard({
                 </motion.div>
               )}
 
-              {!isCompleted && (
-                <>
-                  {/* Key Message */}
-                  {day.keyMessage && (
-                    <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
-                      <p className="text-blue-800 font-medium italic">
-                        {day.keyMessage}
-                      </p>
-                    </div>
-                  )}
+              {/* Key Message */}
+              {day.keyMessage && !isCompleted && (
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <p className="text-blue-800 font-medium italic">
+                    {day.keyMessage}
+                  </p>
+                </div>
+              )}
 
-                  {/* Checklist */}
-                  <div className="space-y-3">
-                    {checklist.map((item, idx) => (
-                      <ChecklistItem
-                        key={idx}
-                        item={item}
-                        checked={item.checked}
-                        onChange={() => onChecklistChange(idx)}
-                        disabled={isCompleted}
-                      />
-                    ))}
-                  </div>
-                </>
+              {/* Checklist */}
+              <div className="space-y-3">
+                {checklist.map((item, idx) => (
+                  <ChecklistItem
+                    key={idx}
+                    item={item}
+                    checked={item.checked}
+                    onChange={() => onChecklistChange(idx)}
+                    disabled={isCompleted}
+                  />
+                ))}
+              </div>
+
+              {/* Completion Message for completed days */}
+              {isCompleted && day.completionMessage && (
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                  <p className="text-green-800 font-medium">
+                    ✅ {day.completionMessage}
+                  </p>
+                </div>
               )}
 
               {/* Action Buttons */}

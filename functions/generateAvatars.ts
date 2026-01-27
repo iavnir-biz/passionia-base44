@@ -1,8 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-import OpenAI from 'npm:openai';
+import Anthropic from 'npm:@anthropic-ai/sdk@0.32.1';
 
-const openai = new OpenAI({
-  apiKey: Deno.env.get("OPENAI_API_KEY"),
+const anthropic = new Anthropic({
+  apiKey: Deno.env.get("ANTHROPIC_API_KEY"),
 });
 
 const SYSTEM_PROMPT = `Tu es Noah, expert en psychologie client, segmentation d'audience et création d'avatars stratégiques pour les créateurs de produits d'information.
@@ -297,29 +297,30 @@ Génère 3 AVATARS CLIENTS ultra-détaillés selon la structure définie.
 
 Génère maintenant les 3 avatars en JSON.`;
 
-    console.log('OPENAI_CALL start', {
+    console.log('ANTHROPIC_CALL start', {
       fn: 'generateAvatars',
       sessionId,
-      model: 'gpt-4o'
+      model: 'claude-sonnet-4-20250514'
     });
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 8192,
+      system: SYSTEM_PROMPT,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userPrompt }
-      ],
-      temperature: 0.8,
-      response_format: { type: "json_object" }
+      ]
     });
 
-    console.log('OPENAI_CALL end', {
+    console.log('ANTHROPIC_CALL end', {
       fn: 'generateAvatars',
       sessionId,
-      usage: completion.usage
+      usage: message.usage
     });
 
-    const responseText = completion.choices[0].message.content.trim();
+    const responseText = message.content[0].type === 'text'
+      ? message.content[0].text.trim()
+      : '{}';
 
     // Clean potential markdown
     const cleanedResponse = responseText

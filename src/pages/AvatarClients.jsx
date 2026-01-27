@@ -40,6 +40,7 @@ export default function AvatarClients() {
   const [expandedAvatar, setExpandedAvatar] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [hasPremium, setHasPremium] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -250,16 +251,21 @@ export default function AvatarClients() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar currentPage="AvatarClients" progress={calculateProgressFromSession(session)} user={user} />
+      <Sidebar
+        currentPage="AvatarClients"
+        progress={calculateProgressFromSession(session)}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
-      <div className="flex-1 ml-72">
+      <div className="flex-1 ml-0 lg:ml-72 w-full">
         <TopBar
-          title="Avatars clients"
-          subtitle=""
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
 
-        <main className="p-8">
+        <main className="p-4 lg:p-8">
           <div className="max-w-7xl mx-auto space-y-8">
 
             {/* Header Section */}

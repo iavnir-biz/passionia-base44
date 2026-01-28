@@ -154,7 +154,7 @@ export default function UpsellCoaching({
         {/* ================================================================ */}
         <div className="text-center mb-8">
           {/* Icône */}
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl shadow-lg shadow-emerald-200 mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#61f7a2] to-[#4de88f] rounded-2xl shadow-lg shadow-[#61f7a2]/20 mb-6">
             <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
             </svg>
@@ -173,7 +173,7 @@ export default function UpsellCoaching({
             <p className="mb-3">
               Mais soyons honnêtes : <span className="font-semibold text-gray-800">90% des gens</span> qui achètent une formation n'obtiennent jamais de résultats. Pas par manque d'outils. Par manque d'accompagnement.
             </p>
-            <p className="text-emerald-600 font-semibold">
+            <p className="text-[#61f7a2] font-semibold">
               Et si on t'accompagnait main dans la main pour garantir tes premiers résultats ?
             </p>
           </div>
@@ -200,7 +200,7 @@ export default function UpsellCoaching({
                   <p className="text-gray-600 text-lg">avec Alfred & Damien</p>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap">
+              <span className="inline-flex items-center gap-2 bg-[#61f7a2]/10 text-[#61f7a2] px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
@@ -232,7 +232,7 @@ export default function UpsellCoaching({
                   <ul className="space-y-1">
                     {pilier.details.map((detail, i) => (
                       <li key={i} className="flex items-start gap-2 text-gray-600">
-                        <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                        <Check className="w-4 h-4 text-[#61f7a2] flex-shrink-0 mt-0.5" />
                         <span>{detail}</span>
                       </li>
                     ))}
@@ -278,7 +278,7 @@ export default function UpsellCoaching({
               <span>Tu as une question ? → <span className="text-white font-medium">Réponse sous 24h</span></span>
             </div>
           </div>
-          <p className="text-center mt-6 text-lg font-semibold text-emerald-400">
+          <p className="text-center mt-6 text-lg font-semibold text-[#61f7a2]">
             30 jours. Main dans la main. Tes premiers résultats garantis.
           </p>
         </div>
@@ -286,18 +286,18 @@ export default function UpsellCoaching({
         {/* ================================================================ */}
         {/* BLOC PRIX WHAOU */}
         {/* ================================================================ */}
-        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-6 sm:p-8 mb-8 border-2 border-emerald-200">
+        <div className="bg-gradient-to-br from-[#61f7a2]/5 to-[#4de88f]/5 rounded-3xl p-6 sm:p-8 mb-8 border-2 border-[#61f7a2]/20">
           <div className="text-center">
             <p className="text-gray-400 text-lg mb-2">
               Prix normal : <span className="line-through">897€</span>
             </p>
-            <p className="text-emerald-600 font-bold text-lg mb-2">
+            <p className="text-[#61f7a2] font-bold text-lg mb-2">
               🔥 TON PRIX AUJOURD'HUI UNIQUEMENT :
             </p>
-            <p className="text-6xl sm:text-7xl font-black text-emerald-600 mb-4">
+            <p className="text-6xl sm:text-7xl font-black text-[#61f7a2] mb-4">
               497€
             </p>
-            <div className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-full text-lg font-bold">
+            <div className="inline-flex items-center gap-2 bg-[#61f7a2] text-white px-6 py-3 rounded-full text-lg font-bold">
               <Gift className="w-5 h-5" />
               Tu économises 400€ (-45%)
             </div>
@@ -324,7 +324,7 @@ export default function UpsellCoaching({
               <div className="border-t border-gray-100 pt-3">
                 <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
                 <p className="text-gray-500 text-xs">{t.role}</p>
-                <p className="text-emerald-600 font-semibold text-sm mt-1">💰 {t.result}</p>
+                <p className="text-[#61f7a2] font-semibold text-sm mt-1">💰 {t.result}</p>
               </div>
             </div>
           ))}
@@ -356,7 +356,7 @@ export default function UpsellCoaching({
         <div className="text-center space-y-4">
           <button
             onClick={onAccept}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-xl font-bold px-12 py-5 rounded-2xl shadow-xl shadow-emerald-200 transition-all hover:scale-105 active:scale-100"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#61f7a2] text-white text-xl font-bold px-12 py-5 rounded-2xl shadow-xl shadow-[#61f7a2]/20 transition-all hover:scale-105 active:scale-100"
           >
             <Rocket className="w-6 h-6" />
             OUI, je veux être accompagné — 497€

@@ -44,15 +44,36 @@ Deno.serve(async (req) => {
 
       console.log('Session metadata:', { userId, customerEmail, hasOrderBump, paymentType });
 
+      // --- TRAITEMENT ORDER BUMP (37€) ---
+      if (paymentType === 'order_bump') {
+        console.log('Processing order bump payment');
+
+        if (userId) {
+          try {
+            await base44.entities.User.update(userId, {
+              has_purchased_order_bump: true,
+              order_bump_purchased_at: new Date().toISOString()
+            });
+
+            console.log(`Order bump payment processed for user ${userId}`);
+          } catch (error) {
+            console.error('Error processing order bump:', error);
+          }
+        }
+
+        return Response.json({ received: true });
+      }
+
       // --- TRAITEMENT UPSELL COACHING (497€) ---
       if (paymentType === 'upsell_coaching') {
         console.log('Processing upsell coaching payment');
 
         if (userId) {
           try {
-            // Mettre a jour l'utilisateur avec le flag coaching
+            // Mettre a jour l'utilisateur avec le flag coaching ET upsell
             await base44.entities.User.update(userId, {
               has_coaching: true,
+              has_purchased_upsell: true,
               coaching_purchased_at: new Date().toISOString()
             });
 
@@ -97,9 +118,10 @@ Deno.serve(async (req) => {
 
         if (userId) {
           try {
-            // Mettre a jour l'utilisateur avec le flag coaching
+            // Mettre a jour l'utilisateur avec le flag coaching ET downsell
             await base44.entities.User.update(userId, {
               has_coaching: true,
+              has_purchased_downsell: true,
               coaching_purchased_at: new Date().toISOString()
             });
 

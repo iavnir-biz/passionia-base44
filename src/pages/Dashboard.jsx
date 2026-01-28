@@ -183,6 +183,8 @@ export default function Dashboard() {
     return session?.has_seen_upsell === true 
       && !session?.has_coaching 
       && !user?.has_coaching 
+      && !user?.has_purchased_upsell
+      && !user?.has_purchased_downsell
       && timeLeftCoaching > 0;
   };
 

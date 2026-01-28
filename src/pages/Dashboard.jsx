@@ -187,6 +187,7 @@ export default function Dashboard() {
       && !user?.has_purchased_upsell
       && !user?.has_purchased_downsell
       && !user?.has_coaching
+      && !session?.has_seen_upsell
       && timeLeftCoaching > 0;
   };
 

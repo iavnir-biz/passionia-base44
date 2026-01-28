@@ -89,53 +89,6 @@ Deno.serve(async (req) => {
         return Response.json({ received: true });
       }
 
-      // --- TRAITEMENT DOWNSELL SESSION DECLIC ---
-      if (paymentType === 'downsell_session_declic') {
-        console.log('Processing downsell session declic payment');
-
-        if (userId) {
-          try {
-            // Mettre a jour l'utilisateur avec le flag session declic
-            await base44.entities.User.update(userId, {
-              has_session_declic: true,
-              session_declic_purchased_at: new Date().toISOString()
-            });
-
-            // Mettre a jour la Session si on a un session_id
-            const userSessionId = session.metadata?.session_id;
-            if (userSessionId) {
-              await base44.entities.Session.update(userSessionId, {
-                has_seen_upsell: true,
-                has_seen_downsell: true,
-                downsell_accepted: true,
-                has_session_declic: true
-              });
-            } else {
-              // Trouver la session par email de l'utilisateur
-              const users = await base44.entities.User.filter({ id: userId });
-              if (users.length > 0) {
-                const userEmail = users[0].email;
-                const sessions = await base44.entities.Session.filter({ created_by: userEmail });
-                if (sessions.length > 0) {
-                  await base44.entities.Session.update(sessions[0].id, {
-                    has_seen_upsell: true,
-                    has_seen_downsell: true,
-                    downsell_accepted: true,
-                    has_session_declic: true
-                  });
-                }
-              }
-            }
-
-            console.log(`Downsell session declic payment processed for user ${userId}`);
-          } catch (error) {
-            console.error('Error processing downsell session declic:', error);
-          }
-        }
-
-        return Response.json({ received: true });
-      }
-
       // --- TRAITEMENT ACHAT INITIAL (existant) ---
 
       if (userId) {

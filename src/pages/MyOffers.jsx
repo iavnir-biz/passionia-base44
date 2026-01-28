@@ -227,24 +227,20 @@ export default function MyOffers() {
 
   const handleCopy = (offer) => {
     const text = `
-${offer.title}
-${offer.price}
+${offer.title || 'Offre'}
+${offer.price || ''}
 
 ${offer.subtitle || ''}
 
-${offer.description}
+${offer.description || ''}
 
-Livrables:
-${offer.deliverables.join('\n')}
+${offer.deliverables?.length ? 'Livrables:\n' + offer.deliverables.join('\n') : ''}
 
-Bénéfices:
-${offer.benefits.join('\n')}
+${offer.benefits?.length ? 'Bénéfices:\n' + offer.benefits.join('\n') : ''}
 
-Pour qui:
-${offer.ideal_for?.slice(0, 3).join('\n') || ''}
+${offer.ideal_for?.length ? 'Pour qui:\n' + offer.ideal_for.slice(0, 3).join('\n') : ''}
 
-Rôle dans le funnel:
-${offer.ecosystem_role || ''}
+${offer.ecosystem_role ? 'Rôle dans le funnel:\n' + offer.ecosystem_role : ''}
     `.trim();
 
     navigator.clipboard.writeText(text);

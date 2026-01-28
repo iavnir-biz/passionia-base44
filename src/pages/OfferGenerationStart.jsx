@@ -133,9 +133,11 @@ export default function OfferGenerationStart() {
   }, []);
 
   const generateOffer = async (retryCount = 0) => {
+    const MAX_RETRIES = 2; // Pour les erreurs 504/timeout
+
     try {
       const user = await base44.auth.me();
-      
+
       if (!user.sessionId) {
         console.error('❌ [OFFER_START] Pas de sessionId sur User');
         navigate(createPageUrl('OnboardingFirstName'));
@@ -155,7 +157,7 @@ export default function OfferGenerationStart() {
           setIsRetrying(false);
           return generateOffer(1); // Retry
         }
-        
+
         // Erreur persistante
         console.error('❌ [OFFER_START] Fetch session failed:', fetchError);
         setError({
@@ -164,13 +166,13 @@ export default function OfferGenerationStart() {
         });
         return;
       }
-      
+
       if (!sessions || sessions.length === 0) {
         console.error('❌ [OFFER_START] Session introuvable:', user.sessionId);
         const fallbackSessions = await base44.entities.Session.filter({ created_by: user.email });
         if (fallbackSessions.length > 0) {
           console.warn('⚠️ [OFFER_START] Fallback sur created_by');
-          const latestSession = fallbackSessions.sort((a, b) => 
+          const latestSession = fallbackSessions.sort((a, b) =>
             new Date(b.created_date) - new Date(a.created_date)
           )[0];
           await base44.auth.updateMe({ sessionId: latestSession.id });
@@ -192,6 +194,13 @@ export default function OfferGenerationStart() {
         isDone: session.is_onboarding_done,
         skill: session.skill
       });
+
+      // 🚀 OPTIMISATION : Vérifier le cache AVANT d'appeler le backend
+      if (session.offer_generation && session.offer_generation.offerChoices) {
+        console.log('✅ [OFFER_START] Offre déjà générée (cache), navigation directe');
+        navigate(createPageUrl('OfferProductPrincipal'));
+        return;
+      }
 
       // ✅ Validation stricte étape par étape
       if (!session.is_onboarding_done || (session.onboarding_history?.length || 0) < 11) {
@@ -221,21 +230,21 @@ export default function OfferGenerationStart() {
           'perceivedObstacles': 'OnboardingQ23Obstacles',
           'readinessScore': 'OnboardingQ25Readiness'
         };
-        
+
         const firstMissing = missingKeys[0];
         const redirectPage = redirectMap[firstMissing] || 'OnboardingQ16TargetIncome';
-        
+
         console.log('🔄 [OFFER_START] Redirect:', redirectPage, 'missing:', missingKeys);
         navigate(createPageUrl(redirectPage));
         return;
       }
 
       const missingData = [];
-      
+
       if (!user.firstName) {
         missingData.push('firstName');
       }
-      
+
       if (!session.skill && !fullData.coreSkill && !session.onboarding_summary?.who_to_teach) {
         missingData.push('skill');
       }
@@ -252,7 +261,7 @@ export default function OfferGenerationStart() {
           user_coreSkill: user.coreSkill,
           user_targetIncome: user.targetIncome
         });
-        
+
         // Rediriger intelligemment selon ce qui manque
         if (missingData.some(d => d.includes('onboarding_history'))) {
           alert(`⚠️ Onboarding incomplet (${session.onboarding_history?.length || 0}/11 questions)\n\nTu vas être redirigé pour finir les questions.`);
@@ -266,13 +275,41 @@ export default function OfferGenerationStart() {
         }
         return;
       }
-      
+
       console.log('✅ [OfferGenerationStart] Toutes les données validées, génération...');
-      
-      // 🔥 Generate Full Stack Offer (P.S.S.O.)
-      const response = await base44.functions.invoke('generateFullStackOffer', {
-        sessionId
-      });
+
+      // 🔥 Generate Full Stack Offer (P.S.S.O.) avec gestion des erreurs 504
+      let response;
+      try {
+        response = await base44.functions.invoke('generateFullStackOffer', {
+          sessionId
+        });
+      } catch (invokeError) {
+        // 🚀 OPTIMISATION : Retry automatique sur erreur 504 Gateway Timeout
+        const is504 = invokeError.message?.includes('504') ||
+                      invokeError.message?.includes('Gateway') ||
+                      invokeError.message?.includes('timeout') ||
+                      invokeError.message?.includes('Timeout');
+
+        if (is504 && retryCount < MAX_RETRIES) {
+          const delayMs = (retryCount + 1) * 3000; // 3s, 6s
+          console.warn(`⚠️ [OFFER_START] Erreur 504, retry ${retryCount + 1}/${MAX_RETRIES} dans ${delayMs/1000}s...`);
+          setIsRetrying(true);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          setIsRetrying(false);
+          return generateOffer(retryCount + 1);
+        }
+
+        // Erreur 504 persistante ou autre erreur
+        console.error('❌ [OFFER_START] Invoke failed:', invokeError);
+        setError({
+          type: 'generation_error',
+          message: is504
+            ? 'Le serveur met trop de temps à répondre. Réessaye dans quelques instants.'
+            : invokeError.message || 'Une erreur est survenue'
+        });
+        return;
+      }
 
       console.log('📨 [OfferGenerationStart] Réponse génération:', {
         hasError: !!response.data?.error,
@@ -284,23 +321,46 @@ export default function OfferGenerationStart() {
       // 🔥 NE NAVIGUER QUE SI GÉNÉRATION RÉUSSIE
       if (response.data?.error) {
         console.error('❌ [OfferGenerationStart] Génération échouée:', response.data.error);
-        alert(`⚠️ Erreur lors de la génération de tes offres.\n\n${response.data.error}\n\nRéessaye dans quelques instants.`);
+        setError({
+          type: 'generation_error',
+          message: response.data.error
+        });
         return; // ❌ PAS DE NAVIGATION
       }
 
       if (!response.data?.success) {
         console.error('❌ [OfferGenerationStart] Génération non confirmée');
-        alert('⚠️ La génération n\'a pas pu être confirmée. Réessaye.');
+        setError({
+          type: 'generation_error',
+          message: 'La génération n\'a pas pu être confirmée. Réessaye.'
+        });
         return;
       }
-      
+
       console.log('✅ [OfferGenerationStart] Génération réussie → Navigation');
       navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
       console.error('❌ [OFFER_START] Error:', error);
+
+      // Gestion spéciale des erreurs 504 dans le catch global
+      const is504 = error.message?.includes('504') ||
+                    error.message?.includes('Gateway') ||
+                    error.message?.includes('timeout');
+
+      if (is504 && retryCount < MAX_RETRIES) {
+        const delayMs = (retryCount + 1) * 3000;
+        console.warn(`⚠️ [OFFER_START] Erreur 504 (catch), retry ${retryCount + 1}/${MAX_RETRIES} dans ${delayMs/1000}s...`);
+        setIsRetrying(true);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        setIsRetrying(false);
+        return generateOffer(retryCount + 1);
+      }
+
       setError({
         type: 'generation_error',
-        message: error.message || 'Une erreur est survenue'
+        message: is504
+          ? 'Le serveur met trop de temps à répondre. Réessaye dans quelques instants.'
+          : error.message || 'Une erreur est survenue'
       });
     }
   };

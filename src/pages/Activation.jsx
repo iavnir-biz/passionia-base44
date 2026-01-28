@@ -53,7 +53,7 @@ export default function Activation() {
       setUser(currentUser);
 
       // Vérifier paiement
-      if (!currentUser.has_paid) {
+      if (!currentUser.has_purchased) {
         navigate(createPageUrl('Dashboard'));
         return;
       }

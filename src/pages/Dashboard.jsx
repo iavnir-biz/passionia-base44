@@ -187,7 +187,7 @@ export default function Dashboard() {
   };
 
   const handleGoToCoaching = () => {
-    navigate(createPageUrl('DownsellSession'));
+    navigate(createPageUrl('UpsellCoaching'));
   };
 
   if (authLoading || loading) {

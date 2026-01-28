@@ -57,6 +57,7 @@ import CTAPAYWALL from './pages/CTAPAYWALL';
 import DailyActions from './pages/DailyActions';
 import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
+import DownsellSession from './pages/DownsellSession';
 import EmailsMarketing from './pages/EmailsMarketing';
 import GenerationProgress from './pages/GenerationProgress';
 import Home from './pages/Home';
@@ -111,10 +112,9 @@ import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
+import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import UpsellCoaching from './pages/UpsellCoaching';
-import DownsellSession from './pages/DownsellSession';
 
 
 export const PAGES = {
@@ -128,6 +128,7 @@ export const PAGES = {
     "DailyActions": DailyActions,
     "Dashboard": Dashboard,
     "Documents": Documents,
+    "DownsellSession": DownsellSession,
     "EmailsMarketing": EmailsMarketing,
     "GenerationProgress": GenerationProgress,
     "Home": Home,
@@ -182,10 +183,9 @@ export const PAGES = {
     "Settings": Settings,
     "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
+    "UpsellCoaching": UpsellCoaching,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "UpsellCoaching": UpsellCoaching,
-    "DownsellSession": DownsellSession,
 }
 
 export const pagesConfig = {

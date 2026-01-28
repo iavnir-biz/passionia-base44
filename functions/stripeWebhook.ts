@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
 
       console.log('Session metadata:', { userId, customerEmail, hasOrderBump, paymentType });
 
-      // --- TRAITEMENT UPSELL COACHING ---
+      // --- TRAITEMENT UPSELL COACHING (497€) ---
       if (paymentType === 'upsell_coaching') {
         console.log('Processing upsell coaching payment');
 
@@ -62,7 +62,8 @@ Deno.serve(async (req) => {
               await base44.entities.Session.update(userSessionId, {
                 has_seen_upsell: true,
                 upsell_accepted: true,
-                has_coaching: true
+                has_coaching: true,
+                coaching_purchased_at: new Date().toISOString()
               });
             } else {
               // Trouver la session par email de l'utilisateur
@@ -74,7 +75,8 @@ Deno.serve(async (req) => {
                   await base44.entities.Session.update(sessions[0].id, {
                     has_seen_upsell: true,
                     upsell_accepted: true,
-                    has_coaching: true
+                    has_coaching: true,
+                    coaching_purchased_at: new Date().toISOString()
                   });
                 }
               }
@@ -83,6 +85,51 @@ Deno.serve(async (req) => {
             console.log(`Upsell coaching payment processed for user ${userId}`);
           } catch (error) {
             console.error('Error processing upsell coaching:', error);
+          }
+        }
+
+        return Response.json({ received: true });
+      }
+
+      // --- TRAITEMENT DOWNSELL COACHING (197€) ---
+      if (paymentType === 'downsell_coaching') {
+        console.log('Processing downsell coaching payment');
+
+        if (userId) {
+          try {
+            // Mettre a jour l'utilisateur avec le flag coaching
+            await base44.entities.User.update(userId, {
+              has_coaching: true,
+              coaching_purchased_at: new Date().toISOString()
+            });
+
+            // Mettre a jour la Session si on a un session_id
+            const userSessionId = session.metadata?.session_id;
+            if (userSessionId) {
+              await base44.entities.Session.update(userSessionId, {
+                has_seen_upsell: true,
+                has_coaching: true,
+                coaching_purchased_at: new Date().toISOString()
+              });
+            } else {
+              // Trouver la session par email de l'utilisateur
+              const users = await base44.entities.User.filter({ id: userId });
+              if (users.length > 0) {
+                const userEmail = users[0].email;
+                const sessions = await base44.entities.Session.filter({ created_by: userEmail });
+                if (sessions.length > 0) {
+                  await base44.entities.Session.update(sessions[0].id, {
+                    has_seen_upsell: true,
+                    has_coaching: true,
+                    coaching_purchased_at: new Date().toISOString()
+                  });
+                }
+              }
+            }
+
+            console.log(`Downsell coaching payment processed for user ${userId}`);
+          } catch (error) {
+            console.error('Error processing downsell coaching:', error);
           }
         }
 

@@ -21,7 +21,9 @@ import {
   Package,
   ChevronDown,
   BarChart3,
-  Users
+  Users,
+  Clock,
+  Zap
 } from "lucide-react";
 import ProgressBar from '@/components/ui/ProgressBar';
 
@@ -80,12 +82,55 @@ const menuStructure = [
 ];
 
 export default function Sidebar({ currentPage, progress = 0, user, isOpen, onClose }) {
+  const [timeLeftCoaching, setTimeLeftCoaching] = useState(0);
+
   const calculateDay = (prog) => {
     if (prog === 0) return 1;
     if (prog < 30) return 1;
     if (prog < 60) return 2;
     if (prog < 100) return 3;
     return 4;
+  };
+
+  // ⏰ Countdown 72h pour coaching (démarre depuis l'achat du pack)
+  useEffect(() => {
+    if (!user?.has_purchased || !user?.purchased_at) return;
+    if (user?.has_purchased_upsell || user?.has_purchased_downsell || user?.has_coaching) return;
+
+    const calculateTimeLeft = () => {
+      const purchasedAt = new Date(user.purchased_at).getTime();
+      const now = Date.now();
+      const deadline = purchasedAt + (72 * 60 * 60 * 1000); // 72h en millisecondes
+      const remaining = Math.max(0, deadline - now);
+      return Math.floor(remaining / 1000); // en secondes
+    };
+
+    setTimeLeftCoaching(calculateTimeLeft());
+
+    const timer = setInterval(() => {
+      const remaining = calculateTimeLeft();
+      setTimeLeftCoaching(remaining);
+      if (remaining <= 0) {
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [user]);
+
+  const formatTimeCoaching = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
+  };
+
+  const shouldShowCoachingOffer = () => {
+    return user?.has_purchased
+      && !user?.has_purchased_upsell
+      && !user?.has_purchased_downsell
+      && !user?.has_coaching
+      && timeLeftCoaching > 0;
   };
 
   return (
@@ -162,6 +207,41 @@ export default function Sidebar({ currentPage, progress = 0, user, isOpen, onClo
 
         {/* Bloc Besoin d'aide - Premium */}
         <div className="p-4 border-t border-gray-200">
+          
+          {/* ENCART COACHING 72h */}
+          {shouldShowCoachingOffer() && (
+            <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 mb-3 shadow-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="w-5 h-5 text-white" />
+                <h3 className="text-white font-bold text-sm">
+                  🔥 Dernière chance
+                </h3>
+              </div>
+              <p className="text-white/90 text-xs mb-3">
+                Accompagnement VIP 30 jours avec Alfred & Damien
+              </p>
+              
+              {/* Compteur compact */}
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 mb-3 border border-white/30">
+                <div className="flex items-center gap-1 mb-1">
+                  <Clock className="w-3 h-3 text-white/80" />
+                  <span className="text-white/80 text-xs font-medium">Expire dans :</span>
+                </div>
+                <p className="text-lg font-black text-white font-mono">
+                  {formatTimeCoaching(timeLeftCoaching)}
+                </p>
+              </div>
+
+              <Link
+                to={createPageUrl('UpsellCoaching')}
+                className="flex items-center justify-center gap-2 w-full bg-white text-orange-600 hover:bg-white/90 font-bold py-2 px-3 rounded-lg transition-all shadow-md"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="text-xs">Voir l'offre</span>
+              </Link>
+            </div>
+          )}
+
           <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-xl p-3 mb-2 shadow-sm">
             <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
               ✨ Besoin d'aide ?

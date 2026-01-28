@@ -49,11 +49,6 @@ export default function UpsellCoaching() {
       if (sessions.length > 0) {
         const userSession = sessions[0];
         setSession(userSession);
-
-        if (userSession.has_seen_upsell === true) {
-          navigate(createPageUrl('Dashboard'));
-          return;
-        }
       }
     } catch (error) {
       console.error('Error loading data:', error);

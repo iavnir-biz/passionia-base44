@@ -15,9 +15,7 @@ import {
   Package,
   Users,
   FileText,
-  Loader2,
-  Clock,
-  Sparkles
+  Loader2
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -33,7 +31,6 @@ export default function Dashboard() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [timeLeftCoaching, setTimeLeftCoaching] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -51,30 +48,7 @@ export default function Dashboard() {
     }
   }, [session?.generation_in_progress]);
 
-  // ⏰ Countdown 72h pour coaching
-  useEffect(() => {
-    if (!session?.upsell_refused_at || session?.has_coaching || user?.has_coaching) return;
 
-    const calculateTimeLeft = () => {
-      const refusedAt = new Date(session.upsell_refused_at).getTime();
-      const now = Date.now();
-      const deadline = refusedAt + (72 * 60 * 60 * 1000); // 72h en millisecondes
-      const remaining = Math.max(0, deadline - now);
-      return Math.floor(remaining / 1000); // en secondes
-    };
-
-    setTimeLeftCoaching(calculateTimeLeft());
-
-    const timer = setInterval(() => {
-      const remaining = calculateTimeLeft();
-      setTimeLeftCoaching(remaining);
-      if (remaining <= 0) {
-        clearInterval(timer);
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [session, user]);
 
   const checkGenerationComplete = async () => {
     try {
@@ -172,26 +146,6 @@ export default function Dashboard() {
 
   const countGenerated = () => livrables.filter(item => session?.[item.field]).length;
 
-  const formatTimeCoaching = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, '0')}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
-  };
-
-  const shouldShowCoachingOffer = () => {
-    return session?.has_seen_upsell === true 
-      && !session?.has_coaching 
-      && !user?.has_coaching 
-      && !user?.has_purchased_upsell
-      && !user?.has_purchased_downsell
-      && timeLeftCoaching > 0;
-  };
-
-  const handleGoToCoaching = () => {
-    navigate(createPageUrl('UpsellCoaching'));
-  };
-
   if (authLoading || loading) {
     return (
       <div className="flex min-h-screen bg-white">
@@ -255,59 +209,6 @@ export default function Dashboard() {
               <div>
                 <p className="text-blue-900 font-semibold mb-1">Génération en cours...</p>
                 <p className="text-blue-700 text-sm">Noah génère tes documents. Ça prend 1-2 minutes.</p>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ENCART COACHING DERNIÈRE CHANCE - 72h */}
-          {shouldShowCoachingOffer() && (
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }} 
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-6 mb-8 shadow-2xl shadow-purple-200 border-2 border-purple-400"
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-white font-bold text-xl">
-                      🔥 Offre coaching - Dernière chance
-                    </h3>
-                  </div>
-                  <p className="text-white/90 text-sm mb-4">
-                    Tu as 72h pour profiter de l'accompagnement VIP avec Alfred & Damien. Après, cette opportunité disparaît définitivement.
-                  </p>
-                  
-                  {/* Compteur */}
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 border border-white/20">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-white/80 text-sm font-medium flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        Temps restant :
-                      </span>
-                    </div>
-                    <p className="text-3xl font-black text-white font-mono tracking-wider">
-                      {formatTimeCoaching(timeLeftCoaching)}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button
-                      onClick={handleGoToCoaching}
-                      className="flex-1 bg-white text-purple-700 font-bold py-3 px-6 rounded-xl hover:bg-purple-50 transition-all shadow-lg"
-                    >
-                      ✨ Voir l'offre coaching
-                    </button>
-                    <button
-                      onClick={() => setTimeLeftCoaching(0)}
-                      className="text-white/70 hover:text-white text-sm underline underline-offset-4"
-                    >
-                      Masquer
-                    </button>
-                  </div>
-                </div>
               </div>
             </motion.div>
           )}

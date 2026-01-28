@@ -94,6 +94,9 @@ Deno.serve(async (req) => {
       mode: 'payment',
       success_url: successUrl,
       cancel_url: cancelUrl,
+      phone_number_collection: {
+        enabled: true,
+      },
       metadata: user ? {
         user_id: user.id,
         user_email: user.email,

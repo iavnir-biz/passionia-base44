@@ -1,170 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Crown,
-  Sparkles,
-  CheckCircle,
-  Clock,
-  MessageCircle,
-  FileCheck,
-  Target,
-  Shield,
-  Star,
-  Loader2,
-  PartyPopper,
-  Rocket,
-  AlertTriangle
-} from 'lucide-react';
-import GlowButton from '@/components/ui/GlowButton';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from 'react';
+import { Clock, MessageCircle, Users, FileCheck, Target, Shield, Check, Rocket, Gift, AlertTriangle, Star, Bot, Sparkles } from 'lucide-react';
 
-const TIMER_DURATION = 10 * 60; // 10 minutes en secondes
+// ============================================================================
+// UPSELL COACHING VIP - 497€
+// ============================================================================
+// DWY (Done With You) - On accompagne ENSEMBLE, on couvre tous les besoins
+// ============================================================================
 
-export default function UpsellCoaching() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
-  const [timerExpired, setTimerExpired] = useState(false);
-  const timerRef = useRef(null);
+export default function UpsellCoaching({ 
+  user = {}, 
+  session = {}, 
+  onAccept, 
+  onDecline 
+}) {
+  // ========================================================================
+  // STATE & DATA
+  // ========================================================================
+  const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes
+  const placesRestantes = 7;
 
+  // Données dynamiques - PRÉNOM PERSONNALISÉ
+  const firstName = user?.firstName || session?.onboarding_full?.firstName || '';
+  const thematique = session?.onboarding_summary?.who_to_teach || session?.onboarding_full?.coreSkill || 'ton domaine';
+
+  // ========================================================================
+  // TIMER COUNTDOWN
+  // ========================================================================
   useEffect(() => {
-    loadData();
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
-
-  // Timer countdown
-  useEffect(() => {
-    if (loading) return;
-
-    // Check localStorage for existing timer
-    const storedStartTime = localStorage.getItem('upsell_timer_start');
-    let startTime;
-
-    if (storedStartTime) {
-      startTime = parseInt(storedStartTime);
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const remaining = TIMER_DURATION - elapsed;
-
-      if (remaining <= 0) {
-        setTimerExpired(true);
-        handleTimerExpired();
-        return;
-      }
-      setTimeLeft(remaining);
-    } else {
-      startTime = Date.now();
-      localStorage.setItem('upsell_timer_start', startTime.toString());
-    }
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-          setTimerExpired(true);
-          handleTimerExpired();
-          return 0;
-        }
-        return prev - 1;
-      });
+    if (timeLeft <= 0) return;
+    const timer = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
     }, 1000);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [loading]);
-
-  const loadData = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      // Charger la session
-      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
-
-      if (sessions.length > 0) {
-        const userSession = sessions[0];
-        setSession(userSession);
-
-        // Vérifier si l'utilisateur a déjà vu l'upsell
-        if (userSession.has_seen_upsell === true) {
-          console.log('[UpsellCoaching] Upsell already seen, redirecting to Dashboard');
-          navigate(createPageUrl('Dashboard'));
-          return;
-        }
-      }
-    } catch (error) {
-      console.error('Error loading data:', error);
-      toast.error('Erreur lors du chargement');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTimerExpired = async () => {
-    // Sauvegarder que l'utilisateur a vu l'upsell
-    if (session) {
-      try {
-        await base44.entities.Session.update(session.id, {
-          has_seen_upsell: true,
-          upsell_refused_at: new Date().toISOString()
-        });
-      } catch (e) {
-        console.error('Error updating session:', e);
-      }
-    }
-    localStorage.removeItem('upsell_timer_start');
-
-    // Redirect après 3 secondes
-    setTimeout(() => {
-      navigate(createPageUrl('Dashboard'));
-    }, 3000);
-  };
-
-  const handleAcceptOffer = async () => {
-    setIsCreatingCheckout(true);
-    try {
-      const { data } = await base44.functions.invoke('createCheckoutUpsell', {
-        sessionId: session?.id,
-        upsellPrice: 49700
-      });
-
-      if (data?.url) {
-        window.top.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL returned');
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error('Erreur lors de la redirection vers le paiement');
-      setIsCreatingCheckout(false);
-    }
-  };
-
-  const handleDeclineOffer = async () => {
-    try {
-      // Sauvegarder le refus dans la session
-      if (session) {
-        await base44.entities.Session.update(session.id, {
-          has_seen_upsell: true,
-          upsell_refused_at: new Date().toISOString()
-        });
-      }
-      localStorage.removeItem('upsell_timer_start');
-      console.log('[UpsellCoaching] Offer declined, redirecting to Dashboard');
-      navigate(createPageUrl('Dashboard'));
-    } catch (error) {
-      console.error('Error declining offer:', error);
-      navigate(createPageUrl('Dashboard'));
-    }
-  };
+    return () => clearInterval(timer);
+  }, [timeLeft]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -172,322 +40,353 @@ export default function UpsellCoaching() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-green-50/30 to-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
-      </div>
-    );
-  }
+  // ========================================================================
+  // PILIERS DATA - VERSION DWY (Done With You)
+  // ========================================================================
+  const piliers = [
+    {
+      icon: Clock,
+      title: "3 Sessions de coaching 1-1 (3 x 45 min)",
+      details: [
+        "Session 1 : Audit complet de ton offre + positionnement unique",
+        "Session 2 : Analyse de tes premiers résultats + ajustements",
+        "Session 3 : Plan de scaling et optimisation long terme"
+      ],
+      color: "from-emerald-400 to-teal-500"
+    },
+    {
+      icon: MessageCircle,
+      title: "Support WhatsApp direct avec nous (30 jours)",
+      details: [
+        "Pose tes questions à tout moment, on répond sous 24h",
+        "Feedback rapide sur chacune de tes actions",
+        "Déblocage immédiat quand tu es coincé",
+        "Tu n'es jamais seul entre les sessions"
+      ],
+      color: "from-blue-400 to-indigo-500"
+    },
+    {
+      icon: Sparkles,
+      title: "Accompagnement complet, ensemble",
+      details: [
+        "Stratégie : positionnement, pricing, cible idéale",
+        "Design : visuels, pages de vente, identité",
+        "Création produit : structure, contenu, format",
+        "Technique : Stripe, paiements, Pixel Meta",
+        "Tu bloques quelque part ? On le fait AVEC toi"
+      ],
+      color: "from-purple-400 to-pink-500",
+      highlight: true
+    },
+    {
+      icon: Users,
+      title: "Accès à la communauté privée",
+      details: [
+        "Échange avec d'autres entrepreneurs comme toi",
+        "Partage tes victoires et tes blocages",
+        "Entraide et motivation collective",
+        "Lives et contenus exclusifs"
+      ],
+      color: "from-orange-400 to-amber-500"
+    },
+    {
+      icon: Bot,
+      title: "Support IA Noah personnalisé",
+      details: [
+        "Noah connaît ton projet et tes objectifs",
+        "Assistance 24/7 pour avancer entre les sessions",
+        "Génération de contenus adaptés à ta niche",
+        "L'IA + l'humain = combo gagnant"
+      ],
+      color: "from-cyan-400 to-blue-500"
+    },
+    {
+      icon: Target,
+      title: "Roadmap personnalisée selon TA situation",
+      details: [
+        "Plan d'action clair : quoi faire, dans quel ordre",
+        "Priorisation des actions à fort impact",
+        "Objectifs concrets semaine par semaine"
+      ],
+      color: "from-rose-400 to-red-500"
+    }
+  ];
 
+  // ========================================================================
+  // TÉMOIGNAGES DATA
+  // ========================================================================
+  const temoignages = [
+    {
+      initial: "S",
+      color: "bg-pink-500",
+      text: "Les sessions avec Alfred m'ont débloquée. En 1 appel, j'avais mon positionnement clair. Première vente 5 jours après.",
+      name: "Sarah M.",
+      role: "Coach en nutrition",
+      result: "2 400€ en 3 semaines"
+    },
+    {
+      initial: "M",
+      color: "bg-blue-500",
+      text: "Le WhatsApp change tout. Question sur mon pricing à 22h, réponse le lendemain 8h. Je n'étais jamais bloqué plus de 24h.",
+      name: "Marc D.",
+      role: "Consultant freelance",
+      result: "Première vente en 5 jours"
+    },
+    {
+      initial: "J",
+      color: "bg-violet-500",
+      text: "Je bloquais sur Stripe depuis des semaines. En session avec Damien, on l'a configuré ensemble en 20 min. Game changer.",
+      name: "Julie K.",
+      role: "Formatrice en langues",
+      result: "3 ventes la première semaine"
+    }
+  ];
+
+  // ========================================================================
+  // RENDER
+  // ========================================================================
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-green-50/30 to-white py-8 px-4 overflow-y-auto">
-      <div className="max-w-3xl mx-auto">
-
-        {/* Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8"
-        >
-          {/* Celebration Icon */}
-          <motion.div
-            className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] mb-6 shadow-lg"
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <PartyPopper className="w-10 h-10 text-white" />
-          </motion.div>
-
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-            Felicitations ! Ton Pack Passion IA est active.
-          </h1>
-          <p className="text-lg text-gray-600 max-w-xl mx-auto">
-            Tu as fait le premier pas vers la monetisation de ton savoir.
-            Maintenant, laisse-moi t'aider a maximiser tes resultats...
-          </p>
-        </motion.div>
-
-        {/* Main Offer Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="relative bg-white rounded-3xl border-2 border-yellow-400 shadow-2xl overflow-hidden mb-8"
-        >
-          {/* Premium Badge */}
-          <div className="absolute top-4 right-4 z-10">
-            <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-lg">
-              <Sparkles className="w-3 h-3" />
-              OFFRE UNIQUE
-            </div>
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white">
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+        
+        {/* ================================================================ */}
+        {/* HEADER */}
+        {/* ================================================================ */}
+        <div className="text-center mb-8">
+          {/* Icône */}
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl shadow-lg shadow-emerald-200 mb-6">
+            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
           </div>
 
-          {/* Card Header */}
-          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 px-6 py-6 border-b border-yellow-200">
-            <div className="flex items-center gap-3 mb-2">
-              <Crown className="w-8 h-8 text-yellow-500" />
-              <h2 className="text-2xl font-bold text-gray-900">
-                Pack 3 Sessions Coaching 1-1 Personnalise
-              </h2>
+          {/* Titre - PRÉNOM PERSONNALISÉ */}
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            {firstName ? `${firstName}, ton` : 'Ton'} Pack Passion IA est activé ! 🎉
+          </h1>
+
+          {/* Sous-titre */}
+          <div className="max-w-2xl mx-auto text-gray-600 text-lg leading-relaxed">
+            <p className="mb-3">
+              Tu as maintenant tous les outils IA pour créer ton offre en <span className="font-semibold text-gray-800">{thematique}</span>.
+            </p>
+            <p className="mb-3">
+              Mais soyons honnêtes : <span className="font-semibold text-gray-800">90% des gens</span> qui achètent une formation n'obtiennent jamais de résultats. Pas par manque d'outils. Par manque d'accompagnement.
+            </p>
+            <p className="text-emerald-600 font-semibold">
+              Et si on t'accompagnait main dans la main pour garantir tes premiers résultats ?
+            </p>
+          </div>
+        </div>
+
+        {/* ================================================================ */}
+        {/* CARD PRINCIPALE */}
+        {/* ================================================================ */}
+        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden mb-8">
+          
+          {/* Header Card */}
+          <div className="p-6 sm:p-8 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-200">
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                    Accompagnement VIP 30 jours
+                  </h2>
+                  <p className="text-gray-600 text-lg">avec Alfred & Damien</p>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                OFFRE UNIQUE
+              </span>
             </div>
-            <p className="text-gray-600">
-              Fais-toi accompagner pour transformer ton projet en revenus concrets
+            <p className="mt-4 text-gray-600 text-lg">
+              On t'accompagne <span className="font-semibold text-gray-800">main dans la main</span> pendant 30 jours.<br />
+              Stratégie, design, création, technique... On couvre tous tes besoins, <span className="font-semibold text-gray-800">ensemble</span>.
             </p>
           </div>
 
-          {/* Card Content */}
-          <div className="p-6 space-y-6">
+          {/* Piliers */}
+          <div className="p-6 sm:p-8 space-y-4">
+            {piliers.map((pilier, index) => (
+              <div 
+                key={index}
+                className={`flex gap-4 p-4 rounded-2xl transition-colors ${
+                  pilier.highlight 
+                    ? 'bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200' 
+                    : 'bg-gray-50 hover:bg-gray-100'
+                }`}
+              >
+                <div className={`flex-shrink-0 w-12 h-12 bg-gradient-to-br ${pilier.color} rounded-xl flex items-center justify-center shadow-lg`}>
+                  <pilier.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-grow">
+                  <h3 className="font-bold text-gray-900 text-lg mb-2">{pilier.title}</h3>
+                  <ul className="space-y-1">
+                    {pilier.details.map((detail, i) => (
+                      <li key={i} className="flex items-start gap-2 text-gray-600">
+                        <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {pilier.highlight && (
+                    <div className="mt-2 inline-flex items-center gap-1 text-purple-600 text-sm font-semibold">
+                      <span>🔥</span> Tu bloques ? On le fait ensemble.
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-            {/* Feature 1: Sessions */}
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  3 Sessions de coaching 1-1 (3 x 30 min)
-                </h3>
-                <ul className="text-sm text-gray-600 space-y-1 ml-6">
-                  <li>Session 1 : Audit complet de ton offre et positionnement</li>
-                  <li>Session 2 : Analyse des premiers resultats + ajustements</li>
-                  <li>Session 3 : Plan de scaling et optimisation</li>
-                </ul>
-              </div>
+        {/* ================================================================ */}
+        {/* BLOC DIFFÉRENCIATEUR */}
+        {/* ================================================================ */}
+        <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 sm:p-8 mb-8 text-white">
+          <h3 className="text-xl sm:text-2xl font-bold mb-4 text-center">
+            Pourquoi cet accompagnement change tout ?
+          </h3>
+          <div className="text-center mb-6">
+            <p className="text-gray-300 text-lg mb-2">Avec Noah, tu as l'IA pour créer.</p>
+            <p className="text-gray-300 text-lg mb-2">Avec la communauté, tu as le soutien pour avancer.</p>
+            <p className="text-emerald-400 text-xl font-semibold">Avec nous, tu as l'humain pour réussir.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4 text-gray-300">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🎯</span>
+              <span>Tu doutes de ta stratégie ? → <span className="text-white font-medium">On la valide ensemble</span></span>
             </div>
-
-            {/* Feature 2: Support */}
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  Support WhatsApp/Telegram direct (30 jours)
-                </h3>
-                <ul className="text-sm text-gray-600 space-y-1 ml-6">
-                  <li>Questions rapides entre les sessions</li>
-                  <li>Feedback sur tes actions</li>
-                  <li>Deblocage rapide si bloque</li>
-                </ul>
-              </div>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🎨</span>
+              <span>Tu galères sur le design ? → <span className="text-white font-medium">On le fait avec toi</span></span>
             </div>
-
-            {/* Feature 3: Document Review */}
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                <FileCheck className="w-5 h-5 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  Revue personnalisee de tes documents
-                </h3>
-                <ul className="text-sm text-gray-600 space-y-1 ml-6">
-                  <li>Check de tes pages de vente</li>
-                  <li>Validation de tes messages de prospection</li>
-                  <li>Correction de ton positionnement</li>
-                </ul>
-              </div>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">⚙️</span>
+              <span>Tu bloques sur Stripe ? → <span className="text-white font-medium">On configure ensemble</span></span>
             </div>
-
-            {/* Feature 4: Action Plan */}
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-                <Target className="w-5 h-5 text-orange-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  Plan d'action sur-mesure
-                </h3>
-                <ul className="text-sm text-gray-600 space-y-1 ml-6">
-                  <li>Roadmap personnalisee selon ta situation</li>
-                  <li>Priorisation des actions</li>
-                  <li>Methode de suivi des resultats</li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Pricing Section */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 text-center border border-green-200">
-              <div className="mb-2">
-                <span className="text-lg text-gray-500 line-through">591 EUR</span>
-              </div>
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <span className="text-5xl font-bold text-[#61f7a2]">497 EUR</span>
-              </div>
-              <div className="inline-block bg-green-500 text-white text-sm font-semibold px-4 py-1.5 rounded-full">
-                Economie : 94 EUR
-              </div>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">💬</span>
+              <span>Tu as une question ? → <span className="text-white font-medium">Réponse sous 24h</span></span>
             </div>
           </div>
-        </motion.div>
+          <p className="text-center mt-6 text-lg font-semibold text-emerald-400">
+            30 jours. Main dans la main. Tes premiers résultats garantis.
+          </p>
+        </div>
 
-        {/* Social Proof */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="grid md:grid-cols-2 gap-4 mb-8"
-        >
-          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
-                S
-              </div>
-              <div>
-                <div className="flex items-center gap-1 mb-1">
+        {/* ================================================================ */}
+        {/* BLOC PRIX WHAOU */}
+        {/* ================================================================ */}
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-6 sm:p-8 mb-8 border-2 border-emerald-200">
+          <div className="text-center">
+            <p className="text-gray-400 text-lg mb-2">
+              Prix normal : <span className="line-through">897€</span>
+            </p>
+            <p className="text-emerald-600 font-bold text-lg mb-2">
+              🔥 TON PRIX AUJOURD'HUI UNIQUEMENT :
+            </p>
+            <p className="text-6xl sm:text-7xl font-black text-emerald-600 mb-4">
+              497€
+            </p>
+            <div className="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-full text-lg font-bold">
+              <Gift className="w-5 h-5" />
+              Tu économises 400€ (-45%)
+            </div>
+          </div>
+        </div>
+
+        {/* ================================================================ */}
+        {/* TÉMOIGNAGES */}
+        {/* ================================================================ */}
+        <div className="grid sm:grid-cols-3 gap-4 mb-8">
+          {temoignages.map((t, index) => (
+            <div key={index} className="bg-white rounded-2xl p-5 shadow-lg shadow-gray-100 border border-gray-100">
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-10 h-10 ${t.color} rounded-full flex items-center justify-center text-white font-bold`}>
+                  {t.initial}
+                </div>
+                <div className="flex text-amber-400">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-4 h-4 fill-current" />
                   ))}
                 </div>
-                <p className="text-sm text-gray-700 mb-2">
-                  "Sarah a genere <strong>2 400 EUR en 3 semaines</strong> avec notre coaching. Le suivi personnalise a fait toute la difference."
-                </p>
-                <p className="text-xs text-gray-500">Sarah M. - Coach en nutrition</p>
+              </div>
+              <p className="text-gray-700 text-sm mb-3">"{t.text}"</p>
+              <div className="border-t border-gray-100 pt-3">
+                <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
+                <p className="text-gray-500 text-xs">{t.role}</p>
+                <p className="text-emerald-600 font-semibold text-sm mt-1">💰 {t.result}</p>
               </div>
             </div>
+          ))}
+        </div>
+
+        {/* ================================================================ */}
+        {/* URGENCE */}
+        {/* ================================================================ */}
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 mb-8 text-center">
+          <div className="flex items-center justify-center gap-2 text-amber-700 font-semibold mb-3">
+            <AlertTriangle className="w-5 h-5" />
+            Cette offre disparaît dans :
           </div>
-
-          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
-                M
-              </div>
-              <div>
-                <div className="flex items-center gap-1 mb-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-700 mb-2">
-                  "Marc a valide son offre en <strong>1 session</strong> et lance <strong>5 jours apres</strong>. Resultat : premiere vente des la semaine suivante."
-                </p>
-                <p className="text-xs text-gray-500">Marc D. - Consultant freelance</p>
-              </div>
-            </div>
+          <p className="text-5xl font-black text-gray-900 mb-3 font-mono">
+            {formatTime(timeLeft)}
+          </p>
+          <p className="text-amber-700">
+            et ne sera plus jamais disponible à ce prix.
+          </p>
+          <div className="mt-4 inline-flex items-center gap-2 bg-amber-200 text-amber-800 px-4 py-2 rounded-full text-sm font-semibold">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            Places limitées : {placesRestantes}/10 restantes ce mois-ci
           </div>
-        </motion.div>
+        </div>
 
-        {/* Urgency Timer */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mb-6"
-        >
-          <div className={`text-center p-4 rounded-2xl border-2 ${
-            timerExpired
-              ? 'bg-red-50 border-red-300'
-              : timeLeft < 60
-                ? 'bg-red-50 border-red-300'
-                : timeLeft < 180
-                  ? 'bg-orange-50 border-orange-300'
-                  : 'bg-amber-50 border-amber-300'
-          }`}>
-            {timerExpired ? (
-              <div className="flex items-center justify-center gap-2 text-red-600">
-                <AlertTriangle className="w-5 h-5" />
-                <span className="font-semibold">Offre expiree ! Redirection vers le Dashboard...</span>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center justify-center gap-2 text-gray-700 mb-2">
-                  <AlertTriangle className={`w-5 h-5 ${timeLeft < 180 ? 'text-red-500' : 'text-amber-500'}`} />
-                  <span className="font-medium">Cette offre disparait dans :</span>
-                </div>
-                <motion.div
-                  className={`text-4xl font-bold ${
-                    timeLeft < 60
-                      ? 'text-red-600'
-                      : timeLeft < 180
-                        ? 'text-orange-600'
-                        : 'text-gray-900'
-                  }`}
-                  animate={timeLeft < 60 ? { scale: [1, 1.05, 1] } : {}}
-                  transition={{ duration: 0.5, repeat: Infinity }}
-                >
-                  {formatTime(timeLeft)}
-                </motion.div>
-                <p className="text-sm text-gray-600 mt-2">
-                  et ne sera plus jamais disponible a ce prix
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* Scarcity Badge */}
-          <div className="text-center mt-3">
-            <span className="inline-flex items-center gap-1.5 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
-              Places limitees : 7/10 restantes ce mois-ci
-            </span>
-          </div>
-        </motion.div>
-
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="space-y-4 mb-6"
-        >
-          {/* Primary CTA */}
-          <motion.button
-            onClick={handleAcceptOffer}
-            disabled={isCreatingCheckout || timerExpired}
-            className={`w-full py-5 px-8 rounded-2xl text-lg font-bold transition-all duration-300 flex items-center justify-center gap-3 ${
-              timerExpired
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-[#61f7a2] to-[#4de88f] text-[#11112b] hover:shadow-lg hover:shadow-green-300/50 hover:scale-[1.02] active:scale-[0.98]'
-            }`}
-            animate={!timerExpired && !isCreatingCheckout ? {
-              boxShadow: ['0 0 20px rgba(97, 247, 162, 0.3)', '0 0 40px rgba(97, 247, 162, 0.5)', '0 0 20px rgba(97, 247, 162, 0.3)']
-            } : {}}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            {isCreatingCheckout ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
-            ) : (
-              <Rocket className="w-6 h-6" />
-            )}
-            {isCreatingCheckout ? 'Redirection...' : 'OUI, je prends le coaching 497 EUR'}
-          </motion.button>
-
-          {/* Secondary CTA */}
+        {/* ================================================================ */}
+        {/* CTA */}
+        {/* ================================================================ */}
+        <div className="text-center space-y-4">
           <button
-            onClick={handleDeclineOffer}
-            disabled={isCreatingCheckout}
-            className="w-full py-3 px-6 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all text-sm border border-gray-200"
+            onClick={onAccept}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-xl font-bold px-12 py-5 rounded-2xl shadow-xl shadow-emerald-200 transition-all hover:scale-105 active:scale-100"
           >
-            Non merci, je continue seul au Dashboard
+            <Rocket className="w-6 h-6" />
+            OUI, je veux être accompagné — 497€
           </button>
-        </motion.div>
+          
+          <div>
+            <button
+              onClick={onDecline}
+              className="text-gray-500 hover:text-gray-700 underline underline-offset-4 transition-colors"
+            >
+              Non merci, je préfère avancer seul →
+            </button>
+          </div>
 
-        {/* Trust Badges */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="flex flex-wrap justify-center gap-4 text-sm text-gray-500"
-        >
-          <div className="flex items-center gap-1.5">
-            <Shield className="w-4 h-4 text-green-500" />
-            <span>Paiement 100% securise par Stripe</span>
+          {/* Garanties */}
+          <div className="flex flex-wrap items-center justify-center gap-6 pt-6 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Paiement 100% sécurisé par Stripe
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4" />
+              Satisfait ou remboursé 30 jours
+            </div>
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" />
+              97% font leur 1ère vente
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span>Garantie satisfait ou rembourse 30 jours</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <MessageCircle className="w-4 h-4 text-green-500" />
-            <span>97% de clients coaches atteignent leur premiere vente</span>
-          </div>
-        </motion.div>
+        </div>
 
       </div>
     </div>

@@ -480,8 +480,33 @@ export default function OfferGenerationStart() {
             </div>
           </motion.div>
 
+          {/* Encadré d'information */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2 }}
+            className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-5 mb-6"
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                <span className="text-xl">✨</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-amber-900 font-bold text-base mb-2 flex items-center gap-2">
+                  🎯 Génération en cours...
+                </h3>
+                <p className="text-amber-800 text-sm leading-relaxed mb-1.5">
+                  Pour des offres <span className="font-semibold">ultra-personnalisées et optimales</span>, la génération peut prendre jusqu'à <span className="font-semibold">5 minutes</span>.
+                </p>
+                <p className="text-amber-900 font-semibold text-sm">
+                  ⚠️ Ne ferme surtout pas cette page ! Laisse la magie opérer... 🪄
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
           {/* Étapes de préparation */}
-          <div className="space-y-3 mt-8">
+          <div className="space-y-3 mt-6">
             {preparationSteps.map((step, index) => {
               const Icon = step.icon;
               const isCompleted = index < currentStep;

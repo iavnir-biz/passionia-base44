@@ -45,6 +45,11 @@ export default function UpsellCoaching() {
         return;
       }
 
+      if (currentUser.has_purchased_upsell || currentUser.has_purchased_downsell || currentUser.has_coaching) {
+        navigate(createPageUrl('Dashboard'));
+        return;
+      }
+
       const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
       if (sessions.length > 0) {
         const userSession = sessions[0];

@@ -576,23 +576,15 @@ ${offer.ecosystem_role || ''}
                             </GlowButton>
                           ) : (
                             <GlowButton
-                              onClick={() => handleDownloadPDF(offer, offerType.title)}
-                              variant="secondary"
+                              onClick={() => handleCopy(offer)}
+                              variant="primary"
                               size="sm"
-                              icon={Download}
+                              icon={Copy}
                               className="flex-1"
                             >
-                              PDF
+                              Copier l'offre
                             </GlowButton>
                           )}
-                          <GlowButton
-                            onClick={() => handleCopy(offer)}
-                            variant="ghost"
-                            size="sm"
-                            icon={Copy}
-                          >
-                            Copier
-                          </GlowButton>
                         </div>
                       </>
                     ) : (

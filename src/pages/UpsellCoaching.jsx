@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, MessageCircle, Users, FileCheck, Target, Shield, Check, Rocket, Gift, AlertTriangle, Star, Bot, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { Clock, MessageCircle, Users, FileCheck, Target, Shield, Check, Rocket, Gift, AlertTriangle, Star, Bot, Sparkles, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 // ============================================================================
 // UPSELL COACHING VIP - 497€
@@ -7,21 +11,57 @@ import { Clock, MessageCircle, Users, FileCheck, Target, Shield, Check, Rocket, 
 // DWY (Done With You) - On accompagne ENSEMBLE, on couvre tous les besoins
 // ============================================================================
 
-export default function UpsellCoaching({ 
-  user = {}, 
-  session = {}, 
-  onAccept, 
-  onDecline 
-}) {
+export default function UpsellCoaching() {
+  const navigate = useNavigate();
+  
   // ========================================================================
   // STATE & DATA
   // ========================================================================
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
   const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 minutes
   const placesRestantes = 7;
 
   // Données dynamiques - PRÉNOM PERSONNALISÉ
   const firstName = user?.firstName || session?.onboarding_full?.firstName || '';
   const thematique = session?.onboarding_summary?.who_to_teach || session?.onboarding_full?.coreSkill || 'ton domaine';
+
+  // ========================================================================
+  // CHARGEMENT INITIAL
+  // ========================================================================
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+
+      if (!currentUser.has_purchased) {
+        navigate(createPageUrl('Home'));
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+      if (sessions.length > 0) {
+        const userSession = sessions[0];
+        setSession(userSession);
+
+        if (userSession.has_seen_upsell === true) {
+          navigate(createPageUrl('Dashboard'));
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Erreur lors du chargement');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ========================================================================
   // TIMER COUNTDOWN
@@ -143,8 +183,54 @@ export default function UpsellCoaching({
   ];
 
   // ========================================================================
+  // HANDLERS
+  // ========================================================================
+  const handleAcceptOffer = async () => {
+    setIsCreatingCheckout(true);
+    try {
+      const { data } = await base44.functions.invoke('createCheckoutUpsell', {
+        sessionId: session?.id,
+        upsellPrice: 49700
+      });
+
+      if (data?.url) {
+        window.top.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error('Erreur lors de la redirection vers le paiement');
+      setIsCreatingCheckout(false);
+    }
+  };
+
+  const handleDeclineOffer = async () => {
+    try {
+      if (session) {
+        await base44.entities.Session.update(session.id, {
+          has_seen_upsell: true,
+          upsell_refused_at: new Date().toISOString()
+        });
+      }
+      navigate(createPageUrl('DownsellSession'));
+    } catch (error) {
+      console.error('Error declining offer:', error);
+      navigate(createPageUrl('DownsellSession'));
+    }
+  };
+
+  // ========================================================================
   // RENDER
   // ========================================================================
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white">
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
@@ -355,17 +441,23 @@ export default function UpsellCoaching({
         {/* ================================================================ */}
         <div className="text-center space-y-4">
           <button
-            onClick={onAccept}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#61f7a2] text-white text-xl font-bold px-12 py-5 rounded-2xl shadow-xl shadow-[#61f7a2]/20 transition-all hover:scale-105 active:scale-100"
+            onClick={handleAcceptOffer}
+            disabled={isCreatingCheckout}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#61f7a2] text-white text-xl font-bold px-12 py-5 rounded-2xl shadow-xl shadow-[#61f7a2]/20 transition-all hover:scale-105 active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Rocket className="w-6 h-6" />
-            OUI, je veux être accompagné — 497€
+            {isCreatingCheckout ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : (
+              <Rocket className="w-6 h-6" />
+            )}
+            {isCreatingCheckout ? 'Redirection...' : 'OUI, je veux être accompagné — 497€'}
           </button>
           
           <div>
             <button
-              onClick={onDecline}
-              className="text-gray-500 hover:text-gray-700 underline underline-offset-4 transition-colors"
+              onClick={handleDeclineOffer}
+              disabled={isCreatingCheckout}
+              className="text-gray-500 hover:text-gray-700 underline underline-offset-4 transition-colors disabled:opacity-50"
             >
               Non merci, je préfère avancer seul →
             </button>

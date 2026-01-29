@@ -248,12 +248,14 @@ export default function ChooseYourPath() {
             ))}
           </div>
           
-          <button
-            onClick={() => navigate(createPageUrl('Booking'))}
-            className="w-full bg-transparent border-2 border-[#61f7a2] text-[#61f7a2] hover:bg-[#61f7a2] hover:text-gray-900 font-bold py-4 px-8 rounded-xl transition-all"
+          <a
+            href="https://calendar.app.google/hYKoogWG1ARYkyS59"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-transparent border-2 border-[#61f7a2] text-[#61f7a2] hover:bg-[#61f7a2] hover:text-gray-900 font-bold py-4 px-8 rounded-xl transition-all block text-center"
           >
             Prendre rendez-vous avec nous →
-          </button>
+          </a>
         </div>
 
         <p className="text-center mt-8 text-gray-600 text-sm">

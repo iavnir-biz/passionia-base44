@@ -19,7 +19,8 @@ export default function ChooseYourPath() {
         'Membre Fondateur',
         'Accès Skool à VIE (valeur 1164€/an)'
       ],
-      popular: true
+      popular: false,
+      tagline: null
     },
     {
       price: 104,
@@ -31,18 +32,23 @@ export default function ChooseYourPath() {
         '30 jours de contenu réseaux sociaux prêt à poster',
         'Carrousels, réels, designs adaptés à vos offres'
       ],
-      popular: false
+      popular: true,
+      tagline: '💡 Sans ce pack, vous passez 2 semaines à créer vos contenus. Avec, vous postez dès demain.',
+      highlighted: true
     },
     {
       price: 497,
       title: 'Pack Premium + 3 Coachings',
       items: [
-        'Tout inclus',
+        'Tout inclus (générateur + réseaux sociaux)',
         'Accès Skool à VIE',
         '3 sessions de 45min d\'accompagnement personnalisé',
-        'Audit complet et suivi de votre projet'
+        'Audit complet de votre projet',
+        'Stratégie de lancement personnalisée',
+        'On débloque vos blocages techniques'
       ],
-      popular: false
+      popular: false,
+      tagline: '🚀 L\'option idéale si vous voulez être guidé sans le done-for-you complet.'
     }
   ];
 
@@ -104,10 +110,14 @@ export default function ChooseYourPath() {
           {pricingOptions.map((option) => (
             <label
               key={option.price}
-              className={`bg-white border-2 rounded-2xl p-6 cursor-pointer transition-all ${
+              className={`bg-white rounded-2xl p-6 cursor-pointer transition-all ${
+                option.highlighted 
+                  ? 'border-2 border-[#61f7a2]' 
+                  : 'border-2 border-gray-200'
+              } ${
                 selectedPrice === option.price
-                  ? 'border-[#61f7a2] bg-gradient-to-br from-[#61f7a2]/8 to-[#61f7a2]/2 shadow-lg shadow-[#61f7a2]/20'
-                  : 'border-gray-200 hover:border-[#61f7a2] hover:shadow-lg hover:shadow-[#61f7a2]/15 hover:-translate-y-0.5'
+                  ? 'bg-gradient-to-br from-[#61f7a2]/8 to-[#61f7a2]/2 shadow-lg shadow-[#61f7a2]/20'
+                  : 'hover:border-[#61f7a2] hover:shadow-lg hover:shadow-[#61f7a2]/15 hover:-translate-y-0.5'
               }`}
             >
               <input
@@ -131,7 +141,7 @@ export default function ChooseYourPath() {
                       </span>
                     )}
                   </div>
-                  <ul className="space-y-1.5">
+                  <ul className="space-y-1.5 mb-3">
                     {option.items.map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700 text-[0.9rem]">
                         <Check className="w-4 h-4 text-[#61f7a2] flex-shrink-0 mt-0.5" />
@@ -139,6 +149,11 @@ export default function ChooseYourPath() {
                       </li>
                     ))}
                   </ul>
+                  {option.tagline && (
+                    <p className="text-[#61f7a2] text-sm font-semibold italic">
+                      {option.tagline}
+                    </p>
+                  )}
                 </div>
                 
                 <div className="flex flex-col items-end gap-3">
@@ -196,7 +211,12 @@ export default function ChooseYourPath() {
         <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[20px] p-8 text-white relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"></div>
           
-          <div className="text-4xl mb-3">💎</div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-4xl">💎</div>
+            <span className="bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider animate-pulse">
+              2 PLACES UNIQUEMENT
+            </span>
+          </div>
           
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-bold text-2xl">On le fait pour vous</h3>

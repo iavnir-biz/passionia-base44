@@ -54,33 +54,33 @@ export default function ChooseYourPath() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Bandeau d'urgence */}
-      <div className="bg-red-600 text-white py-3.5 px-5 text-center font-semibold text-[0.95rem] tracking-wide animate-pulse">
-        <span className="inline-block mx-2 animate-bounce">🔥</span>
+      <div className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] text-gray-900 py-3.5 px-5 text-center font-bold text-[0.95rem] tracking-wide">
+        <span className="inline-block mx-2">🔥</span>
         <span>DERNIÈRES OFFRES — Reste 4 places — Ce soir uniquement, demain les prix augmentent</span>
-        <span className="inline-block mx-2 animate-bounce">🔥</span>
+        <span className="inline-block mx-2">🔥</span>
       </div>
 
       {/* Header */}
-      <div className="py-7 px-5 text-center">
-        <div className="flex items-center justify-center gap-2.5 mb-2">
-          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#0f172a"/>
-          </svg>
-          <div className="font-bold text-lg text-gray-900">
-            PASSION IA <span className="font-normal text-gray-600">BY IAVNIR</span>
+      <div className="py-7 px-5 text-center border-b border-gray-200">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg shadow-[#61f7a2]/20">
+            <Sparkles className="w-6 h-6 text-white" />
+          </div>
+          <div className="font-bold text-xl text-gray-900">
+            PASSION IA
           </div>
         </div>
       </div>
 
       {/* Container principal */}
-      <div className="max-w-[580px] mx-auto px-5 pb-16">
+      <div className="max-w-[580px] mx-auto px-5 py-12 pb-16">
         
-        <h1 className="text-4xl font-bold text-center mb-2.5 text-gray-900 leading-tight">
+        <h1 className="text-4xl font-bold text-center mb-3 text-gray-900 leading-tight">
           Choisissez votre chemin
         </h1>
-        <p className="text-center text-gray-600 mb-9">
+        <p className="text-center text-gray-600 text-lg mb-9">
           Votre avenir dépend de la décision que vous prenez ce soir.
         </p>
 
@@ -91,8 +91,8 @@ export default function ChooseYourPath() {
               key={option.price}
               className={`bg-white border-2 rounded-2xl p-6 cursor-pointer transition-all ${
                 selectedPrice === option.price
-                  ? 'border-[#4ade80] bg-gradient-to-br from-[#4ade80]/8 to-[#4ade80]/2 shadow-lg shadow-[#4ade80]/20'
-                  : 'border-gray-200 hover:border-[#4ade80] hover:shadow-lg hover:shadow-[#4ade80]/15 hover:-translate-y-0.5'
+                  ? 'border-[#61f7a2] bg-gradient-to-br from-[#61f7a2]/8 to-[#61f7a2]/2 shadow-lg shadow-[#61f7a2]/20'
+                  : 'border-gray-200 hover:border-[#61f7a2] hover:shadow-lg hover:shadow-[#61f7a2]/15 hover:-translate-y-0.5'
               }`}
             >
               <input
@@ -111,14 +111,14 @@ export default function ChooseYourPath() {
                       {option.title}
                     </div>
                     {option.popular && (
-                      <span className="bg-[#4ade80] text-gray-900 text-[0.7rem] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      <span className="bg-[#61f7a2] text-gray-900 text-[0.7rem] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                         Populaire
                       </span>
                     )}
                   </div>
                   <p className="text-gray-600 text-[0.9rem] leading-relaxed">
                     {option.description.split('Accès Skool à VIE')[0]}
-                    <strong className="text-[#4ade80] font-semibold">
+                    <strong className="text-[#61f7a2] font-semibold">
                       Accès Skool à VIE
                     </strong>
                     {option.description.split('Accès Skool à VIE')[1]}
@@ -133,7 +133,7 @@ export default function ChooseYourPath() {
                   {/* Radio indicator */}
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                     selectedPrice === option.price
-                      ? 'border-[#4ade80] bg-[#4ade80]'
+                      ? 'border-[#61f7a2] bg-[#61f7a2]'
                       : 'border-gray-300'
                   }`}>
                     {selectedPrice === option.price && (
@@ -150,7 +150,7 @@ export default function ChooseYourPath() {
         <button
           onClick={handlePayment}
           disabled={!selectedPrice || isProcessing}
-          className="w-full bg-[#4ade80] hover:bg-[#86efac] disabled:bg-gray-200 disabled:text-gray-500 text-gray-900 font-bold text-lg py-4 px-8 rounded-xl transition-all uppercase tracking-wide disabled:cursor-not-allowed hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#4ade80]/40 flex items-center justify-center gap-2"
+          className="w-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#61f7a2] disabled:bg-gray-200 disabled:text-gray-500 text-gray-900 font-bold text-lg py-4 px-8 rounded-xl transition-all uppercase tracking-wide disabled:cursor-not-allowed hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#61f7a2]/30 flex items-center justify-center gap-2"
         >
           {isProcessing ? (
             <>
@@ -165,7 +165,7 @@ export default function ChooseYourPath() {
         </button>
 
         <div className="flex items-center justify-center gap-2 mt-4 text-gray-600 text-sm">
-          <Shield className="w-4.5 h-4.5 text-[#4ade80]" />
+          <Shield className="w-4.5 h-4.5 text-[#61f7a2]" />
           <span>Paiement sécurisé — Satisfait ou remboursé 14 jours</span>
         </div>
 
@@ -178,13 +178,13 @@ export default function ChooseYourPath() {
 
         {/* Option Premium : Done for you */}
         <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[20px] p-8 text-white relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#4ade80] to-[#86efac]"></div>
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#61f7a2] to-[#4de88f]"></div>
           
           <div className="text-4xl mb-3">💎</div>
           
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-bold text-2xl">On le fait pour vous</h3>
-            <div className="font-bold text-4xl text-[#4ade80]">4000€</div>
+            <div className="font-bold text-4xl text-[#61f7a2]">4000€</div>
           </div>
           
           <p className="text-gray-400 text-[0.95rem] mb-6 leading-relaxed">
@@ -214,7 +214,7 @@ export default function ChooseYourPath() {
           
           <button
             onClick={() => navigate(createPageUrl('Booking'))}
-            className="w-full bg-transparent border-2 border-[#4ade80] text-[#4ade80] hover:bg-[#4ade80] hover:text-gray-900 font-bold py-4 px-8 rounded-xl transition-all"
+            className="w-full bg-transparent border-2 border-[#61f7a2] text-[#61f7a2] hover:bg-[#61f7a2] hover:text-gray-900 font-bold py-4 px-8 rounded-xl transition-all"
           >
             Prendre rendez-vous avec nous →
           </button>
@@ -222,7 +222,7 @@ export default function ChooseYourPath() {
 
         <p className="text-center mt-8 text-gray-600 text-sm">
           Des questions ? Contactez-nous sur{' '}
-          <a href="https://www.skool.com/ia-pour-tous-6043/about" target="_blank" rel="noopener noreferrer" className="text-[#4ade80] underline">
+          <a href="https://www.skool.com/ia-pour-tous-6043/about" target="_blank" rel="noopener noreferrer" className="text-[#61f7a2] underline hover:text-[#4de88f]">
             Skool
           </a>
           {' '}ou par email.

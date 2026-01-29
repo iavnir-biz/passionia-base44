@@ -7,34 +7,38 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), {
 
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
     const { selectedPrice } = await req.json();
 
     if (!selectedPrice || ![67, 104, 497].includes(selectedPrice)) {
       return Response.json({ error: 'Invalid price' }, { status: 400 });
     }
 
-    // Récupérer l'utilisateur s'il est authentifié
+    // Récupérer l'utilisateur s'il est authentifié (optionnel)
     let user = null;
     let customerId = null;
     
     try {
-      user = await base44.auth.me();
+      const base44 = createClientFromRequest(req);
+      const isAuth = await base44.auth.isAuthenticated();
       
-      // Créer ou récupérer le client Stripe pour utilisateur authentifié
-      if (user) {
-        customerId = user.stripe_customer_id;
-        if (!customerId) {
-          const customer = await stripe.customers.create({
-            email: user.email,
-            name: user.firstName || user.full_name,
-            metadata: {
-              user_id: user.id,
-              app_user: 'true'
-            }
-          });
-          customerId = customer.id;
-          await base44.auth.updateMe({ stripe_customer_id: customerId });
+      if (isAuth) {
+        user = await base44.auth.me();
+        
+        // Créer ou récupérer le client Stripe pour utilisateur authentifié
+        if (user) {
+          customerId = user.stripe_customer_id;
+          if (!customerId) {
+            const customer = await stripe.customers.create({
+              email: user.email,
+              name: user.firstName || user.full_name,
+              metadata: {
+                user_id: user.id,
+                app_user: 'true'
+              }
+            });
+            customerId = customer.id;
+            await base44.auth.updateMe({ stripe_customer_id: customerId });
+          }
         }
       }
     } catch (error) {

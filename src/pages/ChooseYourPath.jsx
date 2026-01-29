@@ -150,7 +150,7 @@ export default function ChooseYourPath() {
                     ))}
                   </ul>
                   {option.tagline && (
-                    <p className="text-[#61f7a2] text-sm font-semibold italic">
+                    <p className="text-[#1fa85f] text-sm font-semibold italic">
                       {option.tagline}
                     </p>
                   )}
@@ -220,7 +220,7 @@ export default function ChooseYourPath() {
           
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-bold text-2xl">On le fait pour vous</h3>
-            <div className="font-bold text-4xl text-[#61f7a2]">4000€</div>
+            <div className="font-bold text-4xl text-[#2dd673]">4000€</div>
           </div>
           
           <p className="text-gray-400 text-[0.95rem] mb-6 leading-relaxed">

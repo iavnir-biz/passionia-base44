@@ -54,6 +54,7 @@ import AvatarClients from './pages/AvatarClients';
 import BonneNouvelle from './pages/BonneNouvelle';
 import Booking from './pages/Booking';
 import CTAPAYWALL from './pages/CTAPAYWALL';
+import ChooseYourPath from './pages/ChooseYourPath';
 import DailyActions from './pages/DailyActions';
 import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
@@ -115,7 +116,6 @@ import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import ChooseYourPath from './pages/ChooseYourPath';
 
 
 export const PAGES = {
@@ -126,6 +126,7 @@ export const PAGES = {
     "BonneNouvelle": BonneNouvelle,
     "Booking": Booking,
     "CTAPAYWALL": CTAPAYWALL,
+    "ChooseYourPath": ChooseYourPath,
     "DailyActions": DailyActions,
     "Dashboard": Dashboard,
     "Documents": Documents,
@@ -187,7 +188,6 @@ export const PAGES = {
     "UpsellCoaching": UpsellCoaching,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "ChooseYourPath": ChooseYourPath,
 }
 
 export const pagesConfig = {

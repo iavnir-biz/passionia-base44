@@ -13,20 +13,35 @@ export default function ChooseYourPath() {
   const pricingOptions = [
     {
       price: 67,
-      title: 'Pack Accélérateur + Membre Fondateur',
-      description: 'Générateur complet + Accès Skool à VIE (valeur 1164€/an)',
+      title: 'Pack Accélérateur',
+      items: [
+        'Générateur complet',
+        'Membre Fondateur',
+        'Accès Skool à VIE (valeur 1164€/an)'
+      ],
       popular: true
     },
     {
       price: 104,
-      title: 'Pack Accélérateur + Réseaux Sociaux',
-      description: 'Tout le pack + Accès Skool à VIE + 30 jours de contenus RS prêts à poster (carrousels, réels, designs)',
+      title: 'Pack Accélérateur + Pack Réseaux Sociaux',
+      items: [
+        'Générateur complet',
+        'Membre Fondateur',
+        'Accès Skool à VIE (valeur 1164€/an)',
+        '30 jours de contenu réseaux sociaux prêt à poster',
+        'Carrousels, réels, designs adaptés à vos offres'
+      ],
       popular: false
     },
     {
       price: 497,
       title: 'Pack Premium + 3 Coachings',
-      description: 'Tout inclus + Accès Skool à VIE + 3 sessions de 45min d\'accompagnement personnalisé pour auditer et faire avancer votre projet',
+      items: [
+        'Tout inclus',
+        'Accès Skool à VIE',
+        '3 sessions de 45min d\'accompagnement personnalisé',
+        'Audit complet et suivi de votre projet'
+      ],
       popular: false
     }
   ];
@@ -106,23 +121,24 @@ export default function ChooseYourPath() {
               
               <div className="flex justify-between items-start relative">
                 <div className="flex-1 pr-4">
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 mb-2">
                     <div className="font-bold text-lg text-gray-900">
                       {option.title}
                     </div>
                     {option.popular && (
                       <span className="bg-[#61f7a2] text-gray-900 text-[0.7rem] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        Populaire
+                        Recommandé
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-600 text-[0.9rem] leading-relaxed">
-                    {option.description.split('Accès Skool à VIE')[0]}
-                    <strong className="text-[#61f7a2] font-semibold">
-                      Accès Skool à VIE
-                    </strong>
-                    {option.description.split('Accès Skool à VIE')[1]}
-                  </p>
+                  <ul className="space-y-1.5">
+                    {option.items.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-gray-700 text-[0.9rem]">
+                        <Check className="w-4 h-4 text-[#61f7a2] flex-shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
                 
                 <div className="flex flex-col items-end gap-3">

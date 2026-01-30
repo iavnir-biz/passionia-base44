@@ -61,7 +61,7 @@ const categories = [
   { icon: Dumbbell, label: "Calisthénie", color: "bg-orange-100 text-orange-700 hover:bg-orange-200" },
   { icon: ChefHat, label: "Cuisine moléculaire", color: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200" },
   { icon: Camera, label: "Créer du contenu", color: "bg-purple-100 text-purple-700 hover:bg-purple-200" },
-  { icon: Sword, label: "Jujitsu", color: "bg-red-100 text-red-700 hover:bg-red-200" },
+  { icon: Sword, label: "Jiu jitsu", color: "bg-red-100 text-red-700 hover:bg-red-200" },
   { icon: Sparkle, label: "Intelligence artificielle", color: "bg-indigo-100 text-indigo-700 hover:bg-indigo-200" },
   { icon: Video, label: "Montage vidéo", color: "bg-cyan-100 text-cyan-700 hover:bg-cyan-200" },
   { icon: Heart, label: "Yoga", color: "bg-rose-100 text-rose-700 hover:bg-rose-200" }

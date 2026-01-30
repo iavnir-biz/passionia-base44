@@ -33,7 +33,6 @@ export default function Dashboard() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [timeLeftCoaching, setTimeLeftCoaching] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -50,34 +49,6 @@ export default function Dashboard() {
       return () => clearInterval(interval);
     }
   }, [session?.generation_in_progress]);
-
-  // ⏰ Countdown 72h pour coaching (démarre depuis l'achat du pack)
-  useEffect(() => {
-    if (!user?.has_purchased || !user?.purchased_at) return;
-    if (user?.has_purchased_upsell || user?.has_purchased_downsell || user?.has_coaching) return;
-
-    const calculateTimeLeft = () => {
-      const purchasedAt = new Date(user.purchased_at).getTime();
-      const now = Date.now();
-      const deadline = purchasedAt + (72 * 60 * 60 * 1000); // 72h en millisecondes
-      const remaining = Math.max(0, deadline - now);
-      return Math.floor(remaining / 1000); // en secondes
-    };
-
-    setTimeLeftCoaching(calculateTimeLeft());
-
-    const timer = setInterval(() => {
-      const remaining = calculateTimeLeft();
-      setTimeLeftCoaching(remaining);
-      if (remaining <= 0) {
-        clearInterval(timer);
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [user]);
-
-
 
   const checkGenerationComplete = async () => {
     try {
@@ -175,21 +146,6 @@ export default function Dashboard() {
 
   const countGenerated = () => livrables.filter(item => session?.[item.field]).length;
 
-  const formatTimeCoaching = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, '0')}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
-  };
-
-  const shouldShowCoachingOffer = () => {
-    return user?.has_purchased
-      && !user?.has_purchased_upsell
-      && !user?.has_purchased_downsell
-      && !user?.has_coaching
-      && timeLeftCoaching > 0;
-  };
-
   if (authLoading || loading) {
     return (
       <div className="flex min-h-screen bg-white">
@@ -222,52 +178,6 @@ export default function Dashboard() {
         />
 
         <main className="p-4 sm:p-8 max-w-6xl mx-auto">
-          
-          {/* BANNIÈRE COACHING 72h - Version fine */}
-          {shouldShowCoachingOffer() && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }} 
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-r from-orange-500 to-red-600 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6 shadow-lg"
-            >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                <div className="flex items-center gap-2 sm:gap-3 flex-1 w-full">
-                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-bold text-xs sm:text-sm lg:text-base leading-tight">
-                      🔥 Dernière chance : Accompagnement VIP 30 jours
-                    </h3>
-                    <p className="text-white/80 text-xs hidden sm:block mt-0.5">
-                      3 sessions 1-1 + WhatsApp direct avec Alfred & Damien
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                  {/* Compteur */}
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 border border-white/30 flex-1 sm:flex-none">
-                    <div className="flex items-center gap-1 mb-0.5">
-                      <Clock className="w-3 h-3 text-white/80" />
-                      <span className="text-white/80 text-xs font-medium">Expire dans :</span>
-                    </div>
-                    <p className="text-sm sm:text-base lg:text-lg font-black text-white font-mono">
-                      {formatTimeCoaching(timeLeftCoaching)}
-                    </p>
-                  </div>
-
-                  {/* CTA */}
-                  <Link
-                    to={createPageUrl('UpsellCoaching')}
-                    className="bg-white text-orange-600 hover:bg-white/90 font-bold py-2 px-3 sm:px-4 lg:px-6 rounded-lg transition-all shadow-md text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
-                  >
-                    ✨ Voir l'offre
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          )}
 
           {/* GREETING avec photo */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex items-center gap-4">

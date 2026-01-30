@@ -234,6 +234,18 @@ export default function OnboardingFirstName() {
     }
   };
 
+  // Afficher un loader pendant la vérification d'auth
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <NoahAvatar />
+          <p className="text-gray-600 mt-4">Vérification...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
       <motion.div

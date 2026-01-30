@@ -124,6 +124,26 @@ export default function OnboardingFirstName() {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // 🔐 Vérifier l'authentification au chargement
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth) {
+          // Rediriger vers login avec retour sur cette page
+          base44.auth.redirectToLogin(window.location.href);
+          return;
+        }
+        setIsCheckingAuth(false);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        base44.auth.redirectToLogin(window.location.href);
+      }
+    };
+    checkAuth();
+  }, []);
 
   // Typing effects for each text block
   const text1 = "Commençons par faire connaissance 🙂";

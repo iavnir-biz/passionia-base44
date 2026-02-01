@@ -310,7 +310,7 @@ export default function TeaserPage() {
 
         {/* ━━━ Bouton CTA ━━━ */}
         <a
-          href="#LIEN_VERS_GENERATEUR"
+          href="/OnboardingFirstName"
           style={{
             display: "flex",
             alignItems: "center",

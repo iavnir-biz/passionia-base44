@@ -421,16 +421,7 @@ export default function TeaserPage() {
           C'est parti 🚀
         </a>
 
-        {/* Micro-texte */}
-        <p style={{
-          fontSize: "12px",
-          color: "#ccc",
-          marginTop: "12px",
-          textAlign: "center",
-          animation: "fadeInUp 0.5s ease-out 0.85s both",
-        }}>
-          Aucune carte bancaire · Aucune compétence requise
-        </p>
+
       </div>
 
       <style>{`

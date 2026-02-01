@@ -114,8 +114,8 @@ import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
-import WelcomeOpening from './pages/WelcomeOpening';
 import Welcome from './pages/Welcome';
+import WelcomeOpening from './pages/WelcomeOpening';
 
 
 export const PAGES = {
@@ -186,8 +186,8 @@ export const PAGES = {
     "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
     "UpsellCoaching": UpsellCoaching,
-    "WelcomeOpening": WelcomeOpening,
     "Welcome": Welcome,
+    "WelcomeOpening": WelcomeOpening,
 }
 
 export const pagesConfig = {

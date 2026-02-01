@@ -78,12 +78,11 @@ export default function TeaserPage() {
 
   return (
     <div style={{
-      height: "100vh",
-      background: "#ffffff",
+      minHeight: "100vh",
+      background: "#fafafa",
       fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
       display: "flex",
       flexDirection: "column",
-      overflow: "hidden",
     }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet" />
 
@@ -92,7 +91,7 @@ export default function TeaserPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "12px 20px",
+        padding: "20px 16px",
         maxWidth: "1200px",
         margin: "0 auto",
         width: "100%",
@@ -101,25 +100,25 @@ export default function TeaserPage() {
         <div style={{
           display: "flex",
           alignItems: "center",
-          gap: "8px",
+          gap: "10px",
         }}>
           <div style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "10px",
+            width: "40px",
+            height: "40px",
+            borderRadius: "12px",
             background: "linear-gradient(135deg, #61f7a2, #3dd67a)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(97,247,162,0.25)",
+            boxShadow: "0 4px 16px rgba(97,247,162,0.3)",
           }}>
-            <SparkleIcon size={16} color="white" />
+            <SparkleIcon size={20} color="white" />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-            <span style={{ fontSize: "15px", fontWeight: 800, color: "#111", letterSpacing: "-0.02em" }}>
+            <span style={{ fontSize: "17px", fontWeight: 800, color: "#111", letterSpacing: "-0.02em" }}>
               PassionIA
             </span>
-            <span style={{ fontSize: "10px", fontWeight: 500, color: "#999", letterSpacing: "0" }}>
+            <span style={{ fontSize: "11px", fontWeight: 500, color: "#999", letterSpacing: "0" }}>
               Transforme ton savoir en business
             </span>
           </div>
@@ -136,12 +135,12 @@ export default function TeaserPage() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              padding: "8px 20px",
+              padding: "10px 24px",
               background: "white",
               color: "#111",
               border: "2px solid #111",
               borderRadius: "999px",
-              fontSize: "13px",
+              fontSize: "14px",
               fontWeight: 600,
               cursor: "pointer",
               textDecoration: "none",
@@ -162,12 +161,12 @@ export default function TeaserPage() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              padding: "8px 24px",
+              padding: "10px 28px",
               background: "linear-gradient(135deg, #1a1a1a, #000)",
               color: "white",
               border: "none",
               borderRadius: "999px",
-              fontSize: "13px",
+              fontSize: "14px",
               fontWeight: 700,
               cursor: "pointer",
               textDecoration: "none",
@@ -194,9 +193,8 @@ export default function TeaserPage() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        padding: "0 20px",
-        maxWidth: "900px",
+        padding: "16px 16px 40px",
+        maxWidth: "440px",
         margin: "0 auto",
         width: "100%",
         boxSizing: "border-box",
@@ -205,33 +203,32 @@ export default function TeaserPage() {
         {/* ━━━ Hero ━━━ */}
         <div style={{
           textAlign: "center",
-          marginBottom: "20px",
+          marginBottom: "32px",
           animation: "fadeInUp 0.5s ease-out",
         }}>
           {/* Emoji + badge */}
           <div style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: "6px",
-            background: "rgba(255,255,255,0.6)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(0,0,0,0.06)",
+            gap: "8px",
+            background: "white",
+            border: "1px solid #eee",
             borderRadius: "999px",
-            padding: "4px 12px 4px 6px",
-            marginBottom: "12px",
+            padding: "6px 14px 6px 8px",
+            marginBottom: "20px",
             animation: "fadeInUp 0.5s ease-out 0.1s both",
           }}>
-            <span style={{ fontSize: "16px" }}>🎯</span>
-            <span style={{ fontSize: "12px", color: "#666", fontWeight: 600 }}>
+            <span style={{ fontSize: "18px" }}>🎯</span>
+            <span style={{ fontSize: "13px", color: "#666", fontWeight: 600 }}>
               Prêt à découvrir ton potentiel
             </span>
           </div>
 
           <h1 style={{
-            fontSize: "22px",
+            fontSize: "26px",
             fontWeight: 800,
             color: "#111",
-            margin: "0 0 8px",
+            margin: "0 0 10px",
             lineHeight: 1.2,
             letterSpacing: "-0.03em",
             animation: "fadeInUp 0.5s ease-out 0.15s both",
@@ -241,10 +238,10 @@ export default function TeaserPage() {
           </h1>
 
           <p style={{
-            fontSize: "13px",
+            fontSize: "14px",
             color: "#999",
             margin: 0,
-            lineHeight: 1.4,
+            lineHeight: 1.5,
             animation: "fadeInUp 0.5s ease-out 0.25s both",
           }}>
             En quelques questions simples, notre IA crée tout ce dont tu as besoin pour lancer ton activité.
@@ -253,11 +250,11 @@ export default function TeaserPage() {
 
         {/* ━━━ Les 4 blocs ━━━ */}
         <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "10px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
           width: "100%",
-          marginBottom: "20px",
+          marginBottom: "32px",
         }}>
           {steps.map((step, i) => (
             <div
@@ -266,17 +263,15 @@ export default function TeaserPage() {
               onMouseOut={() => setHoveredStep(null)}
               style={{
                 display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
-                background: "rgba(255,255,255,0.4)",
-                backdropFilter: "blur(20px)",
-                borderRadius: "14px",
-                padding: "14px 16px",
-                border: hoveredStep === i ? `1.5px solid ${step.color}30` : "1.5px solid rgba(0,0,0,0.06)",
+                alignItems: "flex-start",
+                gap: "16px",
+                background: "white",
+                borderRadius: "16px",
+                padding: "18px 20px",
+                border: hoveredStep === i ? `1.5px solid ${step.color}20` : "1.5px solid #f0f0f0",
                 transition: "all 0.25s ease",
                 cursor: "default",
-                boxShadow: hoveredStep === i ? `0 4px 16px ${step.color}15` : "0 1px 3px rgba(0,0,0,0.02)",
+                boxShadow: hoveredStep === i ? `0 4px 16px ${step.color}10` : "0 1px 3px rgba(0,0,0,0.03)",
                 animation: `fadeInUp 0.5s ease-out ${0.3 + i * 0.08}s both`,
               }}
             >
@@ -286,9 +281,9 @@ export default function TeaserPage() {
                 flexShrink: 0,
               }}>
                 <div style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "14px",
                   background: step.bgColor,
                   display: "flex",
                   alignItems: "center",
@@ -302,14 +297,14 @@ export default function TeaserPage() {
                 {/* Petit numéro */}
                 <div style={{
                   position: "absolute",
-                  top: "-3px",
-                  right: "-3px",
-                  width: "16px",
-                  height: "16px",
-                  borderRadius: "5px",
+                  top: "-4px",
+                  right: "-4px",
+                  width: "18px",
+                  height: "18px",
+                  borderRadius: "6px",
                   background: "#111",
                   color: "white",
-                  fontSize: "9px",
+                  fontSize: "10px",
                   fontWeight: 700,
                   display: "flex",
                   alignItems: "center",
@@ -321,9 +316,9 @@ export default function TeaserPage() {
               </div>
 
               {/* Texte */}
-              <div style={{ flex: 1, minWidth: 0, textAlign: "center" }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <h3 style={{
-                  fontSize: "13px",
+                  fontSize: "15px",
                   fontWeight: 700,
                   color: "#111",
                   margin: "0 0 3px",
@@ -332,10 +327,10 @@ export default function TeaserPage() {
                   {step.title}
                 </h3>
                 <p style={{
-                  fontSize: "11px",
+                  fontSize: "13px",
                   color: "#999",
                   margin: 0,
-                  lineHeight: 1.4,
+                  lineHeight: 1.45,
                 }}>
                   {step.desc}
                 </p>
@@ -349,8 +344,8 @@ export default function TeaserPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "14px",
-          marginBottom: "16px",
+          gap: "16px",
+          marginBottom: "24px",
           animation: "fadeInUp 0.5s ease-out 0.7s both",
         }}>
           {["100% gratuit", "60 secondes", "Personnalisé"].map((text, i) => (
@@ -360,7 +355,7 @@ export default function TeaserPage() {
               gap: "4px",
             }}>
               <CheckIcon />
-              <span style={{ fontSize: "11px", color: "#aaa", fontWeight: 500 }}>{text}</span>
+              <span style={{ fontSize: "12px", color: "#aaa", fontWeight: 500 }}>{text}</span>
             </div>
           ))}
         </div>
@@ -372,15 +367,14 @@ export default function TeaserPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "8px",
-            maxWidth: "400px",
+            gap: "10px",
             width: "100%",
-            padding: "14px 24px",
+            padding: "18px 24px",
             background: "linear-gradient(135deg, #1a1a1a, #000)",
             color: "white",
             border: "none",
-            borderRadius: "14px",
-            fontSize: "15px",
+            borderRadius: "16px",
+            fontSize: "17px",
             fontWeight: 700,
             cursor: "pointer",
             fontFamily: "inherit",
@@ -400,16 +394,16 @@ export default function TeaserPage() {
             e.currentTarget.style.transform = "translateY(0)";
           }}
         >
-          <SparkleIcon size={18} color="#61f7a2" />
+          <SparkleIcon size={20} color="#61f7a2" />
           C'est parti
           <ArrowIcon />
         </a>
 
         {/* Micro-texte */}
         <p style={{
-          fontSize: "11px",
+          fontSize: "12px",
           color: "#ccc",
-          marginTop: "10px",
+          marginTop: "12px",
           textAlign: "center",
           animation: "fadeInUp 0.5s ease-out 0.85s both",
         }}>

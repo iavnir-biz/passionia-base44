@@ -47,29 +47,29 @@ const steps = [
     icon: <TargetIcon />,
     color: "#3b82f6",
     bgColor: "rgba(59, 130, 246, 0.08)",
-    title: "Validation de ton idée",
-    desc: "On vérifie si ta passion peut réellement se vendre en ligne, dans ta niche.",
+    title: "Je valide ton idée",
+    desc: "Je vérifie si ta passion peut réellement se vendre, dans ta niche, avec de la vraie demande.",
   },
   {
     icon: <TrendingIcon />,
     color: "#ec4899",
     bgColor: "rgba(236, 72, 153, 0.08)",
-    title: "Ton potentiel de revenus",
-    desc: "Estimation personnalisée basée sur ton savoir, ton vécu et ton marché.",
+    title: "J'estime tes revenus",
+    desc: "Je calcule combien tu peux générer avec ton savoir, ton vécu et ton marché.",
   },
   {
     icon: <FileIcon />,
     color: "#f59e0b",
     bgColor: "rgba(245, 158, 11, 0.08)",
-    title: "Tes 4 offres idéales",
-    desc: "Offres complètes avec prix, page de vente, messages et emails — générés pour toi.",
+    title: "Je crée tes 4 offres",
+    desc: "Offres complètes avec les prix, ta page de vente, tes messages et emails — tout est prêt.",
   },
   {
     icon: <RocketIcon />,
     color: "#22c55e",
     bgColor: "rgba(34, 197, 94, 0.08)",
-    title: "Ton plan d'action",
-    desc: "Semaine par semaine, une action par jour, jusqu'à ta première vente.",
+    title: "Je construis ton plan d'action",
+    desc: "Semaine par semaine, une action par jour. Tu sais exactement quoi faire.",
   },
 ];
 
@@ -206,22 +206,37 @@ export default function TeaserPage() {
           marginBottom: "32px",
           animation: "fadeInUp 0.5s ease-out",
         }}>
-          {/* Emoji + badge */}
+          {/* Avatar Noah */}
           <div style={{
+            position: "relative",
             display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            background: "white",
-            border: "1px solid #eee",
-            borderRadius: "999px",
-            padding: "6px 14px 6px 8px",
             marginBottom: "20px",
             animation: "fadeInUp 0.5s ease-out 0.1s both",
           }}>
-            <span style={{ fontSize: "18px" }}>🎯</span>
-            <span style={{ fontSize: "13px", color: "#666", fontWeight: 600 }}>
-              Prêt à découvrir ton potentiel
-            </span>
+            <div style={{
+              width: "64px",
+              height: "64px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #61f7a2, #3dd67a)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 8px 24px rgba(97,247,162,0.3)",
+            }}>
+              <SparkleIcon size={28} color="white" />
+            </div>
+            {/* Dot vert qui pulse */}
+            <div style={{
+              position: "absolute",
+              bottom: "2px",
+              right: "2px",
+              width: "14px",
+              height: "14px",
+              borderRadius: "50%",
+              background: "#3dd67a",
+              border: "2px solid #fafafa",
+              animation: "pulse 2s ease-in-out infinite",
+            }} />
           </div>
 
           <h1 style={{
@@ -233,18 +248,27 @@ export default function TeaserPage() {
             letterSpacing: "-0.03em",
             animation: "fadeInUp 0.5s ease-out 0.15s both",
           }}>
-            Voici ce que Noah va<br />
-            <span style={{ color: "#3dd67a" }}>générer pour toi</span>
+            Hello 👋 Moi c'est Noah.
           </h1>
 
           <p style={{
             fontSize: "14px",
             color: "#999",
-            margin: 0,
+            margin: "0 0 16px",
             lineHeight: 1.5,
             animation: "fadeInUp 0.5s ease-out 0.25s both",
           }}>
-            En quelques questions simples, notre IA crée tout ce dont tu as besoin pour lancer ton activité.
+            Je suis ton copilote IA. En quelques minutes, je vais analyser ton potentiel et tout créer pour toi.
+          </p>
+
+          <p style={{
+            fontSize: "15px",
+            color: "#111",
+            margin: 0,
+            fontWeight: 600,
+            animation: "fadeInUp 0.5s ease-out 0.3s both",
+          }}>
+            Voici le programme :
           </p>
         </div>
 
@@ -348,7 +372,7 @@ export default function TeaserPage() {
           marginBottom: "24px",
           animation: "fadeInUp 0.5s ease-out 0.7s both",
         }}>
-          {["100% gratuit", "60 secondes", "Personnalisé"].map((text, i) => (
+          {["100% gratuit", "5 minutes", "Personnalisé"].map((text, i) => (
             <div key={i} style={{
               display: "flex",
               alignItems: "center",
@@ -394,9 +418,7 @@ export default function TeaserPage() {
             e.currentTarget.style.transform = "translateY(0)";
           }}
         >
-          <SparkleIcon size={20} color="#61f7a2" />
-          C'est parti
-          <ArrowIcon />
+          C'est parti 🚀
         </a>
 
         {/* Micro-texte */}
@@ -407,7 +429,7 @@ export default function TeaserPage() {
           textAlign: "center",
           animation: "fadeInUp 0.5s ease-out 0.85s both",
         }}>
-          Aucune carte bancaire · Aucune compétence technique requise
+          Aucune carte bancaire · Aucune compétence requise
         </p>
       </div>
 
@@ -415,6 +437,10 @@ export default function TeaserPage() {
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.1); opacity: 0.8; }
         }
       `}</style>
     </div>

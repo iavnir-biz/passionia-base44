@@ -87,101 +87,25 @@ export default function TeaserPage() {
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet" />
 
       {/* Header */}
-      <header style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "20px 16px",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        width: "100%",
-        boxSizing: "border-box",
-      }}>
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-        }}>
-          <div style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "12px",
-            background: "linear-gradient(135deg, #61f7a2, #3dd67a)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 16px rgba(97,247,162,0.3)",
-          }}>
-            <SparkleIcon size={20} color="white" />
+      <header className="header-welcome">
+        <div className="logo-section">
+          <div className="logo-icon">
+            <SparkleIcon size={16} color="white" className="logo-sparkle-mobile" />
+            <SparkleIcon size={20} color="white" className="logo-sparkle-desktop" />
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-            <span style={{ fontSize: "17px", fontWeight: 800, color: "#111", letterSpacing: "-0.02em" }}>
-              PassionIA
-            </span>
-            <span style={{ fontSize: "11px", fontWeight: 500, color: "#999", letterSpacing: "0" }}>
-              Transforme ton savoir en business
-            </span>
+          <div className="logo-text">
+            <span className="logo-title">PassionIA</span>
+            <span className="logo-subtitle">Transforme ton savoir en business</span>
           </div>
         </div>
         
-        {/* Boutons desktop */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-        }}>
-          <a
-            href="#connexion"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              padding: "10px 24px",
-              background: "white",
-              color: "#111",
-              border: "2px solid #111",
-              borderRadius: "999px",
-              fontSize: "14px",
-              fontWeight: 600,
-              cursor: "pointer",
-              textDecoration: "none",
-              transition: "all 0.2s ease",
-            }}
-            onMouseOver={e => {
-              e.currentTarget.style.background = "#f5f5f5";
-            }}
-            onMouseOut={e => {
-              e.currentTarget.style.background = "white";
-            }}
-          >
+        {/* Boutons */}
+        <div className="header-buttons">
+          <a href="#connexion" className="btn-connexion">
             Connexion
           </a>
           
-          <a
-            href="#demarrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              padding: "10px 28px",
-              background: "linear-gradient(135deg, #1a1a1a, #000)",
-              color: "white",
-              border: "none",
-              borderRadius: "999px",
-              fontSize: "14px",
-              fontWeight: 700,
-              cursor: "pointer",
-              textDecoration: "none",
-              transition: "all 0.3s ease",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
-            }}
-            onMouseOver={e => {
-              e.currentTarget.style.boxShadow = "0 4px 20px rgba(97,247,162,0.4)";
-              e.currentTarget.style.transform = "translateY(-1px)";
-            }}
-            onMouseOut={e => {
-              e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.15)";
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
-          >
+          <a href="#demarrer" className="btn-demarrer">
             Démarrer gratuitement
           </a>
         </div>
@@ -432,6 +356,158 @@ export default function TeaserPage() {
         @keyframes pulse {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header-welcome {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 16px;
+          max-width: 1200px;
+          margin: 0 auto;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .logo-section {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .logo-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 10px;
+          background: linear-gradient(135deg, #61f7a2, #3dd67a);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(97,247,162,0.25);
+          flex-shrink: 0;
+        }
+
+        .logo-sparkle-mobile {
+          display: block;
+        }
+
+        .logo-sparkle-desktop {
+          display: none;
+        }
+
+        .logo-text {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+        }
+
+        .logo-title {
+          font-size: 15px;
+          font-weight: 700;
+          color: #111;
+          letter-spacing: -0.01em;
+        }
+
+        .logo-subtitle {
+          display: none;
+          font-size: 11px;
+          font-weight: 500;
+          color: #999;
+        }
+
+        .header-buttons {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .btn-connexion {
+          display: inline-flex;
+          align-items: center;
+          padding: 6px 12px;
+          background: white;
+          color: #111;
+          border: 1.5px solid #111;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+
+        .btn-connexion:hover {
+          background: #f5f5f5;
+        }
+
+        .btn-demarrer {
+          display: none;
+        }
+
+        /* Desktop styles */
+        @media (min-width: 768px) {
+          .header-welcome {
+            padding: 20px 16px;
+          }
+
+          .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+          }
+
+          .logo-sparkle-mobile {
+            display: none;
+          }
+
+          .logo-sparkle-desktop {
+            display: block;
+          }
+
+          .logo-section {
+            gap: 10px;
+          }
+
+          .logo-title {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+          }
+
+          .logo-subtitle {
+            display: block;
+          }
+
+          .header-buttons {
+            gap: 12px;
+          }
+
+          .btn-connexion {
+            padding: 10px 24px;
+            border: 2px solid #111;
+            font-size: 14px;
+          }
+
+          .btn-demarrer {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 28px;
+            background: linear-gradient(135deg, #1a1a1a, #000);
+            color: white;
+            border: none;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+          }
+
+          .btn-demarrer:hover {
+            box-shadow: 0 4px 20px rgba(97,247,162,0.4);
+            transform: translateY(-1px);
+          }
         }
       `}</style>
     </div>

@@ -86,33 +86,104 @@ export default function TeaserPage() {
     }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet" />
 
-      {/* Header minimaliste */}
+      {/* Header */}
       <header style={{
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-between",
         padding: "20px 16px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        width: "100%",
+        boxSizing: "border-box",
       }}>
         <div style={{
           display: "flex",
           alignItems: "center",
-          gap: "8px",
+          gap: "10px",
         }}>
           <div style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "10px",
+            width: "40px",
+            height: "40px",
+            borderRadius: "12px",
             background: "linear-gradient(135deg, #61f7a2, #3dd67a)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(97,247,162,0.25)",
+            boxShadow: "0 4px 16px rgba(97,247,162,0.3)",
           }}>
-            <SparkleIcon size={16} color="white" />
+            <SparkleIcon size={20} color="white" />
           </div>
-          <span style={{ fontSize: "15px", fontWeight: 700, color: "#111", letterSpacing: "-0.01em" }}>
-            PassionIA
-          </span>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+            <span style={{ fontSize: "17px", fontWeight: 800, color: "#111", letterSpacing: "-0.02em" }}>
+              PassionIA
+            </span>
+            <span style={{ fontSize: "11px", fontWeight: 500, color: "#999", letterSpacing: "0" }}>
+              Transforme ton savoir en business
+            </span>
+          </div>
+        </div>
+        
+        {/* Boutons desktop */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+        }}>
+          <a
+            href="#connexion"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              padding: "10px 24px",
+              background: "white",
+              color: "#111",
+              border: "2px solid #111",
+              borderRadius: "999px",
+              fontSize: "14px",
+              fontWeight: 600,
+              cursor: "pointer",
+              textDecoration: "none",
+              transition: "all 0.2s ease",
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.background = "#f5f5f5";
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.background = "white";
+            }}
+          >
+            Connexion
+          </a>
+          
+          <a
+            href="#demarrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              padding: "10px 28px",
+              background: "linear-gradient(135deg, #1a1a1a, #000)",
+              color: "white",
+              border: "none",
+              borderRadius: "999px",
+              fontSize: "14px",
+              fontWeight: 700,
+              cursor: "pointer",
+              textDecoration: "none",
+              transition: "all 0.3s ease",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.boxShadow = "0 4px 20px rgba(97,247,162,0.4)";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.15)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Démarrer gratuitement
+          </a>
         </div>
       </header>
 

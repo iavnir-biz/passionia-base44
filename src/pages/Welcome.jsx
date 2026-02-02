@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
 
 const SparkleIcon = ({ size = 20, color = "currentColor" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -102,14 +101,11 @@ export default function TeaserPage() {
         
         {/* Boutons */}
         <div className="header-buttons">
-          <button 
-            onClick={() => base44.auth.redirectToLogin()} 
-            className="btn-connexion"
-          >
+          <a href="/Dashboard" className="btn-connexion">
             Connexion
-          </button>
+          </a>
           
-          <a href="#demarrer" className="btn-demarrer">
+          <a href="/OnboardingFirstName" className="btn-demarrer">
             Démarrer gratuitement
           </a>
         </div>

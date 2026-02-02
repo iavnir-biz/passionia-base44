@@ -101,7 +101,7 @@ export default function TeaserPage() {
         
         {/* Boutons */}
         <div className="header-buttons">
-          <a href="#connexion" className="btn-connexion">
+          <a href="/Dashboard" className="btn-connexion">
             Connexion
           </a>
           

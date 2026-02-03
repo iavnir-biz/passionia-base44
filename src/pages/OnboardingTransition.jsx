@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Sparkles, CheckCircle2, Package, DollarSign, Mail, FileText, Rocket, Brain, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, CheckCircle2, Package, DollarSign, Mail, FileText, Rocket, Brain, Zap, Loader2 } from 'lucide-react';
+import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 import GlowButton from '@/components/ui/GlowButton';
 import confetti from 'canvas-confetti';
 

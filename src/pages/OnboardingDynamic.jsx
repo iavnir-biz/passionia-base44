@@ -287,7 +287,7 @@ export default function OnboardingDynamic() {
                                                          </div>
                                                      </div>
                                                  </div>
-                                                 <div className="p-6 md:p-8">
+
                                 {/* Titre de la question */}
                                 <h2 className="text-xl font-bold text-gray-900 mb-2">
                   {currentQuestion.title || currentQuestion.text}

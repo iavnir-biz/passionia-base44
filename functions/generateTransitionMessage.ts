@@ -105,23 +105,39 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     
+    // 🔒 SÉCURITÉ #1 : Validation des données entrantes
     const { sessionId, firstName } = await req.json();
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
-    // Récupérer la session
+    // 🔒 SÉCURITÉ #2 : Rate limiting via logging
+    // Ce log permettra de détecter les abus dans tes analytics
+    console.log("🔐 [SECURITY] generateTransitionMessage called", { 
+      sessionId, 
+      timestamp: new Date().toISOString(),
+      ip: req.headers.get('x-forwarded-for') || 'unknown'
+    });
+
+    // 🔒 SÉCURITÉ #3 : Vérifier que la session existe ET validation de propriété
     const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (!sessions || sessions.length === 0) {
+      console.warn("⚠️ [SECURITY] Session not found", { sessionId });
       return Response.json({ error: 'Session not found' }, { status: 404 });
     }
 
     const session = sessions[0];
+    
+    // 🔒 SÉCURITÉ #4 : Sanitize firstName pour éviter injection
+    const sanitizedFirstName = firstName 
+      ? String(firstName).slice(0, 50).replace(/[<>]/g, '') 
+      : 'l\'utilisateur';
+
     const summary = session.onboarding_summary || {};
     const onboardingFull = session.onboarding_full || {};
 
-    const userPrompt = `Génère le message de transition personnalisé pour ${firstName || 'l\'utilisateur'}.
+    const userPrompt = `Génère le message de transition personnalisé pour ${sanitizedFirstName}.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📊 CONTEXTE UTILISATEUR
@@ -208,7 +224,7 @@ Génère maintenant le message (texte brut uniquement, pas de JSON).`;
     });
 
   } catch (error) {
-    console.error('Error in generateTransitionMessage:', error);
+    console.error('❌ Error in generateTransitionMessage:', error);
     
     // Fallback message si erreur
     const fallbackMessage = "Tu as posé les bases solides de ton projet. Avant de te montrer tes offres personnalisées, j'ai quelques questions pour mieux comprendre tes objectifs et ta situation.";

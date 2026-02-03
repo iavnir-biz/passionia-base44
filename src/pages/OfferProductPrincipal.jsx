@@ -152,7 +152,7 @@ export default function OfferProductPrincipal() {
               <Lightbulb className="w-4 h-4 text-white" />
             </div>
             <p className="text-sm text-amber-900 leading-relaxed">
-              <span className="font-semibold">💡 Bon à savoir :</span> Dans ton dashboard, tu pourras régénérer tes produits à volonté. Si tu as déjà une idée, on pourra la travailler ensemble pour créer la meilleure stack !
+              Je te propose <span className="font-semibold">2 options optimisées</span> par offre, basées sur ce qui fonctionne le mieux sur le marché. Dans ton dashboard, tu pourras les ajuster, les régénérer ou m'indiquer tes propres idées — je m'adapte à 100% à toi ! 🚀
             </p>
           </div>
 

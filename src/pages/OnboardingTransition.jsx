@@ -211,31 +211,7 @@ export default function OnboardingTransition() {
         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
           {/* Cerveau IA animé au centre */}
           <div className="flex justify-center mb-6">
-            <motion.div
-              animate={{
-                scale: [1, 1.05, 1],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="relative"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-xl">
-                <Brain className="w-8 h-8 text-white" />
-              </div>
-              {/* Particules animées autour */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-3"
-              >
-                <Zap className="absolute top-0 left-1/2 w-3 h-3 text-[#61f7a2] opacity-60" />
-                <Sparkles className="absolute bottom-0 right-0 w-3 h-3 text-[#4de88f] opacity-60" />
-              </motion.div>
-            </motion.div>
+            <NoahBrainIcon size={72} isThinking={true} isFloating={true} />
           </div>
 
           {/* Titre principal */}

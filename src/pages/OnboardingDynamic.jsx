@@ -280,7 +280,7 @@ export default function OnboardingDynamic() {
               >
                 <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                        <NoahBrainIcon size={44} isThinking={true} />
+                        <NoahBrainIcon size={44} isThinking={true} isFloating={true} />
                         <div>
                             <p className="text-xs font-medium text-[#2dd4bf]">Construisons ta nouvelle vie</p>
                             <p className="text-sm text-gray-500">Question {questionCount + 1}/{MAX_QUESTIONS}</p>

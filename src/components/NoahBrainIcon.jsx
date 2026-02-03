@@ -8,16 +8,19 @@ import { motion } from 'framer-motion';
  * @param {boolean} isThinking - Active l'animation de réflexion (default: true)
  * @param {string} className - Classes CSS additionnelles
  */
-export const NoahBrainIcon = ({ size = 48, isThinking = true, className = '' }) => {
-  const gradientId = `noah-brain-bg-${size}`;
+export const NoahBrainIcon = ({ size = 48, isThinking = true, isFloating = false, className = '' }) => {
+  const gradientId = `noah-brain-bg-${size}-${Math.random().toString(36).substr(2, 9)}`;
   return (
     <motion.div
       className={className}
-      animate={isThinking ? {
+      animate={isFloating ? {
+        y: [0, -8, 0],
+        scale: [1, 1.02, 1],
+      } : isThinking ? {
         scale: [1, 1.05, 1],
       } : {}}
       transition={{
-        duration: 2,
+        duration: isFloating ? 3 : 2,
         repeat: Infinity,
         ease: "easeInOut"
       }}

@@ -179,7 +179,25 @@ export default function OnboardingTransition() {
   };
 
   if (isLoading) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-6"
+        >
+          <NoahBrainIcon size={80} isThinking={true} />
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Noah analyse tes réponses...</h2>
+            <p className="text-gray-500 text-sm">Préparation de ton plan personnalisé</p>
+          </div>
+          <div className="flex items-center gap-2 text-[#61f7a2]">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="text-sm font-medium">Chargement en cours</span>
+          </div>
+        </motion.div>
+      </div>
+    );
   }
 
   return (

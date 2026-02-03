@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { ArrowRight, Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
+import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -237,7 +238,7 @@ export default function OnboardingDynamic() {
   const completedSteps = (session?.onboarding_history?.length || 0) >= MAX_QUESTIONS ? [1] : [];
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] flex overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex overflow-hidden">
       <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progress} />
 
       <div className="flex-1 flex flex-col lg:ml-80 h-screen">
@@ -275,14 +276,18 @@ export default function OnboardingDynamic() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="bg-white rounded-3xl border border-gray-200 shadow-lg p-8 md:p-12"
+                className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden p-8 md:p-12"
               >
                 {/* Icône Noah */}
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                </div>
+                                <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100 -mx-8 -mt-8 mb-8">
+                                    <div className="flex items-center gap-3">
+                                        <NoahBrainIcon size={44} isThinking={true} />
+                                        <div>
+                                            <p className="text-xs font-medium text-[#2dd4bf]">Noah te demande</p>
+                                            <p className="text-sm text-gray-500">Question {questionCount + 1}/{MAX_QUESTIONS}</p>
+                                        </div>
+                                    </div>
+                                </div>
 
                 {/* Titre de la question */}
                 <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 leading-tight">

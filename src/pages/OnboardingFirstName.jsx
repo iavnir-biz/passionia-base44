@@ -4,6 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Brain, Zap } from 'lucide-react';
+import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 import GlowButton from '@/components/ui/GlowButton';
 import { Input } from '@/components/ui/input';
 
@@ -36,88 +37,10 @@ const useTypingEffect = (text, speed = 30, delay = 0) => {
   return { displayedText, isComplete };
 };
 
-// Noah AI Avatar - Animated
 const NoahAvatar = () => (
-  <div className="relative flex items-center justify-center mb-8">
-    {/* Glow effect background */}
-    <motion.div
-      className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-[#61f7a2]/30 to-[#4de88f]/20 blur-2xl"
-      animate={{
-        scale: [1, 1.2, 1],
-        opacity: [0.5, 0.8, 0.5]
-      }}
-      transition={{
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }}
-    />
-    
-    {/* Main Noah Icon */}
-    <motion.div
-      className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-xl"
-      animate={{
-        y: [0, -8, 0],
-      }}
-      transition={{
-        duration: 4,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }}
-    >
-      <Brain className="w-12 h-12 text-white" />
-      
-      {/* Sparkle particles */}
-      <motion.div
-        className="absolute -top-2 -right-2"
-        animate={{
-          scale: [1, 1.3, 1],
-          rotate: [0, 180, 360]
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-      >
-        <Sparkles className="w-6 h-6 text-[#61f7a2]" />
-      </motion.div>
-      
-      <motion.div
-        className="absolute -bottom-1 -left-1"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.5, 1, 0.5]
-        }}
-        transition={{
-          duration: 1.5,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 0.5
-        }}
-      >
-        <Zap className="w-5 h-5 text-[#61f7a2]" />
-      </motion.div>
-    </motion.div>
-    
-    {/* Pulse rings */}
-    {[0, 0.5, 1].map((delay, i) => (
-      <motion.div
-        key={i}
-        className="absolute w-24 h-24 rounded-full border-2 border-[#61f7a2]/30"
-        animate={{
-          scale: [1, 1.5, 1.8],
-          opacity: [0.6, 0.3, 0]
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeOut",
-          delay: delay * 1.5
-        }}
-      />
-    ))}
-  </div>
+    <div className="relative flex items-center justify-center mb-8">
+        <NoahBrainIcon size={96} isThinking={true} />
+    </div>
 );
 
 export default function OnboardingFirstName() {

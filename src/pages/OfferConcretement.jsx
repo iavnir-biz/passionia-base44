@@ -160,10 +160,10 @@ export default function OfferConcretement() {
   }
 
   const phases = [
-    { number: 'S1', title: 'Première vente', subtitle: 'Ta 1ère vente à 47€', ...planDeRoute.phase1, color: 'green', isPriority: true, weekLabel: null },
-    { number: 'S2', title: 'Order bump activé', subtitle: 'Revenus x2', ...planDeRoute.phase2, color: 'blue', isPriority: false, weekLabel: null },
-    { number: 'S3', title: 'Offre supérieure', subtitle: 'Panier moyen x3', ...planDeRoute.phase3, color: 'purple', isPriority: false, weekLabel: null },
-    { number: 'S4', title: 'Système complet', subtitle: 'Automatisation', ...planDeRoute.phase4, color: 'orange', isPriority: false, weekLabel: null }
+    { number: 'S1', title: 'Validation : Ta Première Vente', subtitle: 'Ta 1ère vente à 47€', ...planDeRoute.phase1, color: 'green', isPriority: true, weekLabel: null },
+    { number: 'S2', title: 'Création : La Construction', subtitle: 'Création du petit extra • Revenus x2', ...planDeRoute.phase2, color: 'blue', isPriority: false, weekLabel: null },
+    { number: 'S3', title: 'Automatisation : La Machine', subtitle: 'Offre supérieure • Panier moyen x3', ...planDeRoute.phase3, color: 'purple', isPriority: false, weekLabel: null },
+    { number: 'S4', title: 'Croissance : L\'Expansion', subtitle: 'Offre high ticket • Automatisation', ...planDeRoute.phase4, color: 'orange', isPriority: false, weekLabel: null }
   ];
 
   const advantageIcons = [Rocket, DollarSign, Shield, Sparkles];

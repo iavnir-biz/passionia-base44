@@ -9,7 +9,6 @@ import { motion } from 'framer-motion';
  * @param {string} className - Classes CSS additionnelles
  */
 export const NoahBrainIcon = ({ size = 48, isThinking = true, isFloating = false, className = '' }) => {
-  const gradientId = `noah-brain-bg-${size}-${Math.random().toString(36).substr(2, 9)}`;
   return (
     <motion.div
       className={className}
@@ -32,127 +31,26 @@ export const NoahBrainIcon = ({ size = 48, isThinking = true, isFloating = false
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#61f7a2" />
-            <stop offset="100%" stopColor="#2dd4bf" />
-          </linearGradient>
-        </defs>
+        {/* Background rounded square */}
+        <rect x="4" y="4" width="56" height="56" rx="14" fill="#61f7a2" />
         
-        {/* Background */}
-        <rect x="2" y="2" width="60" height="60" rx="14" fill={`url(#${gradientId})`} />
-        
-        {/* Brain left hemisphere */}
-        <motion.path 
-          d="M18 38C14 38 11 34 11 30C11 27 13 24 16 23C15 21 15 18 17 16C19 14 22 14 24 15C25 12 28 10 32 10"
-          stroke="white" 
-          strokeWidth="3" 
-          strokeLinecap="round"
-          fill="none"
-          animate={isThinking ? { 
-            opacity: [0.9, 1, 0.9],
-            pathLength: [0.95, 1, 0.95]
-          } : {}}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        
-        {/* Brain right hemisphere */}
-        <motion.path 
-          d="M46 38C50 38 53 34 53 30C53 27 51 24 48 23C49 21 49 18 47 16C45 14 42 14 40 15C39 12 36 10 32 10"
-          stroke="white" 
-          strokeWidth="3" 
-          strokeLinecap="round"
-          fill="none"
-          animate={isThinking ? { 
-            opacity: [0.9, 1, 0.9],
-            pathLength: [0.95, 1, 0.95]
-          } : {}}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.2
-          }}
-        />
-        
-        {/* Center connection */}
-        <path d="M32 10V22" stroke="white" strokeWidth="3" strokeLinecap="round" />
-        
-        {/* Brain bottom part - stem */}
-        <motion.path 
-          d="M24 38C24 42 28 46 32 46C36 46 40 42 40 38"
-          stroke="white" 
-          strokeWidth="3" 
-          strokeLinecap="round"
-          fill="none"
-          animate={isThinking ? { 
-            opacity: [0.9, 1, 0.9]
-          } : {}}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.4
-          }}
-        />
-        
-        {/* Brain center folds */}
-        <path d="M32 22V32" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M26 26C28 28 30 28 32 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
-        <path d="M32 26C34 28 36 28 38 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
-        
-        {/* Thinking sparkles - animated */}
-        <motion.circle 
-          cx="54" 
-          cy="10" 
-          r="3" 
-          fill="white"
-          animate={isThinking ? {
-            opacity: [0.4, 1, 0.4],
-            scale: [0.8, 1.2, 0.8]
-          } : { opacity: 0.7 }}
-          transition={{
-            duration: 1.2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.circle 
-          cx="10" 
-          cy="12" 
-          r="2" 
-          fill="#fbbf24"
-          animate={isThinking ? {
-            opacity: [0.5, 1, 0.5],
-            scale: [0.9, 1.1, 0.9]
-          } : { opacity: 0.6 }}
-          transition={{
-            duration: 1,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.3
-          }}
-        />
-        <motion.circle 
-          cx="52" 
-          cy="52" 
-          r="2" 
-          fill="#fbbf24"
-          animate={isThinking ? {
-            opacity: [0.3, 0.8, 0.3],
-            scale: [0.8, 1, 0.8]
-          } : { opacity: 0.5 }}
-          transition={{
-            duration: 1.4,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.6
-          }}
-        />
+        {/* Brain icon - clean symmetric design */}
+        <g transform="translate(14, 12)" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Left hemisphere */}
+          <path d="M18 8C18 8 14 8 11 11C8 14 8 18 8 20C8 22 8 26 11 29C11 29 8 30 8 34C8 38 12 40 16 40" />
+          
+          {/* Right hemisphere */}
+          <path d="M18 8C18 8 22 8 25 11C28 14 28 18 28 20C28 22 28 26 25 29C25 29 28 30 28 34C28 38 24 40 20 40" />
+          
+          {/* Center stem */}
+          <path d="M18 8V16" />
+          <path d="M16 40C16 40 18 44 18 44" />
+          <path d="M20 40C20 40 18 44 18 44" />
+          
+          {/* Brain folds */}
+          <path d="M12 20C14 22 16 22 18 20" />
+          <path d="M18 20C20 22 22 22 24 20" />
+        </g>
       </svg>
     </motion.div>
   );
@@ -171,21 +69,26 @@ export const NoahBrainIconStatic = ({ size = 48, className = '' }) => {
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        <defs>
-          <linearGradient id="noah-brain-static-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#61f7a2" />
-            <stop offset="100%" stopColor="#2dd4bf" />
-          </linearGradient>
-        </defs>
-        <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#noah-brain-static-bg)" />
-        <path d="M18 38C14 38 11 34 11 30C11 27 13 24 16 23C15 21 15 18 17 16C19 14 22 14 24 15C25 12 28 10 32 10" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-        <path d="M46 38C50 38 53 34 53 30C53 27 51 24 48 23C49 21 49 18 47 16C45 14 42 14 40 15C39 12 36 10 32 10" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-        <path d="M32 10V22" stroke="white" strokeWidth="3" strokeLinecap="round" />
-        <path d="M24 38C24 42 28 46 32 46C36 46 40 42 40 38" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-        <path d="M32 22V32" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M26 26C28 28 30 28 32 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
-        <path d="M32 26C34 28 36 28 38 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
-        <circle cx="54" cy="10" r="3" fill="white" opacity="0.7" />
+        {/* Background rounded square */}
+        <rect x="4" y="4" width="56" height="56" rx="14" fill="#61f7a2" />
+        
+        {/* Brain icon - clean symmetric design */}
+        <g transform="translate(14, 12)" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* Left hemisphere */}
+          <path d="M18 8C18 8 14 8 11 11C8 14 8 18 8 20C8 22 8 26 11 29C11 29 8 30 8 34C8 38 12 40 16 40" />
+          
+          {/* Right hemisphere */}
+          <path d="M18 8C18 8 22 8 25 11C28 14 28 18 28 20C28 22 28 26 25 29C25 29 28 30 28 34C28 38 24 40 20 40" />
+          
+          {/* Center stem */}
+          <path d="M18 8V16" />
+          <path d="M16 40C16 40 18 44 18 44" />
+          <path d="M20 40C20 40 18 44 18 44" />
+          
+          {/* Brain folds */}
+          <path d="M12 20C14 22 16 22 18 20" />
+          <path d="M18 20C20 22 22 22 24 20" />
+        </g>
       </svg>
     </div>
   );

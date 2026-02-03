@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
  * @param {string} className - Classes CSS additionnelles
  */
 export const NoahBrainIcon = ({ size = 48, isThinking = true, className = '' }) => {
+  const gradientId = `noah-brain-bg-${size}`;
   return (
     <motion.div
       className={className}
@@ -29,14 +30,14 @@ export const NoahBrainIcon = ({ size = 48, isThinking = true, className = '' }) 
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id={`noah-brain-bg-${size}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#61f7a2" />
             <stop offset="100%" stopColor="#2dd4bf" />
           </linearGradient>
         </defs>
         
         {/* Background */}
-        <rect x="2" y="2" width="60" height="60" rx="14" fill={`url(#noah-brain-bg-${size})`} />
+        <rect x="2" y="2" width="60" height="60" rx="14" fill={`url(#${gradientId})`} />
         
         {/* Brain left hemisphere */}
         <motion.path 

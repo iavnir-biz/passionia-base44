@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { ArrowRight, Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
 import { NoahBrainIcon } from '@/components/NoahBrainIcon';
+import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -434,29 +435,27 @@ export default function OnboardingDynamic() {
 
                   {/* Bouton Continuer (pas pour single_choice car auto-submit) */}
                   {currentQuestion.type !== 'single_choice' && (
-                    <button
-                      onClick={handleNext}
-                      disabled={!canProceed() || isSaving}
-                      className={cn(
-                        "w-full h-14 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-all duration-300 mt-6",
-                        "bg-[#61f7a2] text-gray-900 shadow-lg",
-                        "hover:bg-[#4de88f] hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98]",
-                        (!canProceed() || isSaving) && "opacity-50 cursor-not-allowed shadow-none transform-none"
-                      )}
-                    >
-                      {isSaving ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          <span>Envoi en cours...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Continuer</span>
-                          <ArrowRight className="w-5 h-5" />
-                        </>
-                      )}
-                    </button>
+                    <div className="mt-6">
+                        <button
+                          onClick={handleNext}
+                          disabled={!canProceed() || isSaving}
+                           className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          {isSaving ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              <span>Envoi en cours...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Continuer</span>
+                              <ArrowRight className="w-5 h-5" />
+                            </>
+                          )}
+                        </button>
+                    </div>
                   )}
+                </div>
                 </div>
               </motion.div>
             )}

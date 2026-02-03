@@ -20,8 +20,8 @@ const ONBOARDING_STEPS = [
     title: 'Tes talents',
     icon: Sparkles,
     pages: ['OnboardingDynamic'],
-    color: 'from-[#61f7a2] to-[#4de88f]',
-    bgColor: '#61f7a2'
+    color: 'from-[#8b5cf6] to-[#a78bfa]',
+    bgColor: '#8b5cf6'
   },
   {
     id: 2,

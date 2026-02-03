@@ -40,12 +40,12 @@ export default function Dashboard() {
     }
   }, [isAuthenticated]);
 
-  // 🔥 Polling si génération en cours
+  // 🔥 Polling si génération en cours (optimisé - 10 secondes)
   useEffect(() => {
     if (session?.generation_in_progress) {
       const interval = setInterval(() => {
         loadData();
-      }, 3000);
+      }, 10000); // Réduit de 3s à 10s pour éviter surcharge
       return () => clearInterval(interval);
     }
   }, [session?.generation_in_progress]);

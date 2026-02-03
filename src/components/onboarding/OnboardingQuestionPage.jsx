@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
+import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 
 // Configuration des blocs pour la barre de progression
 const BLOCK_CONFIG = {
@@ -334,7 +335,7 @@ export default function OnboardingQuestionPage({
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-white via-gray-50 to-white flex overflow-x-hidden">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex overflow-x-hidden">
       <OnboardingSidebar currentPage={window.location.pathname.split('/').pop()} completedSteps={completedSteps} />
 
       <div className="flex-1 w-full flex flex-col lg:ml-80 pt-20 lg:pt-0 overflow-x-hidden relative">
@@ -346,19 +347,36 @@ export default function OnboardingQuestionPage({
             className="w-full max-w-2xl"
           >
             <motion.div
-              className="bg-white rounded-2xl p-4 md:p-8 border border-gray-200 shadow-sm"
+              className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <motion.h1
-                className="text-lg md:text-2xl font-bold text-gray-900 mb-2 md:mb-4 leading-normal md:leading-relaxed"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                {replaceVariables(title)}
-              </motion.h1>
+              {/* Header avec Noah */}
+              <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-4 md:px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <NoahBrainIcon size={44} isThinking={true} />
+                  <div>
+                    <p className="text-xs font-medium text-[#2dd4bf]">Noah te demande</p>
+                    {blockType && (
+                      <p className="text-sm text-gray-500">
+                        {blockTitle} · Question {currentQuestion}/{totalQuestions}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="p-4 md:p-8">
+                <motion.h1
+                  className="text-lg md:text-2xl font-bold text-gray-900 mb-2 md:mb-4 leading-normal md:leading-relaxed"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  {replaceVariables(title)}
+                </motion.h1>
 
               {subtitle && (
                 <motion.p
@@ -542,36 +560,37 @@ export default function OnboardingQuestionPage({
                 )}
               </motion.div>
 
-              <motion.div
-                className="flex gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-              >
-                {prevPage && (
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      variant="outline"
-                      onClick={handleBack}
-                      className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 h-10 md:h-11"
+                <motion.div
+                  className="flex gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                  {prevPage && (
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        variant="outline"
+                        onClick={handleBack}
+                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 h-10 md:h-11"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
+                        <span className="text-sm md:text-base">Retour</span>
+                      </Button>
+                    </motion.div>
+                  )}
+                  <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <GlowButton
+                      onClick={handleNext}
+                      disabled={!canProceed()}
+                      loading={isSaving}
+                      className="w-full text-sm md:text-base h-10 md:h-11"
                     >
-                      <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
-                      <span className="text-sm md:text-base">Retour</span>
-                    </Button>
+                      {buttonText}
+                      <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2" />
+                    </GlowButton>
                   </motion.div>
-                )}
-                <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <GlowButton
-                    onClick={handleNext}
-                    disabled={!canProceed()}
-                    loading={isSaving}
-                    className="w-full text-sm md:text-base h-10 md:h-11"
-                  >
-                    {buttonText}
-                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2" />
-                  </GlowButton>
                 </motion.div>
-              </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         </div>

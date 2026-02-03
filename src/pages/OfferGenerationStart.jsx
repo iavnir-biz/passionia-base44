@@ -14,6 +14,22 @@ export default function OfferGenerationStart() {
   const [isRetrying, setIsRetrying] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  // Timer pour afficher le temps écoulé
+  useEffect(() => {
+    const timerInterval = setInterval(() => {
+      setElapsedTime(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, []);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Témoignages clients
   const testimonials = [
@@ -415,6 +431,16 @@ export default function OfferGenerationStart() {
             <p className="text-xl font-semibold text-gray-800 mb-2">
               Noah construit ton offre…
             </p>
+            
+            {/* Timer */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="bg-gray-100 px-4 py-2 rounded-xl flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-gray-700 font-mono font-semibold text-lg">
+                  {formatTime(elapsedTime)}
+                </span>
+              </div>
+            </div>
             
             {/* Loading dots */}
             <div className="flex items-center justify-center gap-2">

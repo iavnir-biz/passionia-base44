@@ -52,13 +52,6 @@ export default function OfferGenerationStart() {
   // Étapes de préparation avec explications
   const preparationSteps = [
     {
-      title: "Produit Principal",
-      description: "Ton offre cœur qui transforme ton expertise en revenu stable",
-      icon: TrendingUp,
-      color: "from-blue-500 to-blue-600",
-      status: "completed"
-    },
-    {
       title: "Low Ticket",
       description: "Une petite offre pour attirer et convertir facilement tes premiers clients",
       icon: Gift,
@@ -336,45 +329,8 @@ export default function OfferGenerationStart() {
 
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white overflow-hidden">
-      {/* Bandeau de témoignages en haut */}
-      <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] py-4 px-6 shadow-lg z-10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentTestimonial}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.5 }}
-            className="text-center"
-          >
-            <p className="text-white font-semibold text-lg">
-              <span className="text-2xl mr-2">{testimonials[currentTestimonial].icon}</span>
-              <span className="font-bold">{testimonials[currentTestimonial].name}</span>
-              {" · "}
-              <span className="opacity-90">{testimonials[currentTestimonial].skill}</span>
-              {" · "}
-              <span className="font-bold">{testimonials[currentTestimonial].result}</span>
-            </p>
-          </motion.div>
-        </AnimatePresence>
-        
-        {/* Indicateurs de pagination */}
-        <div className="flex justify-center gap-2 mt-2">
-          {testimonials.map((_, index) => (
-            <div
-              key={index}
-              className={`h-1 rounded-full transition-all duration-300 ${
-                index === currentTestimonial 
-                  ? 'w-6 bg-white' 
-                  : 'w-1 bg-white/40'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* Contenu principal */}
-      <div className="h-full flex items-center justify-center pt-24 pb-8">
+      <div className="h-full flex items-center justify-center py-8">
         <div className="max-w-2xl w-full px-6">
           {/* Nova AI Avatar avec cerveau animé */}
           <motion.div

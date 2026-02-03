@@ -578,41 +578,7 @@ export default function CTAPAYWALL() {
 
 
 
-          {/* 🔥 C) CE PACK EST FAIT POUR TOI SI */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.68 }}
-            className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl border border-blue-200 p-4 md:p-8 mb-8 overflow-hidden"
-          >
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Fait pour toi */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <CheckCircle className="w-5 h-5 text-[#61f7a2]" />
-                  <h3 className="font-bold text-gray-900">Ce pack est fait pour toi si</h3>
-                </div>
-                <ul className="space-y-2 text-gray-700">
-                  <li>• Tu veux transmettre ton savoir-faire</li>
-                  <li>• Tu cherches un chemin clair</li>
-                  <li>• Tu es prêt·e à agir maintenant</li>
-                </ul>
-              </div>
 
-              {/* Pas pour toi */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <X className="w-5 h-5 text-gray-400" />
-                  <h3 className="font-bold text-gray-900">Ce n'est pas pour toi si</h3>
-                </div>
-                <ul className="space-y-2 text-gray-600">
-                  <li>• Tu cherches un système automatique</li>
-                  <li>• Tu veux juste "tester" sans t'investir</li>
-                  <li>• Tu attends des résultats sans effort</li>
-                </ul>
-              </div>
-            </div>
-          </motion.div>
 
           {/* 🎬 ORDER BUMP - Pack Réseaux Sociaux */}
           <motion.div

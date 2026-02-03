@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
 import confetti from 'canvas-confetti';
@@ -91,6 +93,7 @@ const OFFER_DETAIL_PAGES = [
 ];
 
 export default function OnboardingSidebar({ currentPage, completedSteps = [], progressInStep = 0 }) {
+  const navigate = useNavigate();
   const scrollContainerRef = useRef(null);
 
   // Déterminer l'étape active basée sur la page courante
@@ -216,6 +219,13 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
               const isCompleted = state === 'completed';
               const isFuture = state === 'future';
 
+              // Navigation vers la première page de l'étape complétée
+              const handleStepClick = () => {
+                if (isCompleted && step.pages.length > 0) {
+                  navigate(createPageUrl(step.pages[0]));
+                }
+              };
+
               return (
                 <motion.div
                   key={step.id}
@@ -225,8 +235,10 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
                   className={cn(
                     "flex items-center gap-3 px-3 py-3 rounded-xl transition-all",
                     isActive && "bg-gray-100",
-                    isFuture && "opacity-40"
+                    isFuture && "opacity-40",
+                    isCompleted && "cursor-pointer hover:bg-gray-50"
                   )}
+                  onClick={handleStepClick}
                 >
                   {/* Icône */}
                   <div

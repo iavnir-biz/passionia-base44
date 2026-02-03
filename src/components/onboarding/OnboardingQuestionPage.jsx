@@ -353,22 +353,18 @@ export default function OnboardingQuestionPage({
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               {/* Header avec Noah */}
-              <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-4 md:px-6 py-4 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <NoahBrainIcon size={44} isThinking={true} />
-                  <div>
-                    <p className="text-xs font-medium text-[#2dd4bf]">Noah te demande</p>
-                    {blockType && (
-                      <p className="text-sm text-gray-500">
-                        {blockTitle} · Question {currentQuestion}/{totalQuestions}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+                    <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <NoahBrainIcon size={44} isThinking={true} />
+                        <div>
+                          <p className="text-xs font-medium text-[#2dd4bf]">Noah te demande</p>
+                          <p className="text-sm text-gray-500">Question {currentQuestion}/{totalQuestions}</p>
+                        </div>
+                      </div>
+                    </div>
 
               {/* Body */}
-              <div className="p-4 md:p-8">
+              <div className="p-6">
                 <motion.h1
                   className="text-lg md:text-2xl font-bold text-gray-900 mb-2 md:mb-4 leading-normal md:leading-relaxed"
                   initial={{ opacity: 0, x: -20 }}
@@ -398,11 +394,11 @@ export default function OnboardingQuestionPage({
                 {inputType === 'textarea' && (
                   <div className="space-y-3">
                     <div className="relative">
-                      <Textarea
+                      <textarea 
+                        className="w-full border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-[#61f7a2] focus:border-transparent"
+                        placeholder="Ta réponse..."
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
-                        placeholder={placeholder}
-                        className="w-full bg-white border-gray-300 text-gray-900 min-h-[120px] text-lg p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400 transition-all duration-300"
                       />
                       <div className="absolute bottom-3 right-3 flex items-center gap-2">
                         <input
@@ -578,17 +574,11 @@ export default function OnboardingQuestionPage({
                       </Button>
                     </motion.div>
                   )}
-                  <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <GlowButton
-                      onClick={handleNext}
-                      disabled={!canProceed()}
-                      loading={isSaving}
-                      className="w-full text-sm md:text-base h-10 md:h-11"
-                    >
-                      {buttonText}
-                      <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2" />
-                    </GlowButton>
-                  </motion.div>
+                  <div className="px-6 pb-6">
+                  <button className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-4 rounded-xl transition-colors">
+                  Continuer →
+                  </button>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>

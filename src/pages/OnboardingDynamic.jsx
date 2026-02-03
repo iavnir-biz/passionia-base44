@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { ArrowRight, Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
 import { NoahBrainIcon } from '@/components/NoahBrainIcon';
-import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -262,7 +261,7 @@ export default function OnboardingDynamic() {
         </div>
 
         {/* Zone de contenu avec la question */}
-        <div className="flex-1 overflow-y-auto flex items-center justify-center px-4 py-8">
+        <main className="flex-1 overflow-y-auto flex items-center justify-center p-4">
           <div className="w-full max-w-4xl">
             {isLoading && !currentQuestion ? (
               <div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-12">
@@ -277,10 +276,9 @@ export default function OnboardingDynamic() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden p-8 md:p-12"
+                className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden"
               >
-                {/* Icône Noah */}
-                                <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100 -mx-8 -mt-8 mb-8">
+                <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 md:px-8 py-4 border-b border-gray-100">
                                     <div className="flex items-center gap-3">
                                         <NoahBrainIcon size={44} isThinking={true} />
                                         <div>
@@ -289,9 +287,9 @@ export default function OnboardingDynamic() {
                                         </div>
                                     </div>
                                 </div>
-
-                {/* Titre de la question */}
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                                <div className="p-6 md:p-8">
+                                {/* Titre de la question */}
+                                <h2 className="text-xl font-bold text-gray-900 mb-2">
                   {currentQuestion.title || currentQuestion.text}
                 </h2>
 
@@ -307,7 +305,7 @@ export default function OnboardingDynamic() {
 
                 {/* Sous-titre */}
                 {currentQuestion.subtitle && (
-                  <p className="text-gray-500 text-base mb-8">
+                  <p className="text-gray-600 text-sm mb-6">
                     {currentQuestion.subtitle}
                   </p>
                 )}
@@ -329,8 +327,8 @@ export default function OnboardingDynamic() {
                       <Textarea
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
-                        placeholder=""
-                        className="w-full bg-white border-gray-200 text-gray-900 min-h-[120px] text-base p-4 rounded-2xl focus:border-[#61f7a2] focus:ring-2 focus:ring-[#61f7a2]/20 transition-all resize-none"
+                        placeholder="Ta réponse..."
+                        className="w-full border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-[#61f7a2] focus:border-transparent"
                         autoFocus
                         disabled={isSaving}
                         onKeyDown={(e) => {
@@ -435,7 +433,7 @@ export default function OnboardingDynamic() {
 
                   {/* Bouton Continuer (pas pour single_choice car auto-submit) */}
                   {currentQuestion.type !== 'single_choice' && (
-                    <div className="mt-6">
+                     <div className="px-6 pb-6 pt-2">
                         <button
                           onClick={handleNext}
                           disabled={!canProceed() || isSaving}
@@ -448,8 +446,7 @@ export default function OnboardingDynamic() {
                             </>
                           ) : (
                             <>
-                              <span>Continuer</span>
-                              <ArrowRight className="w-5 h-5" />
+                              <span>Continuer →</span>
                             </>
                           )}
                         </button>

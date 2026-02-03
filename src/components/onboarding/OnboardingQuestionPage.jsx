@@ -425,7 +425,7 @@ export default function OnboardingQuestionPage({
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className={`h-8 w-8 hover:bg-gray-100 ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-gray-700'}`}
+                          className={`h-8 w-8 hover:bg-gray-100 ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-gray-700'}`} disabled={isSaving}
                           onClick={isRecording ? stopRecording : startRecording}
                         >
                           {isRecording ? (
@@ -557,7 +557,7 @@ export default function OnboardingQuestionPage({
               </motion.div>
 
                 <motion.div
-                  className="flex gap-4"
+                  className="px-6 pb-6 flex gap-4"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.5 }}
@@ -567,22 +567,22 @@ export default function OnboardingQuestionPage({
                       <Button
                         variant="outline"
                         onClick={handleBack}
-                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 h-10 md:h-11"
+                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 h-11"
                       >
-                        <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
-                        <span className="text-sm md:text-base">Retour</span>
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        <span>Retour</span>
                       </Button>
                     </motion.div>
                   )}
-                  <div className="px-6 pb-6">
-                      <button 
-                        onClick={handleNext}
-                        disabled={!canProceed() || isSaving}
-                        className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-4 rounded-xl transition-colors flex items-center justify-center"
-                      >
-                        {isSaving ? <Loader2 className="animate-spin" /> : (buttonText + ' →')}
-                      </button>
-                    </div>
+                  <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <button 
+                    onClick={handleNext}
+                    disabled={!canProceed() || isSaving}
+                    className="w-full h-11 bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <>{buttonText} <ArrowRight className="w-4 h-4" /></>}
+                  </button>
+                  </motion.div>
                 </motion.div>
               </div>
             </motion.div>

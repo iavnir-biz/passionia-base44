@@ -279,15 +279,15 @@ export default function OnboardingDynamic() {
                 className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden"
               >
                 <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100">
-                                    <div className="flex items-center gap-3">
-                                        <NoahBrainIcon size={44} isThinking={true} />
-                                        <div>
-                                            <p className="text-xs font-medium text-[#2dd4bf]">Noah te demande</p>
-                                            <p className="text-sm text-gray-500">Question {questionCount + 1}/{MAX_QUESTIONS}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="p-6 md:p-8">
+                                                     <div className="flex items-center gap-3">
+                                                         <NoahBrainIcon size={44} isThinking={true} />
+                                                         <div>
+                                                             <p className="text-xs font-medium text-[#2dd4bf]">Noah te demande</p>
+                                                             <p className="text-sm text-gray-500">Question {questionCount + 1}/{MAX_QUESTIONS}</p>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                                 <div className="p-6 md:p-8">
                                 {/* Titre de la question */}
                                 <h2 className="text-xl font-bold text-gray-900 mb-2">
                   {currentQuestion.title || currentQuestion.text}
@@ -319,8 +319,9 @@ export default function OnboardingDynamic() {
                     </p>
                   </div>
                 )}
-
+                </div>
                 {/* Champ de réponse selon le type */}
+                <div class="p-6 md:p-8">
                 <div className="space-y-6">
                   {currentQuestion.type === 'text' && (
                     <div className="relative">

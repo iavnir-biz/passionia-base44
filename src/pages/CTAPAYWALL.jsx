@@ -448,20 +448,20 @@ export default function CTAPAYWALL() {
                     <h3 className="text-xl font-bold mb-2">🧭 Le protocole simple à suivre</h3>
                     <div className="grid grid-cols-2 gap-3 text-gray-200">
                       <div className="bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold">Semaine 1</p>
-                        <p className="text-sm">Premières ventes</p>
+                        <p className="font-semibold">S1 - Validation</p>
+                        <p className="text-sm">Ta première vente à 47€</p>
                       </div>
                       <div className="bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold">Semaine 2</p>
-                        <p className="text-sm">Order bump</p>
+                        <p className="font-semibold">S2 - Création</p>
+                        <p className="text-sm">Création du petit extra • Revenus x2</p>
                       </div>
                       <div className="bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold">Semaine 3</p>
-                        <p className="text-sm">Offre supérieure</p>
+                        <p className="font-semibold">S3 - Automatisation</p>
+                        <p className="text-sm">Offre supérieure • Panier moyen x3</p>
                       </div>
                       <div className="bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold">Semaine 4</p>
-                        <p className="text-sm">Structuration</p>
+                        <p className="font-semibold">S4 - Croissance</p>
+                        <p className="text-sm">Offre high ticket • Automatisation</p>
                       </div>
                     </div>
                   </div>

@@ -365,8 +365,7 @@ export default function OnboardingQuestionPage({
 
               {/* Body */}
               <div className="p-6">
-                <motion.h1
-                  className="text-lg md:text-2xl font-bold text-gray-900 mb-2 md:mb-4 leading-normal md:leading-relaxed"
+                <h2 className="text-xl font-bold text-gray-900 mb-2"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
@@ -375,8 +374,7 @@ export default function OnboardingQuestionPage({
                 </motion.h1>
 
               {subtitle && (
-                <motion.p
-                  className="text-gray-600 mb-4"
+                <p className="text-gray-600 text-sm mb-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
@@ -394,11 +392,11 @@ export default function OnboardingQuestionPage({
                 {inputType === 'textarea' && (
                   <div className="space-y-3">
                     <div className="relative">
-                      <textarea 
-                        className="w-full border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-[#61f7a2] focus:border-transparent"
-                        placeholder="Ta réponse..."
+                      <Textarea
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
+                        placeholder="Ta réponse..."
+                        className="w-full border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-[#61f7a2] focus:border-transparent"
                       />
                       <div className="absolute bottom-3 right-3 flex items-center gap-2">
                         <input
@@ -575,10 +573,16 @@ export default function OnboardingQuestionPage({
                     </motion.div>
                   )}
                   <div className="px-6 pb-6">
-                  <button className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-4 rounded-xl transition-colors">
-                  Continuer →
-                  </button>
-                  </div>
+                        <GlowButton
+                          onClick={handleNext}
+                          disabled={!canProceed()}
+                          loading={isSaving}
+                          className="w-full"
+                        >
+                          {buttonText}
+                          <ArrowRight className="w-5 h-5 ml-2" />
+                        </GlowButton>
+                      </div>
                 </motion.div>
               </div>
             </motion.div>

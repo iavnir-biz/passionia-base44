@@ -278,7 +278,7 @@ export default function OnboardingDynamic() {
                 transition={{ duration: 0.4 }}
                 className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden"
               >
-                <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 md:px-8 py-4 border-b border-gray-100">
+                <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100">
                                     <div className="flex items-center gap-3">
                                         <NoahBrainIcon size={44} isThinking={true} />
                                         <div>
@@ -433,24 +433,22 @@ export default function OnboardingDynamic() {
 
                   {/* Bouton Continuer (pas pour single_choice car auto-submit) */}
                   {currentQuestion.type !== 'single_choice' && (
-                     <div className="px-6 pb-6 pt-2">
-                        <button
-                          onClick={handleNext}
-                          disabled={!canProceed() || isSaving}
-                           className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        >
-                          {isSaving ? (
-                            <>
-                              <Loader2 className="w-5 h-5 animate-spin" />
-                              <span>Envoi en cours...</span>
-                            </>
-                          ) : (
-                            <>
-                              <span>Continuer →</span>
-                            </>
-                          )}
-                        </button>
-                    </div>
+                     <div className="px-6 pb-6">
+                                              <button
+                                                onClick={handleNext}
+                                                disabled={!canProceed() || isSaving}
+                                                 className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                              >
+                                                {isSaving ? (
+                                                  <>
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                                    <span>Envoi en cours...</span>
+                                                  </>
+                                                ) : (
+                                                  <span>Continuer →</span>
+                                                )}
+                                              </button>
+                                          </div>
                   )}
                 </div>
                 </div>

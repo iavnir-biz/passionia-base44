@@ -319,9 +319,7 @@ export default function OnboardingDynamic() {
                     </p>
                   </div>
                 )}
-                </div>
                 {/* Champ de réponse selon le type */}
-                <div class="p-6 md:p-8">
                 <div className="space-y-6">
                   {currentQuestion.type === 'text' && (
                     <div className="relative">

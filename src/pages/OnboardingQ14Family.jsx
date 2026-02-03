@@ -11,7 +11,8 @@ export default function OnboardingQ14Family() {
         "Célibataire",
         "Célibataire avec enfant(s)",
         "En couple",
-        "En couple avec enfant(s)"
+        "En couple avec enfant(s)",
+        "Autre"
       ]}
       fieldName="familyStatus"
       nextPage="OnboardingQ15CurrentIncome"

@@ -153,7 +153,6 @@ export default function OnboardingSidebar({ currentPage, completedSteps = [], pr
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-sm">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900">PASSION IA</h1>
           </div>
 
           {/* Stepper dots */}

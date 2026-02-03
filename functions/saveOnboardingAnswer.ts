@@ -4,6 +4,12 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     
+    // 🔒 SÉCURITÉ #0 : Vérifier l'authentification
+    const user = await base44.auth.me();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
     // 🔒 SÉCURITÉ #1 : Validation des données entrantes
     const { sessionId, field, value } = await req.json();
     

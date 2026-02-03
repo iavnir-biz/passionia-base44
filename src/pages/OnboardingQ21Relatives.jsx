@@ -76,6 +76,7 @@ export default function OnboardingQ21Relatives() {
       progress={71}
       blockType="objectives"
       useLocalStorage={true}
+      completedSteps={[1, 2]}
     />
   );
 }

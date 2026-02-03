@@ -14,6 +14,7 @@ export default function OnboardingQ25Readiness() {
       progress={95}
       blockType="objectives"
       useLocalStorage={false}
+      completedSteps={[1, 2]}
     />
   );
 }

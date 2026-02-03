@@ -76,6 +76,7 @@ export default function OnboardingQ20Emotions() {
       progress={64}
       blockType="objectives"
       useLocalStorage={true}
+      completedSteps={[1, 2]}
     />
   );
 }

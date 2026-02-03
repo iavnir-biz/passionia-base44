@@ -22,6 +22,7 @@ export default function OnboardingQ23Obstacles() {
       progress={85}
       blockType="objectives"
       useLocalStorage={false}
+      completedSteps={[1, 2]}
     />
   );
 }

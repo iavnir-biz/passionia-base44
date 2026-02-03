@@ -21,6 +21,7 @@ export default function OnboardingQ22Lifestyle() {
       progress={78}
       blockType="objectives"
       useLocalStorage={true}
+      completedSteps={[1, 2]}
     />
   );
 }

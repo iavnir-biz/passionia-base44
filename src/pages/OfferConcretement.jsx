@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
@@ -21,43 +21,27 @@ import OfferTransition from '@/components/offer/OfferTransition';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
 
-function PhaseCard({ number, title, objective, plan, result, delay = 0, color = 'green', isPriority = false, weekLabel = null }) {
+function PhaseCard({ number, title, subtitle, objective, plan, result, delay = 0, color = 'green', isPriority = false }) {
   const colorSchemes = {
     green: {
-      bg: 'from-green-500',
-      border: 'border-green-200',
-      text: 'text-green-600',
-      resultBg: 'from-green-50 to-green-100',
-      resultBorder: 'border-green-200',
-      badgeBg: 'bg-green-100',
-      badgeText: 'text-green-700'
+      bg: 'from-green-500 to-emerald-400',
+      border: 'border-gray-100',
+      text: 'text-green-600'
     },
     blue: {
-      bg: 'from-blue-500',
-      border: 'border-blue-200',
-      text: 'text-blue-600',
-      resultBg: 'from-blue-50 to-blue-100',
-      resultBorder: 'border-blue-200',
-      badgeBg: 'bg-blue-100',
-      badgeText: 'text-blue-700'
+      bg: 'from-blue-500 to-cyan-400',
+      border: 'border-gray-100',
+      text: 'text-blue-600'
     },
     purple: {
-      bg: 'from-purple-500',
-      border: 'border-purple-200',
-      text: 'text-purple-600',
-      resultBg: 'from-purple-50 to-purple-100',
-      resultBorder: 'border-purple-200',
-      badgeBg: 'bg-purple-100',
-      badgeText: 'text-purple-700'
+      bg: 'from-purple-500 to-pink-400',
+      border: 'border-gray-100',
+      text: 'text-purple-600'
     },
     orange: {
-      bg: 'from-orange-500',
-      border: 'border-orange-200',
-      text: 'text-orange-600',
-      resultBg: 'from-orange-50 to-orange-100',
-      resultBorder: 'border-orange-200',
-      badgeBg: 'bg-orange-100',
-      badgeText: 'text-orange-700'
+      bg: 'from-orange-500 to-red-400',
+      border: 'border-gray-100',
+      text: 'text-orange-600'
     }
   };
 
@@ -69,70 +53,31 @@ function PhaseCard({ number, title, objective, plan, result, delay = 0, color = 
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
       className={cn(
-        "rounded-2xl border p-6 shadow-sm hover:shadow-md transition-all",
+        "rounded-2xl border p-4 shadow-sm hover:shadow-md transition-all flex items-center justify-between",
         isPriority 
           ? "bg-gradient-to-br from-[#61f7a2]/10 to-green-50 border-[#61f7a2] ring-2 ring-[#61f7a2]/30" 
           : "bg-white",
         !isPriority && scheme.border
       )}
     >
-      {/* Header avec badges */}
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className={cn("w-12 h-12 rounded-xl bg-gradient-to-br to-white flex items-center justify-center shadow-sm", scheme.bg)}>
-            <span className="text-xl font-bold text-white">{number}</span>
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-900">{title}</h3>
-          </div>
+      <div className="flex items-center gap-4">
+        <div className={cn("w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-sm", scheme.bg)}>
+          <span className="text-sm font-bold text-white">{number}</span>
         </div>
-        
-        {/* 🔥 BADGES TEMPORELS */}
-        {isPriority && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-xl shadow-md">
-            <Trophy className="w-4 h-4 text-white" />
-            <span className="text-xs font-bold text-white uppercase tracking-wide">7 JOURS</span>
-          </div>
-        )}
-        {weekLabel && !isPriority && (
-          <div className={cn("px-3 py-1.5 rounded-lg flex items-center gap-1.5", scheme.badgeBg)}>
-            <Calendar className="w-3.5 h-3.5" />
-            <span className={cn("text-xs font-bold uppercase tracking-wide", scheme.badgeText)}>{weekLabel}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="space-y-4">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Target className={cn("w-4 h-4", scheme.text)} />
-            <span className={cn("text-sm font-semibold uppercase tracking-wide", scheme.text)}>
-              Ton Objectif
-            </span>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+            {isPriority && (
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-lg">
+                <Trophy className="w-3 h-3 text-white" />
+                <span className="text-[10px] font-bold text-white uppercase tracking-wide">PRIORITÉ</span>
+              </div>
+            )}
           </div>
-          <p className="text-gray-700 leading-relaxed">{objective}</p>
-        </div>
-
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className={cn("w-4 h-4", scheme.text)} />
-            <span className={cn("text-sm font-semibold uppercase tracking-wide", scheme.text)}>
-              Notre Plan d'Action
-            </span>
-          </div>
-          <p className="text-gray-700 leading-relaxed">{plan}</p>
-        </div>
-
-        <div className={cn("bg-gradient-to-br rounded-xl p-4 border", scheme.resultBg, scheme.resultBorder)}>
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className={cn("w-4 h-4", scheme.text)} />
-            <span className={cn("text-sm font-semibold uppercase tracking-wide", scheme.text)}>
-              Le Résultat
-            </span>
-          </div>
-          <p className="text-gray-900 font-medium">{result}</p>
+          <p className="text-gray-500 text-sm">{subtitle}</p>
         </div>
       </div>
+      <ArrowRight className="w-5 h-5 text-gray-400" />
     </motion.div>
   );
 }
@@ -215,10 +160,10 @@ export default function OfferConcretement() {
   }
 
   const phases = [
-    { number: 1, ...planDeRoute.phase1, color: 'green', isPriority: true, weekLabel: null },
-    { number: 2, ...planDeRoute.phase2, color: 'blue', isPriority: false, weekLabel: 'SEMAINE 2' },
-    { number: 3, ...planDeRoute.phase3, color: 'purple', isPriority: false, weekLabel: 'SEMAINE 3' },
-    { number: 4, ...planDeRoute.phase4, color: 'orange', isPriority: false, weekLabel: 'SEMAINE 4' }
+    { number: 'S1', title: 'Première vente', subtitle: 'Ta 1ère vente à 47€', ...planDeRoute.phase1, color: 'green', isPriority: true, weekLabel: null },
+    { number: 'S2', title: 'Order bump activé', subtitle: 'Revenus x2', ...planDeRoute.phase2, color: 'blue', isPriority: false, weekLabel: null },
+    { number: 'S3', title: 'Offre supérieure', subtitle: 'Panier moyen x3', ...planDeRoute.phase3, color: 'purple', isPriority: false, weekLabel: null },
+    { number: 'S4', title: 'Système complet', subtitle: 'Automatisation', ...planDeRoute.phase4, color: 'orange', isPriority: false, weekLabel: null }
   ];
 
   const advantageIcons = [Rocket, DollarSign, Shield, Sparkles];
@@ -292,9 +237,7 @@ export default function OfferConcretement() {
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
                   Bienvenue dans ton Plan de Route
                 </h1>
-                <p className="text-gray-700 text-xl max-w-2xl mx-auto">
-                  Oublie la pression des délais. Avance à ton rythme, étape par étape, vers ton objectif.
-                </p>
+
               </div>
             </div>
           </motion.div>
@@ -307,22 +250,12 @@ export default function OfferConcretement() {
             className="flex justify-center mb-8"
           >
             <GlowButton onClick={handleContinue} size="lg" className="px-10">
-              Voir mon Pack Clé en Main
+              Activer mon plan
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
           </motion.div>
 
-          {/* 🔥 Intro Box - AÉRÉ avec ÉMOJIS */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 mb-8"
-          >
-            <div className="text-gray-700 leading-relaxed text-center text-base space-y-4 whitespace-pre-line">
-              {enhanceIntroText(planDeRoute.introduction)}
-            </div>
-          </motion.div>
+
 
           {/* Parcours Guidé Header */}
           <motion.div
@@ -386,20 +319,7 @@ export default function OfferConcretement() {
             </div>
           </motion.div>
 
-          {/* Understanding Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1 }}
-            className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl border border-green-200 p-8 mb-8 text-center shadow-sm"
-          >
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              💡 Tu comprends maintenant ?
-            </h2>
-            <p className="text-gray-700 leading-relaxed text-lg">
-              {planDeRoute.conclusion}
-            </p>
-          </motion.div>
+
 
           {/* Transformation Avant/Après */}
           <motion.div
@@ -427,7 +347,7 @@ export default function OfferConcretement() {
               Prêt(e) à commencer le voyage ?
             </p>
             <GlowButton onClick={handleContinue} size="lg" className="px-12">
-              Voir Mon Pack Clé en Main
+              Activer mon plan
               <ArrowRight className="w-5 h-5 ml-2" />
             </GlowButton>
           </motion.div>

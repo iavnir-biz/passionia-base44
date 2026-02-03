@@ -38,8 +38,8 @@ const ONBOARDING_STEPS = [
     title: 'Tes objectifs',
     icon: Target,
     pages: ['OnboardingQ16TargetIncome', 'OnboardingQ17TargetDelay', 'OnboardingQ18LifeChange', 'OnboardingQ19Impact', 'OnboardingQ20Emotions', 'OnboardingQ21Relatives', 'OnboardingQ22Lifestyle', 'OnboardingQ23Obstacles', 'OnboardingQ24IfNothingChanges', 'OnboardingQ25Readiness', 'OnboardingQ26DeliveryPreferences'],
-    color: 'from-purple-500 to-pink-500',
-    bgColor: '#a855f7'
+    color: 'from-[#fbbf24] to-[#f59e0b]',
+    bgColor: '#fbbf24'
   },
   {
     id: 4,

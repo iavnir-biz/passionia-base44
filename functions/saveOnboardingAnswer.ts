@@ -17,6 +17,7 @@ Deno.serve(async (req) => {
 
     // 🔒 SÉCURITÉ #2 : Whitelist des champs autorisés (CRITIQUE)
     const ALLOWED_FIELDS = [
+      // Questions dynamiques (1-11)
       'coreSkill',
       'experienceLevel',
       'yearsPracticing',
@@ -27,7 +28,23 @@ Deno.serve(async (req) => {
       'mainTeaching',
       'uniqueMethod',
       'typicalMistake',
-      'extraDetail'
+      'extraDetail',
+      // Questions statiques post-transition (12-26)
+      'ageRange',
+      'gender',
+      'familySituation',
+      'currentIncome',
+      'targetIncome',
+      'targetIncomeDelay',
+      'lifeChangeMotivation',
+      'emotionalImpact',
+      'emotionalState',
+      'familySupport',
+      'lifestyleVision',
+      'perceivedObstacles',
+      'nothingChangesScenario',
+      'readinessScore',
+      'deliveryPreferences'
     ];
 
     if (!ALLOWED_FIELDS.includes(field)) {

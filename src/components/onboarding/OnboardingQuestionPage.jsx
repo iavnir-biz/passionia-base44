@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Sparkles, Loader2, Paperclip, Mic, StopCircle, X, Brain } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, Loader2, Paperclip, Mic, StopCircle, X, Brain, Star, Rocket } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -45,7 +45,8 @@ export default function OnboardingQuestionPage({
   useLocalStorage = false, // Pour les questions avant authentification
   customHandleSave = null, // Handler personnalisé pour Q26
   autoSubmit = false, // Pour auto-submit au clic (Q12, Q14, etc.)
-  completedSteps = [] // Étapes complétées à afficher dans la sidebar
+  completedSteps = [], // Étapes complétées à afficher dans la sidebar
+  isLastQuestion = false // Affiche un bandeau spécial pour la dernière question
 }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -352,16 +353,28 @@ export default function OnboardingQuestionPage({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
+              {/* Bandeau dernière question importante */}
+              {isLastQuestion && (
+                <div className="bg-gradient-to-r from-amber-400 to-orange-400 px-4 py-3 flex items-center gap-3">
+                  <div className="bg-white/20 rounded-full p-1.5">
+                    <Star className="w-4 h-4 text-white" fill="white" />
+                  </div>
+                  <p className="text-white text-sm font-semibold flex-1">
+                    🎯 Dernière question et la plus importante ! Elle va me permettre de créer les meilleures offres possibles pour toi.
+                  </p>
+                </div>
+              )}
+
               {/* Header avec Noah */}
-                    <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <NoahBrainIcon size={44} isThinking={true} isFloating={true} />
-                        <div>
-                          <p className="text-xs font-medium text-[#2dd4bf]">Construisons ta nouvelle vie</p>
-                          <p className="text-sm text-gray-500">Question {currentQuestion}/{totalQuestions}</p>
-                        </div>
-                      </div>
-                    </div>
+              <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <NoahBrainIcon size={44} isThinking={true} isFloating={true} />
+                  <div>
+                    <p className="text-xs font-medium text-[#2dd4bf]">Construisons ta nouvelle vie</p>
+                    <p className="text-sm text-gray-500">Question {currentQuestion}/{totalQuestions}</p>
+                  </div>
+                </div>
+              </div>
 
               {/* Body */}
               <div className="p-6">
@@ -557,31 +570,49 @@ export default function OnboardingQuestionPage({
               </motion.div>
 
                 <motion.div
-                  className="px-6 pb-6 flex gap-4"
+                  className="px-6 pb-6 flex flex-col sm:flex-row gap-3"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.5 }}
                 >
                   {prevPage && (
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="order-2 sm:order-1">
                       <Button
                         variant="outline"
                         onClick={handleBack}
-                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 h-11"
+                        className="w-full sm:w-auto bg-white border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 h-12"
                       >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         <span>Retour</span>
                       </Button>
                     </motion.div>
                   )}
-                  <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <button 
-                    onClick={handleNext}
-                    disabled={!canProceed() || isSaving}
-                    className="w-full h-11 bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <>{buttonText} <ArrowRight className="w-4 h-4" /></>}
-                  </button>
+                  <motion.div className="flex-1 order-1 sm:order-2" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    {isLastQuestion ? (
+                      <button 
+                        onClick={handleNext}
+                        disabled={!canProceed() || isSaving}
+                        className="w-full h-14 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-200"
+                      >
+                        {isSaving ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <>
+                            <Rocket className="w-5 h-5" />
+                            <span>{buttonText}</span>
+                            <ArrowRight className="w-5 h-5" />
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={handleNext}
+                        disabled={!canProceed() || isSaving}
+                        className="w-full h-12 bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <>{buttonText} <ArrowRight className="w-4 h-4" /></>}
+                      </button>
+                    )}
                   </motion.div>
                 </motion.div>
               </div>

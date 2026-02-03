@@ -21,6 +21,7 @@ export default function OnboardingQ19Impact() {
       progress={57}
       blockType="objectives"
       useLocalStorage={true}
+      completedSteps={[1, 2]}
     />
   );
 }

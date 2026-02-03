@@ -450,7 +450,6 @@ export default function OnboardingDynamic() {
                                           </div>
                   )}
                 </div>
-                </div>
               </motion.div>
             )}
           </div>

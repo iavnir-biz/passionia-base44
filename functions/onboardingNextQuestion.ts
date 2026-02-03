@@ -325,10 +325,11 @@ Deno.serve(async (req) => {
 
       await base44.asServiceRole.entities.Session.update(sessionId, updatePayload);
 
-      // Si dernière question, pas de prochaine question
-      if (workingHistory.length >= 10) {
+      // Si dernière question (après avoir sauvé la 11ème réponse), pas de prochaine question
+      if (updatedHistory.length >= 11) {
         return Response.json({
           done: true,
+          isDone: true,
           nextQuestionNumber: null
         });
       }

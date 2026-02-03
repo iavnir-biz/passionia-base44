@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Loader2, Video, FileText, Headphones, CheckSquare, BookOpen, GraduationCap, Play } from 'lucide-react';
+import { Loader2, Video, FileText, Headphones, CheckSquare, BookOpen, GraduationCap, Play, Lightbulb } from 'lucide-react';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 import OfferTransition from '@/components/offer/OfferTransition';
 import OfferSidebar from '@/components/onboarding/OfferSidebar';
@@ -146,6 +146,16 @@ export default function OfferProductPrincipal() {
       
       <div className="lg:ml-72 pt-32 lg:pt-12 pb-12">
         <div className="max-w-3xl mx-auto px-4">
+          {/* Bandeau info */}
+          <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl flex items-start gap-3">
+            <div className="bg-amber-400 rounded-full p-1.5 flex-shrink-0 mt-0.5">
+              <Lightbulb className="w-4 h-4 text-white" />
+            </div>
+            <p className="text-sm text-amber-900 leading-relaxed">
+              <span className="font-semibold">💡 Bon à savoir :</span> Dans ton dashboard, tu pourras régénérer tes produits à volonté. Si tu as déjà une idée, on pourra la travailler ensemble pour créer la meilleure stack !
+            </p>
+          </div>
+
           {/* Step Title */}
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-2">

@@ -279,181 +279,184 @@ export default function OnboardingDynamic() {
                 className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden"
               >
                 <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100">
-                                                     <div className="flex items-center gap-3">
-                                                         <NoahBrainIcon size={44} isThinking={true} />
-                                                         <div>
-                                                             <p className="text-xs font-medium text-[#2dd4bf]">Noah te demande</p>
-                                                             <p className="text-sm text-gray-500">Question {questionCount + 1}/{MAX_QUESTIONS}</p>
-                                                         </div>
-                                                     </div>
-                                                 </div>
-
-                                {/* Titre de la question */}
-                                <h2 className="text-xl font-bold text-gray-900 mb-2">
-                  {currentQuestion.title || currentQuestion.text}
-                </h2>
-
-                {/* Badge contextuel pour la première question */}
-                {currentQuestion.number === 1 && (
-                  <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl flex gap-3">
-                    <Sparkles className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-yellow-800 leading-relaxed font-medium">
-                      Plus tu me donnes d'informations, plus je pourrai générer des offres qui te correspondent parfaitement.
-                    </p>
-                  </div>
-                )}
-
-                {/* Sous-titre */}
-                {currentQuestion.subtitle && (
-                  <p className="text-gray-600 text-sm mb-6">
-                    {currentQuestion.subtitle}
-                  </p>
-                )}
-
-                {/* Badge dernière question */}
-                {questionCount === MAX_QUESTIONS - 1 && (
-                  <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl flex gap-3">
-                    <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-orange-800 leading-relaxed font-medium">
-                      Dernière question ! N'hésite pas à être très précis, cela m'aidera à créer une offre qui te ressemble vraiment.
-                    </p>
-                  </div>
-                )}
-                {/* Champ de réponse selon le type */}
-                <div className="space-y-6">
-                  {currentQuestion.type === 'text' && (
-                    <div className="relative">
-                      <Textarea
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                        placeholder="Ta réponse..."
-                        className="w-full border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-[#61f7a2] focus:border-transparent"
-                        autoFocus
-                        disabled={isSaving}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey && canProceed()) {
-                            e.preventDefault();
-                            handleNext();
-                          }
-                        }}
-                      />
-                      <div className="absolute bottom-4 right-4">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className={cn(
-                            "h-10 w-10 rounded-full transition-all",
-                            isRecording ? "bg-red-50 text-red-500 animate-pulse" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                          )}
-                          onClick={isRecording ? stopRecording : startRecording}
-                          disabled={isTranscribing || isSaving}
-                        >
-                          {isTranscribing ? (
-                            <Loader2 className="w-5 h-5 animate-spin text-[#61f7a2]" />
-                          ) : isRecording ? (
-                            <StopCircle className="w-5 h-5" />
-                          ) : (
-                            <Mic className="w-5 h-5" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {currentQuestion.type === 'single_choice' && (
-                    <div className="flex flex-col gap-3">
-                      {(currentQuestion.options || []).map((option, idx) => (
-                        <motion.button
-                          key={idx}
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
-                          className={cn(
-                            "px-6 py-4 rounded-2xl text-base font-medium transition-all shadow-sm border text-left",
-                            value === option
-                              ? "bg-black text-white border-black"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
-                          )}
-                          onClick={() => {
-                            setValue(option);
-                            handleNextDirect(option);
-                          }}
-                          disabled={isSaving}
-                        >
-                          {option}
-                        </motion.button>
-                      ))}
-                    </div>
-                  )}
-
-                  {currentQuestion.type === 'multiple_choice' && (
-                    <div className="flex flex-col gap-3">
-                      {(currentQuestion.options || []).map((option, idx) => (
-                        <motion.button
-                          key={idx}
-                          onClick={() => handleCheckboxChange(option, !value.includes(option))}
-                          className={cn(
-                            "px-6 py-4 rounded-2xl text-base font-medium transition-all border shadow-sm flex items-center gap-3 text-left",
-                            value.includes(option)
-                              ? "bg-[#1a1a1a] text-white border-black"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
-                          )}
-                          disabled={isSaving}
-                        >
-                          <Checkbox checked={value.includes(option)} className="border-white/20" />
-                          {option}
-                        </motion.button>
-                      ))}
-                    </div>
-                  )}
-
-                  {currentQuestion.type === 'slider' && (
-                    <div className="space-y-6">
-                      <div className="bg-gray-50 rounded-2xl p-6">
-                        <div className="flex justify-between items-baseline mb-4">
-                          <span className="text-gray-500 text-sm font-medium">Expérience</span>
-                          <span className="text-4xl font-black text-gray-900">
-                            {value >= (currentQuestion.max || 10) ? `${value}+` : value}
-                            <span className="text-lg text-gray-400 ml-2">ans</span>
-                          </span>
+                    <div className="flex items-center gap-3">
+                        <NoahBrainIcon size={44} isThinking={true} />
+                        <div>
+                            <p className="text-xs font-medium text-[#2dd4bf]">Noah te demande</p>
+                            <p className="text-sm text-gray-500">Question {questionCount + 1}/{MAX_QUESTIONS}</p>
                         </div>
-                        <Slider
-                          value={[value]}
-                          onValueChange={(vals) => setValue(vals[0])}
-                          min={currentQuestion.min || 0}
-                          max={currentQuestion.max || 10}
-                          step={currentQuestion.step || 1}
-                          disabled={isSaving}
-                          className="mt-2"
-                        />
-                      </div>
+                    </div>
+                </div>
+                
+                <div className="p-6 md:p-8">
+                  {/* Titre de la question */}
+                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+                    {currentQuestion.title || currentQuestion.text}
+                  </h2>
+
+                  {/* Badge contextuel pour la première question */}
+                  {currentQuestion.number === 1 && (
+                    <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl flex gap-3">
+                      <Sparkles className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-yellow-800 leading-relaxed font-medium">
+                        Plus tu me donnes d'informations, plus je pourrai générer des offres qui te correspondent parfaitement.
+                      </p>
                     </div>
                   )}
 
-                  {/* Bouton Continuer (pas pour single_choice car auto-submit) */}
-                  {currentQuestion.type !== 'single_choice' && (
-                     <div className="px-6 pb-6">
-                                              <button
-                                                onClick={handleNext}
-                                                disabled={!canProceed() || isSaving}
-                                                 className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                              >
-                                                {isSaving ? (
-                                                  <>
-                                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                                    <span>Envoi en cours...</span>
-                                                  </>
-                                                ) : (
-                                                  <span>Continuer →</span>
-                                                )}
-                                              </button>
-                                          </div>
+                  {/* Sous-titre */}
+                  {currentQuestion.subtitle && (
+                    <p className="text-gray-600 text-sm mb-6">
+                      {currentQuestion.subtitle}
+                    </p>
                   )}
+
+                  {/* Badge dernière question */}
+                  {questionCount === MAX_QUESTIONS - 1 && (
+                    <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl flex gap-3">
+                      <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-orange-800 leading-relaxed font-medium">
+                        Dernière question ! N'hésite pas à être très précis, cela m'aidera à créer une offre qui te ressemble vraiment.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Champ de réponse selon le type */}
+                  <div className="space-y-6">
+                    {currentQuestion.type === 'text' && (
+                      <div className="relative">
+                        <Textarea
+                          value={value}
+                          onChange={(e) => setValue(e.target.value)}
+                          placeholder="Ta réponse..."
+                          className="w-full border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-[#61f7a2] focus:border-transparent"
+                          autoFocus
+                          disabled={isSaving}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey && canProceed()) {
+                              e.preventDefault();
+                              handleNext();
+                            }
+                          }}
+                        />
+                        <div className="absolute bottom-4 right-4">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className={cn(
+                              "h-10 w-10 rounded-full transition-all",
+                              isRecording ? "bg-red-50 text-red-500 animate-pulse" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                            )}
+                            onClick={isRecording ? stopRecording : startRecording}
+                            disabled={isTranscribing || isSaving}
+                          >
+                            {isTranscribing ? (
+                              <Loader2 className="w-5 h-5 animate-spin text-[#61f7a2]" />
+                            ) : isRecording ? (
+                              <StopCircle className="w-5 h-5" />
+                            ) : (
+                              <Mic className="w-5 h-5" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {currentQuestion.type === 'single_choice' && (
+                      <div className="flex flex-col gap-3">
+                        {(currentQuestion.options || []).map((option, idx) => (
+                          <motion.button
+                            key={idx}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            className={cn(
+                              "px-6 py-4 rounded-2xl text-base font-medium transition-all shadow-sm border text-left",
+                              value === option
+                                ? "bg-black text-white border-black"
+                                : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                            )}
+                            onClick={() => {
+                              setValue(option);
+                              handleNextDirect(option);
+                            }}
+                            disabled={isSaving}
+                          >
+                            {option}
+                          </motion.button>
+                        ))}
+                      </div>
+                    )}
+
+                    {currentQuestion.type === 'multiple_choice' && (
+                      <div className="flex flex-col gap-3">
+                        {(currentQuestion.options || []).map((option, idx) => (
+                          <motion.button
+                            key={idx}
+                            onClick={() => handleCheckboxChange(option, !value.includes(option))}
+                            className={cn(
+                              "px-6 py-4 rounded-2xl text-base font-medium transition-all border shadow-sm flex items-center gap-3 text-left",
+                              value.includes(option)
+                                ? "bg-[#1a1a1a] text-white border-black"
+                                : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
+                            )}
+                            disabled={isSaving}
+                          >
+                            <Checkbox checked={value.includes(option)} className="border-white/20" />
+                            {option}
+                          </motion.button>
+                        ))}
+                      </div>
+                    )}
+
+                    {currentQuestion.type === 'slider' && (
+                      <div className="space-y-6">
+                        <div className="bg-gray-50 rounded-2xl p-6">
+                          <div className="flex justify-between items-baseline mb-4">
+                            <span className="text-gray-500 text-sm font-medium">Expérience</span>
+                            <span className="text-4xl font-black text-gray-900">
+                              {value >= (currentQuestion.max || 10) ? `${value}+` : value}
+                              <span className="text-lg text-gray-400 ml-2">ans</span>
+                            </span>
+                          </div>
+                          <Slider
+                            value={[value]}
+                            onValueChange={(vals) => setValue(vals[0])}
+                            min={currentQuestion.min || 0}
+                            max={currentQuestion.max || 10}
+                            step={currentQuestion.step || 1}
+                            disabled={isSaving}
+                            className="mt-2"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bouton Continuer (pas pour single_choice car auto-submit) */}
+                    {currentQuestion.type !== 'single_choice' && (
+                       <div className="pt-6">
+                          <button
+                            onClick={handleNext}
+                            disabled={!canProceed() || isSaving}
+                             className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-semibold py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          >
+                            {isSaving ? (
+                              <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <span>Envoi en cours...</span>
+                              </>
+                            ) : (
+                              <span>Continuer →</span>
+                            )}
+                          </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             )}
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );

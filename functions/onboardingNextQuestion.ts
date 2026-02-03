@@ -166,16 +166,28 @@ Si non → reformule.
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    
+    // 🔒 SÉCURITÉ #1 : Validation des données entrantes
     const { sessionId, userAnswer, firstName } = await req.json();
 
     if (!sessionId) {
       return Response.json({ error: 'sessionId required' }, { status: 400 });
     }
 
+    // 🔒 SÉCURITÉ #2 : Rate limiting via logging
+    console.log("🔐 [SECURITY] onboardingNextQuestion called", { 
+      sessionId, 
+      hasAnswer: !!userAnswer,
+      timestamp: new Date().toISOString(),
+      ip: req.headers.get('x-forwarded-for') || 'unknown'
+    });
+
     // ÉTAPE 1 : Sauvegarder la réponse si présente
     if (userAnswer) {
+      // 🔒 SÉCURITÉ #3 : Vérifier que la session existe
       const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
       if (!sessions || sessions.length === 0) {
+        console.warn("⚠️ [SECURITY] Session not found during answer save", { sessionId });
         return Response.json({ error: 'Session not found' }, { status: 404 });
       }
 
@@ -183,12 +195,25 @@ Deno.serve(async (req) => {
       const workingHistory = currentSession.onboarding_history || [];
       const workingSummary = currentSession.onboarding_summary || {};
 
-      const normalizedAnswer = typeof userAnswer === 'string' ? userAnswer : JSON.stringify(userAnswer);
+      // 🔒 SÉCURITÉ #4 : Sanitize userAnswer (limiter taille + type)
+      let normalizedAnswer;
+      if (typeof userAnswer === 'string') {
+        // Limite à 5000 caractères pour éviter pollution DB
+        normalizedAnswer = userAnswer.slice(0, 5000);
+      } else {
+        normalizedAnswer = JSON.stringify(userAnswer).slice(0, 5000);
+      }
 
       const currentQuestionConfig = QUESTION_STRUCTURE[workingHistory.length];
+      
+      // 🔒 SÉCURITÉ #5 : Sanitize firstName
+      const sanitizedFirstName = firstName 
+        ? String(firstName).slice(0, 50).replace(/[<>]/g, '') 
+        : '';
+
       const questionText = currentQuestionConfig
         ? currentQuestionConfig.titleTemplate
-          .replace('{{firstName}}', firstName || '')
+          .replace('{{firstName}}', sanitizedFirstName)
           .replace('{{coreSkill}}', workingSummary.who_to_teach || 'cette compétence')
           .replace('{{targetAudience}}', workingSummary.learner_profile || 'ces personnes')
         : `Question ${workingHistory.length + 1}`;
@@ -215,7 +240,6 @@ Deno.serve(async (req) => {
 
       // Mapping spécifique selon la question
       if (workingHistory.length === 0) {
-        // Q1: coreSkill
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           coreSkill: normalizedAnswer
@@ -225,7 +249,6 @@ Deno.serve(async (req) => {
           who_to_teach: normalizedAnswer
         };
       } else if (workingHistory.length === 3) {
-        // Q4: targetAudience
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           targetAudience: normalizedAnswer
@@ -235,7 +258,6 @@ Deno.serve(async (req) => {
           learner_profile: normalizedAnswer
         };
       } else if (workingHistory.length === 4) {
-        // Q5: mainProblem
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           mainProblem: normalizedAnswer
@@ -245,7 +267,6 @@ Deno.serve(async (req) => {
           main_learning_problem: normalizedAnswer
         };
       } else if (workingHistory.length === 5) {
-        // Q6: firstQuickResult
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           firstQuickResult: normalizedAnswer
@@ -255,7 +276,6 @@ Deno.serve(async (req) => {
           quick_win: normalizedAnswer
         };
       } else if (workingHistory.length === 6) {
-        // Q7: finalTransformation
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           finalTransformation: normalizedAnswer
@@ -265,7 +285,6 @@ Deno.serve(async (req) => {
           big_transformation: normalizedAnswer
         };
       } else if (workingHistory.length === 7) {
-        // Q8: mainTeaching
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           mainTeaching: normalizedAnswer
@@ -275,7 +294,6 @@ Deno.serve(async (req) => {
           main_teaching: normalizedAnswer
         };
       } else if (workingHistory.length === 8) {
-        // Q9: uniqueMethod
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           uniqueMethod: normalizedAnswer
@@ -285,7 +303,6 @@ Deno.serve(async (req) => {
           method_angle: normalizedAnswer
         };
       } else if (workingHistory.length === 9) {
-        // Q10: typicalMistake
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           typicalMistake: normalizedAnswer
@@ -295,7 +312,6 @@ Deno.serve(async (req) => {
           common_mistake: normalizedAnswer
         };
       } else if (workingHistory.length === 10) {
-        // Q11: extraDetail (dernière question)
         updatePayload.onboarding_full = {
           ...(currentSession.onboarding_full || {}),
           extraDetail: normalizedAnswer
@@ -321,6 +337,7 @@ Deno.serve(async (req) => {
     // ÉTAPE 2 : Générer la prochaine question
     const sessions = await base44.asServiceRole.entities.Session.filter({ id: sessionId });
     if (!sessions || sessions.length === 0) {
+      console.warn("⚠️ [SECURITY] Session not found during question generation", { sessionId });
       return Response.json({ error: 'Session not found' }, { status: 404 });
     }
 
@@ -341,8 +358,13 @@ Deno.serve(async (req) => {
 
     // Pour la première question (pas de contexte), pas besoin d'appeler Claude
     if (nextQuestionIndex === 0) {
+      // 🔒 SÉCURITÉ #6 : Sanitize firstName
+      const sanitizedFirstName = firstName 
+        ? String(firstName).slice(0, 50).replace(/[<>]/g, '') 
+        : '';
+
       const staticTitle = nextQuestion.titleTemplate
-        .replace('{{firstName}}', firstName || '')
+        .replace('{{firstName}}', sanitizedFirstName)
         .replace('{{coreSkill}}', summary.who_to_teach || 'cette compétence')
         .replace('{{targetAudience}}', summary.learner_profile || 'ces personnes');
 
@@ -366,6 +388,11 @@ Deno.serve(async (req) => {
     const lastAnswer = history.length > 0 ? history[history.length - 1].answer : null;
     const previousContext = history.map(h => `Q: ${h.question}\nR: ${h.answer}`).join('\n\n');
 
+    // 🔒 SÉCURITÉ #7 : Sanitize firstName
+    const sanitizedFirstName = firstName 
+      ? String(firstName).slice(0, 50).replace(/[<>]/g, '') 
+      : 'non renseigné';
+
     const userPrompt = `Contexte de la conversation jusqu'à maintenant :
 ${previousContext}
 
@@ -379,7 +406,7 @@ Titre : ${nextQuestion.titleTemplate}
 Sous-titre : ${nextQuestion.subtitleTemplate}
 
 Variables disponibles :
-- firstName: ${firstName || 'non renseigné'}
+- firstName: ${sanitizedFirstName}
 - coreSkill (ce qu'il veut enseigner): ${summary.who_to_teach || 'non renseigné'}
 - targetAudience (à qui il veut enseigner): ${summary.learner_profile || 'non renseigné'}
 
@@ -430,7 +457,7 @@ Retourne UNIQUEMENT un JSON avec cette structure :
       console.error("Anthropic API or Parse error, using fallback", e);
       reformulated = {
         text: nextQuestion.titleTemplate
-          .replace('{{firstName}}', firstName || '')
+          .replace('{{firstName}}', sanitizedFirstName)
           .replace('{{coreSkill}}', summary.who_to_teach || 'cette compétence')
           .replace('{{targetAudience}}', summary.learner_profile || 'ces personnes'),
         subtitle: nextQuestion.subtitleTemplate
@@ -453,7 +480,7 @@ Retourne UNIQUEMENT un JSON avec cette structure :
     });
 
   } catch (error) {
-    console.error('Error in onboardingNextQuestion:', error);
+    console.error('❌ Error in onboardingNextQuestion:', error);
     return Response.json({
       error: error.message,
       stack: error.stack

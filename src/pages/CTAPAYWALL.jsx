@@ -213,11 +213,10 @@ export default function CTAPAYWALL() {
             </div>
 
             <h1 className="text-2xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-              Maintenant, on va mettre tout ça en place ensemble
+              On passe à l'action ?
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Tu sais quoi vendre et à quel prix.<br />
-              On va maintenant te montrer comment passer à l'action et faire ta première vente.
+              Tes offres t'attendent. Débloque-les maintenant.
             </p>
           </motion.div>
 
@@ -316,37 +315,7 @@ export default function CTAPAYWALL() {
             </div>
           </motion.div>
 
-          {/* Bloc empathique */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-blue-50 rounded-3xl border border-blue-200 p-4 md:p-8 mb-8 overflow-hidden"
-          >
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
-              On s'est mis à ta place
-            </h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              On sait ce que tu ressens :
-            </p>
-            <ul className="space-y-2 mb-6">
-              <li className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1">•</span>
-                <span className="text-gray-700">"J'ai mon offre… mais comment je la vends ?"</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1">•</span>
-                <span className="text-gray-700">"Je ne suis pas à l'aise avec le marketing…"</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-blue-600 mt-1">•</span>
-                <span className="text-gray-700">"J'ai peur de me planter…"</span>
-              </li>
-            </ul>
-            <p className="text-center text-gray-900 font-bold text-lg">
-              C'est normal. Et tu n'es pas seul(e).
-            </p>
-          </motion.div>
+
 
           {/* Comparatif Sans/Avec */}
           <motion.div
@@ -415,16 +384,7 @@ export default function CTAPAYWALL() {
             transition={{ delay: 0.5 }}
             className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-4 md:p-10 mb-8 text-white shadow-2xl overflow-hidden"
           >
-            {/* 🔥 P0-2: Ce qui t'attend après paiement */}
-            <div className="bg-[#61f7a2]/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#61f7a2]/30">
-              <p className="text-white text-lg text-center leading-relaxed">
-                <strong className="text-[#61f7a2]">Dès ton accès,</strong> tu arrives dans un dashboard où tout est déjà prêt pour toi :<br />
-                ✅ Offres prêtes • ✅ Messages prêts • ✅ Plan d'action personnalisé • ✅ Checklist quotidienne
-              </p>
-              <p className="text-[#61f7a2] text-center mt-3 font-bold">
-                Accès immédiat • Accès à vie
-              </p>
-            </div>
+
 
             <h2 className="text-3xl font-bold mb-4 text-center">
               Voici ce qu'on a préparé pour toi
@@ -611,92 +571,9 @@ export default function CTAPAYWALL() {
               </div>
             </div>
 
-            {/* Ancrage émotionnel */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 md:p-8 border border-gray-200 text-center mb-6">
-              <p className="text-gray-700 leading-relaxed mb-4 text-lg">
-                Ce que tu achètes ici, ce n'est pas "un pack".
-              </p>
-              <div className="space-y-2 text-gray-900 font-semibold text-lg">
-                <p>👉 C'est un raccourci.</p>
-                <p>👉 C'est de la clarté.</p>
-                <p>👉 C'est le déclic que beaucoup attendent depuis des mois.</p>
-              </div>
-            </div>
-
-            {/* Réassurance */}
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
-              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-xl p-4">
-                <CheckCircle className="w-5 h-5 text-[#61f7a2] flex-shrink-0" />
-                <span className="text-gray-800">Tu n'es jamais seul(e)</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-xl p-4">
-                <CheckCircle className="w-5 h-5 text-[#61f7a2] flex-shrink-0" />
-                <span className="text-gray-800">Tu es accompagné(e) pas à pas</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-xl p-4">
-                <CheckCircle className="w-5 h-5 text-[#61f7a2] flex-shrink-0" />
-                <span className="text-gray-800">Tu avances à ton rythme</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-xl p-4">
-                <CheckCircle className="w-5 h-5 text-[#61f7a2] flex-shrink-0" />
-                <span className="text-gray-800">Tu peux poser tes questions</span>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <p className="text-xl font-bold text-gray-900">
-                "Tu n'as pas besoin d'être prêt(e). Tu as juste besoin de commencer."
-              </p>
-            </div>
           </motion.div>
 
-          {/* 🔥 B) CE QUE TU ACHÈTES / CE QUE TU N'ACHÈTES PAS */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65 }}
-            className="bg-white rounded-3xl border border-gray-200 p-4 md:p-8 mb-8 overflow-hidden"
-          >
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-              💡 Soyons clairs
-            </h2>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Tu achètes */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <CheckCircle className="w-5 h-5 text-[#61f7a2]" />
-                  <h3 className="font-bold text-gray-900">Tu achètes</h3>
-                </div>
-                <ul className="space-y-2 text-gray-700">
-                  <li>• Clarté (tu sais quoi faire)</li>
-                  <li>• Structure (tu as un plan)</li>
-                  <li>• Guidance pas à pas (tu n'es pas seul·e)</li>
-                  <li>• Exécution (on te montre comment)</li>
-                </ul>
-              </div>
-
-              {/* Tu n'achètes pas */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <X className="w-5 h-5 text-gray-400" />
-                  <h3 className="font-bold text-gray-900">Tu n'achètes pas</h3>
-                </div>
-                <ul className="space-y-2 text-gray-600">
-                  <li>• Une promesse magique</li>
-                  <li>• Un rêve flou</li>
-                  <li>• Un hack miracle</li>
-                  <li>• Des revenus garantis</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-              <p className="text-center text-gray-700 text-sm">
-                On te donne les outils et la méthode. C'est toi qui fais le chemin.
-              </p>
-            </div>
-          </motion.div>
 
           {/* 🔥 C) CE PACK EST FAIT POUR TOI SI */}
           <motion.div

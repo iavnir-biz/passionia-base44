@@ -426,9 +426,12 @@ export default function CTAPAYWALL() {
                   <div>
                     <h3 className="text-xl font-bold mb-2">📦 Tout le contenu déjà créé</h3>
                     <ul className="space-y-2 text-gray-200 mb-3">
-                      <li>• Textes des offres</li>
-                      <li>• Page de vente prête</li>
-                      <li>• Emails de vente</li>
+                      <li>• Analyse de ton marché détaillée</li>
+                      <li>• Tes avatars futurs acheteurs</li>
+                      <li>• La page de vente de ton produit low ticket</li>
+                      <li>• Les messages à envoyer pour faire tes premières ventes</li>
+                      <li>• Tes emails marketing</li>
+                      <li>• Ton plan d'action jour par jour, à cocher pour avancer</li>
                     </ul>
                     <p className="text-[#61f7a2] italic">➡️ Tu copies, tu colles, tu appliques.</p>
                   </div>

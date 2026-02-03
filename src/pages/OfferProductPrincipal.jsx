@@ -152,14 +152,14 @@ export default function OfferProductPrincipal() {
               <Lightbulb className="w-4 h-4 text-white" />
             </div>
             <p className="text-sm text-amber-900 leading-relaxed">
-              Je te propose <span className="font-semibold">2 options optimisées</span> par offre, basées sur ce qui fonctionne le mieux sur le marché. Dans ton dashboard, tu pourras les ajuster, les régénérer ou m'indiquer tes propres idées — je m'adapte à 100% à toi ! 🚀
+              Je te propose <span className="font-semibold">2 options optimisées</span> par offre, basées sur ce qui fonctionne le mieux sur le marché. Dans ton dashboard final, tu pourras toujours les ajuster, en choisir de nouvelles, les régénérer ou m'indiquer tes propres idées que je m'efforcerai de rendre le plus sexy et puissant possible — je m'adapte à 100% à toi ! À partir d'aujourd'hui, je deviens ton véritable associé ! 🚀
             </p>
           </div>
 
           {/* Step Title */}
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-2">
-              <span className="text-gray-900"> Choisis ton Produit Principal</span>
+              <span className="text-gray-900">Choisis ton Produit Low Ticket</span>
             </h2>
             <p className="text-gray-700 mx-auto text-sm max-w-lg">C'est ton offre d'entrée. Choisis l'option la plus simple pour commencer.</p>
           </div>

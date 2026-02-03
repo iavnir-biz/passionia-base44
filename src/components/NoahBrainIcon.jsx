@@ -82,50 +82,28 @@ export const NoahBrainIcon = ({ size = 48, isThinking = true, isFloating = false
         {/* Center connection */}
         <path d="M32 10V22" stroke="white" strokeWidth="3" strokeLinecap="round" />
         
-        {/* Eyes */}
-        <circle cx="24" cy="28" r="4" fill="white" />
-        <circle cx="40" cy="28" r="4" fill="white" />
-        
-        {/* Pupils - animated looking around */}
-        <motion.circle 
-          cx="25" 
-          cy="27" 
-          r="2" 
-          fill="#1f2937"
-          animate={isThinking ? {
-            cx: [25, 23, 25, 26, 25],
-            cy: [27, 28, 27, 28, 27]
-          } : {}}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.circle 
-          cx="41" 
-          cy="27" 
-          r="2" 
-          fill="#1f2937"
-          animate={isThinking ? {
-            cx: [41, 39, 41, 42, 41],
-            cy: [27, 28, 27, 28, 27]
-          } : {}}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        
-        {/* Smile */}
-        <path 
-          d="M26 44C26 44 29 48 32 48C35 48 38 44 38 44" 
+        {/* Brain bottom part - stem */}
+        <motion.path 
+          d="M24 38C24 42 28 46 32 46C36 46 40 42 40 38"
           stroke="white" 
-          strokeWidth="2.5" 
-          strokeLinecap="round" 
+          strokeWidth="3" 
+          strokeLinecap="round"
           fill="none"
+          animate={isThinking ? { 
+            opacity: [0.9, 1, 0.9]
+          } : {}}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.4
+          }}
         />
+        
+        {/* Brain center folds */}
+        <path d="M32 22V32" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M26 26C28 28 30 28 32 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M32 26C34 28 36 28 38 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
         
         {/* Thinking sparkles - animated */}
         <motion.circle 
@@ -203,11 +181,10 @@ export const NoahBrainIconStatic = ({ size = 48, className = '' }) => {
         <path d="M18 38C14 38 11 34 11 30C11 27 13 24 16 23C15 21 15 18 17 16C19 14 22 14 24 15C25 12 28 10 32 10" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
         <path d="M46 38C50 38 53 34 53 30C53 27 51 24 48 23C49 21 49 18 47 16C45 14 42 14 40 15C39 12 36 10 32 10" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
         <path d="M32 10V22" stroke="white" strokeWidth="3" strokeLinecap="round" />
-        <circle cx="24" cy="28" r="4" fill="white" />
-        <circle cx="40" cy="28" r="4" fill="white" />
-        <circle cx="25" cy="27" r="2" fill="#1f2937" />
-        <circle cx="41" cy="27" r="2" fill="#1f2937" />
-        <path d="M26 44C26 44 29 48 32 48C35 48 38 44 38 44" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+        <path d="M24 38C24 42 28 46 32 46C36 46 40 42 40 38" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
+        <path d="M32 22V32" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M26 26C28 28 30 28 32 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M32 26C34 28 36 28 38 26" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
         <circle cx="54" cy="10" r="3" fill="white" opacity="0.7" />
       </svg>
     </div>

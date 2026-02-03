@@ -245,7 +245,7 @@ export default function OnboardingDynamic() {
         {/* Header avec barre de progression */}
         <div className="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-10 w-full">
           <div className="max-w-4xl mx-auto w-full flex items-center justify-between gap-6">
-            <span className="text-lg font-bold text-[#8b5cf6]">Tes talents</span>
+            <span className="text-lg font-bold text-[#111827]">Tes talents</span>
             <div className="hidden md:block flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-[#61f7a2] rounded-full"
@@ -278,11 +278,11 @@ export default function OnboardingDynamic() {
                 transition={{ duration: 0.4 }}
                 className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden"
               >
-                <div className="bg-gradient-to-r from-[#8b5cf6]/10 to-[#a78bfa]/10 px-6 py-4 border-b border-gray-100">
+                <div className="bg-gradient-to-r from-[#61f7a2]/10 to-[#2dd4bf]/10 px-6 py-4 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         <NoahBrainIcon size={44} isThinking={true} />
                         <div>
-                            <p className="text-xs font-medium text-[#8b5cf6]">Construisons ta nouvelle vie</p>
+                            <p className="text-xs font-medium text-[#2dd4bf]">Construisons ta nouvelle vie</p>
                             <p className="text-sm text-gray-500">Question {questionCount + 1}/{MAX_QUESTIONS}</p>
                         </div>
                     </div>

@@ -49,8 +49,8 @@ export default function ChooseYourPathNew() {
       title: 'CHEMIN 1: Vous testez l\'outil',
       subtitle: 'Générateur 67€',
       features: [
-        '10 générations + 7j Skool',
-        'Garantie 30 jours: 67€ de CA minimum'
+        '5 générations',
+        'Garantie 30 jours'
       ],
       cta: 'Accéder au Générateur',
       link: 'ProtocoleQuickwin',
@@ -63,10 +63,10 @@ export default function ChooseYourPathNew() {
       color: 'blue',
       icon: Users,
       title: 'CHEMIN 2: Vous construisez avec nous',
-      subtitle: 'Skool 37€/mois ou 370€/an',
+      subtitle: 'Skool 37€/mois',
       features: [
-        'Générateur illimité + accompagnement complet',
-        'Prix verrouillé à vie (plus que 6 places à 37€)'
+        'Générateur illimité',
+        'Accompagnement complet'
       ],
       cta: 'Rejoindre Skool',
       link: 'SkoolAbonnement',
@@ -206,7 +206,7 @@ export default function ChooseYourPathNew() {
           transition={{ delay: 0.5 }}
           className="bg-gradient-to-br from-red-900/30 to-orange-900/30 rounded-2xl border border-red-500/30 p-6 md:p-8 mb-8"
         >
-          <div className="grid md:grid-cols-3 gap-6 text-center">
+          <div className="grid md:grid-cols-2 gap-6 text-center">
             <div className="flex flex-col items-center gap-2">
               <Clock className="w-8 h-8 text-red-400" />
               <p className="text-white font-bold">⏰ Liens actifs jusqu'à minuit</p>
@@ -223,12 +223,6 @@ export default function ChooseYourPathNew() {
               <Gift className="w-8 h-8 text-yellow-400" />
               <p className="text-white font-bold">🎁 Bonus disparaissent</p>
               <p className="text-gray-400">après ce soir</p>
-            </div>
-            
-            <div className="flex flex-col items-center gap-2">
-              <TrendingUp className="w-8 h-8 text-orange-400" />
-              <p className="text-white font-bold">📈 Prix augmentent</p>
-              <p className="text-gray-400">dans quelques jours</p>
             </div>
           </div>
         </motion.div>

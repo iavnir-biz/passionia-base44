@@ -10,25 +10,37 @@ import {
   Loader2,
   Shield,
   Zap,
-  Star
+  Star,
+  Gift,
+  X
 } from 'lucide-react';
 
 export default function ProtocoleQuickwin() {
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasOrderBump, setHasOrderBump] = useState(false);
+  const [showOrderBumpPopup, setShowOrderBumpPopup] = useState(false);
+
+  // Prix
+  const BASE_PRICE = 67;
+  const ORDER_BUMP_PRICE = 37;
+  const totalPrice = hasOrderBump ? BASE_PRICE + ORDER_BUMP_PRICE : BASE_PRICE;
 
   const handleCheckout = async () => {
     setIsProcessing(true);
     try {
-      const { data } = await base44.functions.invoke('createCheckoutChoice', {
-        priceId: 'price_quickwin_67'
+      const { data } = await base44.functions.invoke('createCheckout', {
+        hasOrderBump: hasOrderBump
       });
 
       if (data.success && data.url) {
         window.top.location.href = data.url;
+      } else {
+        alert('Erreur: impossible de créer la session de paiement');
       }
     } catch (error) {
       console.error('Error creating checkout:', error);
+      alert('Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setIsProcessing(false);
     }

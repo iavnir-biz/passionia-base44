@@ -71,7 +71,7 @@ export default function EtComment() {
             {/* Image principale */}
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&h=350&fit=crop"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/33d43f097_Capturedecran2026-02-04a194344.png"
                 alt="Communauté"
                 className="rounded-2xl shadow-2xl w-full"
               />

@@ -69,30 +69,22 @@ export default function ProtocoleQuickwin() {
           className="bg-white rounded-3xl border border-gray-200 shadow-xl overflow-hidden"
         >
           {/* Hero Section */}
-          <div className="p-8 md:p-10 relative">
-            {/* Image coin supérieur droit */}
-            <div className="absolute top-6 right-6 w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden shadow-lg hidden md:block">
-              <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
-                alt="Entrepreneur"
-                className="w-full h-full object-cover"
-              />
+          <div className="p-8 md:p-10">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              GÉNÉRATEUR COMPLET
+            </h1>
+            
+            <div className="flex items-baseline gap-2 mb-4">
+              <span className="text-4xl md:text-5xl font-black text-[#61f7a2]">{totalPrice}€</span>
+              <span className="text-gray-500 font-medium">ONE-TIME</span>
+              {hasOrderBump && (
+                <span className="text-sm text-gray-400 line-through ml-2">104€</span>
+              )}
             </div>
 
-            <div className="pr-0 md:pr-48">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                GÉNÉRATEUR COMPLET
-              </h1>
-              
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-4xl md:text-5xl font-black text-[#61f7a2]">67€</span>
-                <span className="text-gray-500 font-medium">ONE-TIME</span>
-              </div>
-
-              <p className="text-xl text-gray-700 font-medium">
-                Votre première vente en moins de 7 jours
-              </p>
-            </div>
+            <p className="text-xl text-gray-700 font-medium">
+              Votre première vente en moins de 7 jours
+            </p>
           </div>
 
           {/* Ce qui est inclus */}

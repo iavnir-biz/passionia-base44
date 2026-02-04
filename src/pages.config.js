@@ -122,6 +122,7 @@ import WelcomeOpening from './pages/WelcomeOpening';
 import ChooseYourPathNew from './pages/ChooseYourPathNew';
 import DoneForYouElite from './pages/DoneForYouElite';
 import MonetiserSavoir from './pages/MonetiserSavoir';
+import EtComment from './pages/EtComment';
 
 
 export const PAGES = {
@@ -200,6 +201,7 @@ export const PAGES = {
     "ChooseYourPathNew": ChooseYourPathNew,
     "DoneForYouElite": DoneForYouElite,
     "MonetiserSavoir": MonetiserSavoir,
+    "EtComment": EtComment,
 }
 
 export const pagesConfig = {

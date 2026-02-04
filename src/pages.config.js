@@ -50,19 +50,24 @@
 import AIResources from './pages/AIResources';
 import Activation from './pages/Activation';
 import AdCopies from './pages/AdCopies';
+import AgentNoah from './pages/AgentNoah';
 import AvatarClients from './pages/AvatarClients';
 import BonneNouvelle from './pages/BonneNouvelle';
 import Booking from './pages/Booking';
 import CTAPAYWALL from './pages/CTAPAYWALL';
 import ChooseYourPath from './pages/ChooseYourPath';
+import ChooseYourPathNew from './pages/ChooseYourPathNew';
 import DailyActions from './pages/DailyActions';
 import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
+import DoneForYouElite from './pages/DoneForYouElite';
 import DownsellSession from './pages/DownsellSession';
 import EmailsMarketing from './pages/EmailsMarketing';
+import EtComment from './pages/EtComment';
 import GenerationProgress from './pages/GenerationProgress';
 import Home from './pages/Home';
 import MarketAnalysis from './pages/MarketAnalysis';
+import MonetiserSavoir from './pages/MonetiserSavoir';
 import MyOffers from './pages/MyOffers';
 import NoahGeneration from './pages/NoahGeneration';
 import NovaChat from './pages/NovaChat';
@@ -117,33 +122,33 @@ import SkoolAbonnement from './pages/SkoolAbonnement';
 import SkoolComparaison from './pages/SkoolComparaison';
 import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
+import VotreForce from './pages/VotreForce';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import ChooseYourPathNew from './pages/ChooseYourPathNew';
-import DoneForYouElite from './pages/DoneForYouElite';
-import MonetiserSavoir from './pages/MonetiserSavoir';
-import EtComment from './pages/EtComment';
-import VotreForce from './pages/VotreForce';
-import AgentNoah from './pages/AgentNoah';
 
 
 export const PAGES = {
     "AIResources": AIResources,
     "Activation": Activation,
     "AdCopies": AdCopies,
+    "AgentNoah": AgentNoah,
     "AvatarClients": AvatarClients,
     "BonneNouvelle": BonneNouvelle,
     "Booking": Booking,
     "CTAPAYWALL": CTAPAYWALL,
     "ChooseYourPath": ChooseYourPath,
+    "ChooseYourPathNew": ChooseYourPathNew,
     "DailyActions": DailyActions,
     "Dashboard": Dashboard,
     "Documents": Documents,
+    "DoneForYouElite": DoneForYouElite,
     "DownsellSession": DownsellSession,
     "EmailsMarketing": EmailsMarketing,
+    "EtComment": EtComment,
     "GenerationProgress": GenerationProgress,
     "Home": Home,
     "MarketAnalysis": MarketAnalysis,
+    "MonetiserSavoir": MonetiserSavoir,
     "MyOffers": MyOffers,
     "NoahGeneration": NoahGeneration,
     "NovaChat": NovaChat,
@@ -198,14 +203,9 @@ export const PAGES = {
     "SkoolComparaison": SkoolComparaison,
     "SocialMedia": SocialMedia,
     "UpsellCoaching": UpsellCoaching,
+    "VotreForce": VotreForce,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "ChooseYourPathNew": ChooseYourPathNew,
-    "DoneForYouElite": DoneForYouElite,
-    "MonetiserSavoir": MonetiserSavoir,
-    "EtComment": EtComment,
-    "VotreForce": VotreForce,
-    "AgentNoah": AgentNoah,
 }
 
 export const pagesConfig = {

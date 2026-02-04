@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import {
   Sparkles,
@@ -13,12 +14,42 @@ import {
   TrendingUp,
   Star,
   CheckCircle,
-  Calendar
+  Calendar,
+  Loader2,
+  X
 } from 'lucide-react';
 
 export default function ChooseYourPathNew() {
   const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
+  const [hasOrderBump, setHasOrderBump] = useState(false);
+  const [showOrderBumpPopup, setShowOrderBumpPopup] = useState(false);
+
+  // Prix
+  const BASE_PRICE = 67;
+  const ORDER_BUMP_PRICE = 37;
+  const totalPrice = hasOrderBump ? BASE_PRICE + ORDER_BUMP_PRICE : BASE_PRICE;
+
+  const handleGetGenerator = async () => {
+    setIsCreatingCheckout(true);
+    try {
+      const { data } = await base44.functions.invoke('createCheckout', {
+        hasOrderBump: hasOrderBump
+      });
+
+      if (data.success && data.url) {
+        window.top.location.href = data.url;
+      } else {
+        alert('Erreur: impossible de créer la session de paiement');
+      }
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+      alert('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setIsCreatingCheckout(false);
+    }
+  };
 
   // Timer jusqu'à minuit
   useEffect(() => {

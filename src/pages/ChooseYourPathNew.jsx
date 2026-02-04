@@ -71,17 +71,18 @@ export default function ChooseYourPathNew() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
       {/* Header */}
-      <div className="py-6 px-5 border-b border-gray-800">
+      <div className="py-3 md:py-6 px-4 md:px-5 border-b border-gray-800">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg shadow-[#61f7a2]/20">
-              <Sparkles className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg shadow-[#61f7a2]/20">
+              <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <span className="font-bold text-white">PASSION IA</span>
+            <span className="font-bold text-white text-sm md:text-base">PASSION IA</span>
           </div>
-          <div className="flex items-center gap-2 bg-[#61f7a2] text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full">
-            <Star className="w-3 h-3" />
-            PROTOCOLE QUICKWIN
+          <div className="flex items-center gap-1.5 md:gap-2 bg-[#61f7a2] text-gray-900 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full">
+            <Star className="w-2.5 h-2.5 md:w-3 md:h-3" />
+            <span className="hidden sm:inline">PROTOCOLE QUICKWIN</span>
+            <span className="sm:hidden">QUICKWIN</span>
           </div>
         </div>
       </div>
@@ -174,21 +175,7 @@ export default function ChooseYourPathNew() {
           })}
         </div>
 
-        {/* Footer CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="text-center"
-        >
-          <p className="text-2xl md:text-3xl font-bold text-white mb-2">
-            👇 ON SE VOIT DE L'AUTRE CÔTÉ
-          </p>
-          <p className="text-gray-400">
-            Choisissez le chemin qui vous correspond le mieux
-          </p>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
+        </div>
+        </div>
+        );
+        }

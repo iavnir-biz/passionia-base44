@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
-import { Zap, CheckCircle, AlertTriangle, Loader2, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
+import { Zap, CheckCircle, AlertTriangle, Sparkles } from 'lucide-react';
 
 export default function SkoolAbonnement() {
   const navigate = useNavigate();
-  const [isProcessing, setIsProcessing] = useState(null);
 
   // Données scarcity
   const membresActuels = 74;

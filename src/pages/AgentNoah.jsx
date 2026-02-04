@@ -55,63 +55,58 @@ export default function AgentNoah() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="relative flex justify-center"
+            className="relative flex items-center justify-center min-h-[400px]"
           >
             {/* Container du schéma */}
-            <div className="relative">
+            <div className="relative flex items-center">
               {/* Icône centrale Noah */}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="w-20 h-20 rounded-2xl bg-[#61f7a2] flex items-center justify-center shadow-xl shadow-[#61f7a2]/30 relative z-10"
+                className="w-20 h-20 rounded-2xl bg-[#61f7a2] flex items-center justify-center shadow-xl shadow-[#61f7a2]/30 relative z-10 flex-shrink-0"
               >
                 <Brain className="w-10 h-10 text-white" />
               </motion.div>
 
-              {/* Lignes et points */}
-              <div className="absolute top-1/2 left-full -translate-y-1/2 ml-4">
-                <svg width="60" height="300" className="overflow-visible">
-                  {features.map((_, index) => {
-                    const yOffset = (index - 2.5) * 50;
-                    return (
-                      <motion.path
-                        key={index}
-                        d={`M 0 0 Q 30 0 40 ${yOffset}`}
-                        stroke="#61f7a2"
-                        strokeWidth="2"
-                        fill="none"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-                      />
-                    );
-                  })}
-                </svg>
-              </div>
-
-              {/* Features avec points */}
-              <div className="absolute top-1/2 left-full -translate-y-1/2 ml-16 space-y-4">
-                {features.map((feature, index) => {
-                  const yOffset = (index - 2.5) * 50;
+              {/* Lignes SVG */}
+              <svg width="80" height="320" className="flex-shrink-0" style={{ marginLeft: '-10px' }}>
+                {features.map((_, index) => {
+                  const startY = 160;
+                  const endY = 30 + index * 52;
                   return (
-                    <motion.div
-                      key={feature.label}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.7 + index * 0.1 }}
-                      className="flex items-center gap-3"
-                      style={{ transform: `translateY(${yOffset}px)` }}
-                    >
-                      <div className="w-10 h-10 rounded-full bg-[#61f7a2] flex items-center justify-center shadow-lg shadow-[#61f7a2]/30">
-                        <span className="text-lg">{feature.icon}</span>
-                      </div>
-                      <span className="text-white font-medium whitespace-nowrap">
-                        {feature.label}
-                      </span>
-                    </motion.div>
+                    <motion.path
+                      key={index}
+                      d={`M 10 ${startY} Q 40 ${startY} 70 ${endY}`}
+                      stroke="#61f7a2"
+                      strokeWidth="2"
+                      fill="none"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+                    />
                   );
                 })}
+              </svg>
+
+              {/* Features avec points */}
+              <div className="flex flex-col gap-3 ml-2">
+                {features.map((feature, index) => (
+                  <motion.div
+                    key={feature.label}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 + index * 0.1 }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#61f7a2] flex items-center justify-center shadow-lg shadow-[#61f7a2]/30 flex-shrink-0">
+                      <span className="text-lg">{feature.icon}</span>
+                    </div>
+                    <span className="text-white font-medium whitespace-nowrap text-sm md:text-base">
+                      {feature.label}
+                    </span>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </motion.div>

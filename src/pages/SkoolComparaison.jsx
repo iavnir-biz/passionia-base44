@@ -33,8 +33,10 @@ export default function SkoolComparaison() {
   ];
 
   const featuresExclusives = [
-    { label: '30min cerveau collectif et décision stratégique', standard: false, premium: true },
+    { label: '30min coaching individuel/mois (197€/mois de valeur)', standard: false, premium: true },
+    { label: '1 Live Premium exclusif/mois', standard: false, premium: true },
     { label: 'Groupe WhatsApp VIP', standard: false, premium: true },
+    { label: 'Cerveau collectif & mastermind', standard: false, premium: true },
   ];
 
   return (
@@ -135,9 +137,12 @@ export default function SkoolComparaison() {
             <div className="p-6 bg-purple-50">
               <p className="text-gray-600 mb-1">Coût annuel:</p>
               <p className="text-2xl font-bold text-purple-600">370€/an</p>
-              <div className="flex items-center gap-2 mt-3">
-                <Gem className="w-5 h-5 text-purple-600" />
-                <span className="text-purple-600 font-bold">ÉCONOMIE: 74€/an</span>
+              <div className="flex flex-col gap-1 mt-3">
+                <div className="flex items-center gap-2">
+                  <Gem className="w-5 h-5 text-purple-600" />
+                  <span className="text-purple-600 font-bold">ÉCONOMIE: 74€/an (17%)</span>
+                </div>
+                <p className="text-sm text-gray-600">= 2 mois offerts</p>
               </div>
             </div>
           </div>

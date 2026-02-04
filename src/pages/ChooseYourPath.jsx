@@ -13,22 +13,22 @@ export default function ChooseYourPath() {
   const pricingOptions = [
     {
       price: 67,
-      title: 'Pack Accélérateur',
+      title: 'Passion IA — Membre Fondateur',
       items: [
-        'Générateur complet',
-        'Membre Fondateur',
-        'Accès Skool à VIE (valeur 1164€/an)'
+        'Générateur illimité',
+        'Accès Community Skool à VIE (passera à 47€ puis 97€/mois, +20€ tous les 20 users)',
+        'Groupe WhatsApp Premium',
+        '1 live par semaine pour avancer sur ton projet'
       ],
       popular: false,
-      tagline: null
+      tagline: '🎁 Privilège Fondateur — Ce tarif ne sera plus jamais disponible après l\'augmentation.',
+      isFounder: true
     },
     {
       price: 104,
       title: 'Pack Accélérateur + Pack Réseaux Sociaux',
       items: [
-        'Générateur complet',
-        'Membre Fondateur',
-        'Accès Skool à VIE (valeur 1164€/an)',
+        'Tout le pack Passion IA (67€)',
         '30 jours de contenu réseaux sociaux prêt à poster',
         'Carrousels, réels, designs adaptés à vos offres'
       ],
@@ -78,9 +78,9 @@ export default function ChooseYourPath() {
     <div className="min-h-screen bg-white">
       {/* Bandeau d'urgence */}
       <div className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] text-gray-900 py-3.5 px-5 text-center font-bold text-[0.95rem] tracking-wide">
-        <span className="inline-block mx-2">🔥</span>
-        <span>DERNIÈRES OFFRES — Reste 4 places — Ce soir uniquement, demain les prix augmentent</span>
-        <span className="inline-block mx-2">🔥</span>
+        <span className="inline-block mx-2">⏰</span>
+        <span>OFFRE MEMBRE FONDATEUR — Plus que 24 heures pour bénéficier du tarif à 67€</span>
+        <span className="inline-block mx-2">⏰</span>
       </div>
 
       {/* Header */}

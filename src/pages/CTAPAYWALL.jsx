@@ -220,6 +220,25 @@ export default function CTAPAYWALL() {
             </p>
           </motion.div>
 
+          {/* Vidéo Vimeo */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-12"
+          >
+            <div className="relative w-full rounded-2xl overflow-hidden shadow-xl" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src="https://player.vimeo.com/video/1161817300?h=4878f93b53&badge=0&autopause=0&player_id=0&app_id=58479"
+                className="absolute top-0 left-0 w-full h-full"
+                frameBorder="0"
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                allowFullScreen
+                title="Passion IA"
+              />
+            </div>
+          </motion.div>
+
           {/* Tu as maintenant - VERSION ACCOMPLISSEMENT */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

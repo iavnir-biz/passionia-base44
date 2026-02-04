@@ -175,6 +175,92 @@ export default function ProtocoleQuickwin() {
             </div>
           </div>
 
+          {/* ORDER BUMP - Pack Réseaux Sociaux */}
+          <div className="px-8 md:px-10 pb-6">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`rounded-2xl p-5 cursor-pointer transition-all duration-300 ${
+                hasOrderBump
+                  ? 'bg-gradient-to-br from-[#61f7a2]/20 to-green-100 border-4 border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20'
+                  : 'bg-white border-4 border-[#61f7a2] hover:shadow-lg hover:shadow-[#61f7a2]/10'
+              }`}
+              onClick={() => setShowOrderBumpPopup(true)}
+            >
+              {/* Badge */}
+              <div className="flex justify-center mb-3">
+                <span className="bg-[#61f7a2] text-gray-900 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                  <Gift className="w-3 h-3" />
+                  OFFRE SPÉCIALE
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4">
+                {/* Checkbox visuelle */}
+                <div
+                  className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                    hasOrderBump
+                      ? 'bg-[#61f7a2] border-[#61f7a2]'
+                      : 'border-gray-300 bg-white'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHasOrderBump(!hasOrderBump);
+                  }}
+                >
+                  {hasOrderBump && <CheckCircle className="w-5 h-5 text-white" />}
+                </div>
+
+                {/* Icône */}
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#61f7a2] to-green-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">🎬</span>
+                </div>
+
+                {/* Contenu */}
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    🎁 Ajoute le Pack Réseaux Sociaux
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-1">
+                    100+ Templates prêts à poster
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-black text-[#61f7a2]">+37€</span>
+                    <span className="text-gray-400 line-through text-xs">147€</span>
+                    <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                      -75%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bouton détails */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowOrderBumpPopup(true);
+                  }}
+                  className="px-3 py-1.5 bg-[#61f7a2]/20 text-[#61f7a2] font-semibold rounded-lg hover:bg-[#61f7a2]/30 transition-colors text-sm flex items-center gap-1"
+                >
+                  Détails
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+
+              {hasOrderBump && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-3 pt-3 border-t border-[#61f7a2]/30"
+                >
+                  <p className="text-[#61f7a2] font-semibold text-center flex items-center justify-center gap-2 text-sm">
+                    <CheckCircle className="w-4 h-4" />
+                    Pack Réseaux Sociaux ajouté !
+                  </p>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
+
           {/* CTA Section */}
           <div className="px-8 md:px-10 pb-10">
             <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-center">
@@ -182,7 +268,6 @@ export default function ProtocoleQuickwin() {
                 <Zap className="w-5 h-5 text-[#61f7a2]" />
                 <span className="text-white font-bold">LE CHOIX RECOMMANDÉ</span>
               </div>
-
 
               <button
                 onClick={handleCheckout}
@@ -209,6 +294,147 @@ export default function ProtocoleQuickwin() {
           </div>
         </motion.div>
       </div>
+
+      {/* POPUP Order Bump Détails */}
+      {showOrderBumpPopup && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowOrderBumpPopup(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-br from-[#61f7a2] to-green-500 p-6 rounded-t-3xl relative">
+              <button
+                onClick={() => setShowOrderBumpPopup(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+              <div className="text-center">
+                <span className="text-5xl mb-3 block">🎬</span>
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  Pack Réseaux Sociaux - 100+ Templates
+                </h2>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-3xl font-black text-white">+37€</span>
+                  <span className="text-white/70 line-through">Valeur 147€</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Contenu */}
+            <div className="p-6 space-y-4">
+              {/* Instagram/TikTok */}
+              <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-4 border border-pink-200">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">📱</span>
+                  Instagram / TikTok
+                </h3>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>30 scripts Reels adaptés à ton offre</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>20 hooks viraux pour capter l'attention</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>15 légendes de posts qui convertissent</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Carrousels */}
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">🎨</span>
+                  Carrousels
+                </h3>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>15 templates Canva de carrousels éducatifs</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>Copywriting déjà fait, tu personnalises juste</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Stories */}
+              <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-200">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">📖</span>
+                  Stories
+                </h3>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>20 séquences de stories pour vendre</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>Stratégie "Story to DM to Sale"</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* BONUS */}
+              <div className="bg-gradient-to-br from-yellow-100 to-amber-100 rounded-xl p-4 border-2 border-yellow-400">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-yellow-400 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
+                    BONUS
+                  </span>
+                </div>
+                <ul className="space-y-1 text-gray-700 text-sm">
+                  <li className="flex items-start gap-2">
+                    <Gift className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span className="font-medium">Calendrier de contenu 30 jours</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Gift className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span className="font-medium">Guide "Poster sans se montrer"</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 bg-gray-50 rounded-b-3xl border-t border-gray-200">
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setHasOrderBump(true);
+                    setShowOrderBumpPopup(false);
+                  }}
+                  className="flex-1 py-3 px-6 bg-[#61f7a2] text-gray-900 font-bold rounded-xl hover:bg-[#4de88f] transition-colors flex items-center justify-center gap-2"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  Ajouter au panier
+                </button>
+                <button
+                  onClick={() => setShowOrderBumpPopup(false)}
+                  className="px-6 py-3 bg-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-300 transition-colors"
+                >
+                  Non merci
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

@@ -169,24 +169,19 @@ export default function SkoolAbonnement() {
             <div className="space-y-6">
               {/* Générateur illimité */}
               <div>
-                <div className="flex items-start gap-3 mb-2">
+                <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
                   <span className="font-bold text-gray-900">GÉNÉRATEUR ILLIMITÉ</span>
                 </div>
-                <p className="ml-8 text-gray-600 text-sm">
-                  Générations infinies, toutes les features
-                </p>
               </div>
 
               {/* 2 Lives par semaine */}
               <div>
-                <div className="flex items-start gap-3 mb-2">
+                <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
                   <span className="font-bold text-gray-900">2 LIVES PAR SEMAINE</span>
+                  <span className="text-gray-600 text-sm">(aide-vente, création de cours...)</span>
                 </div>
-                <p className="ml-8 text-gray-600 text-sm">
-                  (aide-vente + création de cours)
-                </p>
               </div>
 
               {/* Formation complète */}

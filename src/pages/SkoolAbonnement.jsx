@@ -10,7 +10,7 @@ export default function SkoolAbonnement() {
   const [isProcessing, setIsProcessing] = useState(null);
 
   // Données scarcity
-  const membresActuels = 62;
+  const membresActuels = 74;
   const membresMax = 80;
   const placesRestantes = membresMax - membresActuels;
   const pourcentage = Math.round((membresActuels / membresMax) * 100);
@@ -63,7 +63,7 @@ export default function SkoolAbonnement() {
               </p>
               <div className="flex items-baseline gap-2 mb-2">
                 <span className="text-6xl md:text-7xl font-extrabold text-[#61f7a2]">
-                  37$
+                  37€
                 </span>
                 <span className="text-2xl text-gray-600">/mois</span>
               </div>
@@ -92,7 +92,7 @@ export default function SkoolAbonnement() {
               </div>
               
               <p className="text-gray-900">
-                Le tarif augmentera à <strong>47$</strong> dès 80 membres.
+                Le tarif augmentera à <strong>47€</strong> dès 80 membres.
                 <br />
                 <span className="text-orange-600 font-semibold">Plus que {placesRestantes} places.</span>
               </p>
@@ -118,7 +118,7 @@ export default function SkoolAbonnement() {
                   </span>
                 ) : (
                   <>
-                    <span className="block text-lg">Standard - 37$/mois</span>
+                    <span className="block text-lg">Standard - 37€/mois</span>
                     <span className="block text-sm opacity-70">→ Accès mensuel</span>
                   </>
                 )}
@@ -137,7 +137,7 @@ export default function SkoolAbonnement() {
                   </span>
                 ) : (
                   <>
-                    <span className="block text-lg">Premium - 370$/an</span>
+                    <span className="block text-lg">Premium - 370€/an</span>
                     <span className="block text-sm opacity-80">→ 2 mois offerts + bonus</span>
                   </>
                 )}
@@ -184,27 +184,34 @@ export default function SkoolAbonnement() {
                   <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
                   <span className="font-bold text-gray-900">2 LIVES PAR SEMAINE</span>
                 </div>
-                <ul className="ml-8 space-y-1 text-gray-600 text-sm">
-                  <li>• Mardi: Hot Seat (analyse de vos projets)</li>
-                  <li>• Jeudi: Formation thématique</li>
-                  <li>• Replays disponibles à vie</li>
-                </ul>
+                <p className="ml-8 text-gray-600 text-sm">
+                  (aide-vente + création de cours)
+                </p>
               </div>
 
               {/* Formation complète */}
               <div>
                 <div className="flex items-start gap-3 mb-2">
                   <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                  <span className="font-bold text-gray-900">FORMATION COMPLÈTE</span>
+                  <span className="font-bold text-gray-900">ACCÈS À NOS VIDÉOS DE FORMATION COMPLÈTES</span>
                 </div>
                 <ul className="ml-8 space-y-1 text-gray-600 text-sm">
                   <li>• Module Setup technique</li>
-                  <li>• Module Création produit</li>
+                  <li>• Module Création de produits</li>
                   <li>• Module Pages de vente</li>
                   <li>• Module Systèmes de paiement</li>
                   <li>• Module Publicités</li>
                   <li>• Module Automatisation email</li>
+                  <li>• etc.</li>
                 </ul>
+              </div>
+
+              {/* Templates */}
+              <div>
+                <div className="flex items-start gap-3 mb-2">
+                  <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                  <span className="font-bold text-gray-900">ACCÈS À TOUTES LES RESSOURCES ET TEMPLATES</span>
+                </div>
               </div>
 
               {/* Communauté */}
@@ -218,17 +225,6 @@ export default function SkoolAbonnement() {
                 </p>
               </div>
 
-              {/* Templates */}
-              <div>
-                <div className="flex items-start gap-3 mb-2">
-                  <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                  <span className="font-bold text-gray-900">BIBLIOTHÈQUE TEMPLATES</span>
-                </div>
-                <p className="ml-8 text-gray-600 text-sm">
-                  Ressources + nouveautés chaque semaine
-                </p>
-              </div>
-
               {/* Prix verrouillé */}
               <div>
                 <div className="flex items-start gap-3 mb-2">
@@ -236,7 +232,7 @@ export default function SkoolAbonnement() {
                   <span className="font-bold text-gray-900">PRIX VERROUILLÉ À VIE</span>
                 </div>
                 <p className="ml-8 text-gray-600 text-sm">
-                  Vous payez 37$/mois même si le prix monte à 47$ ou 67$
+                  Vous payez 37€/mois même si le prix monte à 47€, 67€ voire plus
                 </p>
               </div>
             </div>
@@ -247,16 +243,12 @@ export default function SkoolAbonnement() {
             {/* Bonus Premium */}
             <div className="bg-purple-50 rounded-2xl p-6 border border-purple-200">
               <h3 className="font-bold text-purple-700 mb-4">
-                ⭐ BONUS PREMIUM (paiement annuel 370$/an)
+                ⭐ BONUS PREMIUM (paiement annuel 370€/an)
               </h3>
               <ul className="space-y-2 text-gray-700 text-sm">
                 <li className="flex items-start gap-2">
                   <span className="text-purple-600">⭐</span>
-                  <span>30min coaching individuel/mois (197$/mois de valeur)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-purple-600">⭐</span>
-                  <span>1 live Premium exclusif/mois</span>
+                  <span>30min cerveau collectif et décision stratégique</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-600">⭐</span>
@@ -264,11 +256,7 @@ export default function SkoolAbonnement() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-600">⭐</span>
-                  <span>Cerveau collectif & mastermind</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-purple-600">⭐</span>
-                  <span><strong>Économie: 74$/an</strong> vs mensuel</span>
+                  <span><strong>Économie: 74€/an</strong> vs mensuel</span>
                 </li>
               </ul>
             </div>

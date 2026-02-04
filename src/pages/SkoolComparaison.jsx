@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Check, X, Gem, Loader2, ArrowLeft, Sparkles } from 'lucide-react';
+import { Check, X, Gem, Loader2, ArrowLeft, Sparkles, Star } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SkoolComparaison() {
@@ -122,7 +122,7 @@ export default function SkoolComparaison() {
                 <span className="text-gray-400">{feature.label.split('(')[0]}</span>
               </div>
               <div className="p-4 border-b border-gray-100 bg-purple-50/30 flex items-center gap-3">
-                <Check className="w-5 h-5 text-[#61f7a2] flex-shrink-0" />
+                <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                 <span className="text-gray-700">{feature.label}</span>
               </div>
             </div>

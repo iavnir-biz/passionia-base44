@@ -117,6 +117,8 @@ import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
 import ProtocoleQuickwin from './pages/ProtocoleQuickwin';
+import SkoolAbonnement from './pages/SkoolAbonnement';
+import SkoolComparaison from './pages/SkoolComparaison';
 
 
 export const PAGES = {
@@ -190,6 +192,8 @@ export const PAGES = {
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
     "ProtocoleQuickwin": ProtocoleQuickwin,
+    "SkoolAbonnement": SkoolAbonnement,
+    "SkoolComparaison": SkoolComparaison,
 }
 
 export const pagesConfig = {

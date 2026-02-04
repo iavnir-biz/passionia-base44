@@ -1,0 +1,273 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { Zap, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+export default function SkoolAbonnement() {
+  const navigate = useNavigate();
+  const [isProcessing, setIsProcessing] = useState(null);
+
+  // Données scarcity
+  const membresActuels = 62;
+  const membresMax = 80;
+  const placesRestantes = membresMax - membresActuels;
+  const pourcentage = Math.round((membresActuels / membresMax) * 100);
+
+  const handleCheckout = async (plan) => {
+    setIsProcessing(plan);
+    try {
+      // TODO: Implémenter le checkout Stripe pour Skool
+      toast.info('Redirection vers le paiement...');
+      // Simulation - remplacer par l'appel réel
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.error('Checkout non configuré');
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('Erreur lors de la redirection vers le paiement');
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F8F9FA]">
+      {/* Badge Chemin 2 */}
+      <div className="absolute top-4 right-4">
+        <span className="bg-[#FFD700] text-[#1A1A1A] text-xs font-bold px-3 py-1.5 rounded-full">
+          CHEMIN 2
+        </span>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+        <div className="grid md:grid-cols-2 gap-10 items-start">
+          
+          {/* COLONNE GAUCHE */}
+          <div className="space-y-8">
+            {/* Titre + Prix */}
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-2">
+                L'ABONNEMENT SKOOL
+              </h1>
+              <p className="text-xl text-gray-600 mb-6">
+                Construisez votre business avec nous
+              </p>
+              <div className="flex items-baseline gap-2 mb-2">
+                <span className="text-6xl md:text-7xl font-extrabold text-[#00D9A3]">
+                  37$
+                </span>
+                <span className="text-2xl text-gray-600">/mois</span>
+              </div>
+              <p className="text-gray-500 italic">
+                Prix verrouillé à vie à votre inscription
+              </p>
+            </div>
+
+            {/* Encadré Scarcity */}
+            <div className="bg-[#FFF3E0] border-2 border-[#FF9800] rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertTriangle className="w-5 h-5 text-[#FF9800]" />
+                <span className="font-bold text-[#1A1A1A]">PLACES LIMITÉES</span>
+              </div>
+              
+              <p className="text-[#1A1A1A] mb-3">
+                Membres actuels: <strong>{membresActuels}/{membresMax}</strong>
+              </p>
+              
+              {/* Barre de progression */}
+              <div className="w-full h-3 bg-gray-200 rounded-full mb-4 overflow-hidden">
+                <div 
+                  className="h-full bg-[#00D9A3] rounded-full transition-all duration-500"
+                  style={{ width: `${pourcentage}%` }}
+                />
+              </div>
+              
+              <p className="text-[#1A1A1A]">
+                Le tarif augmentera à <strong>47$</strong> dès 80 membres.
+                <br />
+                <span className="text-[#FF9800] font-semibold">Plus que {placesRestantes} places.</span>
+              </p>
+            </div>
+
+            {/* Encadré CTA */}
+            <div className="bg-[#1A1A1A] rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Zap className="w-5 h-5 text-[#00D9A3]" />
+                <span className="text-white font-bold">2 OPTIONS DISPONIBLES</span>
+              </div>
+
+              {/* Bouton Standard */}
+              <button
+                onClick={() => handleCheckout('standard')}
+                disabled={isProcessing}
+                className="w-full bg-[#00D9A3] hover:bg-[#00C494] text-white font-bold py-4 px-6 rounded-xl mb-4 transition-all hover:-translate-y-0.5 disabled:opacity-50"
+              >
+                {isProcessing === 'standard' ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Redirection...
+                  </span>
+                ) : (
+                  <>
+                    <span className="block text-lg">Standard - 37$/mois</span>
+                    <span className="block text-sm opacity-80">→ Accès mensuel</span>
+                  </>
+                )}
+              </button>
+
+              {/* Bouton Premium */}
+              <button
+                onClick={() => handleCheckout('premium')}
+                disabled={isProcessing}
+                className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold py-4 px-6 rounded-xl mb-4 transition-all hover:-translate-y-0.5 disabled:opacity-50"
+              >
+                {isProcessing === 'premium' ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Redirection...
+                  </span>
+                ) : (
+                  <>
+                    <span className="block text-lg">Premium - 370$/an</span>
+                    <span className="block text-sm opacity-80">→ 2 mois offerts + bonus</span>
+                  </>
+                )}
+              </button>
+
+              <p className="text-gray-400 text-sm text-center">
+                Accès immédiat
+              </p>
+            </div>
+
+            {/* Lien vers comparaison */}
+            <button
+              onClick={() => navigate(createPageUrl('SkoolComparaison'))}
+              className="text-[#7C3AED] font-semibold hover:underline"
+            >
+              Voir la comparaison Standard vs Premium →
+            </button>
+          </div>
+
+          {/* COLONNE DROITE - CE QUI EST INCLUS */}
+          <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
+            <h2 className="text-lg font-bold text-[#1A1A1A] mb-1">
+              CE QUI EST INCLUS EXACTEMENT
+            </h2>
+            <p className="text-sm mb-8">
+              <span className="text-[#00D9A3] font-bold">100% personnalisé à votre profil</span>
+            </p>
+
+            <div className="space-y-6">
+              {/* Générateur illimité */}
+              <div>
+                <div className="flex items-start gap-3 mb-2">
+                  <CheckCircle className="w-5 h-5 text-[#00D9A3] mt-0.5 flex-shrink-0" />
+                  <span className="font-bold text-[#00D9A3]">GÉNÉRATEUR ILLIMITÉ</span>
+                </div>
+                <p className="ml-8 text-gray-600 text-sm">
+                  Générations infinies, toutes les features
+                </p>
+              </div>
+
+              {/* 2 Lives par semaine */}
+              <div>
+                <div className="flex items-start gap-3 mb-2">
+                  <CheckCircle className="w-5 h-5 text-[#00D9A3] mt-0.5 flex-shrink-0" />
+                  <span className="font-bold text-[#00D9A3]">2 LIVES PAR SEMAINE</span>
+                </div>
+                <ul className="ml-8 space-y-1 text-gray-600 text-sm">
+                  <li>• Mardi: Hot Seat (analyse de vos projets)</li>
+                  <li>• Jeudi: Formation thématique</li>
+                  <li>• Replays disponibles à vie</li>
+                </ul>
+              </div>
+
+              {/* Formation complète */}
+              <div>
+                <div className="flex items-start gap-3 mb-2">
+                  <CheckCircle className="w-5 h-5 text-[#00D9A3] mt-0.5 flex-shrink-0" />
+                  <span className="font-bold text-[#00D9A3]">FORMATION COMPLÈTE</span>
+                </div>
+                <ul className="ml-8 space-y-1 text-gray-600 text-sm">
+                  <li>• Module Setup technique</li>
+                  <li>• Module Création produit</li>
+                  <li>• Module Pages de vente</li>
+                  <li>• Module Systèmes de paiement</li>
+                  <li>• Module Publicités</li>
+                  <li>• Module Automatisation email</li>
+                </ul>
+              </div>
+
+              {/* Communauté */}
+              <div>
+                <div className="flex items-start gap-3 mb-2">
+                  <CheckCircle className="w-5 h-5 text-[#00D9A3] mt-0.5 flex-shrink-0" />
+                  <span className="font-bold text-[#00D9A3]">COMMUNAUTÉ ACTIVE 24/7</span>
+                </div>
+                <p className="ml-8 text-gray-600 text-sm">
+                  Networking, support, partage de résultats
+                </p>
+              </div>
+
+              {/* Templates */}
+              <div>
+                <div className="flex items-start gap-3 mb-2">
+                  <CheckCircle className="w-5 h-5 text-[#00D9A3] mt-0.5 flex-shrink-0" />
+                  <span className="font-bold text-[#00D9A3]">BIBLIOTHÈQUE TEMPLATES</span>
+                </div>
+                <p className="ml-8 text-gray-600 text-sm">
+                  Ressources + nouveautés chaque semaine
+                </p>
+              </div>
+
+              {/* Prix verrouillé */}
+              <div>
+                <div className="flex items-start gap-3 mb-2">
+                  <CheckCircle className="w-5 h-5 text-[#00D9A3] mt-0.5 flex-shrink-0" />
+                  <span className="font-bold text-[#00D9A3]">PRIX VERROUILLÉ À VIE</span>
+                </div>
+                <p className="ml-8 text-gray-600 text-sm">
+                  Vous payez 37$/mois même si le prix monte à 47$ ou 67$
+                </p>
+              </div>
+            </div>
+
+            {/* Séparateur */}
+            <div className="border-t border-gray-200 my-8" />
+
+            {/* Bonus Premium */}
+            <div className="bg-[#F3E8FF] rounded-2xl p-6 border border-[#7C3AED]/30">
+              <h3 className="font-bold text-[#7C3AED] mb-4">
+                ⭐ BONUS PREMIUM (paiement annuel 370$/an)
+              </h3>
+              <ul className="space-y-2 text-gray-700 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-[#7C3AED]">⭐</span>
+                  <span>30min coaching individuel/mois (197$/mois de valeur)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#7C3AED]">⭐</span>
+                  <span>1 live Premium exclusif/mois</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#7C3AED]">⭐</span>
+                  <span>Groupe WhatsApp VIP</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#7C3AED]">⭐</span>
+                  <span>Cerveau collectif & mastermind</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#7C3AED]">⭐</span>
+                  <span><strong>Économie: 74$/an</strong> vs mensuel</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}

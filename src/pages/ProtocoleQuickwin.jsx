@@ -277,18 +277,19 @@ export default function ProtocoleQuickwin() {
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Redirection...
+                    Redirection vers le paiement...
                   </>
                 ) : (
                   <>
-                    Obtenir le Générateur Complet
+                    Obtenir le Générateur Complet — {totalPrice}€
                     <ArrowRight className="w-5 h-5" />
                   </>
                 )}
               </button>
 
-              <p className="text-gray-500 text-sm mt-4">
-                Accès immédiat
+              <p className="text-gray-400 text-sm mt-4 flex items-center justify-center gap-2">
+                <Shield className="w-4 h-4" />
+                Paiement sécurisé
               </p>
             </div>
           </div>

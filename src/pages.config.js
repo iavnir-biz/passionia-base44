@@ -124,6 +124,7 @@ import DoneForYouElite from './pages/DoneForYouElite';
 import MonetiserSavoir from './pages/MonetiserSavoir';
 import EtComment from './pages/EtComment';
 import VotreForce from './pages/VotreForce';
+import AgentNoah from './pages/AgentNoah';
 
 
 export const PAGES = {
@@ -204,6 +205,7 @@ export const PAGES = {
     "MonetiserSavoir": MonetiserSavoir,
     "EtComment": EtComment,
     "VotreForce": VotreForce,
+    "AgentNoah": AgentNoah,
 }
 
 export const pagesConfig = {

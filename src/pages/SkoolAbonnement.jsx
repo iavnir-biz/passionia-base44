@@ -12,7 +12,7 @@ export default function SkoolAbonnement() {
   const placesRestantes = membresMax - membresActuels;
   const pourcentage = Math.round((membresActuels / membresMax) * 100);
 
-  const SKOOL_URL = 'https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa';
+  const SKOOL_URL = 'https://www.skool.com/ia-pour-tous-6043/plans';
 
   const handleSkoolRedirect = () => {
     window.open(SKOOL_URL, '_blank');

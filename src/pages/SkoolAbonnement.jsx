@@ -97,40 +97,20 @@ export default function SkoolAbonnement() {
 
               {/* Bouton Standard */}
               <button
-                onClick={() => handleCheckout('standard')}
-                disabled={isProcessing}
-                className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-bold py-4 px-6 rounded-xl mb-4 transition-all hover:-translate-y-0.5 disabled:opacity-50"
+                onClick={handleSkoolRedirect}
+                className="w-full bg-[#61f7a2] hover:bg-[#4de88f] text-gray-900 font-bold py-4 px-6 rounded-xl mb-4 transition-all hover:-translate-y-0.5"
               >
-                {isProcessing === 'standard' ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Redirection...
-                  </span>
-                ) : (
-                  <>
-                    <span className="block text-lg">Standard - 37€/mois</span>
-                    <span className="block text-sm opacity-70">→ Accès mensuel</span>
-                  </>
-                )}
+                <span className="block text-lg">Standard - 37€/mois</span>
+                <span className="block text-sm opacity-70">→ Accès mensuel</span>
               </button>
 
               {/* Bouton Premium */}
               <button
-                onClick={() => handleCheckout('premium')}
-                disabled={isProcessing}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-4 px-6 rounded-xl mb-4 transition-all hover:-translate-y-0.5 disabled:opacity-50"
+                onClick={handleSkoolRedirect}
+                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-4 px-6 rounded-xl mb-4 transition-all hover:-translate-y-0.5"
               >
-                {isProcessing === 'premium' ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Redirection...
-                  </span>
-                ) : (
-                  <>
-                    <span className="block text-lg">Premium - 370€/an</span>
-                    <span className="block text-sm opacity-80">→ 2 mois offerts + bonus</span>
-                  </>
-                )}
+                <span className="block text-lg">Premium - 370€/an</span>
+                <span className="block text-sm opacity-80">→ 2 mois offerts + bonus</span>
               </button>
 
               <p className="text-gray-400 text-sm text-center">

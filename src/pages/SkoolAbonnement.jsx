@@ -15,20 +15,10 @@ export default function SkoolAbonnement() {
   const placesRestantes = membresMax - membresActuels;
   const pourcentage = Math.round((membresActuels / membresMax) * 100);
 
-  const handleCheckout = async (plan) => {
-    setIsProcessing(plan);
-    try {
-      // TODO: Implémenter le checkout Stripe pour Skool
-      toast.info('Redirection vers le paiement...');
-      // Simulation - remplacer par l'appel réel
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.error('Checkout non configuré');
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast.error('Erreur lors de la redirection vers le paiement');
-    } finally {
-      setIsProcessing(null);
-    }
+  const SKOOL_URL = 'https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa';
+
+  const handleSkoolRedirect = () => {
+    window.open(SKOOL_URL, '_blank');
   };
 
   return (

@@ -56,7 +56,8 @@ export default function ChooseYourPath() {
       ],
       popular: false,
       tagline: '🎁 Privilège Fondateur — Ce tarif ne sera plus jamais disponible après l\'augmentation.',
-      isFounder: true
+      isFounder: true,
+      paymentType: 'Paiement unique'
     },
     {
       price: 104,
@@ -188,8 +189,13 @@ export default function ChooseYourPath() {
                 </div>
                 
                 <div className="flex flex-col items-end gap-3">
-                  <div className="font-bold text-3xl text-gray-900 whitespace-nowrap">
-                    {option.price}€
+                  <div className="text-right">
+                    <div className="font-bold text-3xl text-gray-900 whitespace-nowrap">
+                      {option.price}€
+                    </div>
+                    {option.paymentType && (
+                      <p className="text-xs text-gray-500 mt-0.5">{option.paymentType}</p>
+                    )}
                   </div>
                   
                   {/* Radio indicator */}

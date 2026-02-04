@@ -9,14 +9,9 @@ import {
   Users,
   Crown,
   ArrowRight,
-  Clock,
-  Gift,
-  TrendingUp,
   Star,
   CheckCircle,
-  Calendar,
-  Loader2,
-  X
+  Calendar
 } from 'lucide-react';
 
 export default function ChooseYourPathNew() {

@@ -1,14 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Sparkles, Shield, Check, Loader2 } from 'lucide-react';
+import { Sparkles, Shield, Check, Loader2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ChooseYourPath() {
   const navigate = useNavigate();
   const [selectedPrice, setSelectedPrice] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 59, seconds: 59 });
+
+  // Timer 24h
+  useEffect(() => {
+    const savedEndTime = localStorage.getItem('founderOfferEndTime');
+    let endTime;
+    
+    if (savedEndTime) {
+      endTime = parseInt(savedEndTime);
+    } else {
+      endTime = Date.now() + 24 * 60 * 60 * 1000;
+      localStorage.setItem('founderOfferEndTime', endTime.toString());
+    }
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = endTime - now;
+      
+      if (diff <= 0) {
+        setTimeLeft({ hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      setTimeLeft({ hours, minutes, seconds });
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const pricingOptions = [
     {
@@ -77,33 +111,30 @@ export default function ChooseYourPath() {
   return (
     <div className="min-h-screen bg-white">
       {/* Bandeau d'urgence */}
-      <div className="bg-gradient-to-r from-[#61f7a2] to-[#4de88f] text-gray-900 py-3.5 px-5 text-center font-bold text-[0.95rem] tracking-wide">
-        <span className="inline-block mx-2">⏰</span>
-        <span>OFFRE MEMBRE FONDATEUR — Plus que 24 heures pour bénéficier du tarif à 67€</span>
-        <span className="inline-block mx-2">⏰</span>
+      <div className="bg-gradient-to-r from-red-600 to-red-500 text-white py-3.5 px-5 text-center font-bold text-[0.95rem] tracking-wide">
+        <div className="flex items-center justify-center gap-3 flex-wrap">
+          <span>🔥 OFFRE MEMBRE FONDATEUR</span>
+          <div className="flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full">
+            <Clock className="w-4 h-4" />
+            <span className="font-mono">
+              {String(timeLeft.hours).padStart(2, '0')}:{String(timeLeft.minutes).padStart(2, '0')}:{String(timeLeft.seconds).padStart(2, '0')}
+            </span>
+          </div>
+          <span>🔥</span>
+        </div>
       </div>
 
       {/* Header */}
       <div className="py-7 px-5 text-center border-b border-gray-200">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg shadow-[#61f7a2]/20">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <div className="font-bold text-xl text-gray-900">
-            PASSION IA
+        <div className="flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg shadow-[#61f7a2]/20">
+            <Sparkles className="w-7 h-7 text-white" />
           </div>
         </div>
       </div>
 
       {/* Container principal */}
       <div className="max-w-[580px] mx-auto px-5 py-12 pb-16">
-        
-        <h1 className="text-4xl font-bold text-center mb-3 text-gray-900 leading-tight">
-          Choisissez votre chemin
-        </h1>
-        <p className="text-center text-gray-600 text-lg mb-9">
-          Votre avenir dépend de la décision que vous prenez ce soir.
-        </p>
 
         {/* Options de paiement */}
         <div className="flex flex-col gap-4 mb-5">

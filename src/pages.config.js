@@ -123,6 +123,7 @@ import ChooseYourPathNew from './pages/ChooseYourPathNew';
 import DoneForYouElite from './pages/DoneForYouElite';
 import MonetiserSavoir from './pages/MonetiserSavoir';
 import EtComment from './pages/EtComment';
+import VotreForce from './pages/VotreForce';
 
 
 export const PAGES = {
@@ -202,6 +203,7 @@ export const PAGES = {
     "DoneForYouElite": DoneForYouElite,
     "MonetiserSavoir": MonetiserSavoir,
     "EtComment": EtComment,
+    "VotreForce": VotreForce,
 }
 
 export const pagesConfig = {

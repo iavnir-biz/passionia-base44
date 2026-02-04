@@ -184,7 +184,7 @@ export default function DoneForYouElite() {
                 2000€ de CA en 60 jours
               </p>
               <p className="text-gray-600 text-sm">
-                OU remboursement intégral <span className="text-green-600 font-semibold">+ 1000€ de dédommagement</span>
+                OU remboursement intégral
               </p>
             </div>
 
@@ -195,15 +195,15 @@ export default function DoneForYouElite() {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">💰 Valeur réelle</span>
-                <span className="font-bold text-gray-900">12 343€</span>
+                <span className="font-bold text-gray-900">8 000€</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-500">🔥 Vous payez</span>
+                <span className="text-gray-500">🔥 Vous payez aujourd'hui</span>
                 <span className="font-bold text-[#61f7a2] text-xl">4000€</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">📉 Économie</span>
-                <span className="font-bold text-green-600">8343€ (68%)</span>
+                <span className="font-bold text-green-600">4000€ (50%)</span>
               </div>
             </div>
           </motion.div>

@@ -87,15 +87,15 @@ export default function ProtocoleQuickwin() {
               <h2 className="text-lg font-bold text-gray-900 mb-1">
                 CE QUI EST INCLUS EXACTEMENT
               </h2>
-              <p className="text-gray-500 text-sm mb-6">
-                Dans le générateur IA - 100% personnalisé à votre profil
+              <p className="text-sm mb-6">
+                <span className="text-[#61f7a2] font-bold">100% personnalisé à votre profil</span>
               </p>
 
-              {/* 10 Générations */}
+              {/* Générateur complet */}
               <div className="mb-6">
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                  <span className="font-bold text-gray-900">10 GÉNÉRATIONS BUSINESS COMPLÈTES</span>
+                  <span className="font-bold text-gray-900">GÉNÉRATEUR COMPLET (jusqu'à 5 générations maximum)</span>
                 </div>
                 <ul className="ml-8 space-y-2 text-gray-700">
                   <li className="flex items-center gap-2">
@@ -104,34 +104,45 @@ export default function ProtocoleQuickwin() {
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    3 avatars clients précis
+                    3 avatars de vos futurs acheteurs
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    4 offres structurées avec prix
+                    Les 4 offres détaillées de votre Full Stack Offer
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    4 messages de vente (angles différents)
+                    Les messages pour vendre dès demain (angles différents)
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    Page de vente rédigée (copy complet)
+                    Les pages de vente rédigées pour chaque offre
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    8 emails marketing ready-to-send
+                    Séquence complète de 8 emails marketing ready-to-send
                   </li>
                 </ul>
               </div>
 
               {/* Plan d'action */}
+              <div className="mb-6">
+                <div className="flex items-start gap-3 mb-2">
+                  <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="font-bold text-gray-900">PLAN D'ACTION "PREMIÈRE VENTE EN 7 JOURS"</span>
+                    <p className="text-gray-600 mt-1">Guide jour par jour + scripts + checklist</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tableau de bord */}
               <div>
                 <div className="flex items-start gap-3 mb-2">
                   <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
                   <div>
-                    <span className="font-bold text-gray-900">PLAN D'ACTION "PREMIÈRE VENTE"</span>
-                    <p className="text-gray-600 mt-1">Guide jour par jour + scripts</p>
+                    <span className="font-bold text-gray-900">TABLEAU DE BORD GAMIFIÉ</span>
+                    <p className="text-gray-600 mt-1">Suivi de progression étape par étape</p>
                   </div>
                 </div>
               </div>

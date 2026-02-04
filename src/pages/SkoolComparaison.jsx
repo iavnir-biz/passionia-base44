@@ -33,10 +33,8 @@ export default function SkoolComparaison() {
   ];
 
   const featuresExclusives = [
-    { label: '30min coaching individuel/mois (197$/mois)', standard: false, premium: true },
-    { label: '1 Live Premium exclusif/mois', standard: false, premium: true },
+    { label: '30min cerveau collectif et décision stratégique', standard: false, premium: true },
     { label: 'Groupe WhatsApp VIP', standard: false, premium: true },
-    { label: 'Cerveau collectif & mastermind', standard: false, premium: true },
   ];
 
   return (
@@ -78,7 +76,7 @@ export default function SkoolComparaison() {
             {/* Standard Header */}
             <div className="p-6 border-r border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-1">STANDARD</h2>
-              <p className="text-3xl font-extrabold text-[#61f7a2]">37$/mois</p>
+              <p className="text-3xl font-extrabold text-[#61f7a2]">37€/mois</p>
             </div>
             
             {/* Premium Header */}
@@ -89,8 +87,8 @@ export default function SkoolComparaison() {
                   RECOMMANDÉ
                 </span>
               </div>
-              <p className="text-3xl font-extrabold text-purple-600">370$/an</p>
-              <p className="text-sm text-gray-600">(30.83$/mois)</p>
+              <p className="text-3xl font-extrabold text-purple-600">370€/an</p>
+              <p className="text-sm text-gray-600">(30.83€/mois)</p>
             </div>
           </div>
 
@@ -132,15 +130,14 @@ export default function SkoolComparaison() {
           <div className="grid grid-cols-2">
             <div className="p-6 border-r border-gray-200 bg-gray-50">
               <p className="text-gray-600 mb-1">Coût annuel:</p>
-              <p className="text-2xl font-bold text-gray-900">444$/an</p>
+              <p className="text-2xl font-bold text-gray-900">444€/an</p>
             </div>
             <div className="p-6 bg-purple-50">
               <p className="text-gray-600 mb-1">Coût annuel:</p>
-              <p className="text-2xl font-bold text-purple-600">370$/an</p>
-              <p className="text-sm text-gray-600">+ 2364$ de bonus inclus</p>
+              <p className="text-2xl font-bold text-purple-600">370€/an</p>
               <div className="flex items-center gap-2 mt-3">
                 <Gem className="w-5 h-5 text-purple-600" />
-                <span className="text-purple-600 font-bold">ÉCONOMIE: 74$/an</span>
+                <span className="text-purple-600 font-bold">ÉCONOMIE: 74€/an</span>
               </div>
             </div>
           </div>
@@ -168,7 +165,7 @@ export default function SkoolComparaison() {
             ) : (
               <>
                 <span className="block text-lg">Choisir Standard</span>
-                <span className="block text-sm opacity-70">37$/mois</span>
+                <span className="block text-sm opacity-70">37€/mois</span>
               </>
             )}
           </button>
@@ -186,7 +183,7 @@ export default function SkoolComparaison() {
             ) : (
               <>
                 <span className="block text-lg">Choisir Premium</span>
-                <span className="block text-sm opacity-80">370$/an — Économisez 74$</span>
+                <span className="block text-sm opacity-80">370€/an — Économisez 74€</span>
               </>
             )}
           </button>

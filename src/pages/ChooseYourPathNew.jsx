@@ -15,57 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function ChooseYourPathNew() {
-  const navigate = useNavigate();
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
-  const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
-  const [hasOrderBump, setHasOrderBump] = useState(false);
-  const [showOrderBumpPopup, setShowOrderBumpPopup] = useState(false);
-
-  // Prix
-  const BASE_PRICE = 67;
-  const ORDER_BUMP_PRICE = 37;
-  const totalPrice = hasOrderBump ? BASE_PRICE + ORDER_BUMP_PRICE : BASE_PRICE;
-
-  const handleGetGenerator = async () => {
-    setIsCreatingCheckout(true);
-    try {
-      const { data } = await base44.functions.invoke('createCheckout', {
-        hasOrderBump: hasOrderBump
-      });
-
-      if (data.success && data.url) {
-        window.top.location.href = data.url;
-      } else {
-        alert('Erreur: impossible de créer la session de paiement');
-      }
-    } catch (error) {
-      console.error('Error creating checkout:', error);
-      alert('Une erreur est survenue. Veuillez réessayer.');
-    } finally {
-      setIsCreatingCheckout(false);
-    }
-  };
-
-  // Timer jusqu'à minuit
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date();
-      const midnight = new Date();
-      midnight.setHours(24, 0, 0, 0);
-      const diff = midnight - now;
-
-      if (diff > 0) {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        setTimeLeft({ hours, minutes, seconds });
-      }
-    };
-
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
-    return () => clearInterval(timer);
-  }, []);
+    const navigate = useNavigate();
 
   const paths = [
     {

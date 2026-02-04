@@ -230,34 +230,6 @@ export default function ChooseYourPathNew() {
           })}
         </div>
 
-        {/* Urgence */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-gradient-to-br from-red-900/30 to-orange-900/30 rounded-2xl border border-red-500/30 p-6 md:p-8 mb-8"
-        >
-          <div className="grid md:grid-cols-2 gap-6 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <Clock className="w-8 h-8 text-red-400" />
-              <p className="text-white font-bold">⏰ Liens actifs jusqu'à minuit</p>
-              <div className="flex items-center gap-2 text-2xl font-mono font-bold text-red-400">
-                <span>{String(timeLeft.hours).padStart(2, '0')}</span>
-                <span>:</span>
-                <span>{String(timeLeft.minutes).padStart(2, '0')}</span>
-                <span>:</span>
-                <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
-              </div>
-            </div>
-            
-            <div className="flex flex-col items-center gap-2">
-              <Gift className="w-8 h-8 text-yellow-400" />
-              <p className="text-white font-bold">🎁 Bonus disparaissent</p>
-              <p className="text-gray-400">après ce soir</p>
-            </div>
-          </div>
-        </motion.div>
-
         {/* Footer CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -120,6 +120,7 @@ import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
 import ChooseYourPathNew from './pages/ChooseYourPathNew';
+import DoneForYouElite from './pages/DoneForYouElite';
 
 
 export const PAGES = {
@@ -196,6 +197,7 @@ export const PAGES = {
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
     "ChooseYourPathNew": ChooseYourPathNew,
+    "DoneForYouElite": DoneForYouElite,
 }
 
 export const pagesConfig = {

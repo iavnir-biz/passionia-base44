@@ -107,18 +107,19 @@ import OnboardingQ9Method from './pages/OnboardingQ9Method';
 import OnboardingTransition from './pages/OnboardingTransition';
 import PlanAction from './pages/PlanAction';
 import PlanStepDetail from './pages/PlanStepDetail';
+import ProtocoleQuickwin from './pages/ProtocoleQuickwin';
 import Results from './pages/Results';
 import SalesMessages from './pages/SalesMessages';
 import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
+import SkoolAbonnement from './pages/SkoolAbonnement';
+import SkoolComparaison from './pages/SkoolComparaison';
 import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import ProtocoleQuickwin from './pages/ProtocoleQuickwin';
-import SkoolAbonnement from './pages/SkoolAbonnement';
-import SkoolComparaison from './pages/SkoolComparaison';
+import ChooseYourPathNew from './pages/ChooseYourPathNew';
 
 
 export const PAGES = {
@@ -182,18 +183,19 @@ export const PAGES = {
     "OnboardingTransition": OnboardingTransition,
     "PlanAction": PlanAction,
     "PlanStepDetail": PlanStepDetail,
+    "ProtocoleQuickwin": ProtocoleQuickwin,
     "Results": Results,
     "SalesMessages": SalesMessages,
     "SalesPage": SalesPage,
     "Settings": Settings,
     "SetupProfile": SetupProfile,
+    "SkoolAbonnement": SkoolAbonnement,
+    "SkoolComparaison": SkoolComparaison,
     "SocialMedia": SocialMedia,
     "UpsellCoaching": UpsellCoaching,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "ProtocoleQuickwin": ProtocoleQuickwin,
-    "SkoolAbonnement": SkoolAbonnement,
-    "SkoolComparaison": SkoolComparaison,
+    "ChooseYourPathNew": ChooseYourPathNew,
 }
 
 export const pagesConfig = {

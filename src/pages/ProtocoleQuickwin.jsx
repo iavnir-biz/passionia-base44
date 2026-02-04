@@ -125,17 +125,6 @@ export default function ProtocoleQuickwin() {
                 </ul>
               </div>
 
-              {/* Pass VIP */}
-              <div className="mb-6">
-                <div className="flex items-start gap-3 mb-2">
-                  <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                  <div>
-                    <span className="font-bold text-gray-900">PASS VIP COMMUNAUTÉ (7 jours)</span>
-                    <p className="text-gray-600 mt-1">Accès total : lives, formation, templates</p>
-                  </div>
-                </div>
-              </div>
-
               {/* Plan d'action */}
               <div>
                 <div className="flex items-start gap-3 mb-2">
@@ -169,27 +158,6 @@ export default function ProtocoleQuickwin() {
             </div>
           </div>
 
-          {/* Prix comparatif */}
-          <div className="px-8 md:px-10 pb-8">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <span className="text-gray-500">💰</span>
-                <span className="text-gray-600">VALEUR RÉELLE:</span>
-                <span className="font-bold text-gray-900">5594€</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-gray-500">🔥</span>
-                <span className="text-gray-600">VOUS PAYEZ:</span>
-                <span className="font-bold text-2xl text-[#61f7a2]">67€</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-gray-500">📉</span>
-                <span className="text-gray-600">ÉCONOMIE:</span>
-                <span className="font-bold text-red-500">99%</span>
-              </div>
-            </div>
-          </div>
-
           {/* CTA Section */}
           <div className="px-8 md:px-10 pb-10">
             <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-center">
@@ -197,10 +165,7 @@ export default function ProtocoleQuickwin() {
                 <Zap className="w-5 h-5 text-[#61f7a2]" />
                 <span className="text-white font-bold">LE CHOIX RECOMMANDÉ</span>
               </div>
-              <p className="text-gray-300 mb-6">
-                Solution 100% automatique pour lancer votre business<br />
-                dès demain, sans maux de tête techniques.
-              </p>
+
 
               <button
                 onClick={handleCheckout}
@@ -220,9 +185,8 @@ export default function ProtocoleQuickwin() {
                 )}
               </button>
 
-              <p className="text-gray-500 text-sm mt-4 flex items-center justify-center gap-2">
-                <Shield className="w-4 h-4" />
-                Paiement sécurisé • Accès immédiat
+              <p className="text-gray-500 text-sm mt-4">
+                Accès immédiat
               </p>
             </div>
           </div>

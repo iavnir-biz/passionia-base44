@@ -116,6 +116,7 @@ import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
+import ProtocoleQuickwin from './pages/ProtocoleQuickwin';
 
 
 export const PAGES = {
@@ -188,6 +189,7 @@ export const PAGES = {
     "UpsellCoaching": UpsellCoaching,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
+    "ProtocoleQuickwin": ProtocoleQuickwin,
 }
 
 export const pagesConfig = {

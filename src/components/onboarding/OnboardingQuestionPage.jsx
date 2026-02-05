@@ -336,11 +336,11 @@ export default function OnboardingQuestionPage({
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex overflow-x-hidden">
+    <div className="h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex overflow-hidden">
       <OnboardingSidebar currentPage={window.location.pathname.split('/').pop()} completedSteps={completedSteps} />
 
-      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-20 lg:pt-0 overflow-x-hidden relative">
-        <div className="flex-1 flex items-center justify-center p-3 md:p-6">
+      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-20 lg:pt-0 overflow-hidden relative h-screen">
+        <div className="flex-1 flex items-center justify-center p-3 md:p-6 overflow-hidden">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

@@ -238,12 +238,12 @@ export default function OnboardingDynamic() {
   const completedSteps = (session?.onboarding_history?.length || 0) >= MAX_QUESTIONS ? [1] : [];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex overflow-hidden">
       <OnboardingSidebar currentPage="OnboardingDynamic" completedSteps={completedSteps} progressInStep={progress} />
 
-      <div className="flex-1 flex flex-col lg:ml-80 h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col lg:ml-80 h-screen">
         {/* Header avec barre de progression */}
-        <div className="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-10 w-full flex-shrink-0">
+        <div className="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-10 w-full">
           <div className="max-w-4xl mx-auto w-full flex items-center justify-between gap-6">
             <span className="text-lg font-bold text-[#111827]">Tes talents</span>
             <div className="hidden md:block flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -260,8 +260,8 @@ export default function OnboardingDynamic() {
           </div>
         </div>
 
-        {/* Zone de contenu avec la question - FIXE sur mobile */}
-        <main className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+        {/* Zone de contenu avec la question */}
+        <main className="flex-1 overflow-y-auto flex items-center justify-center p-4">
           <div className="w-full max-w-4xl">
             {isLoading && !currentQuestion ? (
               <div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-12">

@@ -278,6 +278,21 @@ export default function BonneNouvelle() {
               </motion.div>
             </motion.div>
 
+            {/* Bandeau info Dashboard */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl flex items-start gap-3"
+            >
+              <div className="bg-amber-400 rounded-full p-1.5 flex-shrink-0 mt-0.5">
+                <BarChart3 className="w-4 h-4 text-white" />
+              </div>
+              <p className="text-sm text-amber-900 leading-relaxed">
+                Toute <span className="font-semibold">l'analyse de marché complète</span>, avec tes acheteurs idéaux, les réseaux où les trouver, et bien plus d'analyses détaillées, se trouve maintenant dans <span className="font-semibold">ton dashboard</span> disponible à la fin ! 📊
+              </p>
+            </motion.div>
+
             {/* 🔥 BLOC 1 : Validation Text - UTILISE LA FUNCTION */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

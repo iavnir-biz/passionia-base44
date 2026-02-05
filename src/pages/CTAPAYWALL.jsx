@@ -168,11 +168,26 @@ export default function CTAPAYWALL() {
   const ORDER_BUMP_PRICE = 37;
 
   // Récupérer les offres sélectionnées depuis la session
-  const selectedOffers = session?.offer_generation?.offerChoices || {};
-  const lowOffer = selectedOffers.low;
-  const bumpOffer = selectedOffers.bump;
-  const midOffer = selectedOffers.mid;
-  const highOffer = selectedOffers.high;
+  // Source prioritaire : finalized_offer, puis offer_generation.offerChoices
+  const finalizedOffer = session?.finalized_offer || {};
+  const offerChoices = session?.offer_generation?.offerChoices || {};
+  
+  // Essayer finalized_offer d'abord (mainProduct, orderBump, upsell1, upsell3)
+  // Sinon fallback sur offerChoices (low, bump, mid, high)
+  const lowOffer = finalizedOffer.mainProduct || offerChoices.low;
+  const bumpOffer = finalizedOffer.orderBump || offerChoices.bump;
+  const midOffer = finalizedOffer.upsell1 || offerChoices.mid;
+  const highOffer = finalizedOffer.upsell3 || offerChoices.high;
+  
+  // Debug log pour vérifier les données
+  console.log('🔍 CTAPAYWALL - Offres chargées:', {
+    finalizedOffer,
+    offerChoices,
+    lowOffer,
+    bumpOffer,
+    midOffer,
+    highOffer
+  });
 
   // Plan 30 jours
   const weeks = [

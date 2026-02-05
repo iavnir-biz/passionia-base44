@@ -315,7 +315,7 @@ export default function OfferResume() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="flex justify-center mb-12">
+            className="flex justify-center mb-8">
 
             <GlowButton
               onClick={handleContinue}
@@ -324,6 +324,21 @@ export default function OfferResume() {
               Découvrir si mon marché est validé
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
             </GlowButton>
+          </motion.div>
+
+          {/* Bandeau info Dashboard */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.07 }}
+            className="mb-8 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl flex items-start gap-3"
+          >
+            <div className="bg-amber-400 rounded-full p-1.5 flex-shrink-0 mt-0.5">
+              <Package className="w-4 h-4 text-white" />
+            </div>
+            <p className="text-sm text-amber-900 leading-relaxed">
+              Le <span className="font-semibold">détail complet de tes offres</span> — prix, positionnement, descriptions, livrables — t'attend dans <span className="font-semibold">ton dashboard</span> disponible à la fin ! 🎯
+            </p>
           </motion.div>
 
           {/* Products Summary - Vertical */}

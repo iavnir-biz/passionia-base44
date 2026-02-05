@@ -376,56 +376,7 @@ export default function CTAPAYWALL() {
             </div>
           </motion.div>
 
-          {/* SECTION 7: Order Bump */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            onClick={() => setShowOrderBumpPopup(true)}
-            className={`rounded-2xl p-5 cursor-pointer border-4 transition-all ${hasOrderBump ? 'bg-green-100 border-[#61f7a2] shadow-lg' : 'bg-white border-[#61f7a2]'}`}
-          >
-            <div className="flex justify-center mb-3">
-              <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full">
-                ⚡ -75% OFFRE SPÉCIALE
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div 
-                className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${hasOrderBump ? 'bg-[#61f7a2] border-[#61f7a2]' : 'border-gray-300'}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setHasOrderBump(!hasOrderBump);
-                }}
-              >
-                {hasOrderBump && <CheckCircle className="w-4 h-4 text-white" />}
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-xl">🎬</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-gray-900">Pack Réseaux Sociaux</h3>
-                <p className="text-gray-600 text-[10px]">100+ templates prêts à poster</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-lg font-black text-[#61f7a2]">+{ORDER_BUMP_PRICE}€</span>
-                  <span className="text-gray-400 line-through text-xs">147€</span>
-                </div>
-              </div>
-            </div>
-            {hasOrderBump && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="mt-3 pt-3 border-t border-[#61f7a2]/30"
-              >
-                <p className="text-[#61f7a2] font-semibold text-center text-xs flex items-center justify-center gap-1">
-                  <CheckCircle className="w-4 h-4" />
-                  Ajouté à ta commande !
-                </p>
-              </motion.div>
-            )}
-          </motion.div>
-
-          {/* SECTION 8: Comparatif */}
+          {/* SECTION 7: Comparatif */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

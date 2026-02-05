@@ -167,6 +167,13 @@ export default function CTAPAYWALL() {
   const BASE_PRICE = 67;
   const ORDER_BUMP_PRICE = 37;
 
+  // Récupérer les offres sélectionnées depuis la session
+  const selectedOffers = session?.offer_generation?.offerChoices || {};
+  const lowOffer = selectedOffers.low;
+  const bumpOffer = selectedOffers.bump;
+  const midOffer = selectedOffers.mid;
+  const highOffer = selectedOffers.high;
+
   // Plan 30 jours
   const weeks = [
     { 
@@ -178,7 +185,8 @@ export default function CTAPAYWALL() {
         "Envoyer tes premiers messages de vente"
       ],
       goal: "Ta 1ère vente",
-      isFirst: true 
+      isFirst: true,
+      product: lowOffer ? { title: lowOffer.title, price: lowOffer.price } : null
     },
     { 
       week: 2, 
@@ -190,7 +198,8 @@ export default function CTAPAYWALL() {
         "Ajouter le Petit Extra (Order Bump)"
       ],
       goal: "3 ventes",
-      isFirst: false 
+      isFirst: false,
+      product: bumpOffer ? { title: bumpOffer.title, price: bumpOffer.price } : null
     },
     { 
       week: 3, 
@@ -202,7 +211,8 @@ export default function CTAPAYWALL() {
         "Préparer tes premières publicités"
       ],
       goal: "5 ventes",
-      isFirst: false 
+      isFirst: false,
+      product: midOffer ? { title: midOffer.title, price: midOffer.price } : null
     },
     { 
       week: 4, 
@@ -213,7 +223,8 @@ export default function CTAPAYWALL() {
         "Automatiser tout ton système de vente"
       ],
       goal: "10 ventes",
-      isFirst: false 
+      isFirst: false,
+      product: highOffer ? { title: highOffer.title, price: highOffer.price } : null
     }
   ];
 

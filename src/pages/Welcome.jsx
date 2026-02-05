@@ -99,12 +99,8 @@ export default function TeaserPage() {
           </div>
         </div>
         
-        {/* Boutons */}
+        {/* Bouton */}
         <div className="header-buttons">
-          <a href="/Dashboard" className="btn-connexion">
-            Connexion
-          </a>
-          
           <a href="/OnboardingFirstName" className="btn-demarrer">
             Démarrer gratuitement
           </a>

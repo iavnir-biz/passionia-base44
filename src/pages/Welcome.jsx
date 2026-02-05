@@ -86,12 +86,7 @@ export default function TeaserPage() {
     }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet" />
 
-      {/* Header */}
-      <header className="header-welcome">
-        <div className="logo-icon">
-          <SparkleIcon size={20} color="white" />
-        </div>
-      </header>
+
 
       {/* Contenu principal */}
       <div style={{
@@ -112,7 +107,7 @@ export default function TeaserPage() {
           marginBottom: "32px",
           animation: "fadeInUp 0.5s ease-out",
         }}>
-          {/* Avatar Noah */}
+          {/* Avatar Noah - Cerveau */}
           <div style={{
             position: "relative",
             display: "inline-flex",
@@ -120,16 +115,16 @@ export default function TeaserPage() {
             animation: "fadeInUp 0.5s ease-out 0.1s both",
           }}>
             <div style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "50%",
+              width: "72px",
+              height: "72px",
+              borderRadius: "20px",
               background: "linear-gradient(135deg, #61f7a2, #3dd67a)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               boxShadow: "0 8px 24px rgba(97,247,162,0.3)",
             }}>
-              <SparkleIcon size={28} color="white" />
+              <span style={{ fontSize: "36px" }}>🧠</span>
             </div>
             {/* Dot vert qui pulse */}
             <div style={{
@@ -340,41 +335,7 @@ export default function TeaserPage() {
           50% { transform: scale(1.1); opacity: 0.8; }
         }
 
-        .header-welcome {
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          padding: 16px;
-          max-width: 1200px;
-          margin: 0 auto;
-          width: 100%;
-          box-sizing: border-box;
-        }
 
-        .logo-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 12px;
-          background: linear-gradient(135deg, #61f7a2, #3dd67a);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 12px rgba(97,247,162,0.25);
-          flex-shrink: 0;
-        }
-
-        /* Desktop styles */
-        @media (min-width: 768px) {
-          .header-welcome {
-            padding: 20px 16px;
-          }
-
-          .logo-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-          }
-        }
       `}</style>
     </div>
   );

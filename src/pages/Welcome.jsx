@@ -476,31 +476,9 @@ export default function TeaserPage() {
             gap: 12px;
           }
 
-          .btn-connexion {
-            padding: 10px 24px;
-            border: 2px solid #111;
-            font-size: 14px;
-          }
-
           .btn-demarrer {
-            display: inline-flex;
-            align-items: center;
             padding: 10px 28px;
-            background: linear-gradient(135deg, #1a1a1a, #000);
-            color: white;
-            border: none;
-            border-radius: 999px;
             font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-          }
-
-          .btn-demarrer:hover {
-            box-shadow: 0 4px 20px rgba(97,247,162,0.4);
-            transform: translateY(-1px);
           }
         }
       `}</style>

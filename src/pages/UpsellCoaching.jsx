@@ -244,29 +244,29 @@ export default function UpsellCoaching() {
         {/* ================================================================ */}
         {/* HEADER */}
         {/* ================================================================ */}
-        <div className="text-center mb-8">
+        <div className="text-center p-6 sm:p-8">
           {/* Icône */}
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#61f7a2] to-[#4de88f] rounded-2xl shadow-lg shadow-[#61f7a2]/20 mb-6">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-[#61f7a2] to-[#4de88f] rounded-2xl shadow-lg shadow-[#61f7a2]/20 mb-4">
             <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
             </svg>
           </div>
 
           {/* Titre - PRÉNOM PERSONNALISÉ */}
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
             {firstName ? `${firstName}, ton` : 'Ton'} Pack Passion IA est activé ! 🎉
           </h1>
 
           {/* Sous-titre */}
-          <div className="max-w-2xl mx-auto text-gray-600 text-lg leading-relaxed">
-            <p className="mb-3">
+          <div className="text-gray-600 text-base leading-relaxed">
+            <p className="mb-2">
               Tu as maintenant tous les outils IA pour créer ton offre en <span className="font-semibold text-gray-800">{thematique}</span>.
             </p>
-            <p className="mb-3">
-              Mais soyons honnêtes : <span className="font-semibold text-gray-800">90% des gens</span> qui achètent une formation n'obtiennent jamais de résultats. Pas par manque d'outils. Par manque d'accompagnement.
+            <p className="mb-2">
+              Mais soyons honnêtes : <span className="font-semibold text-gray-800">90% des gens</span> qui achètent une formation n'obtiennent jamais de résultats.
             </p>
             <p className="text-[#61f7a2] font-semibold">
-              Et si on t'accompagnait main dans la main pour garantir tes premiers résultats ?
+              Et si on t'accompagnait main dans la main ?
             </p>
           </div>
         </div>
@@ -274,10 +274,10 @@ export default function UpsellCoaching() {
         {/* ================================================================ */}
         {/* CARD PRINCIPALE */}
         {/* ================================================================ */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden mb-8">
+        <div className="border-t border-gray-100">
           
           {/* Header Card */}
-          <div className="p-6 sm:p-8 border-b border-gray-100">
+          <div className="p-5 sm:p-6 border-b border-gray-100 bg-gray-50">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-200">
@@ -306,7 +306,7 @@ export default function UpsellCoaching() {
           </div>
 
           {/* Piliers */}
-          <div className="p-6 sm:p-8 space-y-4">
+          <div className="p-5 sm:p-6 space-y-3 max-h-[300px] overflow-y-auto">
             {piliers.map((pilier, index) => (
               <div 
                 key={index}
@@ -341,147 +341,70 @@ export default function UpsellCoaching() {
         </div>
 
         {/* ================================================================ */}
-        {/* BLOC DIFFÉRENCIATEUR */}
+        {/* BLOC PRIX COMPACT */}
         {/* ================================================================ */}
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 sm:p-8 mb-8 text-white">
-          <h3 className="text-xl sm:text-2xl font-bold mb-4 text-center">
-            Pourquoi cet accompagnement change tout ?
-          </h3>
-          <div className="text-center mb-6">
-            <p className="text-gray-300 text-lg mb-2">Avec Noah, tu as l'IA pour créer.</p>
-            <p className="text-gray-300 text-lg mb-2">Avec la communauté, tu as le soutien pour avancer.</p>
-            <p className="text-emerald-400 text-xl font-semibold">Avec nous, tu as l'humain pour réussir.</p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4 text-gray-300">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🎯</span>
-              <span>Tu doutes de ta stratégie ? → <span className="text-white font-medium">On la valide ensemble</span></span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🎨</span>
-              <span>Tu galères sur le design ? → <span className="text-white font-medium">On le fait avec toi</span></span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">⚙️</span>
-              <span>Tu bloques sur Stripe ? → <span className="text-white font-medium">On configure ensemble</span></span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">💬</span>
-              <span>Tu as une question ? → <span className="text-white font-medium">Réponse sous 24h</span></span>
-            </div>
-          </div>
-          <p className="text-center mt-6 text-lg font-semibold text-[#61f7a2]">
-            30 jours. Main dans la main. Tes premiers résultats garantis.
-          </p>
-        </div>
-
-        {/* ================================================================ */}
-        {/* BLOC PRIX WHAOU */}
-        {/* ================================================================ */}
-        <div className="bg-gradient-to-br from-[#61f7a2]/5 to-[#4de88f]/5 rounded-3xl p-6 sm:p-8 mb-8 border-2 border-[#61f7a2]/20">
+        <div className="bg-gradient-to-br from-[#61f7a2]/10 to-[#4de88f]/10 p-5 sm:p-6 border-t border-gray-100">
           <div className="text-center">
-            <p className="text-gray-400 text-lg mb-2">
+            <p className="text-gray-400 text-sm mb-1">
               Prix normal : <span className="line-through">897€</span>
             </p>
-            <p className="text-[#61f7a2] font-bold text-lg mb-2">
-              🔥 TON PRIX AUJOURD'HUI UNIQUEMENT :
-            </p>
-            <p className="text-6xl sm:text-7xl font-black text-[#61f7a2] mb-4">
+            <p className="text-4xl sm:text-5xl font-black text-[#61f7a2] mb-2">
               497€
             </p>
-            <div className="inline-flex items-center gap-2 bg-[#61f7a2] text-white px-6 py-3 rounded-full text-lg font-bold">
-              <Gift className="w-5 h-5" />
+            <div className="inline-flex items-center gap-2 bg-[#61f7a2] text-white px-4 py-2 rounded-full text-sm font-bold">
+              <Gift className="w-4 h-4" />
               Tu économises 400€ (-45%)
             </div>
           </div>
         </div>
 
         {/* ================================================================ */}
-        {/* TÉMOIGNAGES */}
+        {/* URGENCE COMPACT */}
         {/* ================================================================ */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-8">
-          {temoignages.map((t, index) => (
-            <div key={index} className="bg-white rounded-2xl p-5 shadow-lg shadow-gray-100 border border-gray-100">
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`w-10 h-10 ${t.color} rounded-full flex items-center justify-center text-white font-bold`}>
-                  {t.initial}
-                </div>
-                <div className="flex text-amber-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-current" />
-                  ))}
-                </div>
-              </div>
-              <p className="text-gray-700 text-sm mb-3">"{t.text}"</p>
-              <div className="border-t border-gray-100 pt-3">
-                <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
-                <p className="text-gray-500 text-xs">{t.role}</p>
-                <p className="text-[#61f7a2] font-semibold text-sm mt-1">💰 {t.result}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ================================================================ */}
-        {/* URGENCE */}
-        {/* ================================================================ */}
-        <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 mb-8 text-center">
-          <div className="flex items-center justify-center gap-2 text-amber-700 font-semibold mb-3">
-            <AlertTriangle className="w-5 h-5" />
-            Cette offre disparaît dans :
+        <div className="bg-amber-50 border-t border-amber-200 p-4 text-center">
+          <div className="flex items-center justify-center gap-2 text-amber-700 font-semibold text-sm mb-1">
+            <AlertTriangle className="w-4 h-4" />
+            Cette offre disparaît dans : <span className="text-xl font-black text-gray-900 font-mono">{formatTime(timeLeft)}</span>
           </div>
-          <p className="text-5xl font-black text-gray-900 mb-3 font-mono">
-            {formatTime(timeLeft)}
-          </p>
-          <p className="text-amber-700">
-            et ne sera plus jamais disponible à ce prix.
-          </p>
-          <div className="mt-4 inline-flex items-center gap-2 bg-amber-200 text-amber-800 px-4 py-2 rounded-full text-sm font-semibold">
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+          <p className="text-amber-600 text-xs">
             Places limitées : {placesRestantes}/10 restantes ce mois-ci
-          </div>
+          </p>
         </div>
 
         {/* ================================================================ */}
         {/* CTA */}
         {/* ================================================================ */}
-        <div className="text-center space-y-4">
+        <div className="p-5 sm:p-6 bg-white border-t border-gray-100 space-y-3">
           <button
             onClick={handleAcceptOffer}
             disabled={isCreatingCheckout}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#61f7a2] text-white text-xl font-bold px-12 py-5 rounded-2xl shadow-xl shadow-[#61f7a2]/20 transition-all hover:scale-105 active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#61f7a2] text-white text-lg font-bold px-8 py-4 rounded-xl shadow-lg shadow-[#61f7a2]/20 transition-all hover:scale-[1.02] active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCreatingCheckout ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Rocket className="w-6 h-6" />
+              <Rocket className="w-5 h-5" />
             )}
             {isCreatingCheckout ? 'Redirection...' : 'OUI, je veux être accompagné — 497€'}
           </button>
           
-          <div>
-            <button
-              onClick={handleDeclineOffer}
-              disabled={isCreatingCheckout}
-              className="text-gray-500 hover:text-gray-700 underline underline-offset-4 transition-colors disabled:opacity-50"
-            >
-              Non merci, je préfère avancer seul →
-            </button>
-          </div>
+          <button
+            onClick={handleDeclineOffer}
+            disabled={isCreatingCheckout}
+            className="w-full text-gray-500 hover:text-gray-700 underline underline-offset-4 transition-colors disabled:opacity-50 text-sm py-2"
+          >
+            Non merci, je préfère avancer seul →
+          </button>
 
           {/* Garanties */}
-          <div className="flex flex-wrap items-center justify-center gap-6 pt-6 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              Paiement 100% sécurisé par Stripe
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs text-gray-500">
+            <div className="flex items-center gap-1">
+              <Shield className="w-3 h-3" />
+              Paiement sécurisé
             </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-4 h-4" />
-              Satisfait ou remboursé 30 jours
-            </div>
-            <div className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" />
-              97% font leur 1ère vente
+            <div className="flex items-center gap-1">
+              <Check className="w-3 h-3" />
+              Remboursé 30j
             </div>
           </div>
         </div>

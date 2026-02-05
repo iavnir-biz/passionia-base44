@@ -255,7 +255,75 @@ export default function OfferConcretement() {
             </GlowButton>
           </motion.div>
 
+          {/* Objectifs de ventes */}
+          {session?.potential_revenue > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl border-2 border-amber-200 p-6 mb-8"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-md">
+                  <Target className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900">🎯 Tes objectifs de ventes</h3>
+                  <p className="text-gray-600 text-sm">Basé sur ton souhait de revenus</p>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-xl p-4 border border-amber-100 mb-4">
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  Pour atteindre ton objectif de <strong className="text-amber-600">{(parseInt(session?.onboarding_full?.targetIncome) || 500).toLocaleString('fr-FR')}€/mois</strong>, 
+                  voici ce que tu devrais réaliser avec tes offres :
+                </p>
+              </div>
 
+              <div className="space-y-2">
+                {(() => {
+                  const finalizedOffer = session?.finalized_offer || {};
+                  const targetIncome = parseInt(session?.onboarding_full?.targetIncome) || 500;
+                  
+                  const products = [
+                    { key: 'mainProduct', label: 'Produit Principal', data: finalizedOffer.mainProduct, baseMultiplier: 30 },
+                    { key: 'orderBump', label: 'Order Bump', data: finalizedOffer.orderBump, baseMultiplier: 15 },
+                    { key: 'upsell1', label: 'Upsell', data: finalizedOffer.upsell1, baseMultiplier: 9 },
+                    { key: 'upsell3', label: 'Premium', data: finalizedOffer.upsell3, baseMultiplier: 1 }
+                  ].filter(p => p.data);
+
+                  const parsePrice = (priceStr) => {
+                    if (!priceStr) return 0;
+                    const cleaned = priceStr.replace(/[^0-9]/g, '');
+                    return parseInt(cleaned, 10) || 0;
+                  };
+
+                  const revenues = products.map(p => ({
+                    ...p,
+                    price: parsePrice(p.data?.price),
+                    baseTotal: parsePrice(p.data?.price) * p.baseMultiplier
+                  }));
+
+                  const basePotential = revenues.reduce((sum, r) => sum + r.baseTotal, 0);
+                  const multiplier = basePotential > 0 ? targetIncome / basePotential : 1;
+
+                  return revenues.map((rev, idx) => {
+                    const salesNeeded = Math.ceil(rev.baseMultiplier * multiplier);
+                    return (
+                      <div key={rev.key} className="flex items-center justify-between py-2 px-3 bg-amber-50/50 rounded-lg">
+                        <span className="text-gray-700 text-sm font-medium">{rev.label}</span>
+                        <span className="text-amber-600 font-bold">{salesNeeded} ventes/mois</span>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+
+              <p className="text-gray-500 text-xs text-center mt-4">
+                💡 Ces volumes sont indicatifs et s'ajustent avec ton expérience
+              </p>
+            </motion.div>
+          )}
 
           {/* Parcours Guidé Header */}
           <motion.div

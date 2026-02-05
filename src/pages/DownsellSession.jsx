@@ -159,15 +159,15 @@ export default function DownsellSession() {
   // ========================================================================
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-white flex items-center justify-center">
+      <div className="min-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-gray-50 via-white to-white transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+    <div className="min-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className={`w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 my-8 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
         
         {/* ================================================================ */}
         {/* HEADER */}

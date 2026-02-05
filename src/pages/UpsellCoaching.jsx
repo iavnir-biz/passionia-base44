@@ -490,5 +490,3 @@ export default function UpsellCoaching() {
     </div>
   );
 }
-
-// Note: The closing div was already present, just reformatting the structure

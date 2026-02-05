@@ -835,6 +835,7 @@ export default function CTAPAYWALL() {
                 <X className="w-5 h-5 text-white" />
               </button>
               <div className="text-center">
+                <p className="text-white/90 text-sm font-medium mb-3">Veux-tu rajouter ce pack en plus du générateur ?</p>
                 <span className="text-4xl mb-2 block">🎬</span>
                 <h2 className="text-xl font-bold text-white mb-1">
                   Pack Réseaux Sociaux

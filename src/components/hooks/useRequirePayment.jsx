@@ -32,8 +32,25 @@ export function useRequirePayment() {
       setUser(currentUser);
       setIsAuthenticated(true);
 
-      // 3. Vérifier le statut de paiement
-      if (!currentUser?.has_purchased) {
+      // 3. Vérifier le statut de paiement (User OU Session)
+      let purchased = currentUser?.has_purchased === true;
+
+      // 🔥 Fallback: vérifier aussi dans la Session (où Stripe webhook écrit souvent)
+      if (!purchased) {
+        try {
+          const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+          if (sessions.length > 0 && sessions[0].has_purchased === true) {
+            purchased = true;
+            // Sync: mettre à jour le User pour les prochaines fois
+            await base44.auth.updateMe({ has_purchased: true });
+            console.log('✅ [useRequirePayment] Synced has_purchased from Session to User');
+          }
+        } catch (sessionError) {
+          console.warn('⚠️ [useRequirePayment] Could not check Session:', sessionError);
+        }
+      }
+
+      if (!purchased) {
         // Rediriger vers la page de paiement si pas encore payé
         navigate('/CTAPAYWALL');
         return;

@@ -107,7 +107,7 @@ export default function TeaserPage() {
           marginBottom: "32px",
           animation: "fadeInUp 0.5s ease-out",
         }}>
-          {/* Avatar Noah - Cerveau stylisé */}
+          {/* Avatar Noah - Brain Icon */}
           <div style={{
             position: "relative",
             display: "inline-flex",
@@ -117,19 +117,14 @@ export default function TeaserPage() {
             <div style={{
               width: "72px",
               height: "72px",
-              borderRadius: "20px",
-              background: "linear-gradient(135deg, #b8f5d0, #8ef0b3)",
+              borderRadius: "18px",
+              background: "#61f7a2",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 8px 24px rgba(97,247,162,0.2)",
+              boxShadow: "0 8px 24px rgba(97,247,162,0.3)",
             }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 4C8.5 4 6 6.5 6 9.5C6 11.5 7 13 8.5 14C8.5 14 8 15.5 8 17C8 18.5 9 20 12 20C15 20 16 18.5 16 17C16 15.5 15.5 14 15.5 14C17 13 18 11.5 18 9.5C18 6.5 15.5 4 12 4Z" stroke="#22c55e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 4V20" stroke="#22c55e" strokeWidth="1.8" strokeLinecap="round"/>
-                <path d="M8.5 8.5C9.5 9 10.5 9 12 9C13.5 9 14.5 9 15.5 8.5" stroke="#22c55e" strokeWidth="1.8" strokeLinecap="round"/>
-                <path d="M8.5 12C9.5 12.5 10.5 12.5 12 12.5C13.5 12.5 14.5 12.5 15.5 12" stroke="#22c55e" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
+              <Brain size={36} color="white" />
             </div>
             {/* Dot vert qui pulse */}
             <div style={{

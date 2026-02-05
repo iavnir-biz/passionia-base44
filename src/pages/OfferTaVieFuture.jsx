@@ -218,6 +218,21 @@ export default function OfferTaVieFuture() {
               </GlowButton>
             </motion.div>
 
+            {/* Bandeau info Dashboard */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl flex items-start gap-3"
+            >
+              <div className="bg-amber-400 rounded-full p-1.5 flex-shrink-0 mt-0.5">
+                <Map className="w-4 h-4 text-white" />
+              </div>
+              <p className="text-sm text-amber-900 leading-relaxed">
+                Ton <span className="font-semibold">plan d'action sur mesure</span> a été généré pour donner vie à cette projection, étape par étape, dans <span className="font-semibold">ton dashboard</span> ! 🗺️
+              </p>
+            </motion.div>
+
             {/* Narrative Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

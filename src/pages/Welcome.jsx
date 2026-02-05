@@ -343,85 +343,24 @@ export default function TeaserPage() {
         .header-welcome {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          padding: 12px 16px;
+          justify-content: flex-start;
+          padding: 16px;
           max-width: 1200px;
           margin: 0 auto;
           width: 100%;
           box-sizing: border-box;
         }
 
-        .logo-section {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
         .logo-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 10px;
+          width: 40px;
+          height: 40px;
+          border-radius: 12px;
           background: linear-gradient(135deg, #61f7a2, #3dd67a);
           display: flex;
           align-items: center;
           justify-content: center;
           box-shadow: 0 4px 12px rgba(97,247,162,0.25);
           flex-shrink: 0;
-        }
-
-        .logo-sparkle-mobile {
-          display: block;
-        }
-
-        .logo-sparkle-desktop {
-          display: none;
-        }
-
-        .logo-text {
-          display: flex;
-          flex-direction: column;
-          gap: 1px;
-        }
-
-        .logo-title {
-          font-size: 15px;
-          font-weight: 700;
-          color: #111;
-          letter-spacing: -0.01em;
-        }
-
-        .logo-subtitle {
-          display: none;
-          font-size: 11px;
-          font-weight: 500;
-          color: #999;
-        }
-
-        .header-buttons {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .btn-demarrer {
-          display: inline-flex;
-          align-items: center;
-          padding: 8px 16px;
-          background: linear-gradient(135deg, #1a1a1a, #000);
-          color: white;
-          border: none;
-          border-radius: 999px;
-          font-size: 12px;
-          font-weight: 700;
-          cursor: pointer;
-          text-decoration: none;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-        }
-
-        .btn-demarrer:hover {
-          box-shadow: 0 4px 20px rgba(97,247,162,0.4);
-          transform: translateY(-1px);
         }
 
         /* Desktop styles */
@@ -431,40 +370,9 @@ export default function TeaserPage() {
           }
 
           .logo-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-          }
-
-          .logo-sparkle-mobile {
-            display: none;
-          }
-
-          .logo-sparkle-desktop {
-            display: block;
-          }
-
-          .logo-section {
-            gap: 10px;
-          }
-
-          .logo-title {
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-          }
-
-          .logo-subtitle {
-            display: block;
-          }
-
-          .header-buttons {
-            gap: 12px;
-          }
-
-          .btn-demarrer {
-            padding: 10px 28px;
-            font-size: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
           }
         }
       `}</style>

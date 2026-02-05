@@ -53,7 +53,7 @@ const NoahBrainIcon = ({ size = 48 }) => (
 );
 
 // Week Card pour le plan 30 jours
-const WeekCard = ({ week, emoji, title, tasks, goal, isFirst }) => (
+const WeekCard = ({ week, emoji, title, tasks, goal, isFirst, product }) => (
   <div className={cn(
     "rounded-2xl p-4 border-2 transition-all",
     isFirst 
@@ -92,11 +92,39 @@ const WeekCard = ({ week, emoji, title, tasks, goal, isFirst }) => (
           ))}
         </ul>
         <div className={cn(
-          "text-sm font-semibold",
+          "text-sm font-semibold mb-3",
           isFirst ? "text-[#61f7a2]" : "text-gray-500"
         )}>
           🎯 Objectif : {goal}
         </div>
+        
+        {/* Produit associé */}
+        {product && (
+          <div className={cn(
+            "rounded-xl p-3 border-2",
+            isFirst 
+              ? "bg-white/80 border-[#61f7a2]/50" 
+              : "bg-gray-50 border-gray-200"
+          )}>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Package className={cn(
+                  "w-4 h-4 flex-shrink-0",
+                  isFirst ? "text-[#61f7a2]" : "text-gray-500"
+                )} />
+                <span className="text-sm font-medium text-gray-800 truncate">
+                  {product.title}
+                </span>
+              </div>
+              <span className={cn(
+                "text-sm font-bold flex-shrink-0",
+                isFirst ? "text-[#61f7a2]" : "text-gray-600"
+              )}>
+                {product.price}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   </div>

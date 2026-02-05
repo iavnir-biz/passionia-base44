@@ -421,11 +421,6 @@ export default function CTAPAYWALL() {
               </div>
             </div>
             
-            <div className="inline-flex items-center gap-1.5 bg-green-100 border border-green-300 px-3 py-1.5 rounded-full mb-5">
-              <Sparkles className="w-4 h-4 text-green-600" />
-              <span className="text-green-700 font-semibold text-xs">100% PERSONNALISÉ À TON PROFIL</span>
-            </div>
-
             <div className="space-y-2">
               {generatorFeatures.map((feature, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-green-50 transition-colors">

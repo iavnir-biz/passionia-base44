@@ -152,13 +152,23 @@ export default function CTAPAYWALL() {
     }
   };
 
-  const handleGetAccess = async () => {
+  // Ouvre le popup Order Bump quand on clique sur un CTA
+  const handleCTAClick = () => {
+    if (!user) return;
+    setShowOrderBumpPopup(true);
+  };
+
+  // Procède au paiement Stripe avec ou sans Order Bump
+  const handleProceedToCheckout = async (withOrderBump) => {
     if (!user) return;
 
+    setShowOrderBumpPopup(false);
+    setHasOrderBump(withOrderBump);
     setIsCreatingCheckout(true);
+    
     try {
       const { data } = await base44.functions.invoke('createCheckout', {
-        hasOrderBump: hasOrderBump
+        hasOrderBump: withOrderBump
       });
 
       if (data.success && data.url) {
@@ -204,11 +214,11 @@ export default function CTAPAYWALL() {
             </div>
           </div>
           <button 
-            onClick={handleGetAccess}
+            onClick={handleCTAClick}
             disabled={isCreatingCheckout}
             className="bg-[#61f7a2] text-gray-900 font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-1"
           >
-            {isCreatingCheckout ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{totalPrice}€ <ArrowRight className="w-4 h-4" /></>}
+            {isCreatingCheckout ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{BASE_PRICE}€ <ArrowRight className="w-4 h-4" /></>}
           </button>
         </div>
 
@@ -476,7 +486,7 @@ export default function CTAPAYWALL() {
                 ))}
               </div>
               <button 
-                onClick={handleGetAccess}
+                onClick={handleCTAClick}
                 disabled={isCreatingCheckout}
                 className="w-full bg-[#61f7a2] text-gray-900 font-bold py-4 rounded-xl flex items-center justify-center gap-2 text-lg hover:bg-[#4de88f] transition-colors disabled:opacity-50"
               >
@@ -487,7 +497,7 @@ export default function CTAPAYWALL() {
                   </>
                 ) : (
                   <>
-                    ✨ Débloquer pour {totalPrice}€
+                    ✨ Débloquer pour {BASE_PRICE}€
                   </>
                 )}
               </button>
@@ -547,7 +557,7 @@ export default function CTAPAYWALL() {
           >
             <p className="font-bold text-gray-900 text-lg mb-3">Ton business t'attend.</p>
             <button 
-              onClick={handleGetAccess}
+              onClick={handleCTAClick}
               disabled={isCreatingCheckout}
               className="bg-[#61f7a2] text-gray-900 font-bold px-8 py-4 rounded-xl flex items-center gap-2 mx-auto hover:bg-[#4de88f] transition-colors disabled:opacity-50"
             >
@@ -558,7 +568,7 @@ export default function CTAPAYWALL() {
                 </>
               ) : (
                 <>
-                  C'est parti pour {totalPrice}€ <ArrowRight className="w-5 h-5" />
+                  C'est parti pour {BASE_PRICE}€ <ArrowRight className="w-5 h-5" />
                 </>
               )}
             </button>
@@ -573,7 +583,7 @@ export default function CTAPAYWALL() {
             <span className="text-gray-900 font-bold text-2xl ml-2">{totalPrice}€</span>
           </div>
           <button 
-            onClick={handleGetAccess}
+            onClick={handleCTAClick}
             disabled={isCreatingCheckout}
             className="bg-[#61f7a2] text-gray-900 font-bold px-8 py-3 rounded-xl flex items-center gap-2 hover:bg-[#4de88f] transition-colors disabled:opacity-50"
           >
@@ -710,22 +720,30 @@ export default function CTAPAYWALL() {
 
             {/* Footer */}
             <div className="p-5 bg-gray-50 rounded-b-3xl border-t border-gray-200">
-              <div className="flex gap-3">
+              <div className="space-y-3">
+                {/* Prix récap */}
+                <div className="bg-white rounded-xl p-3 border border-gray-200 text-center">
+                  <p className="text-gray-600 text-xs mb-1">Ton total avec le Pack RS :</p>
+                  <p className="text-2xl font-black text-gray-900">{BASE_PRICE + ORDER_BUMP_PRICE}€ <span className="text-sm font-normal text-gray-400 line-through">214€</span></p>
+                </div>
+                
                 <button
-                  onClick={() => {
-                    setHasOrderBump(true);
-                    setShowOrderBumpPopup(false);
-                  }}
-                  className="flex-1 py-3 px-4 bg-[#61f7a2] text-gray-900 font-bold rounded-xl hover:bg-[#4de88f] transition-colors flex items-center justify-center gap-2"
+                  onClick={() => handleProceedToCheckout(true)}
+                  disabled={isCreatingCheckout}
+                  className="w-full py-4 px-4 bg-[#61f7a2] text-gray-900 font-bold rounded-xl hover:bg-[#4de88f] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <CheckCircle className="w-5 h-5" />
-                  Ajouter au panier
+                  {isCreatingCheckout ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Redirection...</>
+                  ) : (
+                    <><CheckCircle className="w-5 h-5" /> OUI, j'ajoute le Pack RS (+37€)</>
+                  )}
                 </button>
                 <button
-                  onClick={() => setShowOrderBumpPopup(false)}
-                  className="px-5 py-3 bg-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-300 transition-colors"
+                  onClick={() => handleProceedToCheckout(false)}
+                  disabled={isCreatingCheckout}
+                  className="w-full py-3 bg-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-300 transition-colors disabled:opacity-50"
                 >
-                  Non merci
+                  {isCreatingCheckout ? 'Redirection...' : `Non merci, continuer à ${BASE_PRICE}€`}
                 </button>
               </div>
             </div>

@@ -467,7 +467,7 @@ export default function CTAPAYWALL() {
             transition={{ delay: 0.2 }}
             className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm"
           >
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-6">
               <NoahBrainIcon size={48} />
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Tout ce que Noah a préparé pour toi</h2>
@@ -475,13 +475,65 @@ export default function CTAPAYWALL() {
               </div>
             </div>
             
-            <div className="space-y-2">
-              {generatorFeatures.map((feature, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-green-50 transition-colors">
-                  <span className="text-xl">{feature.icon}</span>
-                  <span className="text-gray-800 font-medium">{feature.text}</span>
-                </div>
-              ))}
+            {/* CATÉGORIE 1 : PRÊT À VENDRE */}
+            <div className="bg-[#61f7a2]/10 rounded-2xl p-4 mb-4 border-l-4 border-[#61f7a2]">
+              <p className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#61f7a2]" />
+                PRÊT À VENDRE
+              </p>
+              <div className="space-y-2">
+                {[
+                  { icon: "🎯", text: "4 offres complètes avec produits et prix détaillés" },
+                  { icon: "💬", text: "Les messages pour vendre en 48 heures" },
+                  { icon: "📄", text: "Les pages de vente rédigées et structurées" },
+                  { icon: "📧", text: "Les séquences d'emails marketing prêtes" }
+                ].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-white/70">
+                    <span className="text-lg">{feature.icon}</span>
+                    <span className="text-gray-800 font-medium text-sm">{feature.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CATÉGORIE 2 : ANALYSE & STRATÉGIE */}
+            <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+              <p className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-gray-600" />
+                ANALYSE & STRATÉGIE
+              </p>
+              <div className="space-y-2">
+                {[
+                  { icon: "📊", text: "Analyse de marché détaillée + viabilité de ta niche" },
+                  { icon: "💰", text: "Ta projection de revenus personnalisée" },
+                  { icon: "👥", text: "3 avatars de tes futurs acheteurs" }
+                ].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-white">
+                    <span className="text-lg">{feature.icon}</span>
+                    <span className="text-gray-800 font-medium text-sm">{feature.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CATÉGORIE 3 : TON SYSTÈME COMPLET */}
+            <div className="bg-amber-50/50 rounded-2xl p-4 border border-amber-200/50">
+              <p className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-500" />
+                TON SYSTÈME COMPLET
+              </p>
+              <div className="space-y-2">
+                {[
+                  { icon: "🎮", text: "Dashboard de progression gamifié" },
+                  { icon: "📅", text: "Plan d'action sur 30 jours étape par étape" },
+                  { icon: "🔄", text: "Jusqu'à 5 générations pour affiner tes offres" }
+                ].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-white/70">
+                    <span className="text-lg">{feature.icon}</span>
+                    <span className="text-gray-800 font-medium text-sm">{feature.text}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
 

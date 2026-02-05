@@ -26,17 +26,58 @@ import {
   Video,
   Package,
   ShoppingBag,
-  Crown
+  Crown,
+  Trophy,
+  Lock,
+  Play
 } from 'lucide-react';
-import GlowButton from '@/components/ui/GlowButton';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
 
-function parsePrice(priceStr) {
-  if (!priceStr) return 0;
-  const cleaned = priceStr.replace(/[^0-9]/g, '');
-  return parseInt(cleaned, 10) || 0;
-}
+// Noah Brain Icon
+const NoahBrainIcon = ({ size = 48 }) => (
+  <div 
+    className="rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg"
+    style={{ width: size, height: size }}
+  >
+    <span style={{ fontSize: size * 0.5 }}>🧠</span>
+  </div>
+);
+
+// Week Card
+const WeekCard = ({ week, title, goal, isFirst }) => (
+  <div className={`rounded-xl p-3 border-2 ${isFirst ? 'bg-gradient-to-br from-green-100 to-green-50 border-[#61f7a2]' : 'bg-white/10 border-white/20'}`}>
+    <div className="flex items-center gap-3">
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm ${isFirst ? 'bg-gradient-to-br from-[#61f7a2] to-green-500 text-white' : 'bg-white/20 text-white'}`}>
+        S{week}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`font-bold text-sm ${isFirst ? 'text-gray-900' : 'text-white'}`}>{title}</span>
+          {isFirst && (
+            <span className="bg-[#61f7a2] text-gray-900 text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+              <Trophy className="w-3 h-3" />
+              PRIORITÉ
+            </span>
+          )}
+        </div>
+        <p className={`text-xs font-semibold ${isFirst ? 'text-[#61f7a2]' : 'text-gray-300'}`}>
+          🎯 {goal}
+        </p>
+      </div>
+      {!isFirst && <Lock className="w-3 h-3 text-gray-400 flex-shrink-0" />}
+    </div>
+  </div>
+);
+
+// Skool Feature
+const SkoolFeature = ({ emoji, title, isHighlight }) => (
+  <div className={`flex items-center gap-2 p-2 rounded-lg text-xs ${isHighlight ? 'bg-yellow-50 border border-yellow-300' : 'bg-white border border-gray-200'}`}>
+    <span>{emoji}</span>
+    <span className="text-gray-900 font-medium">{title}</span>
+    {isHighlight && <span className="text-yellow-500">⭐</span>}
+  </div>
+);
 
 export default function CTAPAYWALL() {
   const navigate = useNavigate();
@@ -44,17 +85,45 @@ export default function CTAPAYWALL() {
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
-  const [isSimulating, setIsSimulating] = useState(false);
 
   // Order Bump states
   const [hasOrderBump, setHasOrderBump] = useState(false);
   const [showOrderBumpPopup, setShowOrderBumpPopup] = useState(false);
-  const [checkboxInPopup, setCheckboxInPopup] = useState(false);
 
   // Prix
   const BASE_PRICE = 67;
   const ORDER_BUMP_PRICE = 37;
   const totalPrice = hasOrderBump ? BASE_PRICE + ORDER_BUMP_PRICE : BASE_PRICE;
+
+  const weeks = [
+    { week: 1, title: "Ta première vente", goal: "1 vente", isFirst: true },
+    { week: 2, title: "Répétition & Order Bump", goal: "3 ventes", isFirst: false },
+    { week: 3, title: "Offre supérieure", goal: "5 ventes", isFirst: false },
+    { week: 4, title: "Système complet", goal: "10 ventes", isFirst: false }
+  ];
+
+  const generatorFeatures = [
+    "📊 Analyse de marché détaillée",
+    "👥 3 avatars de tes futurs acheteurs",
+    "🎯 4 offres complètes (Full Stack Offer)",
+    "💬 Messages de vente (plusieurs angles)",
+    "📄 Pages de vente rédigées",
+    "📧 8 emails marketing ready-to-send",
+    "📅 Plan d'action 7 jours",
+    "🎮 Dashboard gamifié"
+  ];
+
+  const skoolFeatures = [
+    { emoji: "🎥", title: "Accompagnement vidéo", isHighlight: true },
+    { emoji: "📺", title: "2 lives/semaine", isHighlight: false },
+    { emoji: "🎧", title: "30 min coaching privé", isHighlight: true },
+    { emoji: "📚", title: "Formation complète", isHighlight: false },
+    { emoji: "👥", title: "Communauté 24/7", isHighlight: false },
+    { emoji: "📁", title: "Templates & ressources", isHighlight: false },
+    { emoji: "⭐", title: "1 Live Premium/mois", isHighlight: true },
+    { emoji: "💬", title: "WhatsApp VIP", isHighlight: false },
+    { emoji: "🧠", title: "Mastermind", isHighlight: false }
+  ];
 
   useEffect(() => {
     loadUser();
@@ -65,7 +134,6 @@ export default function CTAPAYWALL() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // 🔥 P0-1: Guard paywall - si déjà payé → redirect
       if (currentUser.has_purchased) {
         navigate(createPageUrl('Dashboard'));
         return;
@@ -89,23 +157,14 @@ export default function CTAPAYWALL() {
 
     setIsCreatingCheckout(true);
     try {
-      console.log('=== Calling createCheckout ===');
-      console.log('hasOrderBump value:', hasOrderBump);
-      console.log('Sending to createCheckout:', { hasOrderBump });
-
       const { data } = await base44.functions.invoke('createCheckout', {
         hasOrderBump: hasOrderBump
       });
 
-      console.log('Checkout response:', data);
-
       if (data.success && data.url) {
-        // Sauvegarder le timestamp de clic paywall
         await base44.auth.updateMe({
           paywall_clicked_at: new Date().toISOString()
         });
-
-        // Rediriger vers Stripe Checkout (au niveau top pour éviter l'iframe)
         window.top.location.href = data.url;
       } else {
         alert('Erreur: impossible de créer la session de paiement');
@@ -118,116 +177,73 @@ export default function CTAPAYWALL() {
     }
   };
 
-  const handleSimulatePurchase = async () => {
-    if (!user) return;
-
-    setIsSimulating(true);
-    try {
-      await base44.functions.invoke('simulatePurchase');
-      navigate(createPageUrl('Dashboard'));
-    } catch (error) {
-      console.error('Error simulating purchase:', error);
-      alert('Erreur lors de la simulation.');
-    } finally {
-      setIsSimulating(false);
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
   }
 
   const completedSteps = [1, 2, 3, 4, 5, 6];
-
-  // 🔥 P0-1: Source of truth = session.finalized_offer
-  const finalizedOffer = session?.finalized_offer || {};
-  const productPrincipal = finalizedOffer.mainProduct;
-  const petitExtra = finalizedOffer.orderBump;
-  const offreSuperieure = finalizedOffer.upsell1;
-  const offrePremium = finalizedOffer.upsell3;
-
-  const products = [
-    {
-      label: 'Produit Principal',
-      data: productPrincipal,
-      multiplier: 30,
-      icon: ShoppingBag,
-      iconColor: 'text-orange-500',
-      bgColor: 'bg-orange-50',
-      priceColor: 'text-orange-600'
-    },
-    {
-      label: 'Order Bump',
-      data: petitExtra,
-      multiplier: 15,
-      icon: Gift,
-      iconColor: 'text-blue-500',
-      bgColor: 'bg-blue-50',
-      priceColor: 'text-blue-600'
-    },
-    {
-      label: 'Upsell',
-      data: offreSuperieure,
-      multiplier: 9,
-      icon: TrendingUp,
-      iconColor: 'text-purple-500',
-      bgColor: 'bg-purple-50',
-      priceColor: 'text-purple-600'
-    },
-    {
-      label: 'Premium',
-      data: offrePremium,
-      multiplier: 1,
-      icon: Crown,
-      iconColor: 'text-amber-500',
-      bgColor: 'bg-amber-50',
-      priceColor: 'text-amber-600'
-    }
-  ].filter(p => p.data);
-
-  // 🔥 P0-2: Utiliser potential_revenue (pas recalcul)
-  const potentialRevenue = session?.potential_revenue || 0;
+  const potentialRevenue = session?.potential_revenue || 3200;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex overflow-x-hidden w-full max-w-[100vw]">
+    <div className="min-h-screen bg-white flex overflow-x-hidden w-full max-w-[100vw]">
       <OnboardingSidebar currentPage="CTAPAYWALL" completedSteps={completedSteps} progressInStep={0} />
 
       <div className="flex-1 flex flex-col lg:ml-80 overflow-x-hidden w-full min-w-0">
-        <div className="w-full max-w-4xl mx-auto px-4 md:px-6 py-12 pt-28 md:pt-12 box-border">
+        
+        {/* Sticky Header Mobile */}
+        <div className="lg:hidden bg-gray-900 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
+          <div className="flex items-center gap-2">
+            <NoahBrainIcon size={32} />
+            <div>
+              <p className="text-white font-semibold text-xs">Pack Générateur</p>
+              <p className="text-gray-400 text-[10px]">+ 7j communauté</p>
+            </div>
+          </div>
+          <button 
+            onClick={handleGetAccess}
+            disabled={isCreatingCheckout}
+            className="bg-[#61f7a2] text-gray-900 font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-1"
+          >
+            {isCreatingCheckout ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{totalPrice}€ <ArrowRight className="w-4 h-4" /></>}
+          </button>
+        </div>
 
-          {/* Header */}
-          <motion.div
+        <div className="w-full max-w-2xl mx-auto px-4 py-8 space-y-6">
+
+          {/* SECTION 1: Hero */}
+          <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center"
           >
-            <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-full mb-6">
-              <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-              <span className="text-[#61f7a2] font-semibold text-sm">
-                ✅ Ton plan d'action validé
-              </span>
+            <div className="inline-flex items-center gap-1.5 bg-green-100 border border-green-300 px-3 py-1.5 rounded-full mb-4">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-green-600 font-semibold text-sm">Tout est prêt !</span>
             </div>
-
-            <h1 className="text-2xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-              On passe à l'action ?
+            <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+              Ton business est à<br /><span className="text-[#61f7a2]">un clic</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Tes offres t'attendent. Débloque-les maintenant.
+            <p className="text-gray-600 mb-4">
+              Noah a tout préparé. <strong>100% personnalisé.</strong>
             </p>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-blue-100 px-4 py-2 rounded-xl border border-green-200">
+              <span className="text-gray-700 text-sm">Potentiel :</span>
+              <span className="font-bold text-[#61f7a2]">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
+            </div>
           </motion.div>
 
-          {/* Vidéo Vimeo */}
+          {/* SECTION 2: VSL */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-12"
+            className="bg-gray-900 rounded-2xl p-4 overflow-hidden"
           >
-            <div className="relative w-full rounded-2xl overflow-hidden shadow-xl" style={{ paddingBottom: '56.25%' }}>
+            <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
               <iframe
                 src="https://player.vimeo.com/video/1161817300?h=4878f93b53&badge=0&autopause=0&player_id=0&app_id=58479"
                 className="absolute top-0 left-0 w-full h-full"
@@ -237,824 +253,483 @@ export default function CTAPAYWALL() {
                 title="Passion IA"
               />
             </div>
+            <p className="text-gray-400 text-xs text-center mt-3">Ce qui t'attend après le paiement</p>
           </motion.div>
 
-          {/* Tu as maintenant - VERSION ACCOMPLISSEMENT */}
+          {/* SECTION 3: Générateur Noah */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl border border-gray-200 shadow-sm p-4 md:p-8 mb-8 overflow-hidden"
+            className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-              ✅ Regarde ce que tu as maintenant
-            </h2>
-
-            <div className="space-y-3 mb-6">
-              {/* 1. Offres + Prix */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.25 }}
-                className="flex items-start gap-4 py-4 px-5 rounded-xl border-2 bg-orange-50 border-orange-200"
-              >
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm">
-                  <ShoppingBag className="w-6 h-6 text-orange-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-gray-900 font-bold mb-1">4 offres complètes + leurs prix</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Du petit produit à l'accompagnement premium, ton système d'offres est prêt
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* 2. Validation Marché */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className="flex items-start gap-4 py-4 px-5 rounded-xl border-2 bg-green-50 border-green-200"
-              >
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm">
-                  <CheckCircle className="w-6 h-6 text-green-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-gray-900 font-bold mb-1">Validation que ta passion est viable</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Ton expertise a de la valeur et le marché est prêt à payer pour
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* 3. Potentiel calculé */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.35 }}
-                className="flex items-start gap-4 py-4 px-5 rounded-xl border-2 bg-blue-50 border-blue-200"
-              >
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm">
-                  <BarChart3 className="w-6 h-6 text-blue-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-gray-900 font-bold mb-1">Potentiel de revenus basé sur des milliers de données</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {potentialRevenue > 0 ? `${potentialRevenue.toLocaleString('fr-FR')} €/mois` : 'Calculé selon ton marché et ton positionnement'}
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* 4. Plan de route */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex items-start gap-4 py-4 px-5 rounded-xl border-2 bg-purple-50 border-purple-200"
-              >
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white shadow-sm">
-                  <Target className="w-6 h-6 text-purple-500" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-gray-900 font-bold mb-1">Plan d'action exact et éprouvé</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Le protocole étape par étape pour passer de 0 à tes premières ventes
-                  </p>
-                </div>
-              </motion.div>
+            <div className="flex items-center gap-3 mb-4">
+              <NoahBrainIcon size={40} />
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">Le Générateur Noah</h2>
+                <p className="text-gray-500 text-xs">100% personnalisé à ton profil</p>
+              </div>
             </div>
-
-            <div className="bg-gradient-to-br from-[#61f7a2]/10 to-blue-50 rounded-2xl p-6 text-center">
-              <p className="text-gray-900 font-bold text-lg mb-2">
-                🎯 Tu as tout ce qu'il faut pour démarrer
-              </p>
-              <p className="text-gray-600">
-                Maintenant, on va t'aider à mettre tout ça en action
+            <div className="grid grid-cols-1 gap-1.5 mb-4">
+              {generatorFeatures.map((feature, i) => (
+                <div key={i} className={`flex items-center gap-2 p-2.5 rounded-lg text-sm ${i < 4 ? 'bg-green-50' : 'bg-gray-50'}`}>
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+            <div className="bg-green-100 rounded-xl p-3 border border-green-300 text-center">
+              <p className="text-gray-900 text-sm">
+                <strong className="text-[#61f7a2]">Jusqu'à 5 générations</strong> pour affiner tes offres
               </p>
             </div>
           </motion.div>
 
+          {/* SECTION 4: Dashboard Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <h2 className="text-lg font-bold text-gray-900 mb-2 text-center">
+              🎯 Ce qui t'attend dans ton dashboard
+            </h2>
+            <p className="text-gray-500 text-xs text-center mb-4">Tout est personnalisé pour toi</p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { emoji: "📊", label: "Analyse marché", color: "bg-orange-50" },
+                { emoji: "👥", label: "3 avatars", color: "bg-blue-50" },
+                { emoji: "🎯", label: "4 offres", color: "bg-purple-50" },
+                { emoji: "💬", label: "Messages", color: "bg-green-50" },
+                { emoji: "📄", label: "Pages vente", color: "bg-pink-50" },
+                { emoji: "📧", label: "8 emails", color: "bg-cyan-50" }
+              ].map((item, i) => (
+                <div key={i} className={`${item.color} rounded-xl p-3 text-center relative border border-gray-100`}>
+                  <span className="text-2xl">{item.emoji}</span>
+                  <p className="text-gray-900 text-[10px] font-medium mt-1">{item.label}</p>
+                  <span className="absolute top-1 right-1 bg-[#61f7a2] text-gray-900 text-[8px] px-1.5 py-0.5 rounded font-bold">PERSO</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
-
-          {/* Comparatif Sans/Avec */}
+          {/* SECTION 5: Plan 4 semaines */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="grid md:grid-cols-2 gap-6 mb-12"
+            className="bg-gray-900 rounded-2xl p-5"
           >
-            {/* Sans */}
-            <div className="bg-white rounded-2xl border-2 border-red-200 p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                  <X className="w-5 h-5 text-red-600" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Sans ce pack</h3>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2 text-gray-700">
-                  <X className="w-4 h-4 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Tu vas galérer seul(e)</span>
-                </li>
-                <li className="flex items-start gap-2 text-gray-700">
-                  <X className="w-4 h-4 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Tu ne sauras pas par où commencer</span>
-                </li>
-                <li className="flex items-start gap-2 text-gray-700">
-                  <X className="w-4 h-4 text-red-500 mt-1 flex-shrink-0" />
-                  <span>Tu risques d'abandonner</span>
-                </li>
-              </ul>
+            <h2 className="text-white font-bold mb-1">🗺️ Plan "Première vente en 7 jours"</h2>
+            <p className="text-gray-400 text-xs mb-4">Guide jour par jour + scripts + checklist</p>
+            <div className="space-y-2">
+              {weeks.map((week, i) => (
+                <WeekCard key={i} {...week} />
+              ))}
             </div>
-
-            {/* Avec */}
-            <div className="bg-gradient-to-br from-[#61f7a2]/20 to-green-50 rounded-2xl border-2 border-[#61f7a2] p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#61f7a2] flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Avec ce pack (recommandé)</h3>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2 text-gray-900">
-                  <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-1 flex-shrink-0" />
-                  <span className="font-medium">Tout est déjà prêt</span>
-                </li>
-                <li className="flex items-start gap-2 text-gray-900">
-                  <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-1 flex-shrink-0" />
-                  <span className="font-medium">Tu avances étape par étape</span>
-                </li>
-                <li className="flex items-start gap-2 text-gray-900">
-                  <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-1 flex-shrink-0" />
-                  <span className="font-medium">Tu es guidé(e) chaque jour</span>
-                </li>
-                <li className="flex items-start gap-2 text-gray-900">
-                  <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-1 flex-shrink-0" />
-                  <span className="font-medium">Tu lances cette semaine</span>
-                </li>
-              </ul>
+            <div className="bg-[#61f7a2]/20 rounded-xl p-3 mt-4 border border-[#61f7a2]/30">
+              <p className="text-white text-center text-sm">
+                <strong className="text-[#61f7a2]">De 0 à 10 ventes en 4 semaines</strong>
+              </p>
             </div>
           </motion.div>
 
-          {/* Bloc principal sombre - Le pack */}
+          {/* SECTION 6: 7 jours communauté */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-4 md:p-10 mb-8 text-white shadow-2xl overflow-hidden"
+            className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border-2 border-purple-300 p-5 relative"
           >
-
-
-            <h2 className="text-3xl font-bold mb-4 text-center">
-              Voici ce qu'on a préparé pour toi
-            </h2>
-            <p className="text-gray-300 text-center mb-10">
-              Tu n'achètes pas du contenu. Tu accèdes à un système qui travaille avec toi.
-            </p>
-
-            <div className="space-y-8">
-              {/* 1. Première vente à 27€ */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0">
-                    <Rocket className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">🚀 Ta première vente à {productPrincipal ? productPrincipal.price : '27€'}</h3>
-                    <ul className="space-y-2 text-gray-200">
-                      <li>• Messages déjà rédigés</li>
-                      <li>• Pas besoin de communauté</li>
-                      <li>• Pas besoin de te montrer</li>
-                      <li>• On te dit exactement quoi faire</li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="bg-[#61f7a2]/20 rounded-xl p-4 border border-[#61f7a2]">
-                  <p className="text-white font-bold">
-                    👉 Tu sais exactement quoi faire dès aujourd'hui pour ta première vente
-                  </p>
-                </div>
+            <span className="absolute top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
+              🎁 OFFERT
+            </span>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <span className="text-2xl">👥</span>
               </div>
-
-              {/* 2. Contenu déjà créé */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-                    <Package className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">📦 Tout le contenu déjà créé</h3>
-                    <ul className="space-y-2 text-gray-200 mb-3">
-                      <li>• Analyse de ton marché détaillée</li>
-                      <li>• Tes avatars futurs acheteurs</li>
-                      <li>• La page de vente de ton produit low ticket</li>
-                      <li>• Les messages à envoyer pour faire tes premières ventes</li>
-                      <li>• Tes emails marketing</li>
-                      <li>• Ton plan d'action jour par jour, à cocher pour avancer</li>
-                    </ul>
-                    <p className="text-[#61f7a2] italic">➡️ Tu copies, tu colles, tu appliques.</p>
-                  </div>
-                </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">7 jours communauté</h2>
+                <p className="text-gray-600 text-xs">Teste tout sans engagement</p>
               </div>
-
-              {/* 3. Protocole simple */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                    <Target className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">🧭 Le protocole simple à suivre</h3>
-                    <div className="grid grid-cols-2 gap-3 text-gray-200">
-                      <div className="bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold">S1 - Validation</p>
-                        <p className="text-sm">Ta première vente à 47€</p>
-                      </div>
-                      <div className="bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold">S2 - Création</p>
-                        <p className="text-sm">Création du petit extra • Revenus x2</p>
-                      </div>
-                      <div className="bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold">S3 - Automatisation</p>
-                        <p className="text-sm">Offre supérieure • Panier moyen x3</p>
-                      </div>
-                      <div className="bg-white/5 rounded-lg p-3">
-                        <p className="font-semibold">S4 - Croissance</p>
-                        <p className="text-sm">Offre high ticket • Automatisation</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. Accompagnement vidéo */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
-                    <Video className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">🎥 Accompagnement vidéo</h3>
-                    <ul className="space-y-2 text-gray-200">
-                      <li>• Comment contacter les gens</li>
-                      <li>• Comment vendre sans forcer</li>
-                      <li>• Comment améliorer ce qui fonctionne</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* 5. Communauté School BONUS */}
-              <div className="bg-gradient-to-br from-yellow-400/20 to-yellow-500/20 backdrop-blur-sm rounded-2xl p-6 border-2 border-yellow-400">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center flex-shrink-0">
-                    <Gift className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-bold">🤝 Accès à la communauté Skool</h3>
-                      <span className="bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
-                        BONUS
-                      </span>
-                    </div>
-                    <ul className="space-y-2 text-gray-200 mb-3">
-                      <li>• Groupe privé</li>
-                      <li>• Lives réguliers</li>
-                      <li>• Entraide + réponses</li>
-                    </ul>
-                    <div className="flex items-center gap-2">
-                      <span className="line-through text-gray-400">97€/mois</span>
-                      <span className="text-yellow-400 font-bold">GRATUIT À VIE</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 mb-4">
+              {skoolFeatures.map((feature, i) => (
+                <SkoolFeature key={i} {...feature} />
+              ))}
+            </div>
+            <div className="bg-white/80 rounded-xl p-2 border border-purple-200 text-center">
+              <p className="text-sm">
+                <strong className="text-purple-600">Valeur : 37€</strong> → <span className="text-[#61f7a2] font-bold">OFFERT</span>
+              </p>
             </div>
           </motion.div>
 
-          {/* Bloc émotionnel - Projection */}
+          {/* SECTION 7: Order Bump */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 rounded-3xl border-2 border-[#61f7a2]/40 p-4 md:p-10 mb-8 overflow-hidden"
-          >
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-              Imagine dans quelques jours…
-            </h2>
-
-            <div className="space-y-6 mb-8">
-              <p className="text-gray-700 leading-relaxed text-lg">
-                Aujourd'hui, tu as :
-              </p>
-              <ul className="space-y-2 ml-6">
-                <li className="text-gray-700">• une idée</li>
-                <li className="text-gray-700">• un savoir-faire</li>
-                <li className="text-gray-700">• une offre claire</li>
-                <li className="text-gray-700">• mais peut-être encore des doutes.</li>
-              </ul>
-
-              <p className="text-gray-700 leading-relaxed text-lg">
-                Dans quelques jours, tu peux avoir :
-              </p>
-              <ul className="space-y-2 ml-6">
-                <li className="text-gray-900 font-semibold">• ta première vente en ligne</li>
-                <li className="text-gray-900 font-semibold">• un message de quelqu'un qui te dit "merci"</li>
-                <li className="text-gray-900 font-semibold">• la preuve que c'est possible pour toi aussi</li>
-              </ul>
-            </div>
-
-            {/* AVANT / APRÈS */}
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="text-red-500">❌</span>
-                  Avant Passion IA
-                </h3>
-                <ul className="space-y-2 text-gray-700">
-                  <li>• Tu réfléchis trop</li>
-                  <li>• Tu ne sais pas par où commencer</li>
-                  <li>• Tu repousses le moment de te lancer</li>
-                  <li>• Tu doutes de toi</li>
-                </ul>
-              </div>
-
-              <div className="bg-gradient-to-br from-[#61f7a2]/20 to-green-100 rounded-2xl p-6 border-2 border-[#61f7a2]">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="text-[#61f7a2]">✅</span>
-                  Après Passion IA
-                </h3>
-                <ul className="space-y-2 text-gray-900 font-medium">
-                  <li>• Tu sais exactement quoi faire chaque jour</li>
-                  <li>• Tu passes à l'action sans te poser 1000 questions</li>
-                  <li>• Tu fais ta première vente</li>
-                  <li>• Tu prends confiance en toi et en ton projet</li>
-                </ul>
-              </div>
-            </div>
-
-          </motion.div>
-
-
-
-
-
-          {/* 🎬 ORDER BUMP - Pack Réseaux Sociaux */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.69 }}
-            className={`rounded-3xl p-6 mb-8 cursor-pointer transition-all duration-300 ${
-              hasOrderBump
-                ? 'bg-gradient-to-br from-[#61f7a2]/20 to-green-100 border-4 border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20'
-                : 'bg-white border-4 border-[#61f7a2] hover:shadow-lg hover:shadow-[#61f7a2]/10'
-            }`}
             onClick={() => setShowOrderBumpPopup(true)}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            className={`rounded-2xl p-5 cursor-pointer border-4 transition-all ${hasOrderBump ? 'bg-green-100 border-[#61f7a2] shadow-lg' : 'bg-white border-[#61f7a2]'}`}
           >
-            {/* Badge */}
-            <div className="flex justify-center mb-4">
-              <span className="bg-[#61f7a2] text-gray-900 text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1">
-                <Gift className="w-3 h-3" />
-                OFFRE SPÉCIALE
+            <div className="flex justify-center mb-3">
+              <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-full">
+                ⚡ -75% OFFRE SPÉCIALE
               </span>
             </div>
-
-            <div className="flex items-center gap-4">
-              {/* Checkbox visuelle */}
-              <div
-                className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                  hasOrderBump
-                    ? 'bg-[#61f7a2] border-[#61f7a2]'
-                    : 'border-gray-300 bg-white'
-                }`}
+            <div className="flex items-center gap-3">
+              <div 
+                className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 ${hasOrderBump ? 'bg-[#61f7a2] border-[#61f7a2]' : 'border-gray-300'}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setHasOrderBump(!hasOrderBump);
                 }}
               >
-                {hasOrderBump && <CheckCircle className="w-5 h-5 text-white" />}
+                {hasOrderBump && <CheckCircle className="w-4 h-4 text-white" />}
               </div>
-
-              {/* Icône */}
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-green-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-3xl">🎬</span>
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
+                <span className="text-xl">🎬</span>
               </div>
-
-              {/* Contenu */}
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-900 mb-1">
-                  🎁 Ajoute le Pack Réseaux Sociaux
-                </h3>
-                <p className="text-gray-600 mb-2">
-                  100+ Templates prêts à poster
-                </p>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-black text-[#61f7a2]">+37€</span>
-                  <span className="text-gray-400 line-through text-sm">147€</span>
-                  <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">
-                    -75%
-                  </span>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-gray-900">Pack Réseaux Sociaux</h3>
+                <p className="text-gray-600 text-[10px]">100+ templates prêts à poster</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-lg font-black text-[#61f7a2]">+{ORDER_BUMP_PRICE}€</span>
+                  <span className="text-gray-400 line-through text-xs">147€</span>
                 </div>
               </div>
-
-              {/* Bouton détails */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowOrderBumpPopup(true);
-                }}
-                className="px-4 py-2 bg-[#61f7a2]/20 text-[#61f7a2] font-semibold rounded-xl hover:bg-[#61f7a2]/30 transition-colors flex items-center gap-1"
-              >
-                Voir les détails
-                <ArrowRight className="w-4 h-4" />
-              </button>
             </div>
-
             {hasOrderBump && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="mt-4 pt-4 border-t border-[#61f7a2]/30"
+                className="mt-3 pt-3 border-t border-[#61f7a2]/30"
               >
-                <p className="text-[#61f7a2] font-semibold text-center flex items-center justify-center gap-2">
-                  <CheckCircle className="w-5 h-5" />
-                  Pack Réseaux Sociaux ajouté à ta commande !
+                <p className="text-[#61f7a2] font-semibold text-center text-xs flex items-center justify-center gap-1">
+                  <CheckCircle className="w-4 h-4" />
+                  Ajouté à ta commande !
                 </p>
               </motion.div>
             )}
           </motion.div>
 
-          {/* POPUP Order Bump Détails */}
-          {showOrderBumpPopup && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-              onClick={() => setShowOrderBumpPopup(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Header */}
-                <div className="bg-gradient-to-br from-[#61f7a2] to-green-500 p-6 rounded-t-3xl relative">
-                  <button
-                    onClick={() => setShowOrderBumpPopup(false)}
-                    className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
-                  >
-                    <X className="w-5 h-5 text-white" />
-                  </button>
-                  <div className="text-center">
-                    <span className="text-5xl mb-3 block">🎬</span>
-                    <h2 className="text-2xl font-bold text-white mb-2">
-                      Pack Réseaux Sociaux - 100+ Templates
-                    </h2>
-                    <div className="flex items-center justify-center gap-3">
-                      <span className="text-3xl font-black text-white">+37€</span>
-                      <span className="text-white/70 line-through">Valeur 147€</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contenu */}
-                <div className="p-6 space-y-6">
-                  {/* Instagram/TikTok */}
-                  <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-5 border border-pink-200">
-                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <span className="text-xl">📱</span>
-                      Instagram / TikTok
-                    </h3>
-                    <ul className="space-y-2 text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>30 scripts Reels adaptés à ton offre</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>20 hooks viraux pour capter l'attention</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>15 légendes de posts qui convertissent</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>10 CTA qui poussent à l'action</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Carrousels */}
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-5 border border-blue-200">
-                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <span className="text-xl">🎨</span>
-                      Carrousels
-                    </h3>
-                    <ul className="space-y-2 text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>15 templates Canva de carrousels éducatifs</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>Structures éprouvées pour présenter ton offre</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>Copywriting déjà fait, tu personnalises juste</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Stories */}
-                  <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-5 border border-orange-200">
-                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <span className="text-xl">📖</span>
-                      Stories
-                    </h3>
-                    <ul className="space-y-2 text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>20 séquences de stories pour vendre</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>Templates visuels + textes</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>Stratégie "Story to DM to Sale"</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* LinkedIn */}
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-300">
-                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <span className="text-xl">💼</span>
-                      LinkedIn
-                    </h3>
-                    <ul className="space-y-2 text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>10 posts viraux pour entrepreneurs</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>Formats qui génèrent de l'engagement</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>Templates de carrousels pro</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Ads */}
-                  <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-5 border border-red-200">
-                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <span className="text-xl">🎯</span>
-                      Ads Facebook / Instagram
-                    </h3>
-                    <ul className="space-y-2 text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>10 scripts de publicités testés</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>Accroches qui stoppent le scroll</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-[#61f7a2] mt-0.5 flex-shrink-0" />
-                        <span>Structure AIDA/PAS prête</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* BONUS */}
-                  <div className="bg-gradient-to-br from-yellow-100 to-amber-100 rounded-2xl p-5 border-2 border-yellow-400">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
-                        BONUS INCLUS
-                      </span>
-                    </div>
-                    <ul className="space-y-2 text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <Gift className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                        <span className="font-medium">Calendrier de contenu 30 jours</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Gift className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                        <span className="font-medium">Guide "Poster sans se montrer"</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Gift className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                        <span className="font-medium">Stratégie 1 post/jour en 15 min</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Footer avec checkbox et boutons */}
-                <div className="p-6 bg-gray-50 rounded-b-3xl border-t border-gray-200">
-                  {/* Grande checkbox */}
-                  <div
-                    className={`p-4 rounded-2xl mb-4 cursor-pointer transition-all ${
-                      checkboxInPopup
-                        ? 'bg-[#61f7a2]/20 border-2 border-[#61f7a2]'
-                        : 'bg-white border-2 border-gray-200 hover:border-[#61f7a2]/50'
-                    }`}
-                    onClick={() => setCheckboxInPopup(!checkboxInPopup)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                        checkboxInPopup
-                          ? 'bg-[#61f7a2] border-[#61f7a2]'
-                          : 'border-gray-300 bg-white'
-                      }`}>
-                        {checkboxInPopup && <CheckCircle className="w-5 h-5 text-white" />}
-                      </div>
-                      <span className="font-bold text-gray-900 text-lg">
-                        ☑️ OUI, j'ajoute le Pack Réseaux Sociaux (+37€)
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Boutons */}
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        setHasOrderBump(true);
-                        setShowOrderBumpPopup(false);
-                      }}
-                      className="flex-1 py-4 px-6 bg-[#61f7a2] text-gray-900 font-bold rounded-2xl hover:bg-[#4de88f] transition-colors text-lg flex items-center justify-center gap-2"
-                    >
-                      <CheckCircle className="w-5 h-5" />
-                      Ajouter au panier
-                    </button>
-                    <button
-                      onClick={() => {
-                        setCheckboxInPopup(false);
-                        setShowOrderBumpPopup(false);
-                      }}
-                      className="px-6 py-4 bg-gray-200 text-gray-600 font-semibold rounded-2xl hover:bg-gray-300 transition-colors"
-                    >
-                      Non merci
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* Bloc prix & urgence */}
+          {/* SECTION 8: Comparatif */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.7 }}
-            className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 rounded-3xl border-2 border-yellow-600 p-4 md:p-8 mb-8 shadow-2xl text-center overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+            className="grid grid-cols-2 gap-3"
           >
-            <div className="mb-4">
-              <span className="text-white/90 text-lg block mb-2">Prix normal</span>
-              <span className="text-white text-3xl line-through opacity-60">{hasOrderBump ? '444€' : '297€'}</span>
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center">
+                  <X className="w-4 h-4 text-red-500" />
+                </div>
+                <span className="font-bold text-gray-900 text-sm">Sans</span>
+              </div>
+              <ul className="space-y-2 text-xs text-gray-500">
+                <li className="flex items-start gap-1.5"><X className="w-3 h-3 text-red-400 flex-shrink-0 mt-0.5" /> Tu galères seul</li>
+                <li className="flex items-start gap-1.5"><X className="w-3 h-3 text-red-400 flex-shrink-0 mt-0.5" /> Tu abandonnes</li>
+              </ul>
             </div>
+            <div className="bg-green-100 rounded-xl border-2 border-[#61f7a2] p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-full bg-[#61f7a2] flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-bold text-gray-900 text-sm">Avec</span>
+              </div>
+              <ul className="space-y-2 text-xs text-gray-900 font-medium">
+                <li className="flex items-start gap-1.5"><CheckCircle className="w-3 h-3 text-[#61f7a2] flex-shrink-0 mt-0.5" /> Tout est prêt</li>
+                <li className="flex items-start gap-1.5"><CheckCircle className="w-3 h-3 text-[#61f7a2] flex-shrink-0 mt-0.5" /> <strong>1 vente en 7j</strong></li>
+              </ul>
+            </div>
+          </motion.div>
 
-            <div className="mb-6">
-              <span className="text-white/90 text-xl block mb-2">
-                {hasOrderBump ? 'Ton total avec le Pack Réseaux Sociaux' : 'Offre de lancement'}
-              </span>
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-white text-7xl font-black">{totalPrice}€</span>
+          {/* SECTION 9: Prix + CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-center relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 w-24 h-24 bg-[#61f7a2]/20 rounded-full blur-3xl" />
+            <div className="relative z-10">
+              <p className="text-gray-400 text-sm mb-2">Accès complet</p>
+              <div className="mb-4">
+                <span className="text-gray-500 line-through text-xl">297€</span>
+                <span className="text-white text-5xl md:text-6xl font-black ml-2">{totalPrice}€</span>
               </div>
               {hasOrderBump && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-3 bg-white/20 rounded-xl px-4 py-2 inline-flex items-center gap-2"
-                >
-                  <CheckCircle className="w-4 h-4 text-white" />
-                  <span className="text-white/90 text-sm">
-                    Pack Clé en Main (67€) + Pack Réseaux Sociaux (37€)
-                  </span>
-                </motion.div>
+                <p className="text-[#61f7a2] text-xs mb-4">
+                  Générateur (67€) + Pack RS (37€)
+                </p>
               )}
-              <p className="text-white/80 mt-2">Accès immédiat</p>
-            </div>
-
-            <div className="flex justify-center">
-              <GlowButton
+              <div className="flex flex-wrap justify-center gap-2 mb-5">
+                {["Générateur ∞", "Plan 4 sem", "7j communauté"].map((item, i) => (
+                  <span key={i} className="bg-white/10 text-white text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3 text-[#61f7a2]" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <button 
                 onClick={handleGetAccess}
                 disabled={isCreatingCheckout}
-                size="lg"
-                className="px-12 bg-white text-yellow-600 hover:bg-gray-100 font-bold"
+                className="w-full bg-[#61f7a2] text-gray-900 font-bold py-4 rounded-xl flex items-center justify-center gap-2 text-lg hover:bg-[#4de88f] transition-colors disabled:opacity-50"
               >
                 {isCreatingCheckout ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     Redirection...
                   </>
                 ) : (
                   <>
-                    ✨ Je veux lancer mon activité maintenant
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    ✨ Débloquer pour {totalPrice}€
                   </>
                 )}
-              </GlowButton>
+              </button>
+              <p className="text-gray-400 text-[10px] mt-3">🔒 Sécurisé • ⚡ Accès immédiat</p>
             </div>
-
-            <p className="text-white/70 text-sm mt-4">
-              Accès immédiat après paiement sécurisé
-            </p>
-
           </motion.div>
 
-          {/* Garantie */}
+          {/* SECTION 10: Garantie */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75 }}
+            className="bg-green-50 rounded-2xl border-2 border-green-300 p-5"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">Garantie "1 vente en 30 jours"</h3>
+                <p className="text-gray-600 text-xs">Ou remboursement, sans question</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl p-3 border border-green-200">
+              <p className="text-gray-700 text-sm text-center">
+                Tu fais ta 1ère vente (même mini-produit) ou <strong>remboursement total</strong>.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* SECTION 11: FAQ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl border-2 border-green-200 p-4 md:p-8 mb-8 text-center overflow-hidden"
+            className="space-y-2"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500 mb-4">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              ✅ Garantie Satisfait ou Remboursé 30 jours
-            </h3>
-            <p className="text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Teste le pack pendant 30 jours. Si tu ne vois pas la valeur, on te rembourse intégralement. Aucune justification nécessaire.
-            </p>
+            <h3 className="font-bold text-gray-900 text-center mb-3">Questions fréquentes</h3>
+            {[
+              { q: "J'ai accès à quoi ?", a: "Générateur (5 générations), 4 offres, messages, emails, plan 4 sem, 7j communauté" },
+              { q: "Besoin de tech ?", a: "Non. Tu copies, tu appliques. Tout est expliqué." },
+              { q: "Et si 0 vente ?", a: "Garantie 30 jours : remboursement intégral" }
+            ].map((faq, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="font-semibold text-gray-900 text-sm">{faq.q}</p>
+                <p className="text-gray-600 text-xs mt-1">{faq.a}</p>
+              </div>
+            ))}
           </motion.div>
 
-          {/* 🔥 P1-7: Promesse de continuité post-paiement */}
+          {/* SECTION 12: Final CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.85 }}
-            className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-200 p-6 mb-8 text-center"
+            className="text-center pb-8"
           >
-            <p className="text-gray-700 text-lg">
-              <strong className="text-gray-900">Après le paiement,</strong> tu accèdes immédiatement à ton dashboard.<br />
-              Tout ce que tu as créé ici t'y attend, prêt à être utilisé.
-            </p>
-          </motion.div>
-
-          {/* Final CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="text-center"
-          >
-            <p className="text-gray-900 mb-3 text-2xl font-bold">
-              Ton business personnalisé est prêt.
-            </p>
-            <p className="text-gray-700 mb-6 text-xl">
-              Il t'attend juste derrière ces portes.
-            </p>
-            <div className="flex justify-center mb-4">
-              <GlowButton
-                onClick={handleGetAccess}
-                disabled={isCreatingCheckout}
-                size="lg"
-                className="px-12"
-              >
-                {isCreatingCheckout ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Redirection...
-                  </>
-                ) : (
-                  <>
-                    Oui, je veux mon Pack Clé en Main
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </>
-                )}
-              </GlowButton>
-            </div>
-
-            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 text-gray-500 text-sm mt-8 pb-8">
-              <div className="flex items-center gap-2 text-gray-400">
-                <Shield className="w-4 h-4" />
-                <span>Paiement 100% sécurisé</span>
-              </div>
-              <div className="hidden md:block w-1 h-1 bg-gray-300 rounded-full" />
-              <div className="flex items-center gap-2 text-gray-600 font-medium">
-                <CheckCircle className="w-4 h-4 text-[#61f7a2]" />
-                <span>Satisfait ou remboursé 30 jours</span>
-              </div>
-            </div>
+            <p className="font-bold text-gray-900 text-lg mb-3">Ton business t'attend.</p>
+            <button 
+              onClick={handleGetAccess}
+              disabled={isCreatingCheckout}
+              className="bg-[#61f7a2] text-gray-900 font-bold px-8 py-4 rounded-xl flex items-center gap-2 mx-auto hover:bg-[#4de88f] transition-colors disabled:opacity-50"
+            >
+              {isCreatingCheckout ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Redirection...
+                </>
+              ) : (
+                <>
+                  C'est parti pour {totalPrice}€ <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
           </motion.div>
 
         </div>
+
+        {/* Sticky Bottom Desktop */}
+        <div className="hidden lg:flex bg-white border-t border-gray-200 p-4 items-center justify-center gap-6 sticky bottom-0">
+          <div>
+            <span className="text-gray-400 line-through text-sm">297€</span>
+            <span className="text-gray-900 font-bold text-2xl ml-2">{totalPrice}€</span>
+          </div>
+          <button 
+            onClick={handleGetAccess}
+            disabled={isCreatingCheckout}
+            className="bg-[#61f7a2] text-gray-900 font-bold px-8 py-3 rounded-xl flex items-center gap-2 hover:bg-[#4de88f] transition-colors disabled:opacity-50"
+          >
+            {isCreatingCheckout ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Redirection...
+              </>
+            ) : (
+              <>
+                Débloquer <ArrowRight className="w-5 h-5" />
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* POPUP Order Bump Détails */}
+      {showOrderBumpPopup && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowOrderBumpPopup(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-br from-[#61f7a2] to-green-500 p-5 rounded-t-3xl relative">
+              <button
+                onClick={() => setShowOrderBumpPopup(false)}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+              <div className="text-center">
+                <span className="text-4xl mb-2 block">🎬</span>
+                <h2 className="text-xl font-bold text-white mb-1">
+                  Pack Réseaux Sociaux
+                </h2>
+                <p className="text-white/80 text-sm mb-2">100+ Templates prêts à poster</p>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-2xl font-black text-white">+37€</span>
+                  <span className="text-white/60 line-through text-sm">147€</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Contenu */}
+            <div className="p-5 space-y-4">
+              {/* Instagram/TikTok */}
+              <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-4 border border-pink-200">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">📱</span>
+                  Instagram / TikTok
+                </h3>
+                <ul className="space-y-1.5 text-gray-700 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>30 scripts Reels adaptés à ton offre</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>20 hooks viraux pour capter l'attention</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>15 légendes de posts qui convertissent</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Carrousels */}
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">🎨</span>
+                  Carrousels
+                </h3>
+                <ul className="space-y-1.5 text-gray-700 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>15 templates Canva de carrousels éducatifs</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>Copywriting déjà fait, tu personnalises juste</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Stories */}
+              <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-200">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">📖</span>
+                  Stories
+                </h3>
+                <ul className="space-y-1.5 text-gray-700 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>20 séquences de stories pour vendre</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#61f7a2] mt-0.5 flex-shrink-0" />
+                    <span>Stratégie "Story to DM to Sale"</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* BONUS */}
+              <div className="bg-gradient-to-br from-yellow-100 to-amber-100 rounded-xl p-4 border-2 border-yellow-400">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-yellow-400 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
+                    BONUS
+                  </span>
+                </div>
+                <ul className="space-y-1.5 text-gray-700 text-sm">
+                  <li className="flex items-start gap-2">
+                    <Gift className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span className="font-medium">Calendrier de contenu 30 jours</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Gift className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <span className="font-medium">Guide "Poster sans se montrer"</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 bg-gray-50 rounded-b-3xl border-t border-gray-200">
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setHasOrderBump(true);
+                    setShowOrderBumpPopup(false);
+                  }}
+                  className="flex-1 py-3 px-4 bg-[#61f7a2] text-gray-900 font-bold rounded-xl hover:bg-[#4de88f] transition-colors flex items-center justify-center gap-2"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  Ajouter au panier
+                </button>
+                <button
+                  onClick={() => setShowOrderBumpPopup(false)}
+                  className="px-5 py-3 bg-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-300 transition-colors"
+                >
+                  Non merci
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

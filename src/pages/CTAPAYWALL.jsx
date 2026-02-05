@@ -527,29 +527,6 @@ export default function CTAPAYWALL() {
 
         </div>
 
-        {/* Sticky Bottom Desktop */}
-        <div className="hidden lg:flex bg-white border-t border-gray-200 p-4 items-center justify-center gap-6 sticky bottom-0">
-          <div>
-            <span className="text-gray-400 line-through text-sm">297€</span>
-            <span className="text-gray-900 font-bold text-2xl ml-2">{totalPrice}€</span>
-          </div>
-          <button 
-            onClick={handleCTAClick}
-            disabled={isCreatingCheckout}
-            className="bg-[#61f7a2] text-gray-900 font-bold px-8 py-3 rounded-xl flex items-center gap-2 hover:bg-[#4de88f] transition-colors disabled:opacity-50"
-          >
-            {isCreatingCheckout ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Redirection...
-              </>
-            ) : (
-              <>
-                Débloquer <ArrowRight className="w-5 h-5" />
-              </>
-            )}
-          </button>
-        </div>
       </div>
 
       {/* POPUP Order Bump Détails */}

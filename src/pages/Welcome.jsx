@@ -88,22 +88,8 @@ export default function TeaserPage() {
 
       {/* Header */}
       <header className="header-welcome">
-        <div className="logo-section">
-          <div className="logo-icon">
-            <SparkleIcon size={16} color="white" className="logo-sparkle-mobile" />
-            <SparkleIcon size={20} color="white" className="logo-sparkle-desktop" />
-          </div>
-          <div className="logo-text">
-            <span className="logo-title">PassionIA</span>
-            <span className="logo-subtitle">Transforme ton savoir en business</span>
-          </div>
-        </div>
-        
-        {/* Bouton */}
-        <div className="header-buttons">
-          <a href="/OnboardingFirstName" className="btn-demarrer">
-            Démarrer gratuitement
-          </a>
+        <div className="logo-icon">
+          <SparkleIcon size={20} color="white" />
         </div>
       </header>
 

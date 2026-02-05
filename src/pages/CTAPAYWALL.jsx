@@ -186,7 +186,7 @@ export default function CTAPAYWALL() {
   }
 
   const completedSteps = [1, 2, 3, 4, 5, 6];
-  const potentialRevenue = session?.potential_revenue || 3200;
+  const potentialRevenue = session?.potential_revenue || 0;
 
   return (
     <div className="min-h-screen bg-white flex overflow-x-hidden w-full max-w-[100vw]">
@@ -230,10 +230,12 @@ export default function CTAPAYWALL() {
             <p className="text-gray-600 mb-4">
               Noah a tout préparé. <strong>100% personnalisé.</strong>
             </p>
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-blue-100 px-4 py-2 rounded-xl border border-green-200">
-              <span className="text-gray-700 text-sm">Potentiel :</span>
-              <span className="font-bold text-[#61f7a2]">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
-            </div>
+            {potentialRevenue > 0 && (
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-blue-100 px-4 py-2 rounded-xl border border-green-200">
+                <span className="text-gray-700 text-sm">Potentiel :</span>
+                <span className="font-bold text-[#61f7a2]">{potentialRevenue.toLocaleString('fr-FR')} €/mois</span>
+              </div>
+            )}
           </motion.div>
 
           {/* SECTION 2: VSL */}

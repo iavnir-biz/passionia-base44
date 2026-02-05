@@ -417,27 +417,25 @@ export default function TeaserPage() {
           gap: 8px;
         }
 
-        .btn-connexion {
+        .btn-demarrer {
           display: inline-flex;
           align-items: center;
-          padding: 6px 12px;
-          background: white;
-          color: #111;
-          border: 1.5px solid #111;
+          padding: 8px 16px;
+          background: linear-gradient(135deg, #1a1a1a, #000);
+          color: white;
+          border: none;
           border-radius: 999px;
           font-size: 12px;
-          font-weight: 600;
+          font-weight: 700;
           cursor: pointer;
           text-decoration: none;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.15);
         }
 
-        .btn-connexion:hover {
-          background: #f5f5f5;
-        }
-
-        .btn-demarrer {
-          display: none;
+        .btn-demarrer:hover {
+          box-shadow: 0 4px 20px rgba(97,247,162,0.4);
+          transform: translateY(-1px);
         }
 
         /* Desktop styles */

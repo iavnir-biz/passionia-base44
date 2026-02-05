@@ -64,8 +64,9 @@ return (
             e.stopPropagation(); // ✅ évite toggle parent
             setIsExpanded(!isExpanded);
           }}
-          className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+          className="flex items-center gap-1.5 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
         >
+          <span className="text-xs font-medium hidden sm:inline">Détail de la mission</span>
           <ChevronDown
             className={cn("w-5 h-5 transition-transform", isExpanded && "rotate-180")}
           />

@@ -87,13 +87,10 @@ export default function DayCard({
         </div>
 
         {!isLocked && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-400 hidden sm:inline">Détail de la mission</span>
-            <ChevronDown className={cn(
-              "w-5 h-5 transition-transform text-gray-400",
-              isExpanded && "rotate-180"
-            )} />
-          </div>
+          <ChevronDown className={cn(
+            "w-5 h-5 transition-transform text-gray-400",
+            isExpanded && "rotate-180"
+          )} />
         )}
       </button>
 

@@ -51,7 +51,7 @@ const ONBOARDING_STEPS = [
   },
   {
     id: 5,
-    title: 'Ta niche',
+    title: 'Ton marché',
     icon: BarChart3,
     pages: ['BonneNouvelle'],
     color: 'from-green-500 to-emerald-500',

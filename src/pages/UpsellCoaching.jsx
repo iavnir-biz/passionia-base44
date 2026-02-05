@@ -220,20 +220,26 @@ export default function UpsellCoaching() {
     }
   };
 
+  // Animation d'entrée
+  const [isVisible, setIsVisible] = useState(false);
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 100);
+  }, []);
+
   // ========================================================================
   // RENDER
   // ========================================================================
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white flex items-center justify-center">
+      <div className="min-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white">
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+    <div className="min-h-screen bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className={`w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 my-8 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
         
         {/* ================================================================ */}
         {/* HEADER */}
@@ -484,3 +490,5 @@ export default function UpsellCoaching() {
     </div>
   );
 }
+
+// Note: The closing div was already present, just reformatting the structure

@@ -296,34 +296,6 @@ export default function CTAPAYWALL() {
             </div>
           </motion.div>
 
-          {/* SECTION 4: Dashboard Preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <h2 className="text-lg font-bold text-gray-900 mb-2 text-center">
-              🎯 Ce qui t'attend dans ton dashboard
-            </h2>
-            <p className="text-gray-500 text-xs text-center mb-4">Tout est personnalisé pour toi</p>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { emoji: "📊", label: "Analyse marché", color: "bg-orange-50" },
-                { emoji: "👥", label: "3 avatars", color: "bg-blue-50" },
-                { emoji: "🎯", label: "4 offres", color: "bg-purple-50" },
-                { emoji: "💬", label: "Messages", color: "bg-green-50" },
-                { emoji: "📄", label: "Pages vente", color: "bg-pink-50" },
-                { emoji: "📧", label: "8 emails", color: "bg-cyan-50" }
-              ].map((item, i) => (
-                <div key={i} className={`${item.color} rounded-xl p-3 text-center relative border border-gray-100`}>
-                  <span className="text-2xl">{item.emoji}</span>
-                  <p className="text-gray-900 text-[10px] font-medium mt-1">{item.label}</p>
-                  <span className="absolute top-1 right-1 bg-[#61f7a2] text-gray-900 text-[8px] px-1.5 py-0.5 rounded font-bold">PERSO</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
           {/* SECTION 5: Plan 4 semaines */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -133,7 +133,7 @@ export default function OfferTaVieFuture() {
   };
 
   const handleTransitionComplete = () => {
-    navigate(createPageUrl('OfferConcretement'));
+    navigate(createPageUrl('CTAPAYWALL'));
   };
 
   if (isLoading || isGenerating) {

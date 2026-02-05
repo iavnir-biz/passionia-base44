@@ -69,14 +69,14 @@ const ONBOARDING_STEPS = [
     id: 7,
     title: "Ton plan d'action",
     icon: Map,
-    pages: ['OfferConcretement', 'PlanAction'],
+    pages: ['PlanAction'],
     color: 'from-indigo-500 to-purple-500',
     bgColor: '#6366f1'
   },
   {
     id: 8,
-    title: 'Bienvenue',
-    icon: PartyPopper,
+    title: "Ton plan d'action",
+    icon: Map,
     pages: ['CTAPAYWALL', 'Dashboard'],
     color: 'from-[#61f7a2] to-[#4de88f]',
     bgColor: '#61f7a2'

@@ -72,7 +72,6 @@ import MyOffers from './pages/MyOffers';
 import NoahGeneration from './pages/NoahGeneration';
 import NovaChat from './pages/NovaChat';
 import NovaGeneration from './pages/NovaGeneration';
-import OfferConcretement from './pages/OfferConcretement';
 import OfferGenerationStart from './pages/OfferGenerationStart';
 import OfferPetitExtra from './pages/OfferPetitExtra';
 import OfferPremium from './pages/OfferPremium';
@@ -153,7 +152,6 @@ export const PAGES = {
     "NoahGeneration": NoahGeneration,
     "NovaChat": NovaChat,
     "NovaGeneration": NovaGeneration,
-    "OfferConcretement": OfferConcretement,
     "OfferGenerationStart": OfferGenerationStart,
     "OfferPetitExtra": OfferPetitExtra,
     "OfferPremium": OfferPremium,

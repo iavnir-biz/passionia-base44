@@ -344,10 +344,10 @@ export default function OfferGenerationStart() {
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white overflow-x-hidden">
       {/* Contenu principal */}
-      <div className="h-full flex items-center justify-center py-8">
-        <div className="max-w-2xl w-full px-6">
+      <div className="min-h-screen flex flex-col items-center justify-start pt-24 lg:pt-8 pb-12 px-6">
+        <div className="max-w-2xl w-full">
           {/* Nova AI Avatar avec cerveau animé */}
           <motion.div
             animate={{ 

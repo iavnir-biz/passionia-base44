@@ -172,29 +172,25 @@ export default function DownsellSession() {
         {/* ================================================================ */}
         {/* HEADER */}
         {/* ================================================================ */}
-        <div className="text-center mb-8">
+        <div className="text-center p-6 sm:p-8">
           {/* Icône */}
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl shadow-lg shadow-amber-200 mb-6">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl shadow-lg shadow-amber-200 mb-4">
             <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
 
           {/* Titre */}
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
             Attends{firstName ? ` ${firstName}` : ''} — On comprend.
           </h1>
 
           {/* Sous-titre */}
-          <div className="max-w-xl mx-auto text-gray-600 text-lg leading-relaxed">
-            <p className="mb-3">
-              497€, c'est un investissement. Et peut-être que tu n'as pas besoin de tout l'accompagnement VIP pour démarrer.
+          <div className="text-gray-600 text-base leading-relaxed">
+            <p className="mb-2">
+              497€, c'est un investissement. Mais partir <span className="font-semibold text-gray-800">sans AUCUN accompagnement</span> ?
             </p>
-            <p className="mb-3">
-              Mais partir <span className="font-semibold text-gray-800">sans AUCUN accompagnement</span> ?<br />
-              C'est le meilleur moyen de rejoindre les 90% qui n'obtiennent jamais de résultats.
-            </p>
-            <p className="text-[#61f7a2] font-semibold text-xl">
+            <p className="text-[#61f7a2] font-semibold text-lg">
               On a une solution intermédiaire pour toi...
             </p>
           </div>
@@ -203,10 +199,10 @@ export default function DownsellSession() {
         {/* ================================================================ */}
         {/* CARD PRINCIPALE */}
         {/* ================================================================ */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden mb-8">
+        <div className="border-t border-gray-100">
           
           {/* Header Card */}
-          <div className="p-6 sm:p-8 border-b border-gray-100">
+          <div className="p-5 sm:p-6 border-b border-gray-100 bg-gray-50">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <span className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-semibold mb-3">
@@ -226,7 +222,7 @@ export default function DownsellSession() {
           </div>
 
           {/* Ce qui est inclus */}
-          <div className="p-6 sm:p-8 space-y-4">
+          <div className="p-5 sm:p-6 space-y-3 max-h-[250px] overflow-y-auto">
             {inclus.map((item, index) => (
               <div 
                 key={index}
@@ -252,111 +248,66 @@ export default function DownsellSession() {
         </div>
 
         {/* ================================================================ */}
-        {/* COMPARATIF VISUEL */}
+        {/* BLOC PRIX COMPACT */}
         {/* ================================================================ */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-8">
-          <div className="grid grid-cols-3 bg-gray-50 border-b border-gray-200">
-            <div className="p-4 font-semibold text-gray-700"></div>
-            <div className="p-4 text-center border-l border-gray-200">
-              <p className="font-bold text-gray-900">COACHING VIP</p>
-              <p className="text-gray-500 text-sm">497€</p>
-            </div>
-            <div className="p-4 text-center border-l border-gray-200 bg-[#61f7a2]/10">
-              <p className="font-bold text-[#61f7a2]">SESSION DÉCLIC</p>
-              <p className="text-[#61f7a2] text-sm font-semibold">197€</p>
-            </div>
-          </div>
-          {comparatif.map((row, index) => (
-            <div key={index} className="grid grid-cols-3 border-b border-gray-100 last:border-b-0">
-              <div className="p-4 text-gray-700 font-medium">{row.feature}</div>
-              <div className="p-4 text-center border-l border-gray-100 text-gray-600">
-                {typeof row.vip === 'boolean' ? (
-                  row.vip ? <Check className="w-5 h-5 text-[#61f7a2] mx-auto" /> : <X className="w-5 h-5 text-gray-300 mx-auto" />
-                ) : (
-                  row.vip
-                )}
-              </div>
-              <div className="p-4 text-center border-l border-gray-100 bg-[#61f7a2]/5 text-gray-600">
-                {typeof row.declic === 'boolean' ? (
-                  row.declic ? <Check className="w-5 h-5 text-[#61f7a2] mx-auto" /> : <X className="w-5 h-5 text-gray-300 mx-auto" />
-                ) : (
-                  row.declic
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ================================================================ */}
-        {/* BLOC PRIX */}
-        {/* ================================================================ */}
-        <div className="bg-gradient-to-br from-[#61f7a2]/5 to-[#4de88f]/5 rounded-3xl p-6 sm:p-8 mb-8 border-2 border-[#61f7a2]/20">
+        <div className="bg-gradient-to-br from-[#61f7a2]/10 to-[#4de88f]/10 p-5 sm:p-6 border-t border-gray-100">
           <div className="text-center">
-            <p className="text-gray-500 mb-2">
-              Valeur de cette formule : <span className="font-semibold">397€</span>
+            <p className="text-gray-400 text-sm mb-1">
+              Valeur : <span className="line-through">397€</span>
             </p>
-            <div className="h-px bg-[#61f7a2]/20 max-w-xs mx-auto my-4"></div>
-            <p className="text-[#61f7a2] font-bold text-lg mb-2">
-              🎁 TON PRIX AUJOURD'HUI :
-            </p>
-            <p className="text-6xl sm:text-7xl font-black text-[#61f7a2] mb-4">
+            <p className="text-4xl sm:text-5xl font-black text-[#61f7a2] mb-2">
               197€
             </p>
-            <div className="inline-flex items-center gap-2 bg-[#61f7a2] text-white px-6 py-3 rounded-full text-lg font-bold">
+            <div className="inline-flex items-center gap-2 bg-[#61f7a2] text-white px-4 py-2 rounded-full text-sm font-bold">
               Tu économises 200€
             </div>
           </div>
         </div>
 
         {/* ================================================================ */}
-        {/* URGENCE */}
+        {/* URGENCE COMPACT */}
         {/* ================================================================ */}
-        <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 mb-8 text-center">
-          <div className="flex items-center justify-center gap-2 text-amber-700 font-semibold mb-2">
-            <AlertTriangle className="w-5 h-5" />
+        <div className="bg-amber-50 border-t border-amber-200 p-4 text-center">
+          <div className="flex items-center justify-center gap-2 text-amber-700 font-semibold text-sm">
+            <AlertTriangle className="w-4 h-4" />
             Cette offre est uniquement disponible MAINTENANT.
           </div>
-          <p className="text-amber-700">
-            Si tu quittes cette page, tu ne reverras plus jamais ce prix.
-          </p>
         </div>
 
         {/* ================================================================ */}
         {/* CTA */}
         {/* ================================================================ */}
-        <div className="text-center space-y-4">
+        <div className="p-5 sm:p-6 bg-white border-t border-gray-100 space-y-3">
           <button
             onClick={handleAcceptOffer}
             disabled={isCreatingCheckout}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#61f7a2] text-white text-xl font-bold px-12 py-5 rounded-2xl shadow-xl shadow-[#61f7a2]/20 transition-all hover:scale-105 active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#61f7a2] to-[#4de88f] hover:from-[#4de88f] hover:to-[#61f7a2] text-white text-lg font-bold px-8 py-4 rounded-xl shadow-lg shadow-[#61f7a2]/20 transition-all hover:scale-[1.02] active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCreatingCheckout ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Check className="w-6 h-6" />
+              <Check className="w-5 h-5" />
             )}
             {isCreatingCheckout ? 'Redirection...' : 'OUI, je prends la Session Déclic — 197€'}
           </button>
           
-          <div>
-            <button
-              onClick={handleDeclineOffer}
-              disabled={isCreatingCheckout}
-              className="text-gray-500 hover:text-gray-700 underline underline-offset-4 transition-colors disabled:opacity-50"
-            >
-              Non merci, je me lance vraiment seul →
-            </button>
-          </div>
+          <button
+            onClick={handleDeclineOffer}
+            disabled={isCreatingCheckout}
+            className="w-full text-gray-500 hover:text-gray-700 underline underline-offset-4 transition-colors disabled:opacity-50 text-sm py-2"
+          >
+            Non merci, je me lance vraiment seul →
+          </button>
 
           {/* Garanties */}
-          <div className="flex flex-wrap items-center justify-center gap-6 pt-6 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              Paiement 100% sécurisé
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs text-gray-500">
+            <div className="flex items-center gap-1">
+              <Shield className="w-3 h-3" />
+              Paiement sécurisé
             </div>
-            <div className="flex items-center gap-2">
-              <Check className="w-4 h-4" />
-              Satisfait ou remboursé 14 jours
+            <div className="flex items-center gap-1">
+              <Check className="w-3 h-3" />
+              Remboursé 14j
             </div>
           </div>
         </div>

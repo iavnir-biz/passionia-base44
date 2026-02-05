@@ -229,7 +229,7 @@ export default function OfferTaVieFuture() {
                 <Map className="w-4 h-4 text-white" />
               </div>
               <p className="text-sm text-amber-900 leading-relaxed">
-                Ton <span className="font-semibold">plan d'action sur mesure</span> a été généré pour donner vie à cette projection, étape par étape, dans <span className="font-semibold">ton dashboard</span> ! 🗺️
+                Pour donner vie à cette projection de ta vie future, un <span className="font-semibold">plan d'action sur-mesure sur 30 jours</span>, personnalisé à ton profil et à tes offres, a été créé dans <span className="font-semibold">ton dashboard final</span>.
               </p>
             </motion.div>
 

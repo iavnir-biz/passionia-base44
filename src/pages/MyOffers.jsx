@@ -5,7 +5,7 @@ import { calculateProgressFromSession } from '@/utils/progressUtils';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import UpgradeModal from '@/components/paywall/UpgradeModal';
-import { Sparkles, Loader2, Copy, Package, ShoppingCart, TrendingUp, Crown, Brain, Download, FileText, Video, FileCheck, Users, Clock, Target } from 'lucide-react';
+import { Sparkles, Loader2, Copy, Package, ShoppingCart, TrendingUp, Crown, Brain, Download, FileText, Video, FileCheck, Users, Clock, Target, Lightbulb, ArrowLeftRight, ChevronDown } from 'lucide-react';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import GlowButton from '@/components/ui/GlowButton';
@@ -21,6 +21,7 @@ export default function MyOffers() {
   const [generatedOffers, setGeneratedOffers] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [hasPremium, setHasPremium] = useState(false);
+  const [expandedAlternatives, setExpandedAlternatives] = useState({});
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -306,6 +307,43 @@ ${offer.ecosystem_role ? 'Rôle dans le funnel:\n' + offer.ecosystem_role : ''}
     }
   ];
 
+  // Mapping offerType.id -> offerChoices key + finalized_offer key
+  const choicesMapping = {
+    low: { choicesKey: 'mainProductChoices', finalizedKey: 'mainProduct', ideaKey: 'mainProduct' },
+    bump: { choicesKey: 'orderBump1Choices', finalizedKey: 'orderBump', ideaKey: 'orderBump' },
+    mid: { choicesKey: 'upsell1Choices', finalizedKey: 'upsell1', ideaKey: 'upsell1' },
+    high: { choicesKey: 'upsell3Choices', finalizedKey: 'upsell3', ideaKey: 'upsell3' }
+  };
+
+  const getAlternativeOffer = (offerTypeId) => {
+    if (!session?.offer_generation?.offerChoices) return null;
+    const mapping = choicesMapping[offerTypeId];
+    if (!mapping) return null;
+
+    const choices = session.offer_generation.offerChoices[mapping.choicesKey];
+    if (!choices || choices.length < 2) return null;
+
+    const finalized = session.finalized_offer?.[mapping.finalizedKey];
+    if (!finalized) return null;
+
+    // Find the choice that wasn't selected (compare by title since IDs may differ)
+    const alternative = choices.find(c => c.title !== finalized.title);
+    return alternative || choices[1]; // fallback to second choice
+  };
+
+  const getUserIdea = (offerTypeId) => {
+    const mapping = choicesMapping[offerTypeId];
+    if (!mapping) return null;
+    return session?.user_ideas?.[mapping.ideaKey] || null;
+  };
+
+  const toggleAlternative = (offerTypeId) => {
+    setExpandedAlternatives(prev => ({
+      ...prev,
+      [offerTypeId]: !prev[offerTypeId]
+    }));
+  };
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -582,6 +620,53 @@ ${offer.ecosystem_role ? 'Rôle dans le funnel:\n' + offer.ecosystem_role : ''}
                             </GlowButton>
                           )}
                         </div>
+
+                        {/* Idee utilisateur */}
+                        {getUserIdea(offerType.id) && (
+                          <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+                              <span className="text-xs font-semibold text-amber-800">Ton idee</span>
+                            </div>
+                            <p className="text-xs text-amber-700 italic">"{getUserIdea(offerType.id)}"</p>
+                          </div>
+                        )}
+
+                        {/* Voir l'alternative */}
+                        {getAlternativeOffer(offerType.id) && (
+                          <div className="mt-3">
+                            <button
+                              onClick={() => toggleAlternative(offerType.id)}
+                              className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-700 font-medium transition-colors"
+                            >
+                              <ArrowLeftRight className="w-3.5 h-3.5" />
+                              Voir l'autre proposition de Noah
+                              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedAlternatives[offerType.id] ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {expandedAlternatives[offerType.id] && (() => {
+                              const alt = getAlternativeOffer(offerType.id);
+                              return (
+                                <div className="mt-2 bg-gray-100 border border-gray-200 rounded-xl p-4 transition-all">
+                                  <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-2">Proposition alternative</p>
+                                  <h4 className="text-sm font-bold text-gray-900 mb-1">{alt.title}</h4>
+                                  <p className="text-lg font-bold text-gray-800 mb-2">{alt.price}</p>
+                                  {alt.productType && (
+                                    <span className="inline-block text-xs bg-white border border-gray-200 rounded-full px-2 py-0.5 text-gray-600 mb-2">{alt.productType}</span>
+                                  )}
+                                  {alt.description && (
+                                    <p className="text-xs text-gray-600 mb-2">{alt.description}</p>
+                                  )}
+                                  {alt.outcome && (
+                                    <p className="text-xs text-gray-700">
+                                      <span className="font-semibold">Resultat :</span> {alt.outcome}
+                                    </p>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
                       </>
                     ) : (
                       <GlowButton

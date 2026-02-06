@@ -6,6 +6,7 @@ import { Loader2, Video, FileText, Headphones, CheckSquare, BookOpen, Graduation
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 import OfferTransition from '@/components/offer/OfferTransition';
 import OfferSidebar from '@/components/onboarding/OfferSidebar';
+import UserIdeaBlock from '@/components/offer/UserIdeaBlock';
 
 // Fonction pour déterminer l'icône selon le type de produit
 const getProductIcon = (offer) => {
@@ -182,6 +183,15 @@ export default function OfferProductPrincipal() {
                 colorScheme="blue" />
               )}
             </div>
+          )}
+
+          {/* Bloc idee utilisateur */}
+          {session && (
+            <UserIdeaBlock
+              sessionId={session.id}
+              offerKey="mainProduct"
+              existingIdeas={session.user_ideas}
+            />
           )}
 
           {isSaving &&

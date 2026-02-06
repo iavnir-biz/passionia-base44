@@ -6,6 +6,7 @@ import { Loader2, Presentation, GraduationCap, Video, BookOpen, Users } from 'lu
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 import OfferTransition from '@/components/offer/OfferTransition';
 import OfferSidebar from '@/components/onboarding/OfferSidebar';
+import UserIdeaBlock from '@/components/offer/UserIdeaBlock';
 
 // Fonction pour déterminer l'icône selon le type de produit
 const getProductIcon = (offer) => {
@@ -146,6 +147,15 @@ export default function OfferSuperieure() {
                 />
               ))}
             </div>
+          )}
+
+          {/* Bloc idee utilisateur */}
+          {session && (
+            <UserIdeaBlock
+              sessionId={session.id}
+              offerKey="upsell1"
+              existingIdeas={session.user_ideas}
+            />
           )}
 
           {isSaving && (

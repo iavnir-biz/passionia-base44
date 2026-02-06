@@ -337,7 +337,11 @@ export default function CTAPAYWALL() {
 
   // Ouvre le popup Order Bump quand on clique sur un CTA
   const handleCTAClick = () => {
-    if (!user) return;
+    if (!user) {
+      // Rediriger vers login si pas connecté
+      base44.auth.redirectToLogin(window.location.href);
+      return;
+    }
     setShowOrderBumpPopup(true);
   };
 

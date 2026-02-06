@@ -1,170 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { NoahBrainIcon } from '@/components/NoahBrainIcon';
-import GlowButton from '@/components/ui/GlowButton';
-import { Input } from '@/components/ui/input';
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { motion } from "framer-motion";
+import { Brain, Target, TrendingUp, FileText, Rocket, Check, ArrowRight } from "lucide-react";
 
-export default function OnboardingFirstName() {
+const steps = [
+  {
+    icon: Target,
+    color: "text-blue-500",
+    bg: "bg-blue-50",
+    title: "On valide ton idee ensemble",
+    desc: "Je verifie si ta passion peut se vendre — avec de la vraie demande.",
+  },
+  {
+    icon: TrendingUp,
+    color: "text-pink-500",
+    bg: "bg-pink-50",
+    title: "On estime ton potentiel",
+    desc: "Combien tu peux generer, avec ton savoir et ton marche.",
+  },
+  {
+    icon: FileText,
+    color: "text-amber-500",
+    bg: "bg-amber-50",
+    title: "Je cree tes 4 offres",
+    desc: "Offres, prix, page de vente, messages, emails — tout est pret.",
+  },
+  {
+    icon: Rocket,
+    color: "text-green-500",
+    bg: "bg-green-50",
+    title: "Ton plan d'action sur 7 jours",
+    desc: "Une action par jour. Tu sais exactement quoi faire.",
+  },
+];
+
+export default function Welcome() {
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [showContent, setShowContent] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth) {
-          base44.auth.redirectToLogin(window.location.href);
-          return;
-        }
-        setIsCheckingAuth(false);
-        // Petit delai pour laisser l'avatar apparaitre puis reveal le contenu
-        setTimeout(() => setShowContent(true), 600);
-      } catch (error) {
-        console.error('Auth check error:', error);
-        base44.auth.redirectToLogin(window.location.href);
-      }
-    };
-    checkAuth();
-  }, []);
-
-  const handleNext = async () => {
-    if (!firstName.trim()) return;
-
-    setIsLoading(true);
-    try {
-      localStorage.setItem('onboarding_firstName', firstName.trim());
-
-      const prefilledSkill = localStorage.getItem('prefilledSkill');
-      console.log('[OnboardingFirstName] Passion recuperee:', prefilledSkill);
-
-      const onboardingData = {
-        history: [],
-        summary: {},
-        current_question: null,
-        is_onboarding_done: false
-      };
-      localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
-
-      const currentUser = await base44.auth.me();
-
-      const regeneratingSessionId = localStorage.getItem('regenerating_session_id');
-      const activeSessionId = localStorage.getItem('passionia_active_session_id');
-
-      let sessionId;
-
-      const sessionData = {
-        onboarding_history: [],
-        onboarding_summary: prefilledSkill ? { who_to_teach: prefilledSkill } : {},
-        onboarding_full: prefilledSkill ? { coreSkill: prefilledSkill } : {},
-        skill: prefilledSkill || '',
-        is_onboarding_done: false
-      };
-
-      if (regeneratingSessionId) {
-        console.log('[OnboardingFirstName] Regeneration de la session:', regeneratingSessionId);
-        sessionId = regeneratingSessionId;
-        await base44.entities.Session.update(sessionId, sessionData);
-        console.log('Session regeneree mise a jour');
-      } else if (activeSessionId) {
-        const existingSessions = await base44.entities.Session.filter({ id: activeSessionId });
-
-        if (existingSessions.length > 0) {
-          const existingSession = existingSessions[0];
-
-          if (!existingSession.is_onboarding_done && (!existingSession.onboarding_history || existingSession.onboarding_history.length === 0)) {
-            sessionId = activeSessionId;
-            await base44.entities.Session.update(sessionId, sessionData);
-          } else {
-            sessionId = activeSessionId;
-            await base44.entities.Session.update(sessionId, sessionData);
-          }
-        } else {
-          sessionId = await createOrReuseSession(currentUser, sessionData, prefilledSkill);
-        }
-      } else {
-        sessionId = await createOrReuseSession(currentUser, sessionData, prefilledSkill);
-      }
-
-      await base44.auth.updateMe({
-        firstName: firstName.trim(),
-        sessionId: sessionId,
-        coreSkill: prefilledSkill || ''
-      });
-      localStorage.setItem('passionia_active_session_id', sessionId);
-
-      navigate(createPageUrl('OnboardingDynamic'));
-    } catch (error) {
-      console.error('Error saving firstName:', error);
-      alert('Une erreur est survenue. Merci de reessayer.');
-      setIsLoading(false);
-    }
-  };
-
-  const createOrReuseSession = async (currentUser, sessionData, prefilledSkill) => {
-    const existingSessions = await base44.entities.Session.filter({
-      created_by: currentUser.email
-    });
-
-    if (existingSessions.length > 0) {
-      const sessionId = existingSessions[0].id;
-      await base44.entities.Session.update(sessionId, {
-        ...sessionData,
-        session_number: existingSessions[0].session_number || 1,
-        session_name: existingSessions[0].session_name || 'Session 1'
-      });
-      return sessionId;
-    } else {
-      const session = await base44.entities.Session.create({
-        ...sessionData,
-        session_number: 1,
-        session_name: 'Session 1',
-        is_regenerating: false,
-        regeneration_count: 0
-      });
-      return session.id;
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && firstName.trim()) {
-      handleNext();
-    }
-  };
-
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
-        <NoahBrainIcon size={64} isThinking={true} />
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#fafafa] flex flex-col items-center px-4 py-8 sm:py-12">
       <div className="w-full max-w-md">
-
-        {/* Progress bar */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mb-10"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-400 font-medium">Etape 1</span>
-            <span className="text-xs text-gray-400">~ 5 min</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
-            <div className="bg-[#61f7a2] h-1.5 rounded-full" style={{ width: '2%' }} />
-          </div>
-        </motion.div>
 
         {/* Noah Avatar */}
         <motion.div
@@ -173,79 +48,100 @@ export default function OnboardingFirstName() {
           transition={{ duration: 0.5 }}
           className="flex justify-center mb-6"
         >
-          <NoahBrainIcon size={72} isThinking={true} />
+          <div className="relative">
+            <div className="w-[72px] h-[72px] rounded-2xl bg-[#61f7a2] flex items-center justify-center shadow-lg shadow-[#61f7a2]/30">
+              <Brain size={36} className="text-white" />
+            </div>
+            <div className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-green-400 border-2 border-[#fafafa] animate-pulse" />
+          </div>
         </motion.div>
 
-        {/* Conversation card */}
+        {/* Hero */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm"
+          transition={{ delay: 0.1 }}
+          className="text-center mb-8"
         >
-          {/* Noah's message - visible fast */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={showContent ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.4 }}
-          >
-            <p className="text-xl font-bold text-gray-900 leading-relaxed mb-2">
-              On va faire connaissance.
-            </p>
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">
-              Je suis <span className="text-[#61f7a2] font-semibold">Noah</span>, ton associe IA. Ensemble, on va construire ton activite — de l'idee au premier euro. Mais d'abord...
-            </p>
-          </motion.div>
-
-          {/* Question + input - appears right after */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={showContent ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.3, duration: 0.4 }}
-          >
-            <p className="text-gray-900 font-semibold mb-4">
-              Comment je t'appelle ?
-            </p>
-
-            <Input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ton prenom"
-              className="w-full bg-white border-gray-300 text-gray-900 text-lg py-6 px-4 rounded-2xl focus:border-[#61f7a2] focus:ring-[#61f7a2] placeholder:text-gray-400"
-              autoFocus
-            />
-          </motion.div>
-
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={showContent ? { opacity: 1 } : {}}
-            transition={{ delay: 0.5, duration: 0.4 }}
-            className="mt-6"
-          >
-            <GlowButton
-              onClick={handleNext}
-              disabled={!firstName.trim()}
-              loading={isLoading}
-              className="w-full"
-              size="lg"
-            >
-              {firstName.trim() ? `C'est parti, ${firstName.trim()} !` : 'Entre ton prenom pour commencer'}
-              {firstName.trim() && <ArrowRight className="w-5 h-5 ml-2" />}
-            </GlowButton>
-          </motion.div>
+          <h1 className="text-[26px] font-extrabold text-gray-900 tracking-tight leading-tight mb-3">
+            Salut, moi c'est Noah.
+          </h1>
+          <p className="text-gray-500 text-sm leading-relaxed mb-4">
+            Je suis ton associe IA. A partir de maintenant, on construit <span className="text-gray-900 font-semibold">ensemble</span> ton activite en ligne.
+          </p>
+          <p className="text-gray-900 font-semibold text-[15px]">
+            Voici comment on va travailler :
+          </p>
         </motion.div>
+
+        {/* Steps */}
+        <div className="flex flex-col gap-3 mb-8">
+          {steps.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.08 }}
+                className="flex items-start gap-4 bg-white rounded-2xl p-[18px] border border-gray-100 hover:border-gray-200 transition-all"
+              >
+                <div className="relative flex-shrink-0">
+                  <div className={`w-12 h-12 rounded-xl ${step.bg} flex items-center justify-center`}>
+                    <Icon className={`w-[22px] h-[22px] ${step.color}`} />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-md bg-gray-900 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">
+                    {i + 1}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[15px] font-bold text-gray-900 tracking-tight mb-0.5">
+                    {step.title}
+                  </h3>
+                  <p className="text-[13px] text-gray-500 leading-snug">
+                    {step.desc}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
 
         {/* Reassurance */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="flex items-center justify-center gap-5 mb-6"
+        >
+          {["100% gratuit", "5 minutes", "Personnalise"].map((text, i) => (
+            <div key={i} className="flex items-center gap-1">
+              <Check className="w-3.5 h-3.5 text-[#3dd67a]" strokeWidth={3} />
+              <span className="text-xs text-gray-400 font-medium">{text}</span>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* CTA */}
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65 }}
+          onClick={() => navigate(createPageUrl("OnboardingFirstName"))}
+          className="w-full flex items-center justify-center gap-2.5 py-[18px] px-6 bg-gradient-to-b from-gray-900 to-black text-white rounded-2xl text-[17px] font-bold shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-[#61f7a2]/20 hover:-translate-y-0.5 transition-all active:scale-[0.98]"
+        >
+          Commencer avec Noah
+          <ArrowRight className="w-5 h-5" />
+        </motion.button>
+
+        {/* Micro social proof */}
         <motion.p
           initial={{ opacity: 0 }}
-          animate={showContent ? { opacity: 1 } : {}}
-          transition={{ delay: 0.7 }}
-          className="text-center text-xs text-gray-400 mt-6"
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="text-center text-xs text-gray-400 mt-4"
         >
-          Tes donnees restent privees. Noah travaille uniquement pour toi.
+          Rejoins les entrepreneurs qui monetisent deja leur savoir.
         </motion.p>
       </div>
     </div>

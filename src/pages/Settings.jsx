@@ -227,20 +227,7 @@ export default function Settings() {
         </div>
       )
     },
-    {
-      title: 'Onboarding',
-      icon: RefreshCw,
-      content: (
-        <div>
-          <p className="text-gray-600 mb-4">
-            Tu peux recommencer l'onboarding pour mettre à jour tes réponses et régénérer ton analyse.
-          </p>
-          <GlowButton variant="secondary" onClick={handleRestartOnboarding} icon={RefreshCw}>
-            Reprendre l'onboarding
-          </GlowButton>
-        </div>
-      )
-    },
+
     {
       title: 'Abonnement',
       icon: CreditCard,

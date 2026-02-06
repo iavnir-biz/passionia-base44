@@ -1,5 +1,4 @@
 import React from 'react';
-import { base44 } from '@/api/base44Client';
 import OnboardingQuestionPage from '@/components/onboarding/OnboardingQuestionPage';
 
 export default function OnboardingQ26DeliveryPreferences() {
@@ -22,57 +21,6 @@ export default function OnboardingQ26DeliveryPreferences() {
       nextPage="OfferGenerationStart"
       blockType="objectives"
       useLocalStorage={true}
-      customHandleSave={async (user, value) => {
-        const currentUser = await base44.auth.me();
-        
-        if (!currentUser.sessionId) {
-          console.error('❌ [Q26] Pas de sessionId');
-          alert('Session introuvable. Merci de recommencer.');
-          return;
-        }
-        
-        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
-        if (sessions.length === 0) {
-          console.error('❌ [Q26] Session introuvable');
-          alert('Session introuvable. Merci de recommencer.');
-          return;
-        }
-        
-        const session = sessions[0];
-        
-        console.log('📦 [Q26] Session avant merge:', {
-          sessionId: session.id,
-          historyLength: session.onboarding_history?.length || 0,
-          fullKeys: Object.keys(session.onboarding_full || {})
-        });
-        
-        // 🔥 MERGE UNIQUEMENT deliveryPreferences (pas de rebuild)
-        const onboardingFull = { ...session.onboarding_full };
-        onboardingFull.deliveryPreferences = value;
-        
-        const summary = { ...session.onboarding_summary };
-        summary.format_preferences = value;
-        
-        await base44.entities.Session.update(currentUser.sessionId, {
-          onboarding_full: onboardingFull,
-          onboarding_summary: summary,
-          is_onboarding_done: true
-        });
-        
-        console.log('✅ [Q26] Session updated (merge only):', {
-          sessionId: currentUser.sessionId,
-          deliveryPreferences: value,
-          fullKeys: Object.keys(onboardingFull)
-        });
-        
-        // Update User aussi
-        await base44.auth.updateMe({ 
-          deliveryPreferences: value,
-          onboarding_completed: true
-        });
-        
-        console.log('✅ [Q26] User updated with deliveryPreferences');
-      }}
       prevPage="OnboardingQ25Readiness"
       progress={100}
       buttonText="Générer mon offre sur-mesure"

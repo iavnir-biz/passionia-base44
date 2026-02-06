@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Sparkles, CheckCircle2, Package, DollarSign, Mail, FileText, Rocket, Brain, Zap, Loader2 } from 'lucide-react';
+import { CheckCircle2, Package, DollarSign, Mail, FileText, Rocket, Brain, Loader2 } from 'lucide-react';
 import { NoahBrainIcon } from '@/components/NoahBrainIcon';
-import GlowButton from '@/components/ui/GlowButton';
 import confetti from 'canvas-confetti';
 
 export default function OnboardingTransition() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [visibleItems, setVisibleItems] = useState(0);
   const [progress, setProgress] = useState(78);
   const [statusText, setStatusText] = useState('Analyse de ton positionnement…');
   const [transitionMessage, setTransitionMessage] = useState('Ta passion vaut de l\'or');
+  const [userFirstName, setUserFirstName] = useState('');
 
   const items = [
     { icon: CheckCircle2, title: 'Validation complète de ton idée' },
@@ -35,7 +33,7 @@ export default function OnboardingTransition() {
   ];
 
   useEffect(() => {
-    loadUser();
+    loadData();
 
     // Déclencher les confettis au chargement de la page
     const hasShownConfetti = sessionStorage.getItem('talents_confetti_shown');
@@ -89,83 +87,46 @@ export default function OnboardingTransition() {
 
   useEffect(() => {
     // Redirection automatique UNIQUEMENT si données OK
-    if (!isLoading && user) {
+    if (!isLoading && userFirstName) {
       const redirectTimer = setTimeout(() => {
         handleNext();
       }, 10000);
       return () => clearTimeout(redirectTimer);
     }
-  }, [isLoading, user]);
+  }, [isLoading, userFirstName]);
 
-  const loadUser = async () => {
+  const loadData = () => {
     try {
-      const currentUser = await base44.auth.me();
-      const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
+      const firstName = localStorage.getItem('onboarding_firstName') || '';
+      const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
 
-      // Vérifier que la Session existe et contient les données
-      if (!currentUser.sessionId) {
-        console.error('❌ [OnboardingTransition] Pas de sessionId');
-        // Rediriger vers l'onboarding pour reprendre
+      if (!firstName) {
+        console.error('❌ [OnboardingTransition] Pas de firstName');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
-      if (!sessions || sessions.length === 0) {
-        console.error('❌ [OnboardingTransition] Session introuvable');
-        navigate(createPageUrl('OnboardingFirstName'));
-        return;
-      }
-
-      const session = sessions[0];
-      const summary = session.onboarding_summary || {};
-
-      console.log('✅ [OnboardingTransition] Session chargée:', {
-        sessionId: session.id,
-        historyLength: session.onboarding_history?.length || 0,
-        skill: session.skill,
-        isDone: session.is_onboarding_done
-      });
-
-      // Vérifier que l'onboarding est complet
-      if ((session.onboarding_history?.length || 0) < 11) {
-        console.error('❌ [OnboardingTransition] Onboarding incomplet');
+      // Vérifier que l'onboarding Q1-Q11 est complet
+      const history = onboardingData.history || [];
+      if (history.length < 11) {
+        console.error('❌ [OnboardingTransition] Onboarding incomplet:', history.length);
         navigate(createPageUrl('OnboardingDynamic'));
         return;
       }
 
-      setUser({ firstName: firstName, full_name: firstName });
+      setUserFirstName(firstName);
 
-      // Enrichir le User avec les données du summary (une seule fois)
-      const fullData = session.onboarding_full || {};
-
-      await base44.auth.updateMe({
-        firstName: firstName,
-        coreSkill: session.skill || fullData.coreSkill || '',
-        targetAudience: fullData.targetAudience || '',
-        mainProblem: fullData.mainProblem || '',
-        firstResult: fullData.firstQuickResult || '',
-        finalTransformation: fullData.finalTransformation || '',
-        uniqueMethod: fullData.uniqueMethod || '',
-        typicalMistake: fullData.typicalMistake || '',
-        extraDetail: fullData.extraDetail || ''
-      });
-
-      console.log('✅ [OnboardingTransition] User enrichi avec summary');
-
-      // Générer la phrase de transition personnalisée
-      try {
-        const { data } = await base44.functions.invoke('generateTransitionMessage', {
-          sessionId: session.id,
-          firstName: firstName
-        });
-        if (data?.message) {
-          setTransitionMessage(data.message);
-        }
-      } catch (err) {
-        console.warn('⚠️ [OnboardingTransition] Fallback message used:', err);
-        // Garder le message par défaut
+      // Générer un message de transition personnalisé basé sur les données locales
+      const coreSkill = localStorage.getItem('onboarding_coreSkill') || onboardingData.full?.coreSkill || '';
+      if (coreSkill) {
+        setTransitionMessage(`J'ai tout ce qu'il faut pour transformer "${coreSkill}" en activité rentable.`);
       }
+
+      console.log('✅ [OnboardingTransition] Données chargées depuis localStorage:', {
+        firstName,
+        historyLength: history.length,
+        coreSkill
+      });
 
       setIsLoading(false);
     } catch (error) {
@@ -221,7 +182,7 @@ export default function OnboardingTransition() {
             transition={{ delay: 0.2 }}
             className="text-sm font-medium text-gray-700 mb-3 text-left leading-snug"
           >
-            Merci pour toutes ces réponses, {user?.firstName} !<br />
+            Merci pour toutes ces réponses, {userFirstName} !<br />
             {transitionMessage}
           </motion.h1>
 

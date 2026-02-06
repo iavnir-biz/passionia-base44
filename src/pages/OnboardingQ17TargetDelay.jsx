@@ -59,42 +59,22 @@ export default function OnboardingQ17TargetDelay() {
   const saveAndContinue = async (delay) => {
     setIsSaving(true);
     try {
-      // 1️⃣ Sauvegarder en DB d'abord
-      const { base44 } = await import('@/api/base44Client');
-      const currentUser = await base44.auth.me();
-      
-      if (!currentUser.sessionId) {
-        console.error('❌ [Q17] Pas de sessionId');
-        alert('Session introuvable. Merci de recommencer.');
-        setIsSaving(false);
-        return;
+      // Sauvegarder en localStorage (mode public)
+      localStorage.setItem('onboarding_targetIncomeDelay', delay);
+
+      // Mettre à jour onboarding_data
+      try {
+        const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
+        const full = onboardingData.full || {};
+        full.targetIncomeDelay = delay.toString();
+        onboardingData.full = full;
+        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+      } catch (e) {
+        console.warn('⚠️ [Q17] Could not update onboarding_data:', e);
       }
 
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
-      if (!sessions || sessions.length === 0) {
-        console.error('❌ [Q17] Session introuvable');
-        setIsSaving(false);
-        return;
-      }
+      console.log('✅ [Q17] Saved to localStorage:', { targetIncomeDelay: delay });
 
-      const session = sessions[0];
-      const onboardingFull = session.onboarding_full || {};
-      
-      onboardingFull.targetIncomeDelay = delay.toString();
-      
-      await base44.entities.Session.update(currentUser.sessionId, {
-        onboarding_full: onboardingFull
-      });
-
-      console.log('✅ [Q17] Session updated:', { 
-        sessionId: currentUser.sessionId, 
-        targetIncomeDelay: delay 
-      });
-
-      // 2️⃣ Backup localStorage (optionnel)
-      localStorage.setItem(`onboarding_targetIncomeDelay`, delay);
-      
-      // 3️⃣ Navigate uniquement après save OK
       navigate(createPageUrl('OnboardingQ18LifeChange'));
     } catch (error) {
       console.error('❌ [Q17] Error saving:', error);
@@ -105,51 +85,30 @@ export default function OnboardingQ17TargetDelay() {
 
   const handleRealisticChoice = async () => {
     if (!realisticChoice) return;
-    
+
     const newIncome = realisticChoice === 'option1' ? 3000 : 5000;
     setShowWarning(false);
-    
+
     setIsSaving(true);
     try {
-      // 1️⃣ Sauvegarder targetIncome + targetIncomeDelay en DB
-      const { base44 } = await import('@/api/base44Client');
-      const currentUser = await base44.auth.me();
-      
-      if (!currentUser.sessionId) {
-        console.error('❌ [Q17 Garde-fou] Pas de sessionId');
-        alert('Session introuvable. Merci de recommencer.');
-        setIsSaving(false);
-        return;
+      // Sauvegarder en localStorage (mode public)
+      localStorage.setItem('onboarding_targetIncome', newIncome);
+      localStorage.setItem('onboarding_targetIncomeDelay', value);
+
+      // Mettre à jour onboarding_data
+      try {
+        const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
+        const full = onboardingData.full || {};
+        full.targetIncome = newIncome.toString();
+        full.targetIncomeDelay = value.toString();
+        onboardingData.full = full;
+        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+      } catch (e) {
+        console.warn('⚠️ [Q17 Garde-fou] Could not update onboarding_data:', e);
       }
 
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
-      if (!sessions || sessions.length === 0) {
-        console.error('❌ [Q17 Garde-fou] Session introuvable');
-        setIsSaving(false);
-        return;
-      }
+      console.log('✅ [Q17 Garde-fou] Saved to localStorage:', { targetIncome: newIncome, targetIncomeDelay: value });
 
-      const session = sessions[0];
-      const onboardingFull = session.onboarding_full || {};
-      
-      onboardingFull.targetIncome = newIncome.toString();
-      onboardingFull.targetIncomeDelay = value.toString();
-      
-      await base44.entities.Session.update(currentUser.sessionId, {
-        onboarding_full: onboardingFull
-      });
-
-      console.log('✅ [Q17 Garde-fou] Session updated:', { 
-        sessionId: currentUser.sessionId, 
-        targetIncome: newIncome,
-        targetIncomeDelay: value
-      });
-
-      // 2️⃣ Backup localStorage
-      localStorage.setItem(`onboarding_targetIncome`, newIncome);
-      localStorage.setItem(`onboarding_targetIncomeDelay`, value);
-      
-      // 3️⃣ Navigate après save
       navigate(createPageUrl('OnboardingQ18LifeChange'));
     } catch (error) {
       console.error('❌ [Q17 Garde-fou] Error:', error);

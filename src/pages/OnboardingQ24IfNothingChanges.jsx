@@ -42,44 +42,24 @@ export default function OnboardingQ24IfNothingChanges() {
   const handleSelect = async (option) => {
     setValue(option);
     setIsSaving(true);
-    
+
     try {
-      // 1️⃣ Sauvegarder en DB d'abord
-      const { base44 } = await import('@/api/base44Client');
-      const currentUser = await base44.auth.me();
-      
-      if (!currentUser.sessionId) {
-        console.error('❌ [Q24] Pas de sessionId');
-        alert('Session introuvable. Merci de recommencer.');
-        setIsSaving(false);
-        return;
+      // Sauvegarder en localStorage (mode public)
+      localStorage.setItem('onboarding_ifNothingChanges', option);
+
+      // Mettre à jour onboarding_data
+      try {
+        const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
+        const full = onboardingData.full || {};
+        full.ifNothingChanges = option;
+        onboardingData.full = full;
+        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+      } catch (e) {
+        console.warn('⚠️ [Q24] Could not update onboarding_data:', e);
       }
 
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
-      if (!sessions || sessions.length === 0) {
-        console.error('❌ [Q24] Session introuvable');
-        setIsSaving(false);
-        return;
-      }
+      console.log('✅ [Q24] Saved to localStorage:', { ifNothingChanges: option });
 
-      const session = sessions[0];
-      const onboardingFull = session.onboarding_full || {};
-      
-      onboardingFull.ifNothingChanges = option;
-      
-      await base44.entities.Session.update(currentUser.sessionId, {
-        onboarding_full: onboardingFull
-      });
-
-      console.log('✅ [Q24] Session updated:', { 
-        sessionId: currentUser.sessionId, 
-        ifNothingChanges: option 
-      });
-
-      // 2️⃣ Backup localStorage
-      localStorage.setItem(`onboarding_ifNothingChanges`, option);
-      
-      // 3️⃣ Navigate immédiatement après save OK (pas de setTimeout)
       navigate(createPageUrl('OnboardingQ25Readiness'));
     } catch (error) {
       console.error('❌ [Q24] Error saving:', error);

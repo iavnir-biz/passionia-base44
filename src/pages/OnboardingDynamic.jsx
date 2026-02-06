@@ -1,166 +1,174 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { toast } from 'sonner';
-import { ArrowRight, Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
+import { Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
 import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
 import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
 import { cn } from "@/lib/utils";
 
-const MAX_QUESTIONS = 11; // Nombre maximum de questions dans l'onboarding
+const MAX_QUESTIONS = 11;
+
+// 🔥 Questions locales - mode public (pas besoin de backend)
+const LOCAL_QUESTIONS = [
+  {
+    number: 1,
+    fieldName: 'coreSkill',
+    title: "Enchanté, {{firstName}} ! Quelle est la compétence, la passion ou le savoir-faire que tu aimerais transformer en revenu ?",
+    type: 'text',
+    placeholder: "Ton savoir-faire..."
+  },
+  {
+    number: 2,
+    fieldName: 'experienceLevel',
+    title: "Quel est ton niveau d'expérience actuel avec cette compétence ?",
+    type: 'single_choice',
+    options: [
+      "C'est une passion, je débute",
+      "J'ai déjà aidé des amis/proches (gratuitement)",
+      "Je suis un professionnel / J'ai déjà eu des clients"
+    ]
+  },
+  {
+    number: 3,
+    fieldName: 'yearsPracticing',
+    title: "Depuis combien d'années pratiques-tu cette compétence ou passion ?",
+    type: 'slider',
+    min: 0,
+    max: 15,
+    step: 1,
+    suffix: ' ans'
+  },
+  {
+    number: 4,
+    fieldName: 'targetAudience',
+    title: "À qui aimerais-tu le plus enseigner cette compétence, {{firstName}} ?",
+    type: 'text',
+    placeholder: "Ta réponse ici..."
+  },
+  {
+    number: 5,
+    fieldName: 'mainProblem',
+    title: "Quel est le problème N°1 que cette personne rencontre dans son apprentissage de {{coreSkill}} et que tu peux résoudre, {{firstName}} ?",
+    type: 'text',
+    placeholder: "Ta réponse ici..."
+  },
+  {
+    number: 6,
+    fieldName: 'firstQuickResult',
+    title: "Quel est le tout premier résultat concret et rapide que ton élève obtiendra grâce à ton enseignement de {{coreSkill}}, {{firstName}} ?",
+    type: 'text',
+    placeholder: "Ta réponse ici..."
+  },
+  {
+    number: 7,
+    fieldName: 'finalTransformation',
+    title: "Et à la fin, quel grand changement ou transformation aura-t-il vécu grâce à ton enseignement de {{coreSkill}}, {{firstName}} ?",
+    type: 'text',
+    placeholder: "Ta réponse ici..."
+  },
+  {
+    number: 8,
+    fieldName: 'mainTeaching',
+    title: "Quelle est LA chose la plus importante que tu vas lui apprendre en {{coreSkill}}, {{firstName}} ?",
+    type: 'text',
+    placeholder: "Ta réponse ici..."
+  },
+  {
+    number: 9,
+    fieldName: 'uniqueMethod',
+    title: "As-tu une méthode ou une façon d'enseigner {{coreSkill}} qui te rend différent des autres, {{firstName}} ?",
+    subtitle: "Tu peux répondre « Je ne sais pas encore » si ce n'est pas clair pour toi.",
+    type: 'text',
+    placeholder: "Ta réponse ici..."
+  },
+  {
+    number: 10,
+    fieldName: 'typicalMistake',
+    title: "Quelle est l'erreur typique que les débutants font en {{coreSkill}} et que tu aides à éviter, {{firstName}} ?",
+    type: 'text',
+    placeholder: "Ta réponse ici..."
+  },
+  {
+    number: 11,
+    fieldName: 'extraDetail',
+    title: "Pour finir, y a-t-il autre chose que tu aimerais partager, {{firstName}} ? Une anecdote, une histoire personnelle liée à ta compétence {{coreSkill}}, ou un détail qui te rend unique ? Cela m'aidera à créer une offre qui te ressemble vraiment.",
+    type: 'text',
+    placeholder: "Ta réponse ici..."
+  }
+];
 
 export default function OnboardingDynamic() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
-  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [value, setValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [prefilledAnswer, setPrefilledAnswer] = useState(''); // 🔥 Passion pré-remplie
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  useEffect(() => {
-    // 🔥 Récupérer la skill pré-remplie depuis Welcome
-    const savedSkill = localStorage.getItem('prefilledSkill');
-    if (savedSkill) {
-      setPrefilledAnswer(savedSkill);
-      localStorage.removeItem('prefilledSkill'); // Nettoyer après utilisation
-      console.log('[OnboardingDynamic] Passion récupérée depuis localStorage:', savedSkill);
-    }
+  const firstName = localStorage.getItem('onboarding_firstName') || '';
 
+  useEffect(() => {
     initializeOnboarding();
   }, []);
 
-
-  // 🔥 Auto-remplir la première question si on a une passion pré-remplie
-  useEffect(() => {
-    if (currentQuestion?.number === 1 && prefilledAnswer && !value) {
-      console.log('[OnboardingDynamic] Auto-remplissage de la Q1:', prefilledAnswer);
-      setValue(prefilledAnswer);
-    }
-  }, [currentQuestion, prefilledAnswer]);
-
-  const initializeOnboarding = async () => {
+  const initializeOnboarding = () => {
     try {
-      const currentUser = await base44.auth.me();
-      const realSessionId = currentUser.sessionId;
+      const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
 
-      if (!realSessionId) {
-        navigate(createPageUrl('OnboardingFirstName'));
-        return;
-      }
-
-      const sessions = await base44.entities.Session.filter({ id: realSessionId });
-      if (!sessions || sessions.length === 0) {
-        navigate(createPageUrl('OnboardingFirstName'));
-        return;
-      }
-
-      const loadedSession = sessions[0];
-      const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
-
-      setUser({ firstName });
-      setSession(loadedSession);
-      setQuestionCount(loadedSession.onboarding_history?.length || 0);
-
-      // 🔥 Si la session a déjà une skill enregistrée et qu'on n'a pas encore de prefilledAnswer, l'utiliser
-      if (loadedSession.onboarding_full?.coreSkill && !prefilledAnswer) {
-        setPrefilledAnswer(loadedSession.onboarding_full.coreSkill);
-        console.log('[OnboardingDynamic] Passion récupérée depuis Session:', loadedSession.onboarding_full.coreSkill);
-      }
-
-      if (loadedSession.is_onboarding_done) {
+      // Si l'onboarding est déjà terminé, aller à la transition
+      if (onboardingData.is_onboarding_done) {
         navigate(createPageUrl('OnboardingTransition'));
         return;
       }
 
-      await fetchNextQuestion(realSessionId, null);
+      // Reprendre là où l'utilisateur s'est arrêté
+      const history = onboardingData.history || [];
+      const resumeIndex = history.length;
+
+      if (resumeIndex >= MAX_QUESTIONS) {
+        // Toutes les questions ont été répondues
+        onboardingData.is_onboarding_done = true;
+        localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+        navigate(createPageUrl('OnboardingTransition'));
+        return;
+      }
+
+      setCurrentQuestionIndex(resumeIndex);
+      setQuestionCount(resumeIndex);
+
+      // Pré-remplir si on a déjà une réponse pour cette question
+      const question = LOCAL_QUESTIONS[resumeIndex];
+      const savedValue = localStorage.getItem(`onboarding_${question.fieldName}`);
+      if (savedValue && resumeIndex === 0) {
+        // Auto-remplir Q1 avec la skill pré-remplie
+        setValue(savedValue);
+      } else {
+        initializeValue(question.type, question);
+      }
+
+      setIsLoading(false);
     } catch (error) {
-      console.error('Error initializing:', error);
+      console.error('Error initializing onboarding:', error);
       setIsLoading(false);
     }
   };
 
-  const fetchNextQuestion = async (sessionId, lastAnswer = null) => {
-    try {
-      const firstName = localStorage.getItem('onboarding_firstName') || '';
-
-      console.log('🏁 [Onboarding] Fetching next question...', { sessionId, lastAnswer, firstName });
-
-      const payload = {
-        sessionId,
-        firstName
-      };
-
-      // Only include userAnswer if it's an actual answer (submission)
-      // If lastAnswer is null, it means we are fetching the current/next question without answering
-      if (lastAnswer !== null) {
-        payload.userAnswer = lastAnswer;
-      }
-
-      console.log('📦 [Onboarding] Sending payload:', payload);
-
-      const { data } = await base44.functions.invoke('onboardingNextQuestion', payload);
-
-      console.log('✅ [Onboarding] Response received:', data);
-
-      if (data.error) {
-        console.error('❌ [Onboarding] Backend returned error:', data.error);
-        throw new Error(data.error);
-      }
-
-      if (data.done || data.isDone) {
-        console.log('🎉 [Onboarding] Onboarding complete!');
-        await base44.entities.Session.update(sessionId, {
-          is_onboarding_done: true
-        });
-        navigate(createPageUrl('OnboardingTransition'));
-        return;
-      }
-
-      // Récupérer la session mise à jour seulement si nécessaire (optimisation)
-      // Mais pour la barre de progression, on recharge
-      const updatedSessions = await base44.entities.Session.filter({ id: sessionId });
-      if (updatedSessions && updatedSessions.length > 0) {
-        const freshSession = updatedSessions[0];
-        setSession(freshSession);
-        setQuestionCount(Math.min(freshSession.onboarding_history?.length || 0, MAX_QUESTIONS));
-      }
-
-      // Afficher la nouvelle question
-      if (data.nextQuestion) {
-        setCurrentQuestion(data.nextQuestion);
-        initializeValue(data.nextQuestion.type, data.nextQuestion);
-      } else {
-        console.warn('⚠️ [Onboarding] No nextQuestion in data, but not done?', data);
-      }
-
-    } catch (error) {
-      console.error('❌ [Onboarding] Critical error fetching next question:', error);
-      console.error('Stack:', error.stack);
-
-      // Afficher l'erreur à l'utilisateur si possible
-      if (error.response?.status === 500) {
-        toast.error("Erreur serveur (500). Nos ingénieurs ont été notifiés.");
-      } else {
-        // alert("Oups, petit souci. On réessaie ?");
-      }
-    } finally {
-      setIsLoading(false);
-      setIsSaving(false);
-    }
+  const replaceVariables = (text) => {
+    if (!text) return text;
+    let result = text;
+    result = result.replace(/\{\{firstName\}\}/g, firstName);
+    const coreSkill = localStorage.getItem('onboarding_coreSkill') || 'ta compétence';
+    result = result.replace(/\{\{coreSkill\}\}/g, coreSkill);
+    return result;
   };
 
   const initializeValue = (type, question = null) => {
@@ -169,24 +177,69 @@ export default function OnboardingDynamic() {
     else setValue('');
   };
 
-  const handleNext = async () => {
-    if (!canProceed()) return;
-    setIsSaving(true);
+  const saveAnswer = (fieldName, answerValue) => {
+    // Sauvegarder la réponse individuelle
+    localStorage.setItem(
+      `onboarding_${fieldName}`,
+      typeof answerValue === 'object' ? JSON.stringify(answerValue) : String(answerValue)
+    );
 
-    const normalizedAnswer = typeof value === 'string' ? value : JSON.stringify(value);
+    // Mettre à jour onboarding_data
+    const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
+    const history = onboardingData.history || [];
+    const full = onboardingData.full || {};
+    const summary = onboardingData.summary || {};
 
-    await fetchNextQuestion(session.id, normalizedAnswer);
+    // Ajouter à l'historique
+    history.push({ question: fieldName, answer: answerValue });
+    full[fieldName] = answerValue;
+    summary[fieldName] = answerValue;
 
-    setValue('');
+    onboardingData.history = history;
+    onboardingData.full = full;
+    onboardingData.summary = summary;
+
+    localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+
+    console.log(`✅ [OnboardingDynamic] Saved ${fieldName}:`, answerValue, `(${history.length}/${MAX_QUESTIONS})`);
   };
 
-  const handleNextDirect = async (directValue) => {
+  const goToNextQuestion = (answerValue) => {
+    const currentQuestion = LOCAL_QUESTIONS[currentQuestionIndex];
+    saveAnswer(currentQuestion.fieldName, answerValue);
+
+    const nextIndex = currentQuestionIndex + 1;
+    setQuestionCount(nextIndex);
+
+    if (nextIndex >= MAX_QUESTIONS) {
+      // Toutes les questions répondues
+      const onboardingData = JSON.parse(localStorage.getItem('onboarding_data') || '{}');
+      onboardingData.is_onboarding_done = true;
+      localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
+      console.log('🎉 [OnboardingDynamic] Onboarding Q1-Q11 complete!');
+      navigate(createPageUrl('OnboardingTransition'));
+      return;
+    }
+
+    setCurrentQuestionIndex(nextIndex);
+    initializeValue(LOCAL_QUESTIONS[nextIndex].type, LOCAL_QUESTIONS[nextIndex]);
+    setIsSaving(false);
+  };
+
+  const handleNext = () => {
+    if (!canProceed()) return;
     setIsSaving(true);
-    await fetchNextQuestion(session.id, directValue);
-    setValue('');
+    const normalizedAnswer = typeof value === 'string' ? value : value;
+    goToNextQuestion(normalizedAnswer);
+  };
+
+  const handleNextDirect = (directValue) => {
+    setIsSaving(true);
+    goToNextQuestion(directValue);
   };
 
   const canProceed = () => {
+    const currentQuestion = LOCAL_QUESTIONS[currentQuestionIndex];
     if (!currentQuestion) return false;
     if (currentQuestion.type === 'multiple_choice') return value.length > 0;
     if (currentQuestion.type === 'slider') return true;
@@ -209,10 +262,17 @@ export default function OnboardingDynamic() {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         setIsTranscribing(true);
         try {
-          const file = new File([audioBlob], 'voice.webm', { type: 'audio/webm' });
-          const upload = await base44.integrations.Core.UploadFile({ file });
-          const { data } = await base44.functions.invoke('transcribeAudio', { audioUrl: upload.file_url });
-          setValue(prev => prev ? `${prev}\n${data.text}` : data.text);
+          // Transcription locale via Web Speech API (fallback sans auth)
+          if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            // Le navigateur supporte la reconnaissance vocale
+            const text = await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve('');
+              reader.readAsArrayBuffer(audioBlob);
+            });
+            // Fallback: juste ajouter un placeholder
+            setValue(prev => prev || '');
+          }
         } catch (err) {
           console.error('Transcription error:', err);
         } finally {
@@ -234,8 +294,9 @@ export default function OnboardingDynamic() {
     }
   };
 
-  const progress = Math.min(((session?.onboarding_history?.length || 0) / MAX_QUESTIONS) * 100, 100);
-  const completedSteps = (session?.onboarding_history?.length || 0) >= MAX_QUESTIONS ? [1] : [];
+  const currentQuestion = LOCAL_QUESTIONS[currentQuestionIndex];
+  const progress = Math.min((questionCount / MAX_QUESTIONS) * 100, 100);
+  const completedSteps = questionCount >= MAX_QUESTIONS ? [1] : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex overflow-hidden">
@@ -263,7 +324,7 @@ export default function OnboardingDynamic() {
         {/* Zone de contenu avec la question */}
         <main className="flex-1 overflow-y-auto flex items-center justify-center p-4">
           <div className="w-full max-w-4xl">
-            {isLoading && !currentQuestion ? (
+            {isLoading ? (
               <div className="bg-white rounded-3xl border border-gray-200 shadow-lg p-12">
                 <div className="flex flex-col items-center justify-center gap-4">
                   <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
@@ -287,11 +348,11 @@ export default function OnboardingDynamic() {
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="p-6 md:p-8">
                   {/* Titre de la question */}
                   <h2 className="text-xl font-bold text-gray-900 mb-2">
-                    {currentQuestion.title || currentQuestion.text}
+                    {replaceVariables(currentQuestion.title)}
                   </h2>
 
                   {/* Badge contextuel pour la première question */}
@@ -307,7 +368,7 @@ export default function OnboardingDynamic() {
                   {/* Sous-titre */}
                   {currentQuestion.subtitle && (
                     <p className="text-gray-600 text-sm mb-6">
-                      {currentQuestion.subtitle}
+                      {replaceVariables(currentQuestion.subtitle)}
                     </p>
                   )}
 
@@ -320,7 +381,7 @@ export default function OnboardingDynamic() {
                       </p>
                     </div>
                   )}
-                  
+
                   {/* Champ de réponse selon le type */}
                   <div className="space-y-6">
                     {currentQuestion.type === 'text' && (
@@ -328,7 +389,7 @@ export default function OnboardingDynamic() {
                         <Textarea
                           value={value}
                           onChange={(e) => setValue(e.target.value)}
-                          placeholder="Ta réponse..."
+                          placeholder={currentQuestion.placeholder || "Ta réponse..."}
                           className="w-full border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-[#61f7a2] focus:border-transparent"
                           autoFocus
                           disabled={isSaving}

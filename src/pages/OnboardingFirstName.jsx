@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Brain, Zap } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 import GlowButton from '@/components/ui/GlowButton';
 import { Input } from '@/components/ui/input';
@@ -47,26 +46,6 @@ export default function OnboardingFirstName() {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
-  // 🔐 Vérifier l'authentification au chargement
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth) {
-          // Rediriger vers login avec retour sur cette page
-          base44.auth.redirectToLogin(window.location.href);
-          return;
-        }
-        setIsCheckingAuth(false);
-      } catch (error) {
-        console.error('Auth check error:', error);
-        base44.auth.redirectToLogin(window.location.href);
-      }
-    };
-    checkAuth();
-  }, []);
 
   // Typing effects for each text block
   const text1 = "Commençons par faire connaissance 🙂";
@@ -91,56 +70,21 @@ export default function OnboardingFirstName() {
       const prefilledSkill = localStorage.getItem('prefilledSkill');
       console.log('[OnboardingFirstName] Passion récupérée:', prefilledSkill);
 
-      // Initialiser les données d'onboarding
+      // Initialiser les données d'onboarding en localStorage (mode public)
       const onboardingData = {
         history: [],
-        summary: {},
-        current_question: null,
+        summary: prefilledSkill ? { who_to_teach: prefilledSkill } : {},
+        full: prefilledSkill ? { coreSkill: prefilledSkill } : {},
+        current_question: 0,
         is_onboarding_done: false
       };
       localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
 
-      // CRÉER LA SESSION ICI (l'utilisateur est déjà authentifié)
-      const currentUser = await base44.auth.me();
-
-      // Vérifier si une session existe déjà
-      const existingSessions = await base44.entities.Session.filter({
-        created_by: currentUser.email
-      });
-
-      let sessionId;
-
-      // 🔥 Préparer les données initiales de la session avec la skill pré-remplie
-      const sessionData = {
-        onboarding_history: [],
-        onboarding_summary: prefilledSkill ? { who_to_teach: prefilledSkill } : {},
-        onboarding_full: prefilledSkill ? { coreSkill: prefilledSkill } : {},
-        skill: prefilledSkill || '',
-        is_onboarding_done: false
-      };
-
-      if (existingSessions.length > 0) {
-        console.log('✅ Session existe déjà:', existingSessions[0].id);
-        sessionId = existingSessions[0].id;
-
-        // Réinitialiser la session avec la skill pré-remplie
-        await base44.entities.Session.update(sessionId, sessionData);
-        console.log('✅ Skill pré-remplie enregistrée:', prefilledSkill);
-      } else {
-        // Créer la session avec la skill pré-remplie
-        const session = await base44.entities.Session.create(sessionData);
-        sessionId = session.id;
-        console.log('✅ Session créée avec skill:', prefilledSkill);
+      if (prefilledSkill) {
+        localStorage.setItem('onboarding_coreSkill', prefilledSkill);
       }
 
-      // Sauvegarder le sessionId et le prénom sur le user
-      await base44.auth.updateMe({
-        firstName: firstName.trim(),
-        sessionId: sessionId,
-        coreSkill: prefilledSkill || '' // 🔥 Aussi sauvegarder sur le User
-      });
-
-      console.log('✅ User mis à jour avec prénom, sessionId et skill:', sessionId);
+      console.log('✅ [OnboardingFirstName] Données sauvegardées en localStorage (mode public)');
 
       // Navigation vers OnboardingDynamic
       navigate(createPageUrl('OnboardingDynamic'));
@@ -156,18 +100,6 @@ export default function OnboardingFirstName() {
       handleNext();
     }
   };
-
-  // Afficher un loader pendant la vérification d'auth
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <NoahAvatar />
-          <p className="text-gray-600 mt-4">Vérification...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">

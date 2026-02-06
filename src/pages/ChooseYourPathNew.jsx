@@ -41,7 +41,8 @@ export default function ChooseYourPathNew() {
       subtitle: 'Skool 37€/mois',
       features: [
         'Générateur illimité',
-        'Accompagnement complet'
+        'Accompagnement complet',
+        'Formation vidéo'
       ],
       cta: 'Rejoindre Skool',
       link: 'SkoolAbonnement',

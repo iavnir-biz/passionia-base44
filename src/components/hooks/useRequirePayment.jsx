@@ -35,10 +35,11 @@ export function useRequirePayment() {
       // 3. Vérifier le statut de paiement (User OU Session)
       let purchased = currentUser?.has_purchased === true;
 
-      // Fallback: vérifier aussi dans la Session (où Stripe webhook écrit souvent)
-      if (!purchased) {
-        try {
-          const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+      // Vérifier aussi dans la Session (où Stripe webhook écrit souvent)
+      try {
+        const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
+
+        if (!purchased) {
           // Vérifier toutes les sessions (multi-session support)
           const hasPurchasedInAnySession = sessions.some(s => s.has_purchased === true);
           if (hasPurchasedInAnySession) {
@@ -47,24 +48,28 @@ export function useRequirePayment() {
             await base44.auth.updateMe({ has_purchased: true });
             console.log('✅ [useRequirePayment] Synced has_purchased from Session to User');
           }
+        }
 
-          // Backfill session_number pour sessions existantes sans numéro
-          for (let i = 0; i < sessions.length; i++) {
-            if (!sessions[i].session_number) {
-              try {
-                await base44.entities.Session.update(sessions[i].id, {
-                  session_number: i + 1,
-                  session_name: sessions[i].session_name || `Session ${i + 1}`
-                });
-                console.log(`✅ [useRequirePayment] Backfilled session_number=${i + 1} for session ${sessions[i].id}`);
-              } catch (backfillError) {
-                console.warn('⚠️ [useRequirePayment] Backfill error:', backfillError);
-              }
+        // Backfill session_number pour sessions existantes sans numéro (tous les users)
+        const sortedSessions = [...sessions].sort((a, b) =>
+          new Date(a.created_date || 0) - new Date(b.created_date || 0)
+        );
+        for (let i = 0; i < sortedSessions.length; i++) {
+          const correctNumber = i + 1;
+          if (!sortedSessions[i].session_number || sortedSessions[i].session_number !== correctNumber) {
+            try {
+              await base44.entities.Session.update(sortedSessions[i].id, {
+                session_number: correctNumber,
+                session_name: sortedSessions[i].session_name || `Session ${correctNumber}`
+              });
+              console.log(`✅ [useRequirePayment] Backfilled session_number=${correctNumber} for session ${sortedSessions[i].id}`);
+            } catch (backfillError) {
+              console.warn('⚠️ [useRequirePayment] Backfill error:', backfillError);
             }
           }
-        } catch (sessionError) {
-          console.warn('⚠️ [useRequirePayment] Could not check Session:', sessionError);
         }
+      } catch (sessionError) {
+        console.warn('⚠️ [useRequirePayment] Could not check Session:', sessionError);
       }
 
       if (!purchased) {

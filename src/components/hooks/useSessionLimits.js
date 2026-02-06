@@ -46,13 +46,13 @@ export function useSessionLimits() {
 
     if (!limits.has_purchased) {
       if (limits.current >= limits.max) {
-        return 'Passe Premium pour débloquer 5 sessions et recommencer ton parcours autant de fois que tu veux.';
+        return 'Passe Premium pour débloquer 3 sessions.';
       }
       return '';
     }
 
     if (limits.current >= limits.max) {
-      return 'Tu as utilisé tes 5 générations. Elles restent accessibles dans ton dashboard. Tu peux les régénérer autant de fois que tu veux.';
+      return 'Tu as utilisé tes 3 sessions. Elles restent accessibles dans ton dashboard.';
     }
 
     return `${limits.current}/${limits.max} sessions créées. Il te reste ${limits.remaining} session${limits.remaining > 1 ? 's' : ''}.`;

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Package,
-  RefreshCw,
   Eye,
   Edit3,
   Check,
@@ -34,7 +33,6 @@ export default function SessionCard({
   isActive,
   isPaid,
   onSelect,
-  onRegenerate,
   onRename,
   index
 }) {
@@ -194,18 +192,12 @@ export default function SessionCard({
           <span className="text-xs text-gray-500 ml-1">{session.assets_count}/{session.assets_total}</span>
         </div>
 
-        {/* Dates + regen count */}
+        {/* Date */}
         <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
           {session.created_date && (
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {formatDate(session.created_date)}
-            </span>
-          )}
-          {session.regeneration_count > 0 && (
-            <span className="flex items-center gap-1 text-blue-500">
-              <RefreshCw className="w-3 h-3" />
-              {session.regeneration_count}x
             </span>
           )}
         </div>
@@ -219,16 +211,6 @@ export default function SessionCard({
             <Eye className="w-4 h-4" />
             Voir
           </button>
-          {isPaid && (
-            <button
-              onClick={() => onRegenerate(session.id)}
-              disabled={isRegenerating || isGenerating}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Recommencer
-            </button>
-          )}
         </div>
       </div>
     </motion.div>

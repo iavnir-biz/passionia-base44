@@ -20,7 +20,6 @@ import {
   Clock,
   Sparkles,
   Plus,
-  RefreshCw,
   Lock,
   ChevronDown
 } from "lucide-react";
@@ -31,7 +30,6 @@ import GlowButton from '@/components/ui/GlowButton';
 import ChatBubble from '@/components/chat/ChatBubble';
 import SessionCard from '@/components/sessions/SessionCard';
 import SessionCounter from '@/components/sessions/SessionCounter';
-import RegenerationModal from '@/components/sessions/RegenerationModal';
 import SessionPaywallModal from '@/components/sessions/SessionPaywallModal';
 
 export default function Dashboard() {
@@ -49,7 +47,6 @@ export default function Dashboard() {
     canCreate,
     loadSessions,
     createSession,
-    regenerateSession,
     renameSession,
     switchSession
   } = useSessionManager();
@@ -61,9 +58,6 @@ export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Modals
-  const [regenModalOpen, setRegenModalOpen] = useState(false);
-  const [regenSessionId, setRegenSessionId] = useState(null);
-  const [regenLoading, setRegenLoading] = useState(false);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [paywallType, setPaywallType] = useState('upgrade_required');
 
@@ -147,27 +141,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleRegenerate = (sessionId) => {
-    if (!isPaid) {
-      setPaywallType('upgrade_required');
-      setPaywallOpen(true);
-      return;
-    }
-    setRegenSessionId(sessionId);
-    setRegenModalOpen(true);
-  };
-
-  const handleConfirmRegenerate = async () => {
-    setRegenLoading(true);
-    const result = await regenerateSession(regenSessionId);
-    setRegenLoading(false);
-    setRegenModalOpen(false);
-
-    if (result.success) {
-      navigate(createPageUrl('OnboardingFirstName'));
-    }
-  };
-
   const handleSelectSession = (sessionId) => {
     switchSession(sessionId);
     setViewMode('detail');
@@ -236,7 +209,6 @@ export default function Dashboard() {
   }
 
   const currentMission = getNextIncompleteTask();
-  const regenSessionName = sessions.find(s => s.id === regenSessionId)?.session_name;
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -343,10 +315,10 @@ export default function Dashboard() {
                   <Lock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-amber-900 font-semibold text-sm mb-1">
-                      Passe Premium pour debloquer 5 sessions
+                      Passe Premium pour debloquer 3 sessions
                     </p>
                     <p className="text-amber-700 text-xs">
-                      Recommencer ton parcours autant de fois que tu veux et generer de nouvelles offres.
+                      Genere de nouvelles offres avec Noah.
                     </p>
                   </div>
                 </div>
@@ -359,7 +331,7 @@ export default function Dashboard() {
                 <div className="flex items-start gap-3">
                   <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <p className="text-blue-800 text-sm">
-                    Tu as utilise tes {max} generations. Elles restent accessibles ici. Tu peux les <strong>regenerer</strong> autant de fois que tu veux.
+                    Tu as utilise tes {max} sessions. Elles restent accessibles ici.
                   </p>
                 </div>
               </div>
@@ -375,7 +347,6 @@ export default function Dashboard() {
                     isActive={s.id === activeSessionId}
                     isPaid={isPaid}
                     onSelect={handleSelectSession}
-                    onRegenerate={handleRegenerate}
                     onRename={renameSession}
                     index={index}
                   />
@@ -422,49 +393,18 @@ export default function Dashboard() {
           {fullSession && (
             <>
               {/* Session info header (payant avec multi-sessions) */}
-              {isPaid && sessions.length > 0 && (
+              {sessions.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-between mb-6"
+                  className="mb-6"
                 >
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">
-                      {activeSession?.session_name || `Session ${activeSession?.session_number || 1}`}
-                    </h3>
-                    {activeSession?.skill && (
-                      <p className="text-sm text-gray-500">{activeSession.skill}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => handleRegenerate(activeSessionId)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-sm font-medium transition-colors"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Recommencer
-                  </button>
-                </motion.div>
-              )}
-
-              {/* Bouton "Recommencer" desactive pour gratuit */}
-              {!isPaid && sessions.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-end mb-6"
-                >
-                  <div className="relative group">
-                    <button
-                      disabled
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-400 rounded-xl text-sm font-medium cursor-not-allowed"
-                    >
-                      <Lock className="w-4 h-4" />
-                      Recommencer
-                    </button>
-                    <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                      Disponible apres upgrade Premium
-                    </div>
-                  </div>
+                  <h3 className="text-lg font-bold text-gray-900">
+                    {activeSession?.session_name || `Session ${activeSession?.session_number || 1}`}
+                  </h3>
+                  {activeSession?.skill && (
+                    <p className="text-sm text-gray-500">{activeSession.skill}</p>
+                  )}
                 </motion.div>
               )}
 
@@ -576,14 +516,6 @@ export default function Dashboard() {
       <ChatBubble />
 
       {/* Modals */}
-      <RegenerationModal
-        isOpen={regenModalOpen}
-        onClose={() => setRegenModalOpen(false)}
-        onConfirm={handleConfirmRegenerate}
-        sessionName={regenSessionName}
-        loading={regenLoading}
-      />
-
       <SessionPaywallModal
         isOpen={paywallOpen}
         onClose={() => setPaywallOpen(false)}

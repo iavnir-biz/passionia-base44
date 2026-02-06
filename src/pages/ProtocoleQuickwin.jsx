@@ -51,11 +51,8 @@ export default function ProtocoleQuickwin() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 py-4 px-5">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg shadow-[#61f7a2]/20">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-gray-900">PROTOCOLE QUICKWIN</span>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center shadow-lg shadow-[#61f7a2]/20">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
           <span className="text-sm text-gray-500 font-medium">Chemin 1</span>
         </div>
@@ -176,14 +173,14 @@ export default function ProtocoleQuickwin() {
           </div>
 
           {/* ORDER BUMP - Pack Réseaux Sociaux */}
-          <div className="px-8 md:px-10 pb-6">
+          <div className="px-4 md:px-10 pb-6">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`rounded-2xl p-5 cursor-pointer transition-all duration-300 ${
+              className={`rounded-2xl p-4 md:p-5 cursor-pointer transition-all duration-300 ${
                 hasOrderBump
-                  ? 'bg-gradient-to-br from-[#61f7a2]/20 to-green-100 border-4 border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20'
-                  : 'bg-white border-4 border-[#61f7a2] hover:shadow-lg hover:shadow-[#61f7a2]/10'
+                  ? 'bg-gradient-to-br from-[#61f7a2]/20 to-green-100 border-3 md:border-4 border-[#61f7a2] shadow-lg shadow-[#61f7a2]/20'
+                  : 'bg-white border-3 md:border-4 border-[#61f7a2] hover:shadow-lg hover:shadow-[#61f7a2]/10'
               }`}
               onClick={() => setShowOrderBumpPopup(true)}
             >
@@ -195,7 +192,64 @@ export default function ProtocoleQuickwin() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-4">
+              {/* Mobile Layout */}
+              <div className="flex flex-col md:hidden">
+                <div className="flex items-center gap-3 mb-3">
+                  {/* Checkbox visuelle */}
+                  <div
+                    className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                      hasOrderBump
+                        ? 'bg-[#61f7a2] border-[#61f7a2]'
+                        : 'border-gray-300 bg-white'
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setHasOrderBump(!hasOrderBump);
+                    }}
+                  >
+                    {hasOrderBump && <CheckCircle className="w-4 h-4 text-white" />}
+                  </div>
+
+                  {/* Icône */}
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-green-500 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">🎬</span>
+                  </div>
+
+                  {/* Titre */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-gray-900 leading-tight">
+                      🎁 Pack Réseaux Sociaux
+                    </h3>
+                    <p className="text-gray-600 text-xs">
+                      100+ Templates prêts à poster
+                    </p>
+                  </div>
+                </div>
+
+                {/* Prix et bouton */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-black text-[#61f7a2]">+37€</span>
+                    <span className="text-gray-400 line-through text-xs">147€</span>
+                    <span className="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                      -75%
+                    </span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowOrderBumpPopup(true);
+                    }}
+                    className="px-3 py-1.5 bg-[#61f7a2]/20 text-[#61f7a2] font-semibold rounded-lg text-xs flex items-center gap-1"
+                  >
+                    Détails
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Desktop Layout */}
+              <div className="hidden md:flex items-center gap-4">
                 {/* Checkbox visuelle */}
                 <div
                   className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all ${

@@ -25,8 +25,7 @@ import {
   Download,
   DollarSign,
   Heart,
-  Zap,
-  TrendingUp
+  Zap
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -315,16 +314,60 @@ export default function Dashboard() {
   const targetDelay = onboarding.targetIncomeDelay;
   const lifeChangeStory = onboarding.lifeChangeStory;
 
-  // Revenue calculator from offers
-  const offer = fullSession?.finalized_offer;
-  const potentialRevenue = fullSession?.potential_revenue;
-  const parsePrice = (p) => parseInt(String(p || '0').replace(/[^0-9]/g, ''), 10) || 0;
-  const mainPrice = offer?.mainProduct ? parsePrice(offer.mainProduct.price) : 0;
+  // Revenue tracker (interactive)
   const targetNum = Number(targetIncome) || 0;
-  const salesNeeded = mainPrice > 0 && targetNum > 0 ? Math.ceil(targetNum / mainPrice) : 0;
-  const revenueProgress = potentialRevenue && targetNum > 0
-    ? Math.min(100, Math.round((potentialRevenue / targetNum) * 100))
-    : 0;
+  const [currentRevenue, setCurrentRevenue] = useState(0);
+  const [revenueInputValue, setRevenueInputValue] = useState('');
+  const [savingRevenue, setSavingRevenue] = useState(false);
+
+  // Load saved revenue from session
+  useEffect(() => {
+    if (fullSession?.current_revenue != null) {
+      setCurrentRevenue(fullSession.current_revenue);
+      setRevenueInputValue(String(fullSession.current_revenue));
+    }
+  }, [fullSession?.current_revenue]);
+
+  const saveRevenue = useCallback(async (value) => {
+    if (!activeSessionId) return;
+    setSavingRevenue(true);
+    try {
+      await base44.entities.Session.update(activeSessionId, {
+        current_revenue: value
+      });
+    } catch (err) {
+      console.error('[Dashboard] Error saving revenue:', err);
+    } finally {
+      setSavingRevenue(false);
+    }
+  }, [activeSessionId]);
+
+  const handleSliderChange = (e) => {
+    const val = Number(e.target.value);
+    setCurrentRevenue(val);
+    setRevenueInputValue(String(val));
+  };
+
+  const handleSliderRelease = () => {
+    saveRevenue(currentRevenue);
+  };
+
+  const handleRevenueInput = (e) => {
+    const raw = e.target.value.replace(/[^0-9]/g, '');
+    setRevenueInputValue(raw);
+    const val = Math.min(Number(raw) || 0, targetNum);
+    setCurrentRevenue(val);
+  };
+
+  const handleRevenueInputBlur = () => {
+    const val = Math.min(Number(revenueInputValue) || 0, targetNum);
+    setCurrentRevenue(val);
+    setRevenueInputValue(String(val));
+    saveRevenue(val);
+  };
+
+  const remaining = Math.max(0, targetNum - currentRevenue);
+  const revenuePercent = targetNum > 0 ? Math.min(100, Math.round((currentRevenue / targetNum) * 100)) : 0;
 
   // Onboarding recap data
   const onboardingItems = [
@@ -394,7 +437,7 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          {/* OBJECTIF REVENU - carte projection */}
+          {/* OBJECTIF REVENU - barre interactive */}
           {targetIncome && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -403,7 +446,7 @@ export default function Dashboard() {
               className="mb-8 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 sm:p-8"
             >
               {/* Header : objectif + delai */}
-              <div className="flex items-start justify-between mb-5">
+              <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-sm text-gray-500 font-medium mb-2">Ton objectif mensuel</p>
                   <p className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
@@ -418,101 +461,74 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* Barre de progression vers l'objectif */}
-              {potentialRevenue > 0 && (
-                <div className="mb-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-500 font-medium">Projection vs objectif</span>
-                    <span className="text-xs font-bold text-gray-700">{revenueProgress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${revenueProgress}%` }}
-                      transition={{ duration: 1.2, ease: 'easeOut' }}
-                      className={`h-3 rounded-full ${
-                        revenueProgress >= 100
-                          ? 'bg-gradient-to-r from-[#61f7a2] to-[#3dd980]'
-                          : revenueProgress >= 50
-                            ? 'bg-gradient-to-r from-[#61f7a2] to-[#4de88f]'
-                            : 'bg-gradient-to-r from-amber-400 to-orange-400'
-                      }`}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between mt-1.5">
-                    <span className="text-xs text-gray-400">0 EUR</span>
-                    <span className="text-xs text-gray-400">{Number(targetIncome).toLocaleString('fr-FR')} EUR</span>
-                  </div>
+              {/* Barre interactive */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-gray-500 font-medium">Tes revenus ce mois</span>
+                  <span className="text-xs font-bold text-gray-700">{revenuePercent}%</span>
                 </div>
-              )}
 
-              {/* Calculateur de revenus par produit */}
-              {offer?.mainProduct && (
-                <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <TrendingUp className="w-4 h-4 text-[#61f7a2]" />
-                    <span className="text-sm font-semibold text-gray-900">Calculateur de revenus</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-                    {offer.mainProduct && (
-                      <div className="text-center p-2 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500">Produit principal</p>
-                        <p className="text-sm font-bold text-gray-900">{offer.mainProduct.price}</p>
-                      </div>
-                    )}
-                    {offer.orderBump && (
-                      <div className="text-center p-2 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500">Order bump</p>
-                        <p className="text-sm font-bold text-gray-900">{offer.orderBump.price}</p>
-                      </div>
-                    )}
-                    {offer.upsell1 && (
-                      <div className="text-center p-2 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500">Offre mid</p>
-                        <p className="text-sm font-bold text-gray-900">{offer.upsell1.price}</p>
-                      </div>
-                    )}
-                    {offer.upsell3 && (
-                      <div className="text-center p-2 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500">Premium</p>
-                        <p className="text-sm font-bold text-gray-900">{offer.upsell3.price}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {potentialRevenue > 0 && (
-                    <p className="text-sm text-gray-700">
-                      Projection avec ton funnel : <span className="font-bold text-[#61f7a2]">{Number(potentialRevenue).toLocaleString('fr-FR')} EUR/mois</span>
-                    </p>
-                  )}
-                  {salesNeeded > 0 && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      Il te faut <span className="font-bold text-gray-900">{salesNeeded} ventes/mois</span> de ton produit principal ({offer.mainProduct.price}) pour atteindre ton objectif.
-                    </p>
-                  )}
+                {/* Slider visuel */}
+                <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-1">
+                  <div
+                    className={`absolute inset-y-0 left-0 rounded-full transition-all duration-200 ${
+                      revenuePercent >= 100
+                        ? 'bg-gradient-to-r from-[#61f7a2] to-[#3dd980]'
+                        : revenuePercent >= 50
+                          ? 'bg-gradient-to-r from-[#61f7a2] to-[#4de88f]'
+                          : 'bg-gradient-to-r from-amber-400 to-orange-400'
+                    }`}
+                    style={{ width: `${revenuePercent}%` }}
+                  />
+                  <input
+                    type="range"
+                    min={0}
+                    max={targetNum}
+                    step={1}
+                    value={currentRevenue}
+                    onChange={handleSliderChange}
+                    onMouseUp={handleSliderRelease}
+                    onTouchEnd={handleSliderRelease}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
                 </div>
-              )}
 
-              {/* Projection vie future */}
-              {lifeChangeStory && (
-                <div className="bg-white rounded-xl border border-gray-100 p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Heart className="w-4 h-4 text-purple-500" />
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-xs text-gray-400">0 EUR</span>
+                  <span className="text-xs text-gray-400">{Number(targetIncome).toLocaleString('fr-FR')} EUR</span>
+                </div>
+
+                {/* Input direct + infos */}
+                <div className="flex items-center justify-between mt-4 gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={revenueInputValue}
+                        onChange={handleRevenueInput}
+                        onBlur={handleRevenueInputBlur}
+                        onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+                        className="w-28 sm:w-32 border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold text-gray-900 text-right focus:outline-none focus:ring-2 focus:ring-[#61f7a2]/30 focus:border-[#61f7a2] transition-all"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">EUR</span>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">Ta vie dans {targetDelay || 'quelques'} mois</p>
-                      <p className="text-sm text-gray-700 leading-relaxed italic">"{lifeChangeStory}"</p>
-                    </div>
+                    {savingRevenue && <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />}
+                  </div>
+
+                  <div className="text-right">
+                    {remaining > 0 ? (
+                      <p className="text-sm text-gray-600">
+                        Encore <span className="font-bold text-gray-900">{remaining.toLocaleString('fr-FR')} EUR</span>
+                      </p>
+                    ) : (
+                      <p className="text-sm font-bold text-[#61f7a2]">
+                        Objectif atteint !
+                      </p>
+                    )}
                   </div>
                 </div>
-              )}
-
-              {/* Phrase motivation */}
-              <p className="text-center text-gray-500 text-sm mt-4 font-medium">
-                C'est maintenant que ca se joue.
-              </p>
+              </div>
             </motion.div>
           )}
 

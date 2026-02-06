@@ -63,9 +63,11 @@ import Documents from './pages/Documents';
 import DoneForYouElite from './pages/DoneForYouElite';
 import DownsellSession from './pages/DownsellSession';
 import EmailsMarketing from './pages/EmailsMarketing';
+import EtComment from './pages/EtComment';
 import GenerationProgress from './pages/GenerationProgress';
 import Home from './pages/Home';
 import MarketAnalysis from './pages/MarketAnalysis';
+import MonetiserSavoir from './pages/MonetiserSavoir';
 import MyOffers from './pages/MyOffers';
 import NoahGeneration from './pages/NoahGeneration';
 import NovaChat from './pages/NovaChat';
@@ -113,8 +115,6 @@ import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import EtComment from './pages/EtComment';
-import MonetiserSavoir from './pages/MonetiserSavoir';
 
 
 export const PAGES = {
@@ -134,9 +134,11 @@ export const PAGES = {
     "DoneForYouElite": DoneForYouElite,
     "DownsellSession": DownsellSession,
     "EmailsMarketing": EmailsMarketing,
+    "EtComment": EtComment,
     "GenerationProgress": GenerationProgress,
     "Home": Home,
     "MarketAnalysis": MarketAnalysis,
+    "MonetiserSavoir": MonetiserSavoir,
     "MyOffers": MyOffers,
     "NoahGeneration": NoahGeneration,
     "NovaChat": NovaChat,
@@ -184,8 +186,6 @@ export const PAGES = {
     "UpsellCoaching": UpsellCoaching,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "EtComment": EtComment,
-    "MonetiserSavoir": MonetiserSavoir,
 }
 
 export const pagesConfig = {

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Brain } from "lucide-react";
+import { Brain, LogIn } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 const SparkleIcon = ({ size = 20, color = "currentColor" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -89,18 +90,58 @@ export default function TeaserPage() {
 
 
 
-      {/* Contenu principal */}
-      <div style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "16px 16px 40px",
-        maxWidth: "440px",
-        margin: "0 auto",
-        width: "100%",
-        boxSizing: "border-box",
-      }}>
+      {/* Header avec bouton connexion */}
+            <div style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "flex-end",
+              padding: "12px 16px",
+              boxSizing: "border-box",
+            }}>
+              <button
+                onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 14px",
+                  background: "white",
+                  border: "1px solid #e5e5e5",
+                  borderRadius: "10px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#333",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.background = "#f9f9f9";
+                  e.currentTarget.style.borderColor = "#61f7a2";
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.background = "white";
+                  e.currentTarget.style.borderColor = "#e5e5e5";
+                }}
+              >
+                <LogIn size={16} />
+                Connexion
+              </button>
+            </div>
+
+            {/* Contenu principal */}
+            <div style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "0 16px 40px",
+              maxWidth: "440px",
+              margin: "0 auto",
+              width: "100%",
+              boxSizing: "border-box",
+            }}>
 
         {/* ━━━ Hero ━━━ */}
         <div style={{

@@ -25,7 +25,8 @@ import {
   Download,
   DollarSign,
   Heart,
-  Zap
+  Zap,
+  TrendingUp
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -314,6 +315,17 @@ export default function Dashboard() {
   const targetDelay = onboarding.targetIncomeDelay;
   const lifeChangeStory = onboarding.lifeChangeStory;
 
+  // Revenue calculator from offers
+  const offer = fullSession?.finalized_offer;
+  const potentialRevenue = fullSession?.potential_revenue;
+  const parsePrice = (p) => parseInt(String(p || '0').replace(/[^0-9]/g, ''), 10) || 0;
+  const mainPrice = offer?.mainProduct ? parsePrice(offer.mainProduct.price) : 0;
+  const targetNum = Number(targetIncome) || 0;
+  const salesNeeded = mainPrice > 0 && targetNum > 0 ? Math.ceil(targetNum / mainPrice) : 0;
+  const revenueProgress = potentialRevenue && targetNum > 0
+    ? Math.min(100, Math.round((potentialRevenue / targetNum) * 100))
+    : 0;
+
   // Onboarding recap data
   const onboardingItems = [
     { label: 'Competence', value: onboarding.coreSkill || fullSession?.skill, icon: Sparkles },
@@ -382,19 +394,125 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          {/* OBJECTIF REVENU - phrase motivante */}
+          {/* OBJECTIF REVENU - carte projection */}
           {targetIncome && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-8">
-              <p className="text-gray-500 text-sm font-medium mb-1">Ton objectif</p>
-              <p className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
-                {Number(targetIncome).toLocaleString('fr-FR')} <span className="text-[#61f7a2]">EUR</span>
-                <span className="text-lg sm:text-xl font-semibold text-gray-400 ml-1">/ mois</span>
-              </p>
-              {targetDelay && (
-                <p className="text-gray-600 mt-1 text-base">
-                  Dans <span className="font-bold text-gray-900">{targetDelay} mois</span> — c'est maintenant que ca se joue.
-                </p>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="mb-8 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 sm:p-8"
+            >
+              {/* Header : objectif + delai */}
+              <div className="flex items-start justify-between mb-5">
+                <div>
+                  <p className="text-sm text-gray-500 font-medium mb-2">Ton objectif mensuel</p>
+                  <p className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
+                    {Number(targetIncome).toLocaleString('fr-FR')} <span className="text-[#61f7a2]">EUR</span>
+                  </p>
+                </div>
+                {targetDelay && (
+                  <div className="text-right flex-shrink-0 ml-4">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Delai</p>
+                    <p className="text-2xl font-bold text-gray-900">{targetDelay} <span className="text-sm font-medium text-gray-500">mois</span></p>
+                  </div>
+                )}
+              </div>
+
+              {/* Barre de progression vers l'objectif */}
+              {potentialRevenue > 0 && (
+                <div className="mb-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-gray-500 font-medium">Projection vs objectif</span>
+                    <span className="text-xs font-bold text-gray-700">{revenueProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${revenueProgress}%` }}
+                      transition={{ duration: 1.2, ease: 'easeOut' }}
+                      className={`h-3 rounded-full ${
+                        revenueProgress >= 100
+                          ? 'bg-gradient-to-r from-[#61f7a2] to-[#3dd980]'
+                          : revenueProgress >= 50
+                            ? 'bg-gradient-to-r from-[#61f7a2] to-[#4de88f]'
+                            : 'bg-gradient-to-r from-amber-400 to-orange-400'
+                      }`}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between mt-1.5">
+                    <span className="text-xs text-gray-400">0 EUR</span>
+                    <span className="text-xs text-gray-400">{Number(targetIncome).toLocaleString('fr-FR')} EUR</span>
+                  </div>
+                </div>
               )}
+
+              {/* Calculateur de revenus par produit */}
+              {offer?.mainProduct && (
+                <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="w-4 h-4 text-[#61f7a2]" />
+                    <span className="text-sm font-semibold text-gray-900">Calculateur de revenus</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                    {offer.mainProduct && (
+                      <div className="text-center p-2 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-gray-500">Produit principal</p>
+                        <p className="text-sm font-bold text-gray-900">{offer.mainProduct.price}</p>
+                      </div>
+                    )}
+                    {offer.orderBump && (
+                      <div className="text-center p-2 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-gray-500">Order bump</p>
+                        <p className="text-sm font-bold text-gray-900">{offer.orderBump.price}</p>
+                      </div>
+                    )}
+                    {offer.upsell1 && (
+                      <div className="text-center p-2 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-gray-500">Offre mid</p>
+                        <p className="text-sm font-bold text-gray-900">{offer.upsell1.price}</p>
+                      </div>
+                    )}
+                    {offer.upsell3 && (
+                      <div className="text-center p-2 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-gray-500">Premium</p>
+                        <p className="text-sm font-bold text-gray-900">{offer.upsell3.price}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {potentialRevenue > 0 && (
+                    <p className="text-sm text-gray-700">
+                      Projection avec ton funnel : <span className="font-bold text-[#61f7a2]">{Number(potentialRevenue).toLocaleString('fr-FR')} EUR/mois</span>
+                    </p>
+                  )}
+                  {salesNeeded > 0 && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      Il te faut <span className="font-bold text-gray-900">{salesNeeded} ventes/mois</span> de ton produit principal ({offer.mainProduct.price}) pour atteindre ton objectif.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Projection vie future */}
+              {lifeChangeStory && (
+                <div className="bg-white rounded-xl border border-gray-100 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Heart className="w-4 h-4 text-purple-500" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">Ta vie dans {targetDelay || 'quelques'} mois</p>
+                      <p className="text-sm text-gray-700 leading-relaxed italic">"{lifeChangeStory}"</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Phrase motivation */}
+              <p className="text-center text-gray-500 text-sm mt-4 font-medium">
+                C'est maintenant que ca se joue.
+              </p>
             </motion.div>
           )}
 

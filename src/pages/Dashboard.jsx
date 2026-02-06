@@ -23,12 +23,9 @@ import {
   Lock,
   ChevronDown,
   Download,
-  TrendingUp,
   DollarSign,
-  Briefcase,
   Heart,
-  Zap,
-  ChevronUp
+  Zap
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -313,8 +310,6 @@ export default function Dashboard() {
 
   // Revenue / goal data
   const onboarding = fullSession?.onboarding_full || {};
-  const mainOffer = fullSession?.finalized_offer?.mainProduct;
-  const potentialRevenue = fullSession?.potential_revenue;
   const targetIncome = onboarding.targetIncome;
   const targetDelay = onboarding.targetIncomeDelay;
   const lifeChangeStory = onboarding.lifeChangeStory;
@@ -386,91 +381,6 @@ export default function Dashboard() {
               )}
             </div>
           </motion.div>
-
-          {/* ============ BLOC VISION / OBJECTIF TRANSFORMATIONNEL ============ */}
-          {(targetIncome || lifeChangeStory || mainOffer?.title) && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="mb-8"
-            >
-              <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl overflow-hidden relative">
-                {/* Background glow */}
-                <div className="absolute inset-0">
-                  <div className="absolute top-0 right-0 w-72 h-72 bg-[#61f7a2]/10 rounded-full blur-3xl" />
-                  <div className="absolute bottom-0 left-0 w-56 h-56 bg-purple-500/10 rounded-full blur-3xl" />
-                </div>
-
-                <div className="relative z-10 p-6 md:p-8">
-                  {/* Header */}
-                  <div className="flex items-center gap-2 mb-5">
-                    <div className="w-8 h-8 rounded-lg bg-[#61f7a2]/20 flex items-center justify-center">
-                      <TrendingUp className="w-4 h-4 text-[#61f7a2]" />
-                    </div>
-                    <h3 className="text-sm font-semibold text-[#61f7a2] uppercase tracking-wider">Ta vision</h3>
-                  </div>
-
-                  {/* Revenue goal - big and bold */}
-                  {targetIncome && (
-                    <div className="mb-6">
-                      <p className="text-4xl md:text-5xl font-black text-white mb-1">
-                        {Number(targetIncome).toLocaleString('fr-FR')} EUR
-                        <span className="text-lg md:text-xl font-medium text-gray-400"> / mois</span>
-                      </p>
-                      {targetDelay && (
-                        <p className="text-sm text-gray-400">
-                          Ton objectif dans <span className="text-[#61f7a2] font-semibold">{targetDelay} mois</span>
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Life change story - the emotional "why" */}
-                  {lifeChangeStory && (
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6">
-                      <div className="flex items-start gap-3">
-                        <Heart className="w-5 h-5 text-pink-400 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-xs text-gray-400 font-medium mb-1.5 uppercase tracking-wide">Ce qui changerait dans ta vie</p>
-                          <p className="text-white/90 text-sm leading-relaxed line-clamp-4 italic">
-                            "{lifeChangeStory}"
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Bottom row: offer + CTA */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    {mainOffer?.title && (
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                          <Package className="w-5 h-5 text-[#61f7a2]" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-400">Offre principale</p>
-                          <p className="text-white font-semibold text-sm truncate max-w-[200px]">{mainOffer.title}</p>
-                          {mainOffer.price && (
-                            <p className="text-[#61f7a2] font-bold text-xs">{mainOffer.price}</p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    <Link
-                      to={createPageUrl('MyOffers')}
-                      className="flex items-center gap-2 px-5 py-3 bg-[#61f7a2] text-gray-900 rounded-xl font-semibold hover:bg-[#4de88f] transition-colors text-sm flex-shrink-0"
-                    >
-                      <Briefcase className="w-4 h-4" />
-                      Voir mes offres
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
 
           {/* ============ SESSIONS SECTION ============ */}
           <motion.div

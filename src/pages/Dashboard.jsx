@@ -314,18 +314,18 @@ export default function Dashboard() {
   // Revenue / goal data
   const mainOffer = fullSession?.finalized_offer?.mainProduct;
   const potentialRevenue = fullSession?.potential_revenue;
-  const targetIncome = fullSession?.onboarding_full?.target_income;
-  const targetDelay = fullSession?.onboarding_full?.target_delay;
+  const targetIncome = onboarding.targetIncome;
+  const targetDelay = onboarding.targetIncomeDelay;
+  const lifeChangeStory = onboarding.lifeChangeStory;
 
   // Onboarding recap data
-  const onboarding = fullSession?.onboarding_full || {};
   const onboardingItems = [
     { label: 'Competence', value: onboarding.coreSkill || fullSession?.skill, icon: Sparkles },
-    { label: 'Revenu cible', value: targetIncome, icon: DollarSign },
-    { label: 'Delai', value: targetDelay, icon: Clock },
-    { label: 'Ce qui changerait', value: onboarding.life_change, icon: Heart },
+    { label: 'Revenu cible', value: targetIncome ? `${Number(targetIncome).toLocaleString('fr-FR')} EUR/mois` : null, icon: DollarSign },
+    { label: 'Delai', value: targetDelay ? `${targetDelay} mois` : null, icon: Clock },
+    { label: 'Ce qui changerait', value: lifeChangeStory, icon: Heart },
     { label: 'Obstacles', value: onboarding.obstacles, icon: Zap },
-    { label: 'Preferences de livraison', value: onboarding.delivery_preferences, icon: Package },
+    { label: 'Preferences de livraison', value: onboarding.delivery_preferences || onboarding.deliveryPreferences, icon: Package },
   ].filter(item => item.value);
 
   if (authLoading || loading || sessionsLoading) {
@@ -386,65 +386,85 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          {/* ============ OBJECTIF / REVENU POTENTIEL ============ */}
-          {(mainOffer?.title || potentialRevenue || targetIncome) && (
+          {/* ============ BLOC VISION / OBJECTIF TRANSFORMATIONNEL ============ */}
+          {(targetIncome || lifeChangeStory || mainOffer?.title) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
               className="mb-8"
             >
-              <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 text-white overflow-hidden relative">
-                {/* Background pattern */}
-                <div className="absolute inset-0 opacity-5">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#61f7a2] rounded-full blur-3xl" />
-                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500 rounded-full blur-3xl" />
+              <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl overflow-hidden relative">
+                {/* Background glow */}
+                <div className="absolute inset-0">
+                  <div className="absolute top-0 right-0 w-72 h-72 bg-[#61f7a2]/10 rounded-full blur-3xl" />
+                  <div className="absolute bottom-0 left-0 w-56 h-56 bg-purple-500/10 rounded-full blur-3xl" />
                 </div>
 
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp className="w-5 h-5 text-[#61f7a2]" />
-                    <h3 className="text-sm font-semibold text-[#61f7a2] uppercase tracking-wider">Ton objectif</h3>
+                <div className="relative z-10 p-6 md:p-8">
+                  {/* Header */}
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="w-8 h-8 rounded-lg bg-[#61f7a2]/20 flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 text-[#61f7a2]" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-[#61f7a2] uppercase tracking-wider">Ta vision</h3>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Offre principale */}
-                    {mainOffer?.title && (
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">Offre principale</p>
-                        <p className="text-lg font-bold text-white truncate">{mainOffer.title}</p>
-                        {mainOffer.price && (
-                          <p className="text-[#61f7a2] font-bold text-xl mt-1">{mainOffer.price}</p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Revenu potentiel / cible */}
-                    {(potentialRevenue || targetIncome) && (
-                      <div>
-                        <p className="text-xs text-gray-400 mb-1">
-                          {potentialRevenue ? 'Revenu potentiel estime' : 'Objectif de revenu'}
+                  {/* Revenue goal - big and bold */}
+                  {targetIncome && (
+                    <div className="mb-6">
+                      <p className="text-4xl md:text-5xl font-black text-white mb-1">
+                        {Number(targetIncome).toLocaleString('fr-FR')} EUR
+                        <span className="text-lg md:text-xl font-medium text-gray-400"> / mois</span>
+                      </p>
+                      {targetDelay && (
+                        <p className="text-sm text-gray-400">
+                          Ton objectif dans <span className="text-[#61f7a2] font-semibold">{targetDelay} mois</span>
                         </p>
-                        <p className="text-2xl md:text-3xl font-bold text-white">
-                          {potentialRevenue || targetIncome}
-                        </p>
-                        {targetDelay && (
-                          <p className="text-sm text-gray-400 mt-1">Objectif : {targetDelay}</p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* CTA */}
-                    <div className="flex items-center">
-                      <Link
-                        to={createPageUrl('MyOffers')}
-                        className="flex items-center gap-2 px-5 py-3 bg-[#61f7a2] text-gray-900 rounded-xl font-semibold hover:bg-[#4de88f] transition-colors text-sm"
-                      >
-                        <Briefcase className="w-4 h-4" />
-                        Voir mes offres
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
+                      )}
                     </div>
+                  )}
+
+                  {/* Life change story - the emotional "why" */}
+                  {lifeChangeStory && (
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6">
+                      <div className="flex items-start gap-3">
+                        <Heart className="w-5 h-5 text-pink-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs text-gray-400 font-medium mb-1.5 uppercase tracking-wide">Ce qui changerait dans ta vie</p>
+                          <p className="text-white/90 text-sm leading-relaxed line-clamp-4 italic">
+                            "{lifeChangeStory}"
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bottom row: offer + CTA */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    {mainOffer?.title && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                          <Package className="w-5 h-5 text-[#61f7a2]" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400">Offre principale</p>
+                          <p className="text-white font-semibold text-sm truncate max-w-[200px]">{mainOffer.title}</p>
+                          {mainOffer.price && (
+                            <p className="text-[#61f7a2] font-bold text-xs">{mainOffer.price}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <Link
+                      to={createPageUrl('MyOffers')}
+                      className="flex items-center gap-2 px-5 py-3 bg-[#61f7a2] text-gray-900 rounded-xl font-semibold hover:bg-[#4de88f] transition-colors text-sm flex-shrink-0"
+                    >
+                      <Briefcase className="w-4 h-4" />
+                      Voir mes offres
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
                   </div>
                 </div>
               </div>

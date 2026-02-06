@@ -159,7 +159,7 @@ export default function ChooseYourPathNew() {
                     {/* CTA */}
                     <div className="flex-shrink-0">
                       <button
-                        onClick={() => navigate(createPageUrl(path.link))}
+                        onClick={() => path.isExternal ? window.open(path.link, '_blank') : navigate(createPageUrl(path.link))}
                         className={`w-full md:w-auto px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r ${path.bgGradient} hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg`}
                       >
                         {path.isCalendar ? (

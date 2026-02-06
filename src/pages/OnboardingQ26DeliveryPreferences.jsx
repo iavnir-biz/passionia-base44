@@ -25,13 +25,14 @@ export default function OnboardingQ26DeliveryPreferences() {
       customHandleSave={async (user, value) => {
         const currentUser = await base44.auth.me();
         
-        if (!currentUser.sessionId) {
+        const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+        if (!resolvedSessionId) {
           console.error('❌ [Q26] Pas de sessionId');
           alert('Session introuvable. Merci de recommencer.');
           return;
         }
-        
-        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+
+        const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
         if (sessions.length === 0) {
           console.error('❌ [Q26] Session introuvable');
           alert('Session introuvable. Merci de recommencer.');

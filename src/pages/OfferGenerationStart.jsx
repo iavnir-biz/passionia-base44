@@ -145,16 +145,18 @@ export default function OfferGenerationStart() {
     try {
       const user = await base44.auth.me();
       
-      if (!user.sessionId) {
-        console.error('❌ [OFFER_START] Pas de sessionId sur User');
+      // Utiliser activeSessionId (localStorage) avec fallback sur user.sessionId
+      const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || user.sessionId;
+      if (!resolvedSessionId) {
+        console.error('❌ [OFFER_START] Pas de sessionId');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
-      // 🔥 Charger session avec retry sur 429
+      // Charger session avec retry sur 429
       let sessions = null;
       try {
-        sessions = await base44.entities.Session.filter({ id: user.sessionId });
+        sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
       } catch (fetchError) {
         // Si 429 ou erreur réseau, retry 1 fois après délai
         if (retryCount === 0 && (fetchError.message?.includes('429') || fetchError.message?.includes('Too Many'))) {

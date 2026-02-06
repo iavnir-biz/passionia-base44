@@ -1,36 +1,36 @@
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { motion } from "framer-motion";
-import { Brain, Target, TrendingUp, FileText, Rocket, Check, ArrowRight } from "lucide-react";
+import { Target, TrendingUp, FileText, Rocket, Check, ArrowRight, Zap } from "lucide-react";
 
 const steps = [
   {
     icon: Target,
     color: "text-blue-500",
     bg: "bg-blue-50",
-    title: "On valide ton idee ensemble",
-    desc: "Je verifie si ta passion peut se vendre — avec de la vraie demande.",
+    title: "Ton idee, validee par l'IA",
+    desc: "On verifie que ta passion a un vrai marche — et des clients prets a payer.",
   },
   {
     icon: TrendingUp,
     color: "text-pink-500",
     bg: "bg-pink-50",
-    title: "On estime ton potentiel",
-    desc: "Combien tu peux generer, avec ton savoir et ton marche.",
+    title: "Ton potentiel de revenus",
+    desc: "Une estimation realiste de ce que tu peux generer des le premier mois.",
   },
   {
     icon: FileText,
     color: "text-amber-500",
     bg: "bg-amber-50",
-    title: "Je cree tes 4 offres",
-    desc: "Offres, prix, page de vente, messages, emails — tout est pret.",
+    title: "4 offres pretes a vendre",
+    desc: "Prix, page de vente, emails, messages — tout genere et personnalise pour toi.",
   },
   {
     icon: Rocket,
     color: "text-green-500",
     bg: "bg-green-50",
-    title: "Ton plan d'action sur 7 jours",
-    desc: "Une action par jour. Tu sais exactement quoi faire.",
+    title: "Un plan d'action sur 7 jours",
+    desc: "Chaque jour, une action claire. Tu sais exactement quoi faire pour lancer.",
   },
 ];
 
@@ -41,21 +41,6 @@ export default function Welcome() {
     <div className="min-h-screen bg-[#fafafa] flex flex-col items-center px-4 py-8 sm:py-12">
       <div className="w-full max-w-md">
 
-        {/* Noah Avatar */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex justify-center mb-6"
-        >
-          <div className="relative">
-            <div className="w-[72px] h-[72px] rounded-2xl bg-[#61f7a2] flex items-center justify-center shadow-lg shadow-[#61f7a2]/30">
-              <Brain size={36} className="text-white" />
-            </div>
-            <div className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-green-400 border-2 border-[#fafafa] animate-pulse" />
-          </div>
-        </motion.div>
-
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -64,13 +49,10 @@ export default function Welcome() {
           className="text-center mb-8"
         >
           <h1 className="text-[26px] font-extrabold text-gray-900 tracking-tight leading-tight mb-3">
-            Salut, moi c'est Noah.
+            Transforme ta passion<br />en activite rentable.
           </h1>
-          <p className="text-gray-500 text-sm leading-relaxed mb-4">
-            Je suis ton associe IA. A partir de maintenant, on construit <span className="text-gray-900 font-semibold">ensemble</span> ton activite en ligne.
-          </p>
-          <p className="text-gray-900 font-semibold text-[15px]">
-            Voici comment on va travailler :
+          <p className="text-gray-500 text-sm leading-relaxed">
+            En <span className="text-gray-900 font-semibold">5 minutes</span>, tu repars avec un business valide, des offres pretes et un plan d'action concret.
           </p>
         </motion.div>
 
@@ -130,19 +112,22 @@ export default function Welcome() {
           onClick={() => navigate(createPageUrl("OnboardingFirstName"))}
           className="w-full flex items-center justify-center gap-2.5 py-[18px] px-6 bg-gradient-to-b from-gray-900 to-black text-white rounded-2xl text-[17px] font-bold shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-[#61f7a2]/20 hover:-translate-y-0.5 transition-all active:scale-[0.98]"
         >
-          Commencer avec Noah
+          C'est parti
           <ArrowRight className="w-5 h-5" />
         </motion.button>
 
-        {/* Micro social proof */}
-        <motion.p
+        {/* Signup mention */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="text-center text-xs text-gray-400 mt-4"
+          className="flex items-center justify-center gap-1.5 mt-4"
         >
-          Rejoins les entrepreneurs qui monetisent deja leur savoir.
-        </motion.p>
+          <Zap className="w-3.5 h-3.5 text-[#61f7a2]" />
+          <span className="text-xs text-gray-400">
+            Cree ton compte en 10 secondes, et on attaque.
+          </span>
+        </motion.div>
       </div>
     </div>
   );

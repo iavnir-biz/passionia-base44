@@ -24,7 +24,6 @@ export default function OnboardingFirstName() {
           return;
         }
         setIsCheckingAuth(false);
-        // Petit delai pour laisser l'avatar apparaitre puis reveal le contenu
         setTimeout(() => setShowContent(true), 600);
       } catch (error) {
         console.error('Auth check error:', error);
@@ -183,21 +182,21 @@ export default function OnboardingFirstName() {
           transition={{ delay: 0.3, duration: 0.5 }}
           className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm"
         >
-          {/* Noah's message - visible fast */}
+          {/* Noah's message */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={showContent ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.4 }}
           >
             <p className="text-xl font-bold text-gray-900 leading-relaxed mb-2">
-              On va faire connaissance.
+              Salut, moi c'est Noah.
             </p>
             <p className="text-gray-600 text-sm leading-relaxed mb-6">
-              Je suis <span className="text-[#61f7a2] font-semibold">Noah</span>, ton associe IA. Ensemble, on va construire ton activite — de l'idee au premier euro. Mais d'abord...
+              Je suis ton <span className="text-[#61f7a2] font-semibold">associe IA</span>. A partir de maintenant, on bosse ensemble — de l'idee jusqu'a ton premier euro. Mais d'abord...
             </p>
           </motion.div>
 
-          {/* Question + input - appears right after */}
+          {/* Question + input */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={showContent ? { opacity: 1, y: 0 } : {}}

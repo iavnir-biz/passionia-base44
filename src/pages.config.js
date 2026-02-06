@@ -63,11 +63,9 @@ import Documents from './pages/Documents';
 import DoneForYouElite from './pages/DoneForYouElite';
 import DownsellSession from './pages/DownsellSession';
 import EmailsMarketing from './pages/EmailsMarketing';
-import EtComment from './pages/EtComment';
 import GenerationProgress from './pages/GenerationProgress';
 import Home from './pages/Home';
 import MarketAnalysis from './pages/MarketAnalysis';
-import MonetiserSavoir from './pages/MonetiserSavoir';
 import MyOffers from './pages/MyOffers';
 import NoahGeneration from './pages/NoahGeneration';
 import NovaChat from './pages/NovaChat';
@@ -100,14 +98,6 @@ import OnboardingQ23Obstacles from './pages/OnboardingQ23Obstacles';
 import OnboardingQ24IfNothingChanges from './pages/OnboardingQ24IfNothingChanges';
 import OnboardingQ25Readiness from './pages/OnboardingQ25Readiness';
 import OnboardingQ26DeliveryPreferences from './pages/OnboardingQ26DeliveryPreferences';
-import OnboardingQ2ExperienceLevel from './pages/OnboardingQ2ExperienceLevel';
-import OnboardingQ3Years from './pages/OnboardingQ3Years';
-import OnboardingQ4TargetAudience from './pages/OnboardingQ4TargetAudience';
-import OnboardingQ5MainProblem from './pages/OnboardingQ5MainProblem';
-import OnboardingQ6FirstResult from './pages/OnboardingQ6FirstResult';
-import OnboardingQ7FinalTransformation from './pages/OnboardingQ7FinalTransformation';
-import OnboardingQ8MainTeaching from './pages/OnboardingQ8MainTeaching';
-import OnboardingQ9Method from './pages/OnboardingQ9Method';
 import OnboardingTransition from './pages/OnboardingTransition';
 import PlanAction from './pages/PlanAction';
 import PlanStepDetail from './pages/PlanStepDetail';
@@ -121,9 +111,10 @@ import SkoolAbonnement from './pages/SkoolAbonnement';
 import SkoolComparaison from './pages/SkoolComparaison';
 import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
-import VotreForce from './pages/VotreForce';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
+import EtComment from './pages/EtComment';
+import MonetiserSavoir from './pages/MonetiserSavoir';
 
 
 export const PAGES = {
@@ -143,11 +134,9 @@ export const PAGES = {
     "DoneForYouElite": DoneForYouElite,
     "DownsellSession": DownsellSession,
     "EmailsMarketing": EmailsMarketing,
-    "EtComment": EtComment,
     "GenerationProgress": GenerationProgress,
     "Home": Home,
     "MarketAnalysis": MarketAnalysis,
-    "MonetiserSavoir": MonetiserSavoir,
     "MyOffers": MyOffers,
     "NoahGeneration": NoahGeneration,
     "NovaChat": NovaChat,
@@ -180,14 +169,6 @@ export const PAGES = {
     "OnboardingQ24IfNothingChanges": OnboardingQ24IfNothingChanges,
     "OnboardingQ25Readiness": OnboardingQ25Readiness,
     "OnboardingQ26DeliveryPreferences": OnboardingQ26DeliveryPreferences,
-    "OnboardingQ2ExperienceLevel": OnboardingQ2ExperienceLevel,
-    "OnboardingQ3Years": OnboardingQ3Years,
-    "OnboardingQ4TargetAudience": OnboardingQ4TargetAudience,
-    "OnboardingQ5MainProblem": OnboardingQ5MainProblem,
-    "OnboardingQ6FirstResult": OnboardingQ6FirstResult,
-    "OnboardingQ7FinalTransformation": OnboardingQ7FinalTransformation,
-    "OnboardingQ8MainTeaching": OnboardingQ8MainTeaching,
-    "OnboardingQ9Method": OnboardingQ9Method,
     "OnboardingTransition": OnboardingTransition,
     "PlanAction": PlanAction,
     "PlanStepDetail": PlanStepDetail,
@@ -201,9 +182,10 @@ export const PAGES = {
     "SkoolComparaison": SkoolComparaison,
     "SocialMedia": SocialMedia,
     "UpsellCoaching": UpsellCoaching,
-    "VotreForce": VotreForce,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
+    "EtComment": EtComment,
+    "MonetiserSavoir": MonetiserSavoir,
 }
 
 export const pagesConfig = {

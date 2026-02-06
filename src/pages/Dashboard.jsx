@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
 import { useSessionManager } from '@/components/hooks/useSessionManager';
 import { calculateProgressFromSession, getCurrentDay } from '@/utils/progressUtils';
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Target,
   ArrowRight,
@@ -17,15 +17,11 @@ import {
   Users,
   FileText,
   Loader2,
-  Clock,
   Sparkles,
   Plus,
   Lock,
-  ChevronDown,
   Download,
-  DollarSign,
-  Heart,
-  Zap
+  MessageSquare
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -67,8 +63,10 @@ export default function Dashboard() {
   // Session view mode
   const [viewMode, setViewMode] = useState('detail'); // 'detail' | 'grid'
 
-  // Onboarding recap toggle
-  const [showOnboardingRecap, setShowOnboardingRecap] = useState(false);
+  // Feedback
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackSending, setFeedbackSending] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -312,7 +310,6 @@ export default function Dashboard() {
   const onboarding = fullSession?.onboarding_full || {};
   const targetIncome = onboarding.targetIncome;
   const targetDelay = onboarding.targetIncomeDelay;
-  const lifeChangeStory = onboarding.lifeChangeStory;
 
   // Revenue tracker (interactive)
   const targetNum = Number(targetIncome) || 0;
@@ -369,15 +366,25 @@ export default function Dashboard() {
   const remaining = Math.max(0, targetNum - currentRevenue);
   const revenuePercent = targetNum > 0 ? Math.min(100, Math.round((currentRevenue / targetNum) * 100)) : 0;
 
-  // Onboarding recap data
-  const onboardingItems = [
-    { label: 'Competence', value: onboarding.coreSkill || fullSession?.skill, icon: Sparkles },
-    { label: 'Revenu cible', value: targetIncome ? `${Number(targetIncome).toLocaleString('fr-FR')} EUR/mois` : null, icon: DollarSign },
-    { label: 'Delai', value: targetDelay ? `${targetDelay} mois` : null, icon: Clock },
-    { label: 'Ce qui changerait', value: lifeChangeStory, icon: Heart },
-    { label: 'Obstacles', value: onboarding.obstacles, icon: Zap },
-    { label: 'Preferences de livraison', value: onboarding.delivery_preferences || onboarding.deliveryPreferences, icon: Package },
-  ].filter(item => item.value);
+  const handleSendFeedback = async () => {
+    if (!feedbackText.trim() || !user) return;
+    setFeedbackSending(true);
+    try {
+      await base44.entities.Feedback.create({
+        message: feedbackText.trim(),
+        user_email: user.email,
+        user_name: profile?.first_name || user.full_name || '',
+        session_id: activeSessionId || null
+      });
+      setFeedbackSent(true);
+      setFeedbackText('');
+      setTimeout(() => setFeedbackSent(false), 4000);
+    } catch (err) {
+      console.error('[Dashboard] Error sending feedback:', err);
+    } finally {
+      setFeedbackSending(false);
+    }
+  };
 
   if (authLoading || loading || sessionsLoading) {
     return (
@@ -778,61 +785,49 @@ export default function Dashboard() {
                 </Link>
               </motion.div>
 
-              {/* ============ MON PROFIL ENTREPRENEUR (RECAP ONBOARDING) ============ */}
-              {onboardingItems.length > 0 && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                  className="bg-white rounded-2xl border border-gray-200 mb-8 overflow-hidden">
-                  <button
-                    onClick={() => setShowOnboardingRecap(!showOnboardingRecap)}
-                    className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                        <User className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900">Mon profil entrepreneur</h3>
-                        <p className="text-sm text-gray-500">Tes reponses d'onboarding</p>
-                      </div>
-                    </div>
-                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showOnboardingRecap ? 'rotate-180' : ''}`} />
-                  </button>
+              {/* ============ FEEDBACK ============ */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 mb-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900">Un retour ? Une idee ?</h3>
+                    <p className="text-xs text-gray-500">Aide-nous a ameliorer Passionia</p>
+                  </div>
+                </div>
 
-                  <AnimatePresence>
-                    {showOnboardingRecap && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
+                {feedbackSent ? (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                    <p className="text-sm font-semibold text-green-700">Merci pour ton retour !</p>
+                    <p className="text-xs text-green-600 mt-1">On lit tout et on prend en compte.</p>
+                  </div>
+                ) : (
+                  <>
+                    <textarea
+                      value={feedbackText}
+                      onChange={(e) => setFeedbackText(e.target.value)}
+                      placeholder="Dis-nous ce qui te plait, ce qu'on pourrait ameliorer, ou une fonctionnalite que tu aimerais..."
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-700 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all bg-white"
+                      rows={3}
+                    />
+                    <div className="flex justify-end mt-3">
+                      <button
+                        onClick={handleSendFeedback}
+                        disabled={feedbackSending || !feedbackText.trim()}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       >
-                        <div className="px-6 pb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {onboardingItems.map((item, idx) => {
-                            const Icon = item.icon;
-                            const displayValue = typeof item.value === 'object'
-                              ? (Array.isArray(item.value)
-                                  ? item.value.join(', ')
-                                  : JSON.stringify(item.value))
-                              : String(item.value);
-                            return (
-                              <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0 mt-0.5">
-                                  <Icon className="w-4 h-4 text-gray-600" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs text-gray-500 font-medium">{item.label}</p>
-                                  <p className="text-sm text-gray-900 mt-0.5 line-clamp-3">{displayValue}</p>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              )}
+                        {feedbackSending ? (
+                          <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Envoi...</>
+                        ) : (
+                          <><Send className="w-3.5 h-3.5" /> Envoyer</>
+                        )}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </motion.div>
             </>
           )}
 

@@ -21,13 +21,19 @@ import {
   Sparkles,
   Plus,
   Lock,
-  ChevronDown
+  ChevronDown,
+  Download,
+  TrendingUp,
+  DollarSign,
+  Briefcase,
+  Heart,
+  Zap,
+  ChevronUp
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import ProgressBar from '@/components/ui/ProgressBar';
 import GlowButton from '@/components/ui/GlowButton';
-import ChatBubble from '@/components/chat/ChatBubble';
 import SessionCard from '@/components/sessions/SessionCard';
 import SessionCounter from '@/components/sessions/SessionCounter';
 import SessionPaywallModal from '@/components/sessions/SessionPaywallModal';
@@ -63,6 +69,9 @@ export default function Dashboard() {
 
   // Session view mode
   const [viewMode, setViewMode] = useState('detail'); // 'detail' | 'grid'
+
+  // Onboarding recap toggle
+  const [showOnboardingRecap, setShowOnboardingRecap] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -130,7 +139,6 @@ export default function Dashboard() {
 
     const result = await createSession();
     if (result.success) {
-      // Redirect vers onboarding pour la nouvelle session
       navigate(createPageUrl('OnboardingFirstName'));
     } else if (result.error === 'upgrade_required') {
       setPaywallType('upgrade_required');
@@ -144,6 +152,112 @@ export default function Dashboard() {
   const handleSelectSession = (sessionId) => {
     switchSession(sessionId);
     setViewMode('detail');
+  };
+
+  // Download all documents
+  const handleDownloadAll = () => {
+    if (!fullSession) return;
+
+    const sections = [];
+    const sessionName = activeSession?.session_name || 'Session';
+    const skill = fullSession.skill || fullSession.onboarding_full?.coreSkill || '';
+
+    sections.push(`=== ${sessionName} - Documents generes par Noah ===`);
+    sections.push(`Competence : ${skill}`);
+    sections.push(`Date : ${new Date().toLocaleDateString('fr-FR')}`);
+    sections.push('');
+
+    // SWOT
+    if (fullSession.complete_market_analysis) {
+      sections.push('━━━ ANALYSE SWOT ━━━');
+      const ma = fullSession.complete_market_analysis;
+      if (ma.market_overview) {
+        sections.push(`Marche : ${ma.market_overview.definition || ''}`);
+        sections.push(`Taille : ${ma.market_overview.size || ''}`);
+      }
+      if (ma.swot) {
+        sections.push(`Forces : ${(ma.swot.strengths || []).map(s => s.text || s).join(', ')}`);
+        sections.push(`Faiblesses : ${(ma.swot.weaknesses || []).map(s => s.text || s).join(', ')}`);
+        sections.push(`Opportunites : ${(ma.swot.opportunities || []).map(s => s.text || s).join(', ')}`);
+        sections.push(`Menaces : ${(ma.swot.threats || []).map(s => s.text || s).join(', ')}`);
+      }
+      sections.push('');
+    }
+
+    // Avatars
+    if (fullSession.generated_avatars) {
+      sections.push('━━━ AVATARS CLIENTS ━━━');
+      const avatars = Array.isArray(fullSession.generated_avatars) ? fullSession.generated_avatars : [];
+      avatars.forEach((a, i) => {
+        sections.push(`\nAvatar ${i + 1} : ${a.identity?.name || a.name || `Avatar ${i + 1}`}`);
+        if (a.identity) {
+          sections.push(`  Age : ${a.identity.age_range || ''}`);
+          sections.push(`  Situation : ${a.identity.life_situation || ''}`);
+        }
+        if (a.in_their_head) {
+          sections.push(`  Emotion dominante : ${a.in_their_head.dominant_emotion || ''}`);
+          sections.push(`  Phrase interieure : ${a.in_their_head.inner_phrase || ''}`);
+        }
+      });
+      sections.push('');
+    }
+
+    // Offres
+    if (fullSession.finalized_offer) {
+      sections.push('━━━ OFFRES ━━━');
+      const offer = fullSession.finalized_offer;
+      if (offer.mainProduct) {
+        sections.push(`Offre principale : ${offer.mainProduct.title || ''}`);
+        sections.push(`  Prix : ${offer.mainProduct.price || ''}`);
+        sections.push(`  Description : ${offer.mainProduct.subtitle || ''}`);
+      }
+      if (offer.orderBump) {
+        sections.push(`Order Bump : ${offer.orderBump.title || ''} - ${offer.orderBump.price || ''}`);
+      }
+      if (offer.upsells) {
+        offer.upsells.forEach((u, i) => {
+          sections.push(`Upsell ${i + 1} : ${u.title || ''} - ${u.price || ''}`);
+        });
+      }
+      sections.push('');
+    }
+
+    // Messages
+    if (fullSession.generated_sales_messages) {
+      sections.push('━━━ MESSAGES DE VENTE ━━━');
+      const msgs = Array.isArray(fullSession.generated_sales_messages) ? fullSession.generated_sales_messages : [];
+      msgs.forEach((m, i) => {
+        sections.push(`\nMessage ${i + 1} : ${m.title || m.name || ''}`);
+        sections.push(`Objectif : ${m.objective || ''}`);
+        sections.push(`Contenu :`);
+        sections.push(m.content || m.message || m.text || '');
+      });
+      sections.push('');
+    }
+
+    // Emails
+    if (fullSession.generated_marketing_emails) {
+      sections.push('━━━ EMAILS MARKETING ━━━');
+      const emails = Array.isArray(fullSession.generated_marketing_emails) ? fullSession.generated_marketing_emails : [];
+      emails.forEach((e, i) => {
+        sections.push(`\nEmail ${i + 1} : ${e.title || e.name || ''}`);
+        sections.push(`Objet : ${e.subject || ''}`);
+        sections.push(`Contenu :`);
+        sections.push(e.body || e.content || '');
+      });
+      sections.push('');
+    }
+
+    const content = sections.join('\n');
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${sessionName.replace(/\s+/g, '_')}_documents_noah.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   // Existing logic for active session
@@ -197,6 +311,23 @@ export default function Dashboard() {
 
   const countGenerated = () => livrables.filter(item => fullSession?.[item.field]).length;
 
+  // Revenue / goal data
+  const mainOffer = fullSession?.finalized_offer?.mainProduct;
+  const potentialRevenue = fullSession?.potential_revenue;
+  const targetIncome = fullSession?.onboarding_full?.target_income;
+  const targetDelay = fullSession?.onboarding_full?.target_delay;
+
+  // Onboarding recap data
+  const onboarding = fullSession?.onboarding_full || {};
+  const onboardingItems = [
+    { label: 'Competence', value: onboarding.coreSkill || fullSession?.skill, icon: Sparkles },
+    { label: 'Revenu cible', value: targetIncome, icon: DollarSign },
+    { label: 'Delai', value: targetDelay, icon: Clock },
+    { label: 'Ce qui changerait', value: onboarding.life_change, icon: Heart },
+    { label: 'Obstacles', value: onboarding.obstacles, icon: Zap },
+    { label: 'Preferences de livraison', value: onboarding.delivery_preferences, icon: Package },
+  ].filter(item => item.value);
+
   if (authLoading || loading || sessionsLoading) {
     return (
       <div className="flex min-h-screen bg-white">
@@ -226,6 +357,7 @@ export default function Dashboard() {
           subtitle={`Bienvenue ${user?.full_name?.split(' ')[0] || ''} !`}
           user={user}
           onMenuClick={() => setIsSidebarOpen(true)}
+          session={fullSession}
         />
 
         <main className="p-4 sm:p-8 max-w-6xl mx-auto">
@@ -254,11 +386,76 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
+          {/* ============ OBJECTIF / REVENU POTENTIEL ============ */}
+          {(mainOffer?.title || potentialRevenue || targetIncome) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="mb-8"
+            >
+              <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 text-white overflow-hidden relative">
+                {/* Background pattern */}
+                <div className="absolute inset-0 opacity-5">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#61f7a2] rounded-full blur-3xl" />
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500 rounded-full blur-3xl" />
+                </div>
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <TrendingUp className="w-5 h-5 text-[#61f7a2]" />
+                    <h3 className="text-sm font-semibold text-[#61f7a2] uppercase tracking-wider">Ton objectif</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Offre principale */}
+                    {mainOffer?.title && (
+                      <div>
+                        <p className="text-xs text-gray-400 mb-1">Offre principale</p>
+                        <p className="text-lg font-bold text-white truncate">{mainOffer.title}</p>
+                        {mainOffer.price && (
+                          <p className="text-[#61f7a2] font-bold text-xl mt-1">{mainOffer.price}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Revenu potentiel / cible */}
+                    {(potentialRevenue || targetIncome) && (
+                      <div>
+                        <p className="text-xs text-gray-400 mb-1">
+                          {potentialRevenue ? 'Revenu potentiel estime' : 'Objectif de revenu'}
+                        </p>
+                        <p className="text-2xl md:text-3xl font-bold text-white">
+                          {potentialRevenue || targetIncome}
+                        </p>
+                        {targetDelay && (
+                          <p className="text-sm text-gray-400 mt-1">Objectif : {targetDelay}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* CTA */}
+                    <div className="flex items-center">
+                      <Link
+                        to={createPageUrl('MyOffers')}
+                        className="flex items-center gap-2 px-5 py-3 bg-[#61f7a2] text-gray-900 rounded-xl font-semibold hover:bg-[#4de88f] transition-colors text-sm"
+                      >
+                        <Briefcase className="w-4 h-4" />
+                        Voir mes offres
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* ============ SESSIONS SECTION ============ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
+            transition={{ delay: 0.1 }}
             className="mb-8"
           >
             {/* Header sessions */}
@@ -325,7 +522,7 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Info message pour payant 5/5 */}
+            {/* Info message pour payant 3/3 */}
             {isPaid && !canCreate && (
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
                 <div className="flex items-start gap-3">
@@ -392,7 +589,7 @@ export default function Dashboard() {
           {/* ============ ACTIVE SESSION DETAIL ============ */}
           {fullSession && (
             <>
-              {/* Session info header (payant avec multi-sessions) */}
+              {/* Session info header */}
               {sessions.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -445,7 +642,18 @@ export default function Dashboard() {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-bold text-gray-900">Tes documents IA</h3>
-                  <span className="text-sm text-gray-600"><span className="font-bold text-[#61f7a2]">{countGenerated()}</span> / {livrables.length}</span>
+                  <div className="flex items-center gap-3">
+                    {countGenerated() > 0 && (
+                      <button
+                        onClick={handleDownloadAll}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-medium transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Tout telecharger
+                      </button>
+                    )}
+                    <span className="text-sm text-gray-600"><span className="font-bold text-[#61f7a2]">{countGenerated()}</span> / {livrables.length}</span>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {livrables.map((item) => {
@@ -473,7 +681,7 @@ export default function Dashboard() {
 
               {/* PLAN 7 JOURS */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-                className="bg-gray-50 rounded-2xl border border-gray-200 p-6">
+                className="bg-gray-50 rounded-2xl border border-gray-200 p-6 mb-8">
                 <p className="text-lg font-bold text-gray-900 mb-4">Tu es au jour {getCurrentDay(fullSession)}</p>
                 <div className="flex items-center gap-2 mb-6">
                   {[1, 2, 3, 4, 5, 6, 7].map((day) => (
@@ -488,6 +696,62 @@ export default function Dashboard() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </motion.div>
+
+              {/* ============ MON PROFIL ENTREPRENEUR (RECAP ONBOARDING) ============ */}
+              {onboardingItems.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                  className="bg-white rounded-2xl border border-gray-200 mb-8 overflow-hidden">
+                  <button
+                    onClick={() => setShowOnboardingRecap(!showOnboardingRecap)}
+                    className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                        <User className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900">Mon profil entrepreneur</h3>
+                        <p className="text-sm text-gray-500">Tes reponses d'onboarding</p>
+                      </div>
+                    </div>
+                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showOnboardingRecap ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {showOnboardingRecap && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 pb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {onboardingItems.map((item, idx) => {
+                            const Icon = item.icon;
+                            const displayValue = typeof item.value === 'object'
+                              ? (Array.isArray(item.value)
+                                  ? item.value.join(', ')
+                                  : JSON.stringify(item.value))
+                              : String(item.value);
+                            return (
+                              <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0 mt-0.5">
+                                  <Icon className="w-4 h-4 text-gray-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-gray-500 font-medium">{item.label}</p>
+                                  <p className="text-sm text-gray-900 mt-0.5 line-clamp-3">{displayValue}</p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
             </>
           )}
 
@@ -512,8 +776,6 @@ export default function Dashboard() {
 
         </main>
       </div>
-
-      <ChatBubble />
 
       {/* Modals */}
       <SessionPaywallModal

@@ -312,6 +312,7 @@ export default function Dashboard() {
   const countGenerated = () => livrables.filter(item => fullSession?.[item.field]).length;
 
   // Revenue / goal data
+  const onboarding = fullSession?.onboarding_full || {};
   const mainOffer = fullSession?.finalized_offer?.mainProduct;
   const potentialRevenue = fullSession?.potential_revenue;
   const targetIncome = onboarding.targetIncome;

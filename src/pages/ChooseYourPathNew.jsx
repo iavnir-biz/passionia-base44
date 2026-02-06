@@ -61,7 +61,8 @@ export default function ChooseYourPathNew() {
         'Garantie 2000€ de CA en 60 jours'
       ],
       cta: 'Réserver un appel',
-      link: 'Booking',
+      link: 'https://calendar.app.google/tf8vMtGAXWHZgjJz8',
+      isExternal: true,
       bgGradient: 'from-yellow-500 to-amber-600',
       borderColor: 'border-yellow-500',
       bgLight: 'bg-yellow-50',

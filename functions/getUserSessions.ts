@@ -14,17 +14,42 @@ Deno.serve(async (req) => {
     }
 
     const isPaid = user.has_purchased === true;
-    const maxSessions = isPaid ? 5 : 1;
+    const maxSessions = isPaid ? 3 : 1;
 
     // Récupérer toutes les sessions
     const sessions = await base44.entities.Session.filter({ created_by: user.email });
 
+    // Trier par date de création pour assigner des numéros séquentiels
+    const sortedByDate = [...sessions].sort((a, b) =>
+      new Date(a.created_date || 0).getTime() - new Date(b.created_date || 0).getTime()
+    );
+
+    // Assigner des numéros séquentiels (1, 2, 3) basés sur l'ordre de création
+    // et backfill les sessions qui n'ont pas de session_number
+    for (let i = 0; i < sortedByDate.length; i++) {
+      const correctNumber = i + 1;
+      if (!sortedByDate[i].session_number || sortedByDate[i].session_number !== correctNumber) {
+        try {
+          await base44.entities.Session.update(sortedByDate[i].id, {
+            session_number: correctNumber,
+            session_name: sortedByDate[i].session_name || `Session ${correctNumber}`
+          });
+          sortedByDate[i].session_number = correctNumber;
+          if (!sortedByDate[i].session_name) {
+            sortedByDate[i].session_name = `Session ${correctNumber}`;
+          }
+        } catch (e) {
+          console.warn('[getUserSessions] Backfill error for session', sortedByDate[i].id, e);
+        }
+      }
+    }
+
     // Formatter pour le dashboard
-    const formattedSessions = sessions
-      .map(s => ({
+    const formattedSessions = sortedByDate
+      .map((s, index) => ({
         id: s.id,
-        session_number: s.session_number || 1,
-        session_name: s.session_name || `Session ${s.session_number || 1}`,
+        session_number: s.session_number || (index + 1),
+        session_name: s.session_name || `Session ${s.session_number || (index + 1)}`,
         skill: s.skill || s.onboarding_full?.coreSkill || '',
         created_date: s.created_date,
         updated_date: s.updated_date,

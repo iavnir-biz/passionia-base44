@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { X, Lock, Sparkles, RefreshCw, LayoutDashboard, FileText, Check } from 'lucide-react';
+import { X, Lock, Sparkles, LayoutDashboard, FileText, Check } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 
 /**
@@ -56,11 +56,10 @@ export default function SessionPaywallModal({ isOpen, onClose, type = 'upgrade_r
                     <Sparkles className="w-8 h-8 text-[#61f7a2]" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    Tu as cree tes 5 sessions !
+                    Tu as cree tes 3 sessions !
                   </h2>
                   <p className="text-gray-600">
                     Elles restent accessibles dans ton dashboard.
-                    Tu peux les regenerer autant de fois que tu veux.
                   </p>
                 </div>
 
@@ -88,8 +87,7 @@ export default function SessionPaywallModal({ isOpen, onClose, type = 'upgrade_r
 
                 <div className="space-y-3 mb-6">
                   {[
-                    { icon: Sparkles, text: '5 sessions au total' },
-                    { icon: RefreshCw, text: 'Recommencer autant de fois que tu veux' },
+                    { icon: Sparkles, text: '3 sessions au total' },
                     { icon: LayoutDashboard, text: 'Dashboard complet avec historique' },
                     { icon: FileText, text: 'Tous tes documents accessibles' },
                   ].map((feature, i) => (

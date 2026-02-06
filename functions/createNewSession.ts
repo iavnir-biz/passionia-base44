@@ -3,7 +3,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 /**
  * Crée une nouvelle session pour un utilisateur
  * Vérifie les limites avant création
- * Gratuit : 1 session max / Payant : 5 sessions max
+ * Gratuit : 1 session max / Payant : 3 sessions max
  */
 Deno.serve(async (req) => {
   try {
@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
     }
 
     const isPaid = user.has_purchased === true;
-    const maxSessions = isPaid ? 5 : 1;
+    const maxSessions = isPaid ? 3 : 1;
 
     // Compter les sessions existantes
     const existingSessions = await base44.entities.Session.filter({ created_by: user.email });
@@ -26,8 +26,8 @@ Deno.serve(async (req) => {
         success: false,
         error: isPaid ? 'limit_reached' : 'upgrade_required',
         message: isPaid
-          ? 'Tu as créé tes 5 sessions. Tu peux les régénérer autant de fois que tu veux.'
-          : 'Passe Premium pour débloquer 5 sessions et recommencer tes parcours.',
+          ? 'Tu as créé tes 3 sessions. Elles restent accessibles dans ton dashboard.'
+          : 'Passe Premium pour débloquer 3 sessions.',
         current: currentCount,
         max: maxSessions
       }, { status: 403 });

@@ -382,6 +382,22 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
+          {/* OBJECTIF REVENU - phrase motivante */}
+          {targetIncome && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-8">
+              <p className="text-gray-500 text-sm font-medium mb-1">Ton objectif</p>
+              <p className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
+                {Number(targetIncome).toLocaleString('fr-FR')} <span className="text-[#61f7a2]">EUR</span>
+                <span className="text-lg sm:text-xl font-semibold text-gray-400 ml-1">/ mois</span>
+              </p>
+              {targetDelay && (
+                <p className="text-gray-600 mt-1 text-base">
+                  Dans <span className="font-bold text-gray-900">{targetDelay} mois</span> — c'est maintenant que ca se joue.
+                </p>
+              )}
+            </motion.div>
+          )}
+
           {/* ============ SESSIONS SECTION ============ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

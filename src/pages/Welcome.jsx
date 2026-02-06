@@ -1,343 +1,149 @@
-import { useState } from "react";
-import { Brain } from "lucide-react";
-
-const SparkleIcon = ({ size = 20, color = "currentColor" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-  </svg>
-);
-
-const ArrowIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12h14M12 5l7 7-7 7"/>
-  </svg>
-);
-
-const TargetIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-  </svg>
-);
-
-const TrendingIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-  </svg>
-);
-
-const FileIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-  </svg>
-);
-
-const RocketIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3dd67a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 6 9 17l-5-5"/>
-  </svg>
-);
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { motion } from "framer-motion";
+import { Brain, Target, TrendingUp, FileText, Rocket, Check, ArrowRight } from "lucide-react";
 
 const steps = [
   {
-    icon: <TargetIcon />,
-    color: "#3b82f6",
-    bgColor: "rgba(59, 130, 246, 0.08)",
-    title: "Je valide ton idée",
-    desc: "Je vérifie si ta passion peut réellement se vendre, dans ta niche, avec de la vraie demande.",
+    icon: Target,
+    color: "text-blue-500",
+    bg: "bg-blue-50",
+    title: "On valide ton idee ensemble",
+    desc: "Je verifie si ta passion peut se vendre — avec de la vraie demande.",
   },
   {
-    icon: <TrendingIcon />,
-    color: "#ec4899",
-    bgColor: "rgba(236, 72, 153, 0.08)",
-    title: "J'estime tes revenus",
-    desc: "Je calcule combien tu peux générer avec ton savoir, ton vécu et ton marché.",
+    icon: TrendingUp,
+    color: "text-pink-500",
+    bg: "bg-pink-50",
+    title: "On estime ton potentiel",
+    desc: "Combien tu peux generer, avec ton savoir et ton marche.",
   },
   {
-    icon: <FileIcon />,
-    color: "#f59e0b",
-    bgColor: "rgba(245, 158, 11, 0.08)",
-    title: "Je crée tes 4 offres",
-    desc: "Offres complètes avec les prix, ta page de vente, tes messages et emails — tout est prêt.",
+    icon: FileText,
+    color: "text-amber-500",
+    bg: "bg-amber-50",
+    title: "Je cree tes 4 offres",
+    desc: "Offres, prix, page de vente, messages, emails — tout est pret.",
   },
   {
-    icon: <RocketIcon />,
-    color: "#22c55e",
-    bgColor: "rgba(34, 197, 94, 0.08)",
-    title: "Je construis ton plan d'action",
-    desc: "Semaine par semaine, une action par jour. Tu sais exactement quoi faire.",
+    icon: Rocket,
+    color: "text-green-500",
+    bg: "bg-green-50",
+    title: "Ton plan d'action sur 7 jours",
+    desc: "Une action par jour. Tu sais exactement quoi faire.",
   },
 ];
 
-export default function TeaserPage() {
-  const [hoveredStep, setHoveredStep] = useState(null);
+export default function Welcome() {
+  const navigate = useNavigate();
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#fafafa",
-      fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-      display: "flex",
-      flexDirection: "column",
-    }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet" />
+    <div className="min-h-screen bg-[#fafafa] flex flex-col items-center px-4 py-8 sm:py-12">
+      <div className="w-full max-w-md">
 
-
-
-      {/* Contenu principal */}
-      <div style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "16px 16px 40px",
-        maxWidth: "440px",
-        margin: "0 auto",
-        width: "100%",
-        boxSizing: "border-box",
-      }}>
-
-        {/* ━━━ Hero ━━━ */}
-        <div style={{
-          textAlign: "center",
-          marginBottom: "32px",
-          animation: "fadeInUp 0.5s ease-out",
-        }}>
-          {/* Avatar Noah - Brain Icon */}
-          <div style={{
-            position: "relative",
-            display: "inline-flex",
-            marginBottom: "20px",
-            animation: "fadeInUp 0.5s ease-out 0.1s both",
-          }}>
-            <div style={{
-              width: "72px",
-              height: "72px",
-              borderRadius: "18px",
-              background: "#61f7a2",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 8px 24px rgba(97,247,162,0.3)",
-            }}>
-              <Brain size={36} color="white" />
-            </div>
-            {/* Dot vert qui pulse */}
-            <div style={{
-              position: "absolute",
-              bottom: "2px",
-              right: "2px",
-              width: "14px",
-              height: "14px",
-              borderRadius: "50%",
-              background: "#3dd67a",
-              border: "2px solid #fafafa",
-              animation: "pulse 2s ease-in-out infinite",
-            }} />
-          </div>
-
-          <h1 style={{
-            fontSize: "26px",
-            fontWeight: 800,
-            color: "#111",
-            margin: "0 0 10px",
-            lineHeight: 1.2,
-            letterSpacing: "-0.03em",
-            animation: "fadeInUp 0.5s ease-out 0.15s both",
-          }}>
-            Hello 👋 Moi c'est Noah.
-          </h1>
-
-          <p style={{
-            fontSize: "14px",
-            color: "#999",
-            margin: "0 0 16px",
-            lineHeight: 1.5,
-            animation: "fadeInUp 0.5s ease-out 0.25s both",
-          }}>
-            Je suis ton copilote IA. En quelques minutes, je vais analyser ton potentiel et tout créer pour toi.
-          </p>
-
-          <p style={{
-            fontSize: "15px",
-            color: "#111",
-            margin: 0,
-            fontWeight: 600,
-            animation: "fadeInUp 0.5s ease-out 0.3s both",
-          }}>
-            Voici le programme :
-          </p>
-        </div>
-
-        {/* ━━━ Les 4 blocs ━━━ */}
-        <div style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
-          width: "100%",
-          marginBottom: "32px",
-        }}>
-          {steps.map((step, i) => (
-            <div
-              key={i}
-              onMouseOver={() => setHoveredStep(i)}
-              onMouseOut={() => setHoveredStep(null)}
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "16px",
-                background: "white",
-                borderRadius: "16px",
-                padding: "18px 20px",
-                border: hoveredStep === i ? `1.5px solid ${step.color}20` : "1.5px solid #f0f0f0",
-                transition: "all 0.25s ease",
-                cursor: "default",
-                boxShadow: hoveredStep === i ? `0 4px 16px ${step.color}10` : "0 1px 3px rgba(0,0,0,0.03)",
-                animation: `fadeInUp 0.5s ease-out ${0.3 + i * 0.08}s both`,
-              }}
-            >
-              {/* Numéro + Icône */}
-              <div style={{
-                position: "relative",
-                flexShrink: 0,
-              }}>
-                <div style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "14px",
-                  background: step.bgColor,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: step.color,
-                  transition: "transform 0.2s",
-                  transform: hoveredStep === i ? "scale(1.05)" : "scale(1)",
-                }}>
-                  {step.icon}
-                </div>
-                {/* Petit numéro */}
-                <div style={{
-                  position: "absolute",
-                  top: "-4px",
-                  right: "-4px",
-                  width: "18px",
-                  height: "18px",
-                  borderRadius: "6px",
-                  background: "#111",
-                  color: "white",
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "2px solid white",
-                }}>
-                  {i + 1}
-                </div>
-              </div>
-
-              {/* Texte */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <h3 style={{
-                  fontSize: "15px",
-                  fontWeight: 700,
-                  color: "#111",
-                  margin: "0 0 3px",
-                  letterSpacing: "-0.01em",
-                }}>
-                  {step.title}
-                </h3>
-                <p style={{
-                  fontSize: "13px",
-                  color: "#999",
-                  margin: 0,
-                  lineHeight: 1.45,
-                }}>
-                  {step.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ━━━ Réassurance ━━━ */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "16px",
-          marginBottom: "24px",
-          animation: "fadeInUp 0.5s ease-out 0.7s both",
-        }}>
-          {["100% gratuit", "5 minutes", "Personnalisé"].map((text, i) => (
-            <div key={i} style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-            }}>
-              <CheckIcon />
-              <span style={{ fontSize: "12px", color: "#aaa", fontWeight: 500 }}>{text}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* ━━━ Bouton CTA ━━━ */}
-        <a
-          href="/OnboardingFirstName"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "10px",
-            width: "100%",
-            padding: "18px 24px",
-            background: "linear-gradient(135deg, #1a1a1a, #000)",
-            color: "white",
-            border: "none",
-            borderRadius: "16px",
-            fontSize: "17px",
-            fontWeight: 700,
-            cursor: "pointer",
-            fontFamily: "inherit",
-            textDecoration: "none",
-            transition: "all 0.3s ease",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-            letterSpacing: "-0.01em",
-            animation: "fadeInUp 0.5s ease-out 0.75s both",
-            boxSizing: "border-box",
-          }}
-          onMouseOver={e => {
-            e.currentTarget.style.boxShadow = "0 4px 24px rgba(97,247,162,0.4), 0 4px 16px rgba(0,0,0,0.2)";
-            e.currentTarget.style.transform = "translateY(-2px)";
-          }}
-          onMouseOut={e => {
-            e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.2)";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
+        {/* Noah Avatar */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-center mb-6"
         >
-          C'est parti 🚀
-        </a>
+          <div className="relative">
+            <div className="w-[72px] h-[72px] rounded-2xl bg-[#61f7a2] flex items-center justify-center shadow-lg shadow-[#61f7a2]/30">
+              <Brain size={36} className="text-white" />
+            </div>
+            <div className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-green-400 border-2 border-[#fafafa] animate-pulse" />
+          </div>
+        </motion.div>
 
+        {/* Hero */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-[26px] font-extrabold text-gray-900 tracking-tight leading-tight mb-3">
+            Salut, moi c'est Noah.
+          </h1>
+          <p className="text-gray-500 text-sm leading-relaxed mb-4">
+            Je suis ton associe IA. A partir de maintenant, on construit <span className="text-gray-900 font-semibold">ensemble</span> ton activite en ligne.
+          </p>
+          <p className="text-gray-900 font-semibold text-[15px]">
+            Voici comment on va travailler :
+          </p>
+        </motion.div>
 
+        {/* Steps */}
+        <div className="flex flex-col gap-3 mb-8">
+          {steps.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.08 }}
+                className="flex items-start gap-4 bg-white rounded-2xl p-[18px] border border-gray-100 hover:border-gray-200 transition-all"
+              >
+                <div className="relative flex-shrink-0">
+                  <div className={`w-12 h-12 rounded-xl ${step.bg} flex items-center justify-center`}>
+                    <Icon className={`w-[22px] h-[22px] ${step.color}`} />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-md bg-gray-900 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">
+                    {i + 1}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[15px] font-bold text-gray-900 tracking-tight mb-0.5">
+                    {step.title}
+                  </h3>
+                  <p className="text-[13px] text-gray-500 leading-snug">
+                    {step.desc}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Reassurance */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="flex items-center justify-center gap-5 mb-6"
+        >
+          {["100% gratuit", "5 minutes", "Personnalise"].map((text, i) => (
+            <div key={i} className="flex items-center gap-1">
+              <Check className="w-3.5 h-3.5 text-[#3dd67a]" strokeWidth={3} />
+              <span className="text-xs text-gray-400 font-medium">{text}</span>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* CTA */}
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65 }}
+          onClick={() => navigate(createPageUrl("OnboardingFirstName"))}
+          className="w-full flex items-center justify-center gap-2.5 py-[18px] px-6 bg-gradient-to-b from-gray-900 to-black text-white rounded-2xl text-[17px] font-bold shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-[#61f7a2]/20 hover:-translate-y-0.5 transition-all active:scale-[0.98]"
+        >
+          Commencer avec Noah
+          <ArrowRight className="w-5 h-5" />
+        </motion.button>
+
+        {/* Micro social proof */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="text-center text-xs text-gray-400 mt-4"
+        >
+          Rejoins les entrepreneurs qui monetisent deja leur savoir.
+        </motion.p>
       </div>
-
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(16px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.1); opacity: 0.8; }
-        }
-
-
-      `}</style>
     </div>
   );
 }

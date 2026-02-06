@@ -35,15 +35,32 @@ export function useRequirePayment() {
       // 3. Vérifier le statut de paiement (User OU Session)
       let purchased = currentUser?.has_purchased === true;
 
-      // 🔥 Fallback: vérifier aussi dans la Session (où Stripe webhook écrit souvent)
+      // Fallback: vérifier aussi dans la Session (où Stripe webhook écrit souvent)
       if (!purchased) {
         try {
           const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
-          if (sessions.length > 0 && sessions[0].has_purchased === true) {
+          // Vérifier toutes les sessions (multi-session support)
+          const hasPurchasedInAnySession = sessions.some(s => s.has_purchased === true);
+          if (hasPurchasedInAnySession) {
             purchased = true;
             // Sync: mettre à jour le User pour les prochaines fois
             await base44.auth.updateMe({ has_purchased: true });
             console.log('✅ [useRequirePayment] Synced has_purchased from Session to User');
+          }
+
+          // Backfill session_number pour sessions existantes sans numéro
+          for (let i = 0; i < sessions.length; i++) {
+            if (!sessions[i].session_number) {
+              try {
+                await base44.entities.Session.update(sessions[i].id, {
+                  session_number: i + 1,
+                  session_name: sessions[i].session_name || `Session ${i + 1}`
+                });
+                console.log(`✅ [useRequirePayment] Backfilled session_number=${i + 1} for session ${sessions[i].id}`);
+              } catch (backfillError) {
+                console.warn('⚠️ [useRequirePayment] Backfill error:', backfillError);
+              }
+            }
           }
         } catch (sessionError) {
           console.warn('⚠️ [useRequirePayment] Could not check Session:', sessionError);

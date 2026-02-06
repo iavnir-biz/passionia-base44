@@ -87,7 +87,7 @@ export default function OnboardingFirstName() {
       // Sauvegarder le prénom dans localStorage
       localStorage.setItem('onboarding_firstName', firstName.trim());
 
-      // 🔥 Récupérer la passion pré-remplie depuis Welcome
+      // Récupérer la passion pré-remplie depuis Welcome
       const prefilledSkill = localStorage.getItem('prefilledSkill');
       console.log('[OnboardingFirstName] Passion récupérée:', prefilledSkill);
 
@@ -100,17 +100,14 @@ export default function OnboardingFirstName() {
       };
       localStorage.setItem('onboarding_data', JSON.stringify(onboardingData));
 
-      // CRÉER LA SESSION ICI (l'utilisateur est déjà authentifié)
       const currentUser = await base44.auth.me();
 
-      // Vérifier si une session existe déjà
-      const existingSessions = await base44.entities.Session.filter({
-        created_by: currentUser.email
-      });
+      // SESSION SYSTEM : Vérifier si c'est une régénération ou un nouveau parcours
+      const regeneratingSessionId = localStorage.getItem('regenerating_session_id');
+      const activeSessionId = localStorage.getItem('passionia_active_session_id');
 
       let sessionId;
 
-      // 🔥 Préparer les données initiales de la session avec la skill pré-remplie
       const sessionData = {
         onboarding_history: [],
         onboarding_summary: prefilledSkill ? { who_to_teach: prefilledSkill } : {},
@@ -119,26 +116,52 @@ export default function OnboardingFirstName() {
         is_onboarding_done: false
       };
 
-      if (existingSessions.length > 0) {
-        console.log('✅ Session existe déjà:', existingSessions[0].id);
-        sessionId = existingSessions[0].id;
+      if (regeneratingSessionId) {
+        // CAS 1 : Régénération d'une session existante
+        console.log('[OnboardingFirstName] Régénération de la session:', regeneratingSessionId);
+        sessionId = regeneratingSessionId;
 
-        // Réinitialiser la session avec la skill pré-remplie
+        // Mettre à jour la session existante avec les nouvelles données
         await base44.entities.Session.update(sessionId, sessionData);
-        console.log('✅ Skill pré-remplie enregistrée:', prefilledSkill);
+        console.log('✅ Session régénérée mise à jour');
+
+        // Ne pas supprimer le flag ici, on le supprime à la fin de l'onboarding
+      } else if (activeSessionId) {
+        // CAS 2 : Session active existante (créée depuis le dashboard ou précédemment)
+        // Vérifier si cette session existe bien
+        const existingSessions = await base44.entities.Session.filter({ id: activeSessionId });
+
+        if (existingSessions.length > 0) {
+          const existingSession = existingSessions[0];
+
+          // Si la session est vide (nouvelle session créée depuis dashboard), l'utiliser
+          if (!existingSession.is_onboarding_done && (!existingSession.onboarding_history || existingSession.onboarding_history.length === 0)) {
+            sessionId = activeSessionId;
+            await base44.entities.Session.update(sessionId, sessionData);
+            console.log('✅ Session active vide mise à jour:', sessionId);
+          } else {
+            // Session active a déjà des données, on cherche s'il y a une session vide ou on en crée une nouvelle
+            sessionId = activeSessionId;
+            // On écrase si c'est la seule option (premier onboarding, pas de multi-session encore)
+            await base44.entities.Session.update(sessionId, sessionData);
+            console.log('✅ Session active existante réinitialisée:', sessionId);
+          }
+        } else {
+          // activeSessionId invalide, fallback sur la logique classique
+          sessionId = await createOrReuseSession(currentUser, sessionData, prefilledSkill);
+        }
       } else {
-        // Créer la session avec la skill pré-remplie
-        const session = await base44.entities.Session.create(sessionData);
-        sessionId = session.id;
-        console.log('✅ Session créée avec skill:', prefilledSkill);
+        // CAS 3 : Aucune session active → logique classique
+        sessionId = await createOrReuseSession(currentUser, sessionData, prefilledSkill);
       }
 
-      // Sauvegarder le sessionId et le prénom sur le user
+      // Sauvegarder le sessionId sur le user + localStorage
       await base44.auth.updateMe({
         firstName: firstName.trim(),
         sessionId: sessionId,
-        coreSkill: prefilledSkill || '' // 🔥 Aussi sauvegarder sur le User
+        coreSkill: prefilledSkill || ''
       });
+      localStorage.setItem('passionia_active_session_id', sessionId);
 
       console.log('✅ User mis à jour avec prénom, sessionId et skill:', sessionId);
 
@@ -148,6 +171,36 @@ export default function OnboardingFirstName() {
       console.error('Error saving firstName:', error);
       alert('Une erreur est survenue. Merci de réessayer.');
       setIsLoading(false);
+    }
+  };
+
+  // Logique classique : réutiliser la première session ou en créer une
+  const createOrReuseSession = async (currentUser, sessionData, prefilledSkill) => {
+    const existingSessions = await base44.entities.Session.filter({
+      created_by: currentUser.email
+    });
+
+    if (existingSessions.length > 0) {
+      // Réutiliser la première session (rétrocompatible)
+      const sessionId = existingSessions[0].id;
+      await base44.entities.Session.update(sessionId, {
+        ...sessionData,
+        session_number: existingSessions[0].session_number || 1,
+        session_name: existingSessions[0].session_name || 'Session 1'
+      });
+      console.log('✅ Session existante réutilisée:', sessionId);
+      return sessionId;
+    } else {
+      // Créer la première session
+      const session = await base44.entities.Session.create({
+        ...sessionData,
+        session_number: 1,
+        session_name: 'Session 1',
+        is_regenerating: false,
+        regeneration_count: 0
+      });
+      console.log('✅ Première session créée:', session.id);
+      return session.id;
     }
   };
 

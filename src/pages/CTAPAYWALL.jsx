@@ -322,8 +322,10 @@ export default function CTAPAYWALL() {
         return;
       }
 
-      if (currentUser.sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      // Utiliser activeSessionId depuis localStorage avec fallback
+      const activeId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      if (activeId) {
+        const sessions = await base44.entities.Session.filter({ id: activeId });
         if (sessions.length > 0) {
           setSession(sessions[0]);
         }

@@ -55,7 +55,8 @@ export default function OnboardingDynamic() {
   const initializeOnboarding = async () => {
     try {
       const currentUser = await base44.auth.me();
-      const realSessionId = currentUser.sessionId;
+      // Utiliser activeSessionId (localStorage) avec fallback sur user.sessionId
+      const realSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
 
       if (!realSessionId) {
         navigate(createPageUrl('OnboardingFirstName'));

@@ -103,14 +103,14 @@ export default function OnboardingTransition() {
       const firstName = localStorage.getItem('onboarding_firstName') || currentUser.firstName || '';
 
       // Vérifier que la Session existe et contient les données
-      if (!currentUser.sessionId) {
+      const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      if (!resolvedSessionId) {
         console.error('❌ [OnboardingTransition] Pas de sessionId');
-        // Rediriger vers l'onboarding pour reprendre
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
       if (!sessions || sessions.length === 0) {
         console.error('❌ [OnboardingTransition] Session introuvable');
         navigate(createPageUrl('OnboardingFirstName'));

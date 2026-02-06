@@ -48,14 +48,15 @@ export default function OnboardingQ24IfNothingChanges() {
       const { base44 } = await import('@/api/base44Client');
       const currentUser = await base44.auth.me();
       
-      if (!currentUser.sessionId) {
+      const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      if (!resolvedSessionId) {
         console.error('❌ [Q24] Pas de sessionId');
         alert('Session introuvable. Merci de recommencer.');
         setIsSaving(false);
         return;
       }
 
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
       if (!sessions || sessions.length === 0) {
         console.error('❌ [Q24] Session introuvable');
         setIsSaving(false);

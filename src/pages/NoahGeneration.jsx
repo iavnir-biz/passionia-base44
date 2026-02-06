@@ -73,10 +73,27 @@ export default function NoahGeneration() {
         return;
       }
 
-      const sessions = await base44.entities.Session.filter({ created_by: currentUser.email });
-      if (sessions.length > 0) {
-        setSession(sessions[0]);
-        startGeneration(currentUser, sessions[0]);
+      // Utiliser activeSessionId si disponible, sinon fallback sur created_by
+      const activeSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      let targetSession = null;
+
+      if (activeSessionId) {
+        const sessionsById = await base44.entities.Session.filter({ id: activeSessionId });
+        if (sessionsById.length > 0) {
+          targetSession = sessionsById[0];
+        }
+      }
+
+      if (!targetSession) {
+        const sessionsByEmail = await base44.entities.Session.filter({ created_by: currentUser.email });
+        if (sessionsByEmail.length > 0) {
+          targetSession = sessionsByEmail[0];
+        }
+      }
+
+      if (targetSession) {
+        setSession(targetSession);
+        startGeneration(currentUser, targetSession);
       }
     } catch (error) {
       console.error('[NoahGeneration] Error loading data:', error);
@@ -132,11 +149,22 @@ export default function NoahGeneration() {
             if (allReady || !inProgress) {
               console.log('[NoahGeneration] ✅ Generation complete!');
               clearInterval(intervalId);
-              
+
               setCompletedSteps(generationSteps.map(s => s.id));
               setCurrentStep(generationSteps.length);
               setIsGenerating(false);
-              
+
+              // Si c'était une régénération, finaliser
+              const regeneratingId = localStorage.getItem('regenerating_session_id');
+              if (regeneratingId) {
+                try {
+                  await base44.functions.invoke('completeRegeneration', { sessionId: regeneratingId });
+                } catch (e) {
+                  console.warn('[NoahGeneration] completeRegeneration error:', e);
+                }
+                localStorage.removeItem('regenerating_session_id');
+              }
+
               setTimeout(() => {
                 navigate(createPageUrl('Dashboard'));
               }, 2000);

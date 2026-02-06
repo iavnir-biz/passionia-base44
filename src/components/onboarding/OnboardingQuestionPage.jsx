@@ -158,9 +158,10 @@ export default function OnboardingQuestionPage({
         // Sauvegarder en DB si l'utilisateur est authentifié
         try {
           const currentUser = await base44.auth.me();
-          if (currentUser?.sessionId) {
+          const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser?.sessionId;
+          if (resolvedSessionId) {
             const response = await base44.functions.invoke('saveOnboardingAnswer', {
-              sessionId: currentUser.sessionId,
+              sessionId: resolvedSessionId,
               field: fieldName,
               value: inputType === 'checkbox' ? value : value
             });
@@ -185,18 +186,19 @@ export default function OnboardingQuestionPage({
       // Mode base44 - sauvegarder dans User
       await base44.auth.updateMe({ [fieldName]: value });
 
-      // 🔥 BACKEND MERGE : appeler la fonction qui fait le merge server-side
-      if (user.sessionId && fieldName) {
+      // BACKEND MERGE : appeler la fonction qui fait le merge server-side
+      const activeSessionId = localStorage.getItem('passionia_active_session_id') || user.sessionId;
+      if (activeSessionId && fieldName) {
         try {
           const response = await base44.functions.invoke('saveOnboardingAnswer', {
-            sessionId: user.sessionId,
+            sessionId: activeSessionId,
             field: fieldName,
             value
           });
 
           if (response.data?.success) {
             console.log('✅ [ONBOARDING_SAVE]', {
-              sessionId: user.sessionId,
+              sessionId: activeSessionId,
               fieldName,
               saved: true,
               nextPage,
@@ -213,10 +215,10 @@ export default function OnboardingQuestionPage({
         // Cas spécial Q26 : sync format_preferences dans summary
         if (fieldName === 'deliveryPreferences') {
           try {
-            const sessions = await base44.entities.Session.filter({ id: user.sessionId });
+            const sessions = await base44.entities.Session.filter({ id: activeSessionId });
             if (sessions.length > 0) {
               const session = sessions[0];
-              await base44.asServiceRole.entities.Session.update(user.sessionId, {
+              await base44.asServiceRole.entities.Session.update(activeSessionId, {
                 onboarding_summary: {
                   ...(session.onboarding_summary || {}),
                   format_preferences: value

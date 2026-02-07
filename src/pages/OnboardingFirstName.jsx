@@ -71,7 +71,6 @@ export default function OnboardingFirstName() {
   // Typing effects for each text block
   const text1 = "Commençons par faire connaissance 🙂";
   const text2 = "Je suis Noah, l'IA de Passion IA.\nJe vais t'aider à transformer ce que tu sais déjà — en une activité en ligne claire et monétisable.";
-  const text3 = "En quelques minutes, on va poser les bases de ton projet et construire un plan d'action adapté à toi.";
   const text4 = "On commence simplement, quel est ton prénom ? 👇";
 
   const typing1 = useTypingEffect(text1, 30, 500);

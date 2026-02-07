@@ -21,7 +21,10 @@ import {
   Plus,
   Lock,
   Download,
-  MessageSquare
+  MessageSquare,
+  ShoppingCart,
+  TrendingUp,
+  Crown
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -444,96 +447,136 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          {/* OBJECTIF REVENU - barre interactive */}
+          {/* OBJECTIF REVENU + MES OFFRES — side by side */}
           {targetIncome && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              className="mb-8 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 sm:p-8"
+              className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-4"
             >
-              {/* Header : objectif + delai */}
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <p className="text-sm text-gray-500 font-medium mb-2">Ton objectif mensuel</p>
-                  <p className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
-                    {Number(targetIncome).toLocaleString('fr-FR')} <span className="text-[#61f7a2]">EUR</span>
-                  </p>
-                </div>
-                {targetDelay && (
-                  <div className="text-right flex-shrink-0 ml-4">
-                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Delai</p>
-                    <p className="text-2xl font-bold text-gray-900">{targetDelay} <span className="text-sm font-medium text-gray-500">mois</span></p>
+              {/* LEFT — Revenue tracker */}
+              <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col">
+                {/* Header : objectif + delai */}
+                <div className="flex items-start justify-between mb-5">
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium mb-1.5">Ton objectif mensuel</p>
+                    <p className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+                      {Number(targetIncome).toLocaleString('fr-FR')} <span className="text-[#61f7a2] text-2xl sm:text-3xl">EUR</span>
+                    </p>
                   </div>
-                )}
+                  {targetDelay && (
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">Delai</p>
+                      <p className="text-xl font-bold text-gray-900">{targetDelay} <span className="text-xs font-medium text-gray-500">mois</span></p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Barre interactive */}
+                <div className="flex-1 flex flex-col justify-end">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-gray-500 font-medium">Tes revenus ce mois</span>
+                    <span className="text-xs font-bold text-gray-700">{revenuePercent}%</span>
+                  </div>
+
+                  <div className="relative w-full h-3.5 bg-gray-200 rounded-full overflow-hidden mb-1">
+                    <div
+                      className={`absolute inset-y-0 left-0 rounded-full transition-all duration-200 ${
+                        revenuePercent >= 100
+                          ? 'bg-gradient-to-r from-[#61f7a2] to-[#3dd980]'
+                          : revenuePercent >= 50
+                            ? 'bg-gradient-to-r from-[#61f7a2] to-[#4de88f]'
+                            : 'bg-gradient-to-r from-amber-400 to-orange-400'
+                      }`}
+                      style={{ width: `${revenuePercent}%` }}
+                    />
+                    <input
+                      type="range"
+                      min={0}
+                      max={targetNum}
+                      step={1}
+                      value={currentRevenue}
+                      onChange={handleSliderChange}
+                      onMouseUp={handleSliderRelease}
+                      onTouchEnd={handleSliderRelease}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between mt-0.5">
+                    <span className="text-[11px] text-gray-400">0 EUR</span>
+                    <span className="text-[11px] text-gray-400">{Number(targetIncome).toLocaleString('fr-FR')} EUR</span>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-3 gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={revenueInputValue}
+                          onChange={handleRevenueInput}
+                          onBlur={handleRevenueInputBlur}
+                          onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+                          className="w-24 sm:w-28 border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold text-gray-900 text-right focus:outline-none focus:ring-2 focus:ring-[#61f7a2]/30 focus:border-[#61f7a2] transition-all"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">EUR</span>
+                      </div>
+                      {savingRevenue && <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />}
+                    </div>
+
+                    <div className="text-right">
+                      {remaining > 0 ? (
+                        <p className="text-sm text-gray-600">
+                          Encore <span className="font-bold text-gray-900">{remaining.toLocaleString('fr-FR')} EUR</span>
+                        </p>
+                      ) : (
+                        <p className="text-sm font-bold text-[#61f7a2]">
+                          Objectif atteint !
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Barre interactive */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-gray-500 font-medium">Tes revenus ce mois</span>
-                  <span className="text-xs font-bold text-gray-700">{revenuePercent}%</span>
-                </div>
+              {/* RIGHT — 4 products recap */}
+              <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col">
+                <p className="text-xs text-gray-500 font-medium mb-3">Tes 4 offres</p>
 
-                {/* Slider visuel */}
-                <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-1">
-                  <div
-                    className={`absolute inset-y-0 left-0 rounded-full transition-all duration-200 ${
-                      revenuePercent >= 100
-                        ? 'bg-gradient-to-r from-[#61f7a2] to-[#3dd980]'
-                        : revenuePercent >= 50
-                          ? 'bg-gradient-to-r from-[#61f7a2] to-[#4de88f]'
-                          : 'bg-gradient-to-r from-amber-400 to-orange-400'
-                    }`}
-                    style={{ width: `${revenuePercent}%` }}
-                  />
-                  <input
-                    type="range"
-                    min={0}
-                    max={targetNum}
-                    step={1}
-                    value={currentRevenue}
-                    onChange={handleSliderChange}
-                    onMouseUp={handleSliderRelease}
-                    onTouchEnd={handleSliderRelease}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-gray-400">0 EUR</span>
-                  <span className="text-xs text-gray-400">{Number(targetIncome).toLocaleString('fr-FR')} EUR</span>
-                </div>
-
-                {/* Input direct + infos */}
-                <div className="flex items-center justify-between mt-4 gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={revenueInputValue}
-                        onChange={handleRevenueInput}
-                        onBlur={handleRevenueInputBlur}
-                        onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
-                        className="w-28 sm:w-32 border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold text-gray-900 text-right focus:outline-none focus:ring-2 focus:ring-[#61f7a2]/30 focus:border-[#61f7a2] transition-all"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">EUR</span>
-                    </div>
-                    {savingRevenue && <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />}
-                  </div>
-
-                  <div className="text-right">
-                    {remaining > 0 ? (
-                      <p className="text-sm text-gray-600">
-                        Encore <span className="font-bold text-gray-900">{remaining.toLocaleString('fr-FR')} EUR</span>
-                      </p>
-                    ) : (
-                      <p className="text-sm font-bold text-[#61f7a2]">
-                        Objectif atteint !
-                      </p>
-                    )}
-                  </div>
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {[
+                    { key: 'mainProduct', label: 'Produit Principal', icon: Package, gradient: 'from-blue-500 to-blue-600' },
+                    { key: 'orderBump', label: 'Petit Extra', icon: ShoppingCart, gradient: 'from-green-500 to-green-600' },
+                    { key: 'upsell1', label: 'Offre Superieure', icon: TrendingUp, gradient: 'from-purple-500 to-purple-600' },
+                    { key: 'upsell3', label: 'Offre Premium', icon: Crown, gradient: 'from-amber-500 to-amber-600' },
+                  ].map((item) => {
+                    const offer = fullSession?.finalized_offer?.[item.key];
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.key}
+                        to={createPageUrl('MyOffers')}
+                        className="flex items-start gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:border-gray-300 hover:shadow-sm transition-all group"
+                      >
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center flex-shrink-0`}>
+                          <Icon className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] text-gray-400 font-medium mb-0.5">{item.label}</p>
+                          {offer ? (
+                            <>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{offer.title}</p>
+                              <p className="text-xs font-bold text-[#61f7a2] mt-0.5">{offer.price}</p>
+                            </>
+                          ) : (
+                            <p className="text-xs text-gray-400 italic">En attente</p>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             </motion.div>

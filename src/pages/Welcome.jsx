@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Brain, LogIn } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 
 const SparkleIcon = ({ size = 20, color = "currentColor" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -77,6 +79,18 @@ const steps = [
 
 export default function TeaserPage() {
   const [hoveredStep, setHoveredStep] = useState(null);
+  const { isAuthenticated, isLoadingAuth } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoadingAuth && isAuthenticated) {
+      navigate("/Dashboard", { replace: true });
+    }
+  }, [isAuthenticated, isLoadingAuth, navigate]);
+
+  if (isLoadingAuth || isAuthenticated) {
+    return null;
+  }
 
   return (
     <div style={{
@@ -99,7 +113,7 @@ export default function TeaserPage() {
               boxSizing: "border-box",
             }}>
               <button
-                onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                onClick={() => base44.auth.redirectToLogin(window.location.origin + "/Dashboard")}
                 style={{
                   display: "flex",
                   alignItems: "center",

@@ -8,8 +8,15 @@ import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import DayCard from '@/components/plan/DayCard';
 import ChatBubble from '@/components/chat/ChatBubble';
-import { Loader2, Target, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, Target, Sparkles, CheckCircle, AlertCircle, Lock, Rocket, Palette, BarChart3, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+const WEEKS = [
+  { number: 1, name: "Lancer", emoji: "🚀", icon: Rocket, color: "#61f7a2" },
+  { number: 2, name: "Créer", emoji: "🎨", icon: Palette, color: "#f59e0b" },
+  { number: 3, name: "Structurer", emoji: "📊", icon: BarChart3, color: "#3b82f6" },
+  { number: 4, name: "Automatiser", emoji: "⚡", icon: Zap, color: "#8b5cf6" },
+];
 
 export default function PlanAction() {
   const navigate = useNavigate();
@@ -533,11 +540,74 @@ export default function PlanAction() {
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-left mb-8">
             <div className="inline-flex items-center gap-2 bg-[#61f7a2]/10 px-4 py-2 rounded-full mb-4">
               <Target className="w-4 h-4 text-[#61f7a2]" />
-              <span className="text-[#61f7a2] font-semibold text-sm">Jour {currentDay} / 7</span>
+              <span className="text-[#61f7a2] font-semibold text-sm">Semaine 1 / 4 — Jour {currentDay} / 7</span>
             </div>
-            <h1 className="text-5xl font-bold text-gray-900 mb-4">Plan d'action</h1>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Ta première vente en 7 jours</h2>
-            <p className="text-lg text-gray-600 max-w-3xl">Une action par jour. Pas plus. Pas moins.</p>
+            <h1 className="text-5xl font-bold text-gray-900 mb-2">Plan d'action</h1>
+            <p className="text-lg text-gray-600 max-w-3xl mb-8">La méthode étape par étape pour vivre de ton savoir en 30 jours</p>
+
+            {/* Week Mega Menu */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {WEEKS.map((week) => {
+                const isActive = week.number === 1;
+                const isLocked = week.number > 1;
+                const WeekIcon = week.icon;
+
+                return (
+                  <div
+                    key={week.number}
+                    className={`relative rounded-2xl p-4 border-2 transition-all ${
+                      isActive
+                        ? "bg-gradient-to-br from-green-50 to-emerald-50 border-[#61f7a2] shadow-lg cursor-default"
+                        : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                    }`}
+                  >
+                    {isLocked && (
+                      <div className="absolute top-2 right-2">
+                        <Lock className="w-4 h-4 text-gray-400" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 mb-2">
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                          isActive
+                            ? "bg-gradient-to-br from-[#61f7a2] to-green-500"
+                            : "bg-gray-200"
+                        }`}
+                      >
+                        <span>{week.emoji}</span>
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Semaine {week.number}</div>
+                        <div className={`font-bold text-sm ${isActive ? "text-gray-900" : "text-gray-500"}`}>
+                          {week.name}
+                        </div>
+                      </div>
+                    </div>
+                    {isActive && (
+                      <div className="text-xs text-[#61f7a2] font-semibold mt-1">
+                        En cours
+                      </div>
+                    )}
+                    {isLocked && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        Bientôt disponible
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Active week title */}
+            <div className="mt-8 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#61f7a2] to-green-500 flex items-center justify-center text-lg">
+                🚀
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Semaine 1 : Lancer</h2>
+                <p className="text-sm text-gray-500">Ta première vente en 7 jours — Une action par jour</p>
+              </div>
+            </div>
           </motion.div>
 
           {!docsReady && (
@@ -591,8 +661,8 @@ export default function PlanAction() {
               <div className="w-20 h-20 bg-white rounded-full mx-auto mb-6 flex items-center justify-center">
                 <Sparkles className="w-10 h-10 text-[#61f7a2]" />
               </div>
-              <h2 className="text-4xl font-bold mb-4">Félicitations ! 🎉</h2>
-              <p className="text-xl mb-6">Tu as complété le plan 7 jours. Tu as prouvé que c'est possible.</p>
+              <h2 className="text-4xl font-bold mb-4">Semaine 1 terminée ! 🎉</h2>
+              <p className="text-xl mb-6">Tu as complété la phase Lancer. La semaine 2 arrive bientôt.</p>
               <Button onClick={() => navigate(createPageUrl('Dashboard'))} size="lg"
                 className="bg-white text-[#61f7a2] hover:bg-gray-100 font-bold px-8">
                 Retour au Dashboard

@@ -65,6 +65,7 @@ import EmailsMarketing from './pages/EmailsMarketing';
 import EtComment from './pages/EtComment';
 import GenerationProgress from './pages/GenerationProgress';
 import Home from './pages/Home';
+import Journal from './pages/Journal';
 import MarketAnalysis from './pages/MarketAnalysis';
 import MonetiserSavoir from './pages/MonetiserSavoir';
 import MyOffers from './pages/MyOffers';
@@ -136,6 +137,7 @@ export const PAGES = {
     "EtComment": EtComment,
     "GenerationProgress": GenerationProgress,
     "Home": Home,
+    "Journal": Journal,
     "MarketAnalysis": MarketAnalysis,
     "MonetiserSavoir": MonetiserSavoir,
     "MyOffers": MyOffers,

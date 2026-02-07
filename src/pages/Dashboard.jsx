@@ -21,7 +21,10 @@ import {
   Plus,
   Lock,
   Download,
-  MessageSquare
+  MessageSquare,
+  ShoppingCart,
+  TrendingUp,
+  Crown
 } from "lucide-react";
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
@@ -726,45 +729,102 @@ export default function Dashboard() {
                 <p className="text-center text-gray-700 font-medium">Tu es exactement la ou tu dois etre.</p>
               </motion.div>
 
-              {/* LIVRABLES */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900">Tes documents IA</h3>
-                  <div className="flex items-center gap-3">
-                    {countGenerated() > 0 && (
-                      <button
-                        onClick={handleDownloadAll}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-medium transition-colors"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        Tout telecharger
-                      </button>
-                    )}
-                    <span className="text-sm text-gray-600"><span className="font-bold text-[#61f7a2]">{countGenerated()}</span> / {livrables.length}</span>
+              {/* LIVRABLES + PRODUITS - Layout deux colonnes */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {/* COLONNE GAUCHE : Tes documents IA */}
+                <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">Tes documents IA</h3>
+                    <div className="flex items-center gap-3">
+                      {countGenerated() > 0 && (
+                        <button
+                          onClick={handleDownloadAll}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-700 rounded-lg text-xs font-medium transition-colors border border-gray-200"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          Telecharger
+                        </button>
+                      )}
+                      <span className="text-sm text-gray-600"><span className="font-bold text-[#61f7a2]">{countGenerated()}</span> / {livrables.length}</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 flex-1">
+                    {livrables.map((item) => {
+                      const Icon = item.icon;
+                      const isGenerated = fullSession?.[item.field];
+                      return (
+                        <Link key={item.page} to={createPageUrl(item.page)}
+                          className={`flex items-center gap-3 p-3 bg-white border rounded-xl transition-all ${
+                            isGenerated ? 'border-gray-300 hover:border-[#61f7a2] hover:shadow-md' : 'border-gray-200 opacity-60'
+                          }`}>
+                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isGenerated ? 'bg-gray-100' : 'bg-gray-50'}`}>
+                            <Icon className={`w-4 h-4 ${isGenerated ? 'text-gray-700' : 'text-gray-400'}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-medium text-gray-900 text-xs sm:text-sm truncate">{item.title}</span>
+                              {isGenerated ? <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" /> : <Loader2 className="w-3.5 h-3.5 text-gray-400 animate-spin flex-shrink-0" />}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {livrables.map((item) => {
-                    const Icon = item.icon;
-                    const isGenerated = fullSession?.[item.field];
-                    return (
-                      <Link key={item.page} to={createPageUrl(item.page)}
-                        className={`flex items-center gap-3 p-4 bg-white border rounded-xl transition-all ${
-                          isGenerated ? 'border-gray-300 hover:border-[#61f7a2] hover:shadow-md' : 'border-gray-200 opacity-60'
-                        }`}>
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isGenerated ? 'bg-gray-100' : 'bg-gray-50'}`}>
-                          <Icon className={`w-5 h-5 ${isGenerated ? 'text-gray-700' : 'text-gray-400'}`} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-medium text-gray-900 text-sm truncate">{item.title}</span>
-                            {isGenerated ? <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" /> : <Loader2 className="w-4 h-4 text-gray-400 animate-spin flex-shrink-0" />}
+
+                {/* COLONNE DROITE : Tes 4 produits choisis */}
+                <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">Tes 4 produits</h3>
+                    <Link to={createPageUrl('MyOffers')} className="text-xs font-medium text-[#61f7a2] hover:text-[#4de88f] transition-colors flex items-center gap-1">
+                      Voir le detail <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 flex-1">
+                    {[
+                      { key: 'mainProduct', label: 'Produit Principal', icon: Package, gradient: 'from-blue-500 to-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
+                      { key: 'orderBump', label: 'Produit Extra', icon: ShoppingCart, gradient: 'from-green-500 to-green-600', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' },
+                      { key: 'upsell1', label: 'Produit Superieur', icon: TrendingUp, gradient: 'from-purple-500 to-purple-600', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700' },
+                      { key: 'upsell3', label: 'Produit Premium', icon: Crown, gradient: 'from-yellow-500 to-amber-600', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' }
+                    ].map((product) => {
+                      const PIcon = product.icon;
+                      const offer = fullSession?.finalized_offer?.[product.key];
+                      const hasOffer = !!offer;
+                      return (
+                        <Link
+                          key={product.key}
+                          to={createPageUrl('MyOffers')}
+                          className={`flex flex-col p-3 bg-white border rounded-xl transition-all hover:shadow-md ${
+                            hasOffer ? `${product.border} hover:border-[#61f7a2]` : 'border-gray-200 opacity-60'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${product.gradient} flex items-center justify-center flex-shrink-0`}>
+                              <PIcon className="w-4 h-4 text-white" />
+                            </div>
+                            <span className={`text-xs font-semibold ${hasOffer ? 'text-gray-900' : 'text-gray-400'} truncate`}>
+                              {product.label}
+                            </span>
                           </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                          {hasOffer ? (
+                            <div className="flex-1 flex flex-col justify-between min-w-0">
+                              <p className="text-xs font-bold text-gray-900 truncate leading-tight mb-1">
+                                {offer.title}
+                              </p>
+                              <p className={`text-sm font-bold ${product.text}`}>
+                                {offer.price}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-gray-400 italic">Non defini</p>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 </div>
+
               </motion.div>
 
               {/* PLAN 7 JOURS */}

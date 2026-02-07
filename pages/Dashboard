@@ -1,0 +1,907 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { useSessionManager } from '@/components/hooks/useSessionManager';
+import { calculateProgressFromSession, getCurrentDay } from '@/utils/progressUtils';
+import { motion } from "framer-motion";
+import {
+  Target,
+  ArrowRight,
+  CheckCircle,
+  User,
+  MessageCircle,
+  Send,
+  Package,
+  Users,
+  FileText,
+  Loader2,
+  Sparkles,
+  Plus,
+  Lock,
+  Download,
+  MessageSquare,
+  ShoppingCart,
+  TrendingUp,
+  Crown
+} from "lucide-react";
+import Sidebar from '@/components/navigation/Sidebar';
+import TopBar from '@/components/navigation/TopBar';
+import ProgressBar from '@/components/ui/ProgressBar';
+import GlowButton from '@/components/ui/GlowButton';
+import SessionCard from '@/components/sessions/SessionCard';
+import SessionCounter from '@/components/sessions/SessionCounter';
+import SessionPaywallModal from '@/components/sessions/SessionPaywallModal';
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  const { isAuthenticated, hasPurchased, isLoading: authLoading } = useRequirePayment();
+
+  const {
+    sessions,
+    activeSessionId,
+    activeSession,
+    loading: sessionsLoading,
+    current,
+    max,
+    has_purchased: isPaid,
+    canCreate,
+    loadSessions,
+    createSession,
+    renameSession,
+    switchSession
+  } = useSessionManager();
+
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [fullSession, setFullSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Modals
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [paywallType, setPaywallType] = useState('upgrade_required');
+
+  // Session view mode
+  const [viewMode, setViewMode] = useState('detail'); // 'detail' | 'grid'
+
+  // Feedback
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackSending, setFeedbackSending] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadUserData();
+    }
+  }, [isAuthenticated]);
+
+  // Load full session data when activeSessionId changes
+  useEffect(() => {
+    if (activeSessionId) {
+      loadFullSession(activeSessionId);
+    }
+  }, [activeSessionId]);
+
+  // Polling si generation en cours
+  useEffect(() => {
+    if (fullSession?.generation_in_progress) {
+      const interval = setInterval(() => {
+        loadFullSession(activeSessionId);
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [fullSession?.generation_in_progress, activeSessionId]);
+
+  const loadUserData = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+
+      const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
+      if (profiles.length > 0) {
+        setProfile(profiles[0]);
+      }
+
+      if (profiles.length === 0 || !profiles[0].first_name) {
+        navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
+        return;
+      }
+    } catch (error) {
+      console.error('[Dashboard] Error loading user:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFullSession = useCallback(async (sessionId) => {
+    if (!sessionId) return;
+    try {
+      const sessions = await base44.entities.Session.filter({ id: sessionId });
+      if (sessions.length > 0) {
+        setFullSession(sessions[0]);
+      }
+    } catch (err) {
+      console.error('[Dashboard] Error loading full session:', err);
+    }
+  }, []);
+
+  // Session actions
+  const handleCreateSession = async () => {
+    if (!canCreate) {
+      setPaywallType(isPaid ? 'limit_reached' : 'upgrade_required');
+      setPaywallOpen(true);
+      return;
+    }
+
+    const result = await createSession();
+    if (result.success) {
+      navigate(createPageUrl('OnboardingFirstName'));
+    } else if (result.error === 'upgrade_required') {
+      setPaywallType('upgrade_required');
+      setPaywallOpen(true);
+    } else if (result.error === 'limit_reached') {
+      setPaywallType('limit_reached');
+      setPaywallOpen(true);
+    }
+  };
+
+  const handleSelectSession = (sessionId) => {
+    switchSession(sessionId);
+    setViewMode('detail');
+  };
+
+  // Download all documents
+  const handleDownloadAll = () => {
+    if (!fullSession) return;
+
+    const sections = [];
+    const sessionName = activeSession?.session_name || 'Session';
+    const skill = fullSession.skill || fullSession.onboarding_full?.coreSkill || '';
+
+    sections.push(`=== ${sessionName} - Documents generes par Noah ===`);
+    sections.push(`Competence : ${skill}`);
+    sections.push(`Date : ${new Date().toLocaleDateString('fr-FR')}`);
+    sections.push('');
+
+    // SWOT
+    if (fullSession.complete_market_analysis) {
+      sections.push('━━━ ANALYSE SWOT ━━━');
+      const ma = fullSession.complete_market_analysis;
+      if (ma.market_overview) {
+        sections.push(`Marche : ${ma.market_overview.definition || ''}`);
+        sections.push(`Taille : ${ma.market_overview.size || ''}`);
+      }
+      if (ma.swot) {
+        sections.push(`Forces : ${(ma.swot.strengths || []).map(s => s.text || s).join(', ')}`);
+        sections.push(`Faiblesses : ${(ma.swot.weaknesses || []).map(s => s.text || s).join(', ')}`);
+        sections.push(`Opportunites : ${(ma.swot.opportunities || []).map(s => s.text || s).join(', ')}`);
+        sections.push(`Menaces : ${(ma.swot.threats || []).map(s => s.text || s).join(', ')}`);
+      }
+      sections.push('');
+    }
+
+    // Avatars
+    if (fullSession.generated_avatars) {
+      sections.push('━━━ AVATARS CLIENTS ━━━');
+      const avatars = Array.isArray(fullSession.generated_avatars) ? fullSession.generated_avatars : [];
+      avatars.forEach((a, i) => {
+        sections.push(`\nAvatar ${i + 1} : ${a.identity?.name || a.name || `Avatar ${i + 1}`}`);
+        if (a.identity) {
+          sections.push(`  Age : ${a.identity.age_range || ''}`);
+          sections.push(`  Situation : ${a.identity.life_situation || ''}`);
+        }
+        if (a.in_their_head) {
+          sections.push(`  Emotion dominante : ${a.in_their_head.dominant_emotion || ''}`);
+          sections.push(`  Phrase interieure : ${a.in_their_head.inner_phrase || ''}`);
+        }
+      });
+      sections.push('');
+    }
+
+    // Offres
+    if (fullSession.finalized_offer) {
+      sections.push('━━━ OFFRES ━━━');
+      const offer = fullSession.finalized_offer;
+      if (offer.mainProduct) {
+        sections.push(`Offre principale : ${offer.mainProduct.title || ''}`);
+        sections.push(`  Prix : ${offer.mainProduct.price || ''}`);
+        sections.push(`  Description : ${offer.mainProduct.subtitle || ''}`);
+      }
+      if (offer.orderBump) {
+        sections.push(`Order Bump : ${offer.orderBump.title || ''} - ${offer.orderBump.price || ''}`);
+      }
+      if (offer.upsells) {
+        offer.upsells.forEach((u, i) => {
+          sections.push(`Upsell ${i + 1} : ${u.title || ''} - ${u.price || ''}`);
+        });
+      }
+      sections.push('');
+    }
+
+    // Messages
+    if (fullSession.generated_sales_messages) {
+      sections.push('━━━ MESSAGES DE VENTE ━━━');
+      const msgs = Array.isArray(fullSession.generated_sales_messages) ? fullSession.generated_sales_messages : [];
+      msgs.forEach((m, i) => {
+        sections.push(`\nMessage ${i + 1} : ${m.title || m.name || ''}`);
+        sections.push(`Objectif : ${m.objective || ''}`);
+        sections.push(`Contenu :`);
+        sections.push(m.content || m.message || m.text || '');
+      });
+      sections.push('');
+    }
+
+    // Emails
+    if (fullSession.generated_marketing_emails) {
+      sections.push('━━━ EMAILS MARKETING ━━━');
+      const emails = Array.isArray(fullSession.generated_marketing_emails) ? fullSession.generated_marketing_emails : [];
+      emails.forEach((e, i) => {
+        sections.push(`\nEmail ${i + 1} : ${e.title || e.name || ''}`);
+        sections.push(`Objet : ${e.subject || ''}`);
+        sections.push(`Contenu :`);
+        sections.push(e.body || e.content || '');
+      });
+      sections.push('');
+    }
+
+    const content = sections.join('\n');
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${sessionName.replace(/\s+/g, '_')}_documents_noah.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Existing logic for active session
+  const getNextIncompleteTask = () => {
+    if (!fullSession?.plan_progress) {
+      return {
+        title: "Rejoindre la communaute et se presenter",
+        description: "Commence par te connecter avec d'autres entrepreneurs",
+        page: "PlanAction"
+      };
+    }
+
+    const currentDay = getCurrentDay(fullSession);
+    const dayProgress = fullSession.plan_progress[currentDay];
+
+    if (!dayProgress?.checklist) {
+      return {
+        title: "Commencer le jour " + currentDay,
+        description: "Clique pour voir tes missions du jour",
+        page: "PlanAction"
+      };
+    }
+
+    const firstUnchecked = dayProgress.checklist.find(
+      (item) => !item.checked && !item.autoChecked
+    );
+
+    if (firstUnchecked) {
+      return {
+        title: firstUnchecked.text.replace(/^✅\s+/, ''),
+        description: firstUnchecked.details || "Clique pour plus de details",
+        page: firstUnchecked.action?.page || "PlanAction"
+      };
+    }
+
+    return {
+      title: "Valider le jour " + currentDay,
+      description: "Tu as tout fait ! Marque ce jour comme termine",
+      page: "PlanAction"
+    };
+  };
+
+  const livrables = [
+    { title: "Analyse SWOT", page: "MarketAnalysis", icon: Target, field: "complete_market_analysis" },
+    { title: "3 Avatars", page: "AvatarClients", icon: Users, field: "generated_avatars" },
+    { title: "4 Offres", page: "MyOffers", icon: Package, field: "my_generated_offers" },
+    { title: "Messages", page: "SalesMessages", icon: MessageCircle, field: "generated_sales_messages" },
+    { title: "Emails", page: "EmailsMarketing", icon: Send, field: "generated_marketing_emails" },
+    { title: "Page de vente", page: "SalesPage", icon: FileText, field: "generated_sales_pages" }
+  ];
+
+  const countGenerated = () => livrables.filter(item => fullSession?.[item.field]).length;
+
+  // Revenue / goal data
+  const onboarding = fullSession?.onboarding_full || {};
+  const targetIncome = onboarding.targetIncome;
+  const targetDelay = onboarding.targetIncomeDelay;
+
+  // Revenue tracker (interactive)
+  const targetNum = Number(targetIncome) || 0;
+  const [currentRevenue, setCurrentRevenue] = useState(0);
+  const [revenueInputValue, setRevenueInputValue] = useState('');
+  const [savingRevenue, setSavingRevenue] = useState(false);
+
+  // Load saved revenue from session
+  useEffect(() => {
+    if (fullSession?.current_revenue != null) {
+      setCurrentRevenue(fullSession.current_revenue);
+      setRevenueInputValue(String(fullSession.current_revenue));
+    }
+  }, [fullSession?.current_revenue]);
+
+  const saveRevenue = useCallback(async (value) => {
+    if (!activeSessionId) return;
+    setSavingRevenue(true);
+    try {
+      await base44.entities.Session.update(activeSessionId, {
+        current_revenue: value
+      });
+    } catch (err) {
+      console.error('[Dashboard] Error saving revenue:', err);
+    } finally {
+      setSavingRevenue(false);
+    }
+  }, [activeSessionId]);
+
+  const handleSliderChange = (e) => {
+    const val = Number(e.target.value);
+    setCurrentRevenue(val);
+    setRevenueInputValue(String(val));
+  };
+
+  const handleSliderRelease = () => {
+    saveRevenue(currentRevenue);
+  };
+
+  const handleRevenueInput = (e) => {
+    const raw = e.target.value.replace(/[^0-9]/g, '');
+    setRevenueInputValue(raw);
+    const val = Math.min(Number(raw) || 0, targetNum);
+    setCurrentRevenue(val);
+  };
+
+  const handleRevenueInputBlur = () => {
+    const val = Math.min(Number(revenueInputValue) || 0, targetNum);
+    setCurrentRevenue(val);
+    setRevenueInputValue(String(val));
+    saveRevenue(val);
+  };
+
+  const remaining = Math.max(0, targetNum - currentRevenue);
+  const revenuePercent = targetNum > 0 ? Math.min(100, Math.round((currentRevenue / targetNum) * 100)) : 0;
+
+  const handleSendFeedback = async () => {
+    if (!feedbackText.trim() || !user) return;
+    setFeedbackSending(true);
+    try {
+      await base44.entities.Feedback.create({
+        message: feedbackText.trim(),
+        user_email: user.email,
+        user_name: profile?.first_name || user.full_name || '',
+        session_id: activeSessionId || null
+      });
+      setFeedbackSent(true);
+      setFeedbackText('');
+      setTimeout(() => setFeedbackSent(false), 4000);
+    } catch (err) {
+      console.error('[Dashboard] Error sending feedback:', err);
+    } finally {
+      setFeedbackSending(false);
+    }
+  };
+
+  if (authLoading || loading || sessionsLoading) {
+    return (
+      <div className="flex min-h-screen bg-white">
+        <Sidebar currentPage="Dashboard" progress={0} />
+        <div className="flex-1 ml-0 lg:ml-72 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
+        </div>
+      </div>
+    );
+  }
+
+  const currentMission = getNextIncompleteTask();
+
+  return (
+    <div className="flex min-h-screen bg-white">
+      <Sidebar
+        currentPage="Dashboard"
+        progress={calculateProgressFromSession(fullSession)}
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+
+      <div className="flex-1 w-full ml-0 lg:ml-72">
+        <TopBar
+          title="Dashboard"
+          subtitle={`Bienvenue ${user?.full_name?.split(' ')[0] || ''} !`}
+          user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
+          session={fullSession}
+        />
+
+        <main className="p-4 sm:p-8 max-w-6xl mx-auto">
+
+          {/* GREETING avec photo */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 flex items-center gap-4">
+            <div className="flex-shrink-0">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Profil" className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+              )}
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 flex items-center gap-3">
+                Hello {profile?.first_name || user?.first_name || ''} <span className="text-3xl sm:text-4xl">👋</span>
+              </h1>
+              {fullSession?.generation_in_progress && (
+                <p className="text-sm text-[#61f7a2] font-medium flex items-center gap-2 mt-1">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Noah genere tes documents...
+                </p>
+              )}
+            </div>
+          </motion.div>
+
+          {/* OBJECTIF REVENU + MES OFFRES — side by side */}
+          {targetIncome && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-4"
+            >
+              {/* LEFT — Revenue tracker */}
+              <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col">
+                {/* Header : objectif + delai */}
+                <div className="flex items-start justify-between mb-5">
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium mb-1.5">Ton objectif mensuel</p>
+                    <p className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+                      {Number(targetIncome).toLocaleString('fr-FR')} <span className="text-[#61f7a2] text-2xl sm:text-3xl">EUR</span>
+                    </p>
+                  </div>
+                  {targetDelay && (
+                    <div className="text-right flex-shrink-0 ml-3">
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">Delai</p>
+                      <p className="text-xl font-bold text-gray-900">{targetDelay} <span className="text-xs font-medium text-gray-500">mois</span></p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Barre interactive */}
+                <div className="flex-1 flex flex-col justify-end">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-gray-500 font-medium">Tes revenus ce mois</span>
+                    <span className="text-xs font-bold text-gray-700">{revenuePercent}%</span>
+                  </div>
+
+                  <div className="relative w-full h-3.5 bg-gray-200 rounded-full overflow-hidden mb-1">
+                    <div
+                      className={`absolute inset-y-0 left-0 rounded-full transition-all duration-200 ${
+                        revenuePercent >= 100
+                          ? 'bg-gradient-to-r from-[#61f7a2] to-[#3dd980]'
+                          : revenuePercent >= 50
+                            ? 'bg-gradient-to-r from-[#61f7a2] to-[#4de88f]'
+                            : 'bg-gradient-to-r from-amber-400 to-orange-400'
+                      }`}
+                      style={{ width: `${revenuePercent}%` }}
+                    />
+                    <input
+                      type="range"
+                      min={0}
+                      max={targetNum}
+                      step={1}
+                      value={currentRevenue}
+                      onChange={handleSliderChange}
+                      onMouseUp={handleSliderRelease}
+                      onTouchEnd={handleSliderRelease}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between mt-0.5">
+                    <span className="text-[11px] text-gray-400">0 EUR</span>
+                    <span className="text-[11px] text-gray-400">{Number(targetIncome).toLocaleString('fr-FR')} EUR</span>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-3 gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={revenueInputValue}
+                          onChange={handleRevenueInput}
+                          onBlur={handleRevenueInputBlur}
+                          onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+                          className="w-24 sm:w-28 border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold text-gray-900 text-right focus:outline-none focus:ring-2 focus:ring-[#61f7a2]/30 focus:border-[#61f7a2] transition-all"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">EUR</span>
+                      </div>
+                      {savingRevenue && <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />}
+                    </div>
+
+                    <div className="text-right">
+                      {remaining > 0 ? (
+                        <p className="text-sm text-gray-600">
+                          Encore <span className="font-bold text-gray-900">{remaining.toLocaleString('fr-FR')} EUR</span>
+                        </p>
+                      ) : (
+                        <p className="text-sm font-bold text-[#61f7a2]">
+                          Objectif atteint !
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT — 4 products recap */}
+              <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col">
+                <p className="text-xs text-gray-500 font-medium mb-3">Tes 4 offres</p>
+
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {[
+                    { key: 'mainProduct', label: 'Produit Principal', icon: Package, gradient: 'from-blue-500 to-blue-600' },
+                    { key: 'orderBump', label: 'Petit Extra', icon: ShoppingCart, gradient: 'from-green-500 to-green-600' },
+                    { key: 'upsell1', label: 'Offre Superieure', icon: TrendingUp, gradient: 'from-purple-500 to-purple-600' },
+                    { key: 'upsell3', label: 'Offre Premium', icon: Crown, gradient: 'from-amber-500 to-amber-600' },
+                  ].map((item) => {
+                    const offer = fullSession?.finalized_offer?.[item.key];
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.key}
+                        to={createPageUrl('MyOffers')}
+                        className="flex items-start gap-3 p-3 bg-white rounded-xl border border-gray-100 hover:border-gray-300 hover:shadow-sm transition-all group"
+                      >
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center flex-shrink-0`}>
+                          <Icon className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] text-gray-400 font-medium mb-0.5">{item.label}</p>
+                          {offer ? (
+                            <>
+                              <p className="text-sm font-semibold text-gray-900 leading-tight truncate">{offer.title}</p>
+                              <p className="text-xs font-bold text-[#61f7a2] mt-0.5">{offer.price}</p>
+                            </>
+                          ) : (
+                            <p className="text-xs text-gray-400 italic">En attente</p>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ============ SESSIONS SECTION ============ */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-8"
+          >
+            {/* Header sessions */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold text-gray-900">Mes sessions</h2>
+                <div className="w-40">
+                  <SessionCounter current={current} max={max} isPaid={isPaid} />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Toggle view */}
+                {sessions.length > 1 && (
+                  <button
+                    onClick={() => setViewMode(viewMode === 'grid' ? 'detail' : 'grid')}
+                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    {viewMode === 'grid' ? 'Vue detail' : 'Vue grille'}
+                  </button>
+                )}
+
+                {/* Bouton nouvelle session */}
+                {isPaid ? (
+                  <button
+                    onClick={handleCreateSession}
+                    disabled={!canCreate}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                      canCreate
+                        ? 'bg-[#61f7a2] text-gray-900 hover:bg-[#4de88f] hover:scale-105'
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                    title={canCreate ? 'Creer une nouvelle session' : `${current}/${max} sessions utilisees`}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Nouvelle session
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setPaywallType('upgrade_required'); setPaywallOpen(true); }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-xl text-sm font-semibold hover:scale-105 transition-transform"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Passer Premium
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Info message pour gratuit */}
+            {!isPaid && sessions.length > 0 && (
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <Lock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-amber-900 font-semibold text-sm mb-1">
+                      Passe Premium pour debloquer 3 sessions
+                    </p>
+                    <p className="text-amber-700 text-xs">
+                      Genere de nouvelles offres avec Noah.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Info message pour payant 3/3 */}
+            {isPaid && !canCreate && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-blue-800 text-sm">
+                    Tu as utilise tes {max} sessions. Elles restent accessibles ici.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Sessions grid */}
+            {viewMode === 'grid' && sessions.length > 1 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sessions.map((s, index) => (
+                  <SessionCard
+                    key={s.id}
+                    session={s}
+                    isActive={s.id === activeSessionId}
+                    isPaid={isPaid}
+                    onSelect={handleSelectSession}
+                    onRename={renameSession}
+                    index={index}
+                  />
+                ))}
+              </div>
+            ) : sessions.length > 1 ? (
+              /* Session tabs pour vue detail */
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+                {sessions.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => handleSelectSession(s.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+                      s.id === activeSessionId
+                        ? 'bg-[#61f7a2]/10 text-gray-900 border-2 border-[#61f7a2]'
+                        : 'bg-gray-100 text-gray-600 border-2 border-transparent hover:bg-gray-200'
+                    }`}
+                  >
+                    <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold ${
+                      s.id === activeSessionId ? 'bg-[#61f7a2] text-white' : 'bg-gray-300 text-white'
+                    }`}>
+                      {s.session_number}
+                    </span>
+                    {s.session_name}
+                    {s.generation_in_progress && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </motion.div>
+
+          {/* BANNER generation */}
+          {fullSession?.generation_in_progress && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-8 flex gap-3">
+              <Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-blue-900 font-semibold mb-1">Generation en cours...</p>
+                <p className="text-blue-700 text-sm">Noah genere tes documents. Ca prend 1-2 minutes.</p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ============ ACTIVE SESSION DETAIL ============ */}
+          {fullSession && (
+            <>
+              {/* Session info header */}
+              {sessions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6"
+                >
+                  <h3 className="text-lg font-bold text-gray-900">
+                    {activeSession?.session_name || `Session ${activeSession?.session_number || 1}`}
+                  </h3>
+                  {activeSession?.skill && (
+                    <p className="text-sm text-gray-500">{activeSession.skill}</p>
+                  )}
+                </motion.div>
+              )}
+
+              {/* MISSION DU JOUR */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                className="bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3dd980] rounded-3xl px-6 py-8 md:p-10 mb-8 shadow-2xl">
+                <div className="text-left mb-6">
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center gap-2">
+                    <Target className="w-8 h-8" />
+                    Ta mission aujourd'hui
+                  </h2>
+                  <p className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
+                    {currentMission.title}
+                  </p>
+                  <p className="text-white/90 text-lg line-clamp-2">{currentMission.description}</p>
+                </div>
+                <GlowButton onClick={() => navigate(createPageUrl(currentMission.page))} size="lg"
+                  className="bg-white text-gray-900 hover:bg-gray-100 w-full md:w-auto px-6 md:px-12 py-3 md:py-4 text-lg md:text-xl font-bold">
+                  👉 Lancer cette mission
+                </GlowButton>
+              </motion.div>
+
+              {/* PROGRESSION */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                className="bg-white rounded-2xl border border-gray-200 p-6 mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Ta progression</p>
+                    <p className="text-2xl font-bold text-gray-900">Jour {getCurrentDay(fullSession)} / 7</p>
+                  </div>
+                  <p className="text-3xl font-bold text-[#61f7a2]">{calculateProgressFromSession(fullSession)}%</p>
+                </div>
+                <ProgressBar value={calculateProgressFromSession(fullSession)} max={100} className="mb-3" />
+                <p className="text-center text-gray-700 font-medium">Tu es exactement la ou tu dois etre.</p>
+              </motion.div>
+
+              {/* LIVRABLES */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-gray-900">Tes documents IA</h3>
+                  <div className="flex items-center gap-3">
+                    {countGenerated() > 0 && (
+                      <button
+                        onClick={handleDownloadAll}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-medium transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Tout telecharger
+                      </button>
+                    )}
+                    <span className="text-sm text-gray-600"><span className="font-bold text-[#61f7a2]">{countGenerated()}</span> / {livrables.length}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {livrables.map((item) => {
+                    const Icon = item.icon;
+                    const isGenerated = fullSession?.[item.field];
+                    return (
+                      <Link key={item.page} to={createPageUrl(item.page)}
+                        className={`flex items-center gap-3 p-4 bg-white border rounded-xl transition-all ${
+                          isGenerated ? 'border-gray-300 hover:border-[#61f7a2] hover:shadow-md' : 'border-gray-200 opacity-60'
+                        }`}>
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isGenerated ? 'bg-gray-100' : 'bg-gray-50'}`}>
+                          <Icon className={`w-5 h-5 ${isGenerated ? 'text-gray-700' : 'text-gray-400'}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium text-gray-900 text-sm truncate">{item.title}</span>
+                            {isGenerated ? <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" /> : <Loader2 className="w-4 h-4 text-gray-400 animate-spin flex-shrink-0" />}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </motion.div>
+
+              {/* PLAN 7 JOURS */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+                className="bg-gray-50 rounded-2xl border border-gray-200 p-6 mb-8">
+                <p className="text-lg font-bold text-gray-900 mb-4">Tu es au jour {getCurrentDay(fullSession)}</p>
+                <div className="flex items-center gap-2 mb-6">
+                  {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                    <div key={day} className={`flex-1 h-2 rounded-full transition-all ${
+                      day < getCurrentDay(fullSession) ? 'bg-[#61f7a2]' : day === getCurrentDay(fullSession) ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30' : 'bg-gray-200'
+                    }`} />
+                  ))}
+                </div>
+                <Link to={createPageUrl('PlanAction')}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 rounded-xl hover:border-[#61f7a2] hover:shadow-md transition-all font-medium text-gray-900">
+                  Voir le plan complet
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </motion.div>
+
+              {/* ============ FEEDBACK ============ */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 mb-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900">Un retour ? Une idee ?</h3>
+                    <p className="text-xs text-gray-500">Aide-nous a ameliorer Passionia</p>
+                  </div>
+                </div>
+
+                {feedbackSent ? (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                    <p className="text-sm font-semibold text-green-700">Merci pour ton retour !</p>
+                    <p className="text-xs text-green-600 mt-1">On lit tout et on prend en compte.</p>
+                  </div>
+                ) : (
+                  <>
+                    <textarea
+                      value={feedbackText}
+                      onChange={(e) => setFeedbackText(e.target.value)}
+                      placeholder="Dis-nous ce qui te plait, ce qu'on pourrait ameliorer, ou une fonctionnalite que tu aimerais..."
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-700 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all bg-white"
+                      rows={3}
+                    />
+                    <div className="flex justify-end mt-3">
+                      <button
+                        onClick={handleSendFeedback}
+                        disabled={feedbackSending || !feedbackText.trim()}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {feedbackSending ? (
+                          <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Envoi...</>
+                        ) : (
+                          <><Send className="w-3.5 h-3.5" /> Envoyer</>
+                        )}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            </>
+          )}
+
+          {/* No session state */}
+          {!fullSession && !loading && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center py-16"
+            >
+              <div className="w-20 h-20 rounded-2xl bg-gray-100 mx-auto mb-6 flex items-center justify-center">
+                <Sparkles className="w-10 h-10 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Aucune session</h3>
+              <p className="text-gray-600 mb-6">Commence ton parcours pour generer tes offres avec Noah.</p>
+              <GlowButton onClick={handleCreateSession} size="lg">
+                <Plus className="w-5 h-5" />
+                Commencer mon parcours
+              </GlowButton>
+            </motion.div>
+          )}
+
+        </main>
+      </div>
+
+      {/* Modals */}
+      <SessionPaywallModal
+        isOpen={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        type={paywallType}
+      />
+    </div>
+  );
+}

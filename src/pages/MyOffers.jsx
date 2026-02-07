@@ -275,7 +275,7 @@ ${offer.ecosystem_role ? 'Rôle dans le funnel:\n' + offer.ecosystem_role : ''}
   const offerTypes = [
     {
       id: 'low',
-      title: 'Produit d\'appel',
+      title: 'Produit principal',
       subtitle: 'Low ticket',
       description: 'Ton offre d\'entrée de gamme',
       icon: Package,
@@ -283,7 +283,7 @@ ${offer.ecosystem_role ? 'Rôle dans le funnel:\n' + offer.ecosystem_role : ''}
     },
     {
       id: 'bump',
-      title: 'Vente additionnelle',
+      title: 'Petit extra',
       subtitle: 'Order bump',
       description: 'Complément immédiat à ton offre',
       icon: ShoppingCart,
@@ -291,7 +291,7 @@ ${offer.ecosystem_role ? 'Rôle dans le funnel:\n' + offer.ecosystem_role : ''}
     },
     {
       id: 'mid',
-      title: 'Offre intermédiaire',
+      title: 'Offre supérieure',
       subtitle: 'Mid ticket',
       description: 'Ton offre premium',
       icon: TrendingUp,

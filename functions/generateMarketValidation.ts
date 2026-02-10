@@ -22,26 +22,32 @@ Tu dois :
 - ✅ Personnaliser chaque analyse au contexte exact
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📐 STRUCTURE DU TEXTE DE VALIDATION (3 BLOCS)
+📐 STRUCTURE DU TEXTE DE VALIDATION (3 PARAGRAPHES EN TEXTE FLUIDE)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**BLOC 1 : CONTEXTE ACTUEL (1-2 phrases)**
+**PARAGRAPHE 1 : CONTEXTE ACTUEL (2-3 phrases)**
 
-"Après analyse de ton marché autour de [COMPÉTENCE EXACTE], une chose ressort très clairement."
+Commence par une accroche directe qui mentionne la compétence exacte.
+Ensuite, explique le problème spécifique et la tendance observée avec des données concrètes.
 
-"Jamais autant de personnes n'ont cherché à [PROBLÈME/BESOIN]. Ce n'est pas une intuition. Les données montrent [TENDANCE CONCRÈTE]."
+Exemple :
+"Après analyse de ton marché autour du piano jazz pour débutants, une chose ressort très clairement. Jamais autant de personnes n'ont cherché à apprendre à improviser sans solfège. Les recherches sur ce sujet ont augmenté de 67% en 2 ans."
 
-**BLOC 2 : PREUVES CONCRÈTES (2 bullet points)**
+**PARAGRAPHE 2 : PREUVES CONCRÈTES (3-4 phrases)**
 
-• Preuve 1 : Croissance / Volume / Tendance mesurable
-  Exemple : "Intérêt croissant pour [SOLUTION] avec +340% sur Google Trends en 2 ans"
-  
-• Preuve 2 : Comportement d'achat / Demande active
-  Exemple : "Les formations sur [SUJET] génèrent 15k€/mois en moyenne (données Gumroad)"
+Développe 2 preuves concrètes en texte fluide, pas en bullet points :
+1. Une preuve de croissance/volume/tendance mesurable
+2. Une preuve de comportement d'achat ou de demande active
 
-**BLOC 3 : CONCLUSION RASSURANTE (1 phrase)**
+Exemple :
+"L'intérêt pour les méthodes d'apprentissage rapide du jazz a explosé, avec une croissance de 45% sur YouTube et Google Trends ces 18 derniers mois. Les formations musicales en ligne génèrent en moyenne entre 8k et 15k euros par mois selon les données de Gumroad et Teachable, et les cours de piano restent dans le top 3 des formations les plus achetées."
 
-"Autrement dit : tu n'arrives pas trop tôt. Tu arrives au bon moment."
+**PARAGRAPHE 3 : CONCLUSION RASSURANTE (1-2 phrases)**
+
+Termine par une phrase de validation qui donne confiance.
+
+Exemple :
+"Autrement dit : tu n'arrives pas trop tôt. Tu arrives au bon moment, là où la demande est forte et l'audience est prête à investir."
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🚫 INTERDICTIONS ABSOLUES
@@ -53,12 +59,15 @@ Tu dois :
 - Utiliser "ta compétence" si tu connais le skill précis
 - Faire des généralités sans chiffres
 - Dépasser 200 mots
+- Utiliser des bullet points (•) ou du markdown
+- Structurer en liste à puces
 
 ✅ TOUJOURS :
 - Reprendre le skill EXACT (ex: "Piano jazz pour débutants")
-- Citer des chiffres précis avec années
+- Citer des chiffres précis avec années ou fourchettes réalistes
 - Lier au PROBLÈME spécifique, pas au format
-- Ton direct, bienveillant, factuel`;
+- Ton direct, bienveillant, factuel
+- Texte fluide en paragraphes, pas en listes`;
 
 const INDICATORS_SYSTEM_PROMPT = `Tu es un analyste de marché senior.
 
@@ -204,29 +213,31 @@ ${methodAngle ? `Approche unique : ${methodAngle}` : ''}
 
 Génère un texte de validation de marché ULTRA-PERSONNALISÉ pour ${firstName}.
 
-**STRUCTURE OBLIGATOIRE :**
+Le texte doit être structuré en 3 PARAGRAPHES FLUIDES (pas de bullet points, pas de markdown) :
 
-**BLOC 1 :**
-"Après analyse de ton marché autour de ${skill}, une chose ressort très clairement."
+**PARAGRAPHE 1 (2-3 phrases) :**
+Commence par : "Après analyse de ton marché autour de ${skill}, une chose ressort très clairement."
+Puis explique comment le problème "${mainProblem}" est de plus en plus recherché, avec une tendance chiffrée concrète.
 
-"Jamais autant de personnes n'ont cherché à [résoudre ce problème exact : ${mainProblem}]. Ce n'est pas une intuition. Les données montrent [tendance concrète avec chiffre]."
+**PARAGRAPHE 2 (3-4 phrases) :**
+Développe 2 preuves concrètes en texte fluide :
+- Preuve 1 : Croissance mesurable liée spécifiquement à "${mainProblem}" (pas au e-learning en général)
+- Preuve 2 : Comportement d'achat ou monétisation observée pour ce type de solution
 
-**BLOC 2 (2 bullet points avec bordure verte) :**
-• Preuve 1 : Croissance mesurable liée au problème "${mainProblem}"
-• Preuve 2 : Comportement d'achat confirmé pour ce type de solution
+**PARAGRAPHE 3 (1-2 phrases) :**
+Conclus par : "Autrement dit : tu n'arrives pas trop tôt. Tu arrives au bon moment."
+Optionnellement, ajoute une phrase de validation supplémentaire.
 
-**BLOC 3 :**
-"Autrement dit : tu n'arrives pas trop tôt. Tu arrives au bon moment."
-
-⚠️ CONTRAINTES :
+⚠️ CONTRAINTES STRICTES :
 - Maximum 200 mots
-- Reprendre le skill EXACT "${skill}" (pas "création de contenu")
-- Utiliser des fourchettes réalistes (ex: "une augmentation estimée entre 15% et 25%") ou des tendances qualitatives fortes (ex: "une demande qui explose depuis 6 mois")
+- Reprendre le skill EXACT "${skill}" (ne JAMAIS généraliser)
+- Utiliser des fourchettes réalistes (ex: "entre 15% et 25%") ou des tendances qualitatives fortes (ex: "une demande qui explose depuis 6 mois")
 - NE PAS inventer de chiffre précis s'il n'est pas vérifiable
-- Ton direct, factuel, rassurant
-- Texte brut (pas de markdown)
+- Ton direct, factuel, rassurant, personnalisé
+- TEXTE FLUIDE EN PARAGRAPHES (séparés par un saut de ligne double)
+- PAS de bullet points (•), PAS de markdown (**), PAS de listes
 
-Génère maintenant le texte (texte brut uniquement).`;
+Génère maintenant le texte en 3 paragraphes fluides uniquement.`;
 
     const indicatorsPrompt = `CONTEXTE :
 

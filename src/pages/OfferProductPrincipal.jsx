@@ -153,7 +153,7 @@ export default function OfferProductPrincipal() {
               <Lightbulb className="w-4 h-4 text-white" />
             </div>
             <p className="text-sm text-amber-900 leading-relaxed">
-              Je t'ai préparé <span className="font-semibold">2 options prêtes à vendre</span> . Tu pourras modifier, régénérer ou améliorer cette offre à tout moment.
+              Je t'ai préparé <span className="font-semibold">2 options prêtes à vendre</span>. Tu pourras modifier, régénérer ou améliorer cette offre à tout moment.
             </p>
           </div>
 

@@ -160,15 +160,19 @@ export default function OnboardingQuestionPage({
           const currentUser = await base44.auth.me();
           const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser?.sessionId;
           if (resolvedSessionId) {
-            const response = await base44.functions.invoke('saveOnboardingAnswer', {
-              sessionId: resolvedSessionId,
-              field: fieldName,
-              value: inputType === 'checkbox' ? value : value
-            });
+            // 🔥 FIX: Mise à jour directe de Session.onboarding_full au lieu d'appeler saveOnboardingAnswer
+            const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
+            if (sessions.length > 0) {
+              const session = sessions[0];
+              const existingData = session.onboarding_full || {};
+              const updatedData = { ...existingData, [fieldName]: inputType === 'checkbox' ? value : value };
 
-            if (response.data?.success) {
+              await base44.entities.Session.update(resolvedSessionId, {
+                onboarding_full: updatedData
+              });
+
               console.log('✅ [ONBOARDING_SAVE_LOCAL]', {
-                sessionId: currentUser.sessionId,
+                sessionId: resolvedSessionId,
                 fieldName,
                 saved: true
               });
@@ -186,26 +190,28 @@ export default function OnboardingQuestionPage({
       // Mode base44 - sauvegarder dans User
       await base44.auth.updateMe({ [fieldName]: value });
 
-      // BACKEND MERGE : appeler la fonction qui fait le merge server-side
+      // BACKEND MERGE : mise à jour directe de Session.onboarding_full
       const activeSessionId = localStorage.getItem('passionia_active_session_id') || user.sessionId;
       if (activeSessionId && fieldName) {
         try {
-          const response = await base44.functions.invoke('saveOnboardingAnswer', {
-            sessionId: activeSessionId,
-            field: fieldName,
-            value
-          });
+          // 🔥 FIX: Mise à jour directe de Session.onboarding_full au lieu d'appeler saveOnboardingAnswer
+          const sessions = await base44.entities.Session.filter({ id: activeSessionId });
+          if (sessions.length > 0) {
+            const session = sessions[0];
+            const existingData = session.onboarding_full || {};
+            const updatedData = { ...existingData, [fieldName]: value };
 
-          if (response.data?.success) {
+            await base44.entities.Session.update(activeSessionId, {
+              onboarding_full: updatedData
+            });
+
             console.log('✅ [ONBOARDING_SAVE]', {
               sessionId: activeSessionId,
               fieldName,
               saved: true,
               nextPage,
-              totalKeys: Object.keys(response.data.onboarding_full || {}).length
+              totalKeys: Object.keys(updatedData).length
             });
-          } else {
-            console.error('❌ [ONBOARDING_SAVE] Backend returned error:', response.data);
           }
         } catch (backendError) {
           console.error('❌ [ONBOARDING_SAVE] Backend call failed:', backendError);

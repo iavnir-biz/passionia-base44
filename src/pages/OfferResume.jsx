@@ -341,20 +341,6 @@ export default function OfferResume() {
             </p>
           </motion.div>
 
-          {/* Bandeau info régénération */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.09 }}
-            className="mb-8 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl flex items-start gap-3"
-          >
-            <div className="bg-green-500 rounded-full p-1.5 flex-shrink-0 mt-0.5">
-              <Lightbulb className="w-4 h-4 text-white" />
-            </div>
-            <p className="text-sm text-green-800 leading-relaxed">
-              Si tu as déjà une idée de produit ou si tu souhaites régénérer celles-ci, tu pourras me donner encore plus de détails pour créer le <span className="font-semibold">pack d'offres parfait</span> ! ✨
-            </p>
-          </motion.div>
 
           {/* Products Summary - Vertical */}
           <motion.div

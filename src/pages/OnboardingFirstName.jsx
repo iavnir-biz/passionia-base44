@@ -65,7 +65,18 @@ export default function OnboardingFirstName() {
         base44.auth.redirectToLogin(window.location.href);
       }
     };
+
+    // Timeout de sécurité : si l'auth check prend trop longtemps, rediriger vers login
+    const timeout = setTimeout(() => {
+      if (isCheckingAuth) {
+        console.warn('Auth check timeout, redirecting to login');
+        base44.auth.redirectToLogin(window.location.href);
+      }
+    }, 10000);
+
     checkAuth();
+
+    return () => clearTimeout(timeout);
   }, []);
 
   // Typing effects for each text block
@@ -170,6 +181,7 @@ export default function OnboardingFirstName() {
     } catch (error) {
       console.error('Error saving firstName:', error);
       alert('Une erreur est survenue. Merci de réessayer.');
+    } finally {
       setIsLoading(false);
     }
   };

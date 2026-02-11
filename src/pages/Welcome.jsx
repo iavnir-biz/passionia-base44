@@ -342,8 +342,8 @@ export default function TeaserPage() {
         </div>
 
         {/* ━━━ Bouton CTA ━━━ */}
-        <a
-          href="/OnboardingFirstName"
+        <button
+          onClick={() => base44.auth.redirectToLogin(window.location.origin + '/OnboardingFirstName')}
           style={{
             display: "flex",
             alignItems: "center",
@@ -376,7 +376,7 @@ export default function TeaserPage() {
           }}
         >
           C'est parti 🚀
-        </a>
+        </button>
 
 
       </div>

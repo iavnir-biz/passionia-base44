@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Brain, Zap } from 'lucide-react';
 import { NoahBrainIcon } from '@/components/NoahBrainIcon';
@@ -45,39 +46,16 @@ const NoahAvatar = () => (
 
 export default function OnboardingFirstName() {
   const navigate = useNavigate();
+  const { isAuthenticated, isLoadingAuth, navigateToLogin } = useAuth();
   const [firstName, setFirstName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // 🔐 Vérifier l'authentification au chargement
+  // 🔐 Rediriger vers login si non authentifié (auth déjà résolue par AuthContext)
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth) {
-          // Rediriger vers login avec retour sur cette page
-          base44.auth.redirectToLogin(window.location.href);
-          return;
-        }
-        setIsCheckingAuth(false);
-      } catch (error) {
-        console.error('Auth check error:', error);
-        base44.auth.redirectToLogin(window.location.href);
-      }
-    };
-
-    // Timeout de sécurité : si l'auth check prend trop longtemps, rediriger vers login
-    const timeout = setTimeout(() => {
-      if (isCheckingAuth) {
-        console.warn('Auth check timeout, redirecting to login');
-        base44.auth.redirectToLogin(window.location.href);
-      }
-    }, 10000);
-
-    checkAuth();
-
-    return () => clearTimeout(timeout);
-  }, []);
+    if (!isLoadingAuth && !isAuthenticated) {
+      navigateToLogin();
+    }
+  }, [isLoadingAuth, isAuthenticated, navigateToLogin]);
 
   // Typing effects for each text block
   const text1 = "Commençons par faire connaissance 🙂";
@@ -223,7 +201,7 @@ export default function OnboardingFirstName() {
   };
 
   // Afficher un loader pendant la vérification d'auth
-  if (isCheckingAuth) {
+  if (isLoadingAuth || !isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
         <div className="text-center">

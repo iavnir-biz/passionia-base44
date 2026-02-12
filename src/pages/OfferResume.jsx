@@ -195,14 +195,26 @@ export default function OfferResume() {
   const handleRegenerate = async () => {
     setRegenerating(true);
     try {
-      await base44.functions.invoke('generateFullStackOffer', {
-        sessionId: session.id
-      });
+      // Retry automatique sur erreur réseau/rate limit
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          await base44.functions.invoke('generateFullStackOffer', {
+            sessionId: session.id
+          });
+          break;
+        } catch (err) {
+          const isRetryable = err.message?.includes('429') || err.message?.includes('overloaded') || err.message?.includes('529');
+          if (isRetryable && attempt < 2) {
+            await new Promise(r => setTimeout(r, (attempt + 1) * 3000));
+            continue;
+          }
+          throw err;
+        }
+      }
       // Reload session
       await loadUser();
     } catch (error) {
       console.error('Error regenerating:', error);
-      alert('Erreur lors de la régénération. Réessaye.');
     } finally {
       setRegenerating(false);
     }

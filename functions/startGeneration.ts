@@ -182,70 +182,85 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Generate
-      try {
-        console.log(`[startGeneration] Calling ${step.function}...`);
-        
-        const result = await base44.asServiceRole.functions.invoke(step.function, { 
-          sessionId: resolvedSessionId 
-        });
+      // Generate avec retry automatique (1 retry sur échec)
+      const maxStepRetries = 1;
+      let stepSuccess = false;
 
-        // Validation flexible du résultat
-        const isSuccess = result.data?.success || 
-                         result.data?.avatars || 
-                         result.data?.messages || 
-                         result.data?.emails || 
-                         result.data?.offers || 
-                         result.data?.analysis ||
-                         result.data?.marketValidation ||
-                         result.data?.planDeRoute ||
-                         result.data?.salesPage;
+      for (let stepAttempt = 0; stepAttempt <= maxStepRetries; stepAttempt++) {
+        try {
+          console.log(`[startGeneration] Calling ${step.function}... (attempt ${stepAttempt + 1})`);
 
-        if (isSuccess) {
-          console.log(`[startGeneration] ${step.name} ✅ SUCCESS`);
-          
-          const updatedStatus = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
-          const updatedGenerationStatus = updatedStatus[0].generation_status || {};
-          
+          const result = await base44.asServiceRole.functions.invoke(step.function, {
+            sessionId: resolvedSessionId
+          });
+
+          // Validation flexible du résultat
+          const isSuccess = result.data?.success ||
+                           result.data?.avatars ||
+                           result.data?.messages ||
+                           result.data?.emails ||
+                           result.data?.offers ||
+                           result.data?.analysis ||
+                           result.data?.marketValidation ||
+                           result.data?.planDeRoute ||
+                           result.data?.salesPage;
+
+          if (isSuccess) {
+            console.log(`[startGeneration] ${step.name} ✅ SUCCESS`);
+
+            const updatedStatus = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
+            const updatedGenerationStatus = updatedStatus[0].generation_status || {};
+
+            await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
+              generation_status: {
+                ...updatedGenerationStatus,
+                [step.id]: {
+                  status: 'done',
+                  progress: progressPercent,
+                  completedAt: new Date().toISOString()
+                }
+              }
+            });
+            stepSuccess = true;
+            break;
+          } else {
+            throw new Error('Unexpected response format');
+          }
+
+        } catch (error) {
+          console.error(`[startGeneration] ${step.name} ❌ ERROR (attempt ${stepAttempt + 1}):`, error.message);
+
+          if (stepAttempt < maxStepRetries) {
+            // Retry après délai
+            const retryDelay = 8000;
+            console.log(`[startGeneration] Retrying ${step.name} in ${retryDelay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            continue;
+          }
+
+          // Épuisement des retries : marquer en erreur
+          const errorStatus = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
+          const errorGenerationStatus = errorStatus[0].generation_status || {};
+
           await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
             generation_status: {
-              ...updatedGenerationStatus,
-              [step.id]: { 
-                status: 'done', 
+              ...errorGenerationStatus,
+              [step.id]: {
+                status: 'error',
                 progress: progressPercent,
-                completedAt: new Date().toISOString()
+                error: error.message,
+                failedAt: new Date().toISOString()
               }
             }
           });
-        } else {
-          throw new Error('Unexpected response format');
         }
-
-      } catch (error) {
-        console.error(`[startGeneration] ${step.name} ❌ ERROR:`, error.message);
-        
-        const errorStatus = await base44.asServiceRole.entities.Session.filter({ id: resolvedSessionId });
-        const errorGenerationStatus = errorStatus[0].generation_status || {};
-        
-        await base44.asServiceRole.entities.Session.update(resolvedSessionId, {
-          generation_status: {
-            ...errorGenerationStatus,
-            [step.id]: { 
-              status: 'error', 
-              progress: progressPercent,
-              error: error.message,
-              failedAt: new Date().toISOString()
-            }
-          }
-        });
-
-        // Continue même en cas d'erreur pour ne pas bloquer les autres
       }
 
       // 🔥 DÉLAI entre chaque génération (évite rate limits)
       if (i < generationSteps.length - 1) {
-        console.log('[startGeneration] Waiting 5 seconds before next generation...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        const interStepDelay = stepSuccess ? 7000 : 10000; // Plus de délai après un échec
+        console.log(`[startGeneration] Waiting ${interStepDelay}ms before next generation...`);
+        await new Promise(resolve => setTimeout(resolve, interStepDelay));
       }
     }
 

@@ -536,6 +536,35 @@ Génère maintenant le JSON complet selon le format spécifié dans le SYSTEM_PR
       model: "claude-sonnet-4-20250514" 
     });
 
+    // Helper: appel Anthropic avec retry automatique sur 429/529/overloaded
+    const callAnthropicWithRetry = async (promptContent: string, apiRetryLabel: string) => {
+      const maxApiRetries = 3;
+      for (let apiAttempt = 0; apiAttempt <= maxApiRetries; apiAttempt++) {
+        try {
+          return await anthropic.messages.create({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 8000,
+            system: SYSTEM_PROMPT,
+            messages: [{ role: "user", content: promptContent }]
+          });
+        } catch (apiError) {
+          const status = apiError.status || apiError.statusCode;
+          const isRetryable = status === 429 || status === 529 ||
+                             apiError.message?.includes('overloaded') ||
+                             apiError.message?.includes('rate') ||
+                             apiError.message?.includes('Too Many');
+
+          if (isRetryable && apiAttempt < maxApiRetries) {
+            const waitTime = (apiAttempt + 1) * 5000; // 5s, 10s, 15s
+            console.warn(`[generateFullStackOffer] ${apiRetryLabel} - API ${status || 'error'}, retry ${apiAttempt + 1}/${maxApiRetries} in ${waitTime}ms`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            continue;
+          }
+          throw apiError;
+        }
+      }
+    };
+
     let retryCount = 0;
     const maxRetries = 2;
     let finalOffer = null;
@@ -543,33 +572,27 @@ Génère maintenant le JSON complet selon le format spécifié dans le SYSTEM_PR
 
     while (retryCount <= maxRetries) {
       try {
-        const message = await anthropic.messages.create({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 8000,
-          system: SYSTEM_PROMPT,
-          messages: [
-            { 
-              role: "user", 
-              content: retryCount === 0 ? userPrompt : `${userPrompt}\n\n⚠️ ERREURS À CORRIGER :\n${validationErrors.join('\n')}\n\nRegenère le JSON complet en corrigeant ces erreurs.`
-            }
-          ]
-        });
+        const promptContent = retryCount === 0
+          ? userPrompt
+          : `${userPrompt}\n\n⚠️ ERREURS À CORRIGER :\n${validationErrors.join('\n')}\n\nRegenère le JSON complet en corrigeant ces erreurs.`;
 
-        console.log("ANTHROPIC_CALL end", { 
-          fn: "generateFullStackOffer", 
+        const message = await callAnthropicWithRetry(promptContent, `attempt ${retryCount + 1}`);
+
+        console.log("ANTHROPIC_CALL end", {
+          fn: "generateFullStackOffer",
           sessionId,
           usage: message.usage,
           retryCount
         });
 
         const responseText = message.content[0].type === 'text' ? message.content[0].text : '{}';
-        
+
         // Clean potential markdown code blocks
         const cleanedText = responseText
           .replace(/```json\n?/g, '')
           .replace(/```\n?/g, '')
           .trim();
-        
+
         let parsedOffer;
         try {
           parsedOffer = JSON.parse(cleanedText);
@@ -580,7 +603,7 @@ Génère maintenant le JSON complet selon le format spécifié dans le SYSTEM_PR
 
         // Validate the offer
         validationErrors = validateOffer(parsedOffer);
-        
+
         if (validationErrors.length === 0) {
           finalOffer = parsedOffer;
           console.log('Offer validated successfully', { sessionId });
@@ -588,7 +611,7 @@ Génère maintenant le JSON complet selon le format spécifié dans le SYSTEM_PR
         } else {
           console.warn('Validation errors found', { sessionId, retryCount, errors: validationErrors });
           retryCount++;
-          
+
           if (retryCount > maxRetries) {
             console.error('Max retries reached, using best effort', { sessionId, errors: validationErrors });
             finalOffer = parsedOffer;
@@ -598,10 +621,12 @@ Génère maintenant le JSON complet selon le format spécifié dans le SYSTEM_PR
       } catch (error) {
         console.error('Error in generation attempt', { sessionId, retryCount, error: error.message });
         retryCount++;
-        
+
         if (retryCount > maxRetries) {
           throw error;
         }
+        // Délai entre retries de validation
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
     }
 

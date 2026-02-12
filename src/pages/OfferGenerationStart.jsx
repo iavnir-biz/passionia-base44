@@ -141,10 +141,42 @@ export default function OfferGenerationStart() {
     return () => clearInterval(stepInterval);
   }, []);
 
-  const generateOffer = async (retryCount = 0) => {
+  // Helper: attente avec backoff exponentiel
+  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Helper: retry transparent pour les appels réseau
+  const retryableCall = async (fn, { maxRetries = 3, baseDelay = 2000, label = 'call' } = {}) => {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await fn();
+      } catch (err) {
+        const isRetryable = err.message?.includes('429') ||
+                           err.message?.includes('Too Many') ||
+                           err.message?.includes('overloaded') ||
+                           err.message?.includes('529') ||
+                           err.message?.includes('timeout') ||
+                           err.message?.includes('network') ||
+                           err.message?.includes('fetch');
+
+        if (isRetryable && attempt < maxRetries) {
+          const delay = baseDelay * Math.pow(2, attempt); // 2s, 4s, 8s
+          console.warn(`⚠️ [OFFER_START] ${label} attempt ${attempt + 1} failed, retry in ${delay}ms...`);
+          setIsRetrying(true);
+          await wait(delay);
+          continue;
+        }
+        throw err;
+      }
+    }
+  };
+
+  const generateOffer = async () => {
     try {
-      const user = await base44.auth.me();
-      
+      const user = await retryableCall(
+        () => base44.auth.me(),
+        { label: 'auth.me', maxRetries: 2, baseDelay: 1500 }
+      );
+
       // Utiliser activeSessionId (localStorage) avec fallback sur user.sessionId
       const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || user.sessionId;
       if (!resolvedSessionId) {
@@ -153,40 +185,42 @@ export default function OfferGenerationStart() {
         return;
       }
 
-      // Charger session avec retry sur 429
+      // Charger session avec retry robuste
       let sessions = null;
       try {
-        sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
+        sessions = await retryableCall(
+          () => base44.entities.Session.filter({ id: resolvedSessionId }),
+          { label: 'session.filter', maxRetries: 3, baseDelay: 2000 }
+        );
       } catch (fetchError) {
-        // Si 429 ou erreur réseau, retry 1 fois après délai
-        if (retryCount === 0 && (fetchError.message?.includes('429') || fetchError.message?.includes('Too Many'))) {
-          console.warn('⚠️ [OFFER_START] Rate limit, retry dans 1s...');
-          setIsRetrying(true);
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          setIsRetrying(false);
-          return generateOffer(1); // Retry
-        }
-        
-        // Erreur persistante
-        console.error('❌ [OFFER_START] Fetch session failed:', fetchError);
+        console.error('❌ [OFFER_START] Fetch session failed after retries:', fetchError);
+        setIsRetrying(false);
         setError({
           type: 'fetch_error',
           message: 'Impossible de charger tes données. Vérifie ta connexion.'
         });
         return;
       }
-      
+
       if (!sessions || sessions.length === 0) {
         console.error('❌ [OFFER_START] Session introuvable:', user.sessionId);
-        const fallbackSessions = await base44.entities.Session.filter({ created_by: user.email });
-        if (fallbackSessions.length > 0) {
-          console.warn('⚠️ [OFFER_START] Fallback sur created_by');
-          const latestSession = fallbackSessions.sort((a, b) => 
-            new Date(b.created_date) - new Date(a.created_date)
-          )[0];
-          await base44.auth.updateMe({ sessionId: latestSession.id });
-          sessions = [latestSession];
-        } else {
+        try {
+          const fallbackSessions = await retryableCall(
+            () => base44.entities.Session.filter({ created_by: user.email }),
+            { label: 'session.fallback', maxRetries: 2, baseDelay: 2000 }
+          );
+          if (fallbackSessions.length > 0) {
+            console.warn('⚠️ [OFFER_START] Fallback sur created_by');
+            const latestSession = fallbackSessions.sort((a, b) =>
+              new Date(b.created_date) - new Date(a.created_date)
+            )[0];
+            await base44.auth.updateMe({ sessionId: latestSession.id });
+            sessions = [latestSession];
+          } else {
+            navigate(createPageUrl('OnboardingFirstName'));
+            return;
+          }
+        } catch {
           navigate(createPageUrl('OnboardingFirstName'));
           return;
         }
@@ -232,58 +266,59 @@ export default function OfferGenerationStart() {
           'perceivedObstacles': 'OnboardingQ23Obstacles',
           'readinessScore': 'OnboardingQ25Readiness'
         };
-        
+
         const firstMissing = missingKeys[0];
         const redirectPage = redirectMap[firstMissing] || 'OnboardingQ16TargetIncome';
-        
+
         console.log('🔄 [OFFER_START] Redirect:', redirectPage, 'missing:', missingKeys);
         navigate(createPageUrl(redirectPage));
         return;
       }
 
       const missingData = [];
-      
+
       if (!user.firstName) {
         missingData.push('firstName');
       }
-      
+
       if (!session.skill && !fullData.coreSkill && !session.onboarding_summary?.who_to_teach) {
         missingData.push('skill');
       }
 
       if (missingData.length > 0) {
         console.error('❌ Données manquantes pour générer l\'offre:', missingData);
-        console.log('📦 État complet de la session:', {
-          sessionId: session.id,
-          skill: session.skill,
-          onboarding_summary: session.onboarding_summary,
-          onboarding_history_length: session.onboarding_history?.length || 0,
-          onboarding_full_keys: Object.keys(session.onboarding_full || {}),
-          user_firstName: user.firstName,
-          user_coreSkill: user.coreSkill,
-          user_targetIncome: user.targetIncome
-        });
-        
+
         // Rediriger intelligemment selon ce qui manque
         if (missingData.some(d => d.includes('onboarding_history'))) {
-          alert(`⚠️ Onboarding incomplet (${session.onboarding_history?.length || 0}/11 questions)\n\nTu vas être redirigé pour finir les questions.`);
           navigate(createPageUrl('OnboardingDynamic'));
         } else if (missingData.some(d => d.includes('réponses statiques'))) {
-          alert(`⚠️ Questions de profil incomplètes\n\nTu vas être redirigé pour finir ton profil.`);
           navigate(createPageUrl('OnboardingQ12AgeRange'));
         } else {
-          alert(`⚠️ Données manquantes: ${missingData.join(', ')}\n\nRedirection...`);
           navigate(createPageUrl('OnboardingFirstName'));
         }
         return;
       }
-      
+
       console.log('✅ [OfferGenerationStart] Toutes les données validées, génération...');
-      
-      // 🔥 Generate Full Stack Offer (P.S.S.O.)
-      const response = await base44.functions.invoke('generateFullStackOffer', {
-        sessionId
-      });
+
+      // 🔥 Generate Full Stack Offer avec retry automatique (P.S.S.O.)
+      let response;
+      try {
+        response = await retryableCall(
+          () => base44.functions.invoke('generateFullStackOffer', { sessionId }),
+          { label: 'generateFullStackOffer', maxRetries: 3, baseDelay: 3000 }
+        );
+      } catch (genError) {
+        console.error('❌ [OFFER_START] Generation failed after retries:', genError);
+        setIsRetrying(false);
+        setError({
+          type: 'generation_error',
+          message: 'La génération a pris trop de temps. Réessaye, ça devrait marcher !'
+        });
+        return;
+      }
+
+      setIsRetrying(false);
 
       console.log('📨 [OfferGenerationStart] Réponse génération:', {
         hasError: !!response.data?.error,
@@ -292,54 +327,83 @@ export default function OfferGenerationStart() {
         fromCache: response.data?.fromCache
       });
 
-      // 🔥 NE NAVIGUER QUE SI GÉNÉRATION RÉUSSIE
+      // Si erreur dans la réponse, retenter automatiquement 1 fois
       if (response.data?.error) {
-        console.error('❌ [OfferGenerationStart] Génération échouée:', response.data.error);
-        alert(`⚠️ Erreur lors de la génération de tes offres.\n\n${response.data.error}\n\nRéessaye dans quelques instants.`);
-        return; // ❌ PAS DE NAVIGATION
+        console.warn('⚠️ [OfferGenerationStart] Erreur dans réponse, retry auto...');
+        setIsRetrying(true);
+        await wait(3000);
+        try {
+          response = await base44.functions.invoke('generateFullStackOffer', { sessionId });
+          setIsRetrying(false);
+          if (response.data?.error || !response.data?.success) {
+            setError({
+              type: 'generation_error',
+              message: 'La génération a rencontré un souci. Réessaye dans quelques instants.'
+            });
+            return;
+          }
+        } catch {
+          setIsRetrying(false);
+          setError({
+            type: 'generation_error',
+            message: 'La génération a rencontré un souci. Réessaye dans quelques instants.'
+          });
+          return;
+        }
       }
 
       if (!response.data?.success) {
         console.error('❌ [OfferGenerationStart] Génération non confirmée');
-        alert('⚠️ La génération n\'a pas pu être confirmée. Réessaye.');
+        setError({
+          type: 'generation_error',
+          message: 'La génération n\'a pas pu être confirmée. Réessaye.'
+        });
         return;
       }
-      
+
       console.log('✅ [OfferGenerationStart] Génération réussie → Navigation');
       navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
       console.error('❌ [OFFER_START] Error:', error);
+      setIsRetrying(false);
       setError({
         type: 'generation_error',
         message: error.message || 'Une erreur est survenue'
       });
     }
   };
-  
+
   const handleRetry = () => {
     setError(null);
     setIsRetrying(false);
-    generateOffer(0);
+    setElapsedTime(0);
+    setCurrentStep(0);
+    generateOffer();
   };
 
-  // Écran d'erreur avec retry
+  // Écran d'erreur avec retry (affiché seulement après épuisement des retries automatiques)
   if (error) {
     return (
       <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center z-50">
         <div className="text-center max-w-md px-6">
-          <div className="w-20 h-20 rounded-full bg-red-100 mx-auto mb-6 flex items-center justify-center">
-            <span className="text-4xl">⚠️</span>
+          <div className="w-20 h-20 rounded-full bg-amber-50 mx-auto mb-6 flex items-center justify-center">
+            <span className="text-4xl">🔄</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            {error.type === 'fetch_error' ? 'Trop de trafic' : 'Erreur'}
+            Un petit souci temporaire
           </h2>
-          <p className="text-gray-600 mb-6">{error.message}</p>
+          <p className="text-gray-600 mb-6">
+            {error.message || 'La génération a pris plus de temps que prévu. Relance et tout devrait fonctionner !'}
+          </p>
           <Button
             onClick={handleRetry}
             className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-8 py-3 rounded-xl font-semibold"
           >
-            Réessayer
+            Relancer la génération
           </Button>
+          <p className="text-xs text-gray-400 mt-4">
+            Nos serveurs sont parfois très sollicités, ça passe en général au 2e essai
+          </p>
         </div>
       </div>
     );

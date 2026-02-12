@@ -230,19 +230,36 @@ FORMAT : DM Instagram/Facebook (mobile-first)
 
 Écris maintenant le message en respectant STRICTEMENT la longueur maximale.`;
 
-        // Appel API Anthropic Claude Sonnet 4
-        const completion = await anthropic.messages.create({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 400,
-            temperature: 0.8,
-            system: systemMessage,
-            messages: [
-                {
-                    role: "user",
-                    content: userContext
-                }
-            ]
-        });
+        // Appel API avec retry automatique sur 429/529
+        let completion;
+        const maxApiRetries = 3;
+        for (let apiAttempt = 0; apiAttempt <= maxApiRetries; apiAttempt++) {
+          try {
+            completion = await anthropic.messages.create({
+                model: "claude-sonnet-4-20250514",
+                max_tokens: 400,
+                temperature: 0.8,
+                system: systemMessage,
+                messages: [
+                    {
+                        role: "user",
+                        content: userContext
+                    }
+                ]
+            });
+            break;
+          } catch (apiError) {
+            const status = apiError.status || apiError.statusCode;
+            const isRetryable = status === 429 || status === 529 || apiError.message?.includes('overloaded');
+            if (isRetryable && apiAttempt < maxApiRetries) {
+              const waitTime = (apiAttempt + 1) * 5000;
+              console.warn(`[generateSalesMessage] API ${status}, retry ${apiAttempt + 1}/${maxApiRetries} in ${waitTime}ms`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+              continue;
+            }
+            throw apiError;
+          }
+        }
 
         const messageContent = completion.content[0].text;
 

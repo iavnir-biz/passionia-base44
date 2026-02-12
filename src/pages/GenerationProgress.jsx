@@ -51,14 +51,22 @@ export default function GenerationProgress() {
     initializeAndStart();
   }, []);
 
+  // Polling avec intervalle adaptatif (3s → 8s après 30 polls)
+  const pollCountRef = React.useRef(0);
+
   useEffect(() => {
     if (hasStarted && !allReady) {
-      // Polling toutes les 2 secondes
-      const interval = setInterval(() => {
+      let timeoutId;
+      const poll = () => {
         checkProgress();
-      }, 2000);
+        pollCountRef.current += 1;
+        // Augmente progressivement : 3s → 5s → 8s
+        const delay = pollCountRef.current < 10 ? 3000 : pollCountRef.current < 30 ? 5000 : 8000;
+        timeoutId = setTimeout(poll, delay);
+      };
+      timeoutId = setTimeout(poll, 3000);
 
-      return () => clearInterval(interval);
+      return () => clearTimeout(timeoutId);
     }
   }, [hasStarted, allReady]);
 
@@ -80,16 +88,34 @@ export default function GenerationProgress() {
 
       setSessionId(resolvedSessionId);
 
-      // Lancer la génération
+      // Lancer la génération avec retry
       console.log('[GenerationProgress] Starting generation...');
-      await base44.functions.invoke('startGeneration', {
-        sessionId: resolvedSessionId
-      });
+      let startSuccess = false;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          await base44.functions.invoke('startGeneration', {
+            sessionId: resolvedSessionId
+          });
+          startSuccess = true;
+          break;
+        } catch (startError) {
+          const isRetryable = startError.message?.includes('429') ||
+                             startError.message?.includes('overloaded') ||
+                             startError.message?.includes('409');
+          if (isRetryable && attempt < 2) {
+            console.warn(`[GenerationProgress] Start failed, retry ${attempt + 1} in ${(attempt + 1) * 3}s...`);
+            await new Promise(r => setTimeout(r, (attempt + 1) * 3000));
+            continue;
+          }
+          throw startError;
+        }
+      }
 
-      setHasStarted(true);
-      
-      // Premier check immédiat
-      await checkProgress();
+      if (startSuccess) {
+        setHasStarted(true);
+        // Premier check immédiat
+        await checkProgress();
+      }
 
     } catch (error) {
       console.error('Error initializing generation:', error);

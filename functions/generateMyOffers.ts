@@ -141,20 +141,37 @@ AVATARS CLIENTS (référence):
 ${JSON.stringify(avatars, null, 2)}`;
 
         console.log(`[generateMyOffers] Enriching ${offerType}...`);
-        
-        // Appel API Anthropic Claude Sonnet 4
-        const completion = await anthropic.messages.create({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 4096,
-            temperature: 0.7,
-            system: systemMessage,
-            messages: [
-                {
-                    role: "user",
-                    content: userContext
-                }
-            ]
-        });
+
+        // Appel API avec retry automatique sur 429/529
+        let completion;
+        const maxApiRetries = 3;
+        for (let apiAttempt = 0; apiAttempt <= maxApiRetries; apiAttempt++) {
+          try {
+            completion = await anthropic.messages.create({
+                model: "claude-sonnet-4-20250514",
+                max_tokens: 4096,
+                temperature: 0.7,
+                system: systemMessage,
+                messages: [
+                    {
+                        role: "user",
+                        content: userContext
+                    }
+                ]
+            });
+            break;
+          } catch (apiError) {
+            const status = apiError.status || apiError.statusCode;
+            const isRetryable = status === 429 || status === 529 || apiError.message?.includes('overloaded');
+            if (isRetryable && apiAttempt < maxApiRetries) {
+              const waitTime = (apiAttempt + 1) * 5000;
+              console.warn(`[generateMyOffers] API ${status}, retry ${apiAttempt + 1}/${maxApiRetries} in ${waitTime}ms`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+              continue;
+            }
+            throw apiError;
+          }
+        }
 
         // Extraction du JSON depuis la réponse de Claude
         let enrichedOffer;

@@ -444,14 +444,32 @@ Génère maintenant l'analyse complète en JSON.`;
       model: 'claude-sonnet-4-20250514'
     });
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 16000,
-      system: SYSTEM_PROMPT,
-      messages: [
-        { role: "user", content: userPrompt }
-      ]
-    });
+    // Appel avec retry automatique sur 429/529
+    let message;
+    const maxApiRetries = 3;
+    for (let apiAttempt = 0; apiAttempt <= maxApiRetries; apiAttempt++) {
+      try {
+        message = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 16000,
+          system: SYSTEM_PROMPT,
+          messages: [
+            { role: "user", content: userPrompt }
+          ]
+        });
+        break;
+      } catch (apiError) {
+        const status = apiError.status || apiError.statusCode;
+        const isRetryable = status === 429 || status === 529 || apiError.message?.includes('overloaded');
+        if (isRetryable && apiAttempt < maxApiRetries) {
+          const waitTime = (apiAttempt + 1) * 5000;
+          console.warn(`[generateMarketAnalysisV2] API ${status}, retry ${apiAttempt + 1}/${maxApiRetries} in ${waitTime}ms`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+        throw apiError;
+      }
+    }
 
     console.log('ANTHROPIC_CALL end', {
       fn: 'generateCompleteMarketAnalysis',

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { ArrowRight, Loader2, Sparkles, Mic, StopCircle } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,11 +25,7 @@ export default function OnboardingDynamic() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
   const [prefilledAnswer, setPrefilledAnswer] = useState(''); // 🔥 Passion pré-remplie
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
 
   useEffect(() => {
     // 🔥 Récupérer la skill pré-remplie depuis Welcome
@@ -200,41 +196,6 @@ export default function OnboardingDynamic() {
     else setValue(value.filter(v => v !== option));
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-      mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
-      mediaRecorderRef.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        setIsTranscribing(true);
-        try {
-          const file = new File([audioBlob], 'voice.webm', { type: 'audio/webm' });
-          const upload = await base44.integrations.Core.UploadFile({ file });
-          const { data } = await base44.functions.invoke('transcribeAudio', { audioUrl: upload.file_url });
-          setValue(prev => prev ? `${prev}\n${data.text}` : data.text);
-        } catch (err) {
-          console.error('Transcription error:', err);
-        } finally {
-          setIsTranscribing(false);
-        }
-        stream.getTracks().forEach(t => t.stop());
-      };
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-    } catch (err) {
-      console.error('Recording error:', err);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-
   const progress = Math.min(((session?.onboarding_history?.length || 0) / MAX_QUESTIONS) * 100, 100);
   const completedSteps = (session?.onboarding_history?.length || 0) >= MAX_QUESTIONS ? [1] : [];
 
@@ -340,27 +301,6 @@ export default function OnboardingDynamic() {
                             }
                           }}
                         />
-                        <div className="absolute bottom-4 right-4">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className={cn(
-                              "h-10 w-10 rounded-full transition-all",
-                              isRecording ? "bg-red-50 text-red-500 animate-pulse" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                            )}
-                            onClick={isRecording ? stopRecording : startRecording}
-                            disabled={isTranscribing || isSaving}
-                          >
-                            {isTranscribing ? (
-                              <Loader2 className="w-5 h-5 animate-spin text-[#61f7a2]" />
-                            ) : isRecording ? (
-                              <StopCircle className="w-5 h-5" />
-                            ) : (
-                              <Mic className="w-5 h-5" />
-                            )}
-                          </Button>
-                        </div>
                       </div>
                     )}
 

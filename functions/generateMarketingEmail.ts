@@ -378,12 +378,10 @@ Génère maintenant les 5 emails complets en JSON.`;
       model: 'claude-sonnet-4-20250514'
     });
 
-    // 🔥 RETRY LOGIC pour gérer rate limits (429)
+    // 🔥 RETRY LOGIC pour gérer rate limits (429) et surcharge (529)
     let message;
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    while (retryCount < maxRetries) {
+    const maxApiRetries = 3;
+    for (let apiAttempt = 0; apiAttempt <= maxApiRetries; apiAttempt++) {
       try {
         message = await anthropic.messages.create({
           model: "claude-sonnet-4-20250514",
@@ -393,16 +391,17 @@ Génère maintenant les 5 emails complets en JSON.`;
             { role: "user", content: userPrompt }
           ]
         });
-        break; // Success, sortir de la boucle
-      } catch (error) {
-        if (error.status === 429 && retryCount < maxRetries - 1) {
-          retryCount++;
-          const waitTime = retryCount * 5000; // 5s, 10s, 15s
-          console.log(`[generateMarketingEmail] Rate limit hit, retry ${retryCount}/${maxRetries} in ${waitTime}ms`);
+        break;
+      } catch (apiError) {
+        const status = apiError.status || apiError.statusCode;
+        const isRetryable = status === 429 || status === 529 || apiError.message?.includes('overloaded');
+        if (isRetryable && apiAttempt < maxApiRetries) {
+          const waitTime = (apiAttempt + 1) * 5000; // 5s, 10s, 15s
+          console.warn(`[generateMarketingEmail] API ${status}, retry ${apiAttempt + 1}/${maxApiRetries} in ${waitTime}ms`);
           await new Promise(resolve => setTimeout(resolve, waitTime));
-        } else {
-          throw error; // Si ce n'est pas une 429 ou dernière tentative, throw
+          continue;
         }
+        throw apiError;
       }
     }
 

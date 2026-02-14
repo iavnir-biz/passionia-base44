@@ -199,18 +199,37 @@ HTML final complet, publiable, prêt à être copié-collé.
 - Aucune explication, aucun commentaire, seulement le HTML pur.`;
 
     console.log('[generateSalesPage] Calling Claude Sonnet 4 for page content...');
-    const completion = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 16000,
-      temperature: 0.8,
-      system: "Tu es Nova, expert en copywriting de pages de vente et UX produit SaaS. Tu utilises UNIQUEMENT les données fournies sans les inventer. Aucun placeholder générique. Tu génères du HTML structuré, professionnel, et visuellement attractif.",
-      messages: [
-        {
-          role: "user",
-          content: contentPrompt
+
+    // Appel avec retry automatique sur 429/529
+    let completion;
+    const maxApiRetries = 3;
+    for (let apiAttempt = 0; apiAttempt <= maxApiRetries; apiAttempt++) {
+      try {
+        completion = await anthropic.messages.create({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 16000,
+          temperature: 0.8,
+          system: "Tu es Nova, expert en copywriting de pages de vente et UX produit SaaS. Tu utilises UNIQUEMENT les données fournies sans les inventer. Aucun placeholder générique. Tu génères du HTML structuré, professionnel, et visuellement attractif.",
+          messages: [
+            {
+              role: "user",
+              content: contentPrompt
+            }
+          ]
+        });
+        break;
+      } catch (apiError) {
+        const status = apiError.status || apiError.statusCode;
+        const isRetryable = status === 429 || status === 529 || apiError.message?.includes('overloaded');
+        if (isRetryable && apiAttempt < maxApiRetries) {
+          const waitTime = (apiAttempt + 1) * 5000;
+          console.warn(`[generateSalesPage] API ${status}, retry ${apiAttempt + 1}/${maxApiRetries} in ${waitTime}ms`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
         }
-      ]
-    });
+        throw apiError;
+      }
+    }
 
     let htmlContent = completion.content[0].text;
 

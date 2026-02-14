@@ -93,30 +93,43 @@ export default function OfferGenerationCard({ offer, user, sessionId, onGenerate
 
   const handleGenerate = async () => {
     setIsGenerating(true);
-    
+
+    // Helper retry pour les appels réseau
+    const retryCall = async (fn, maxRetries = 2) => {
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          return await fn();
+        } catch (err) {
+          const isRetryable = err.message?.includes('429') || err.message?.includes('overloaded') || err.message?.includes('529');
+          if (isRetryable && attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, (attempt + 1) * 3000));
+            continue;
+          }
+          throw err;
+        }
+      }
+    };
+
     try {
       if (offer.type === 'complete') {
-        // Générer l'offre complète
-        const { data } = await base44.functions.invoke('generateCompleteOffer', { sessionId });
+        const { data } = await retryCall(() => base44.functions.invoke('generateCompleteOffer', { sessionId }));
         if (data.success) {
           setGeneratedOffer(data.offer);
           setVersion(data.offer.version || 1);
           if (onGenerated) onGenerated();
         }
       } else {
-        // Générer une offre individuelle
         const baseOffer = user?.offer?.[offer.type];
         if (!baseOffer) {
-          alert('Offre de base non trouvée. Complète d\'abord ton onboarding.');
           setIsGenerating(false);
           return;
         }
 
-        const { data } = await base44.functions.invoke('generateOfferDetails', {
+        const { data } = await retryCall(() => base44.functions.invoke('generateOfferDetails', {
           offerType: offer.id,
           offerData: baseOffer,
           sessionId
-        });
+        }));
 
         if (data.success) {
           setGeneratedOffer(data.offer);
@@ -126,7 +139,6 @@ export default function OfferGenerationCard({ offer, user, sessionId, onGenerate
       }
     } catch (error) {
       console.error('Error generating offer:', error);
-      alert('Erreur lors de la génération');
     } finally {
       setIsGenerating(false);
     }

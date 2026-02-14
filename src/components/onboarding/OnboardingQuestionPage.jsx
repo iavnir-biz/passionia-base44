@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Sparkles, Loader2, Paperclip, Mic, StopCircle, X, Brain, Star, Rocket } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, Loader2, Paperclip, X, Brain, Star, Rocket } from 'lucide-react';
 import GlowButton from '@/components/ui/GlowButton';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -55,10 +55,7 @@ export default function OnboardingQuestionPage({
   const [isSaving, setIsSaving] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const isSavingRef = useRef(false);
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
   const fileInputRef = useRef(null);
 
   // Calculer la progression dans le bloc actuel
@@ -286,47 +283,6 @@ export default function OnboardingQuestionPage({
     setAttachedFiles(attachedFiles.filter((_, i) => i !== index));
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-
-      mediaRecorderRef.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-
-        setIsUploading(true);
-        try {
-          const file = new File([audioBlob], 'voice-note.webm', { type: 'audio/webm' });
-          const { data } = await base44.integrations.Core.UploadFile({ file });
-          setAttachedFiles([...attachedFiles, { name: 'Note vocale', url: data.file_url, isAudio: true }]);
-        } catch (error) {
-          console.error('Error uploading audio:', error);
-        } finally {
-          setIsUploading(false);
-        }
-
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-
   const handleCheckboxChange = (option, checked) => {
     if (checked) {
       setValue([...value, option]);
@@ -442,19 +398,6 @@ export default function OnboardingQuestionPage({
                             <Paperclip className="w-4 h-4" />
                           )}
                         </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className={`h-8 w-8 hover:bg-gray-100 ${isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-gray-700'}`} disabled={isSaving}
-                          onClick={isRecording ? stopRecording : startRecording}
-                        >
-                          {isRecording ? (
-                            <StopCircle className="w-4 h-4" />
-                          ) : (
-                            <Mic className="w-4 h-4" />
-                          )}
-                        </Button>
                       </div>
                     </div>
 
@@ -463,7 +406,7 @@ export default function OnboardingQuestionPage({
                         {attachedFiles.map((file, index) => (
                           <div key={index} className="flex items-center justify-between bg-gray-50 rounded-lg p-2 border border-gray-200">
                             <div className="flex items-center gap-2">
-                              {file.isAudio ? <Mic className="w-4 h-4 text-gray-600" /> : <Paperclip className="w-4 h-4 text-gray-600" />}
+                              <Paperclip className="w-4 h-4 text-gray-600" />
                               <span className="text-sm text-gray-700">{file.name}</span>
                             </div>
                             <Button

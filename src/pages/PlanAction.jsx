@@ -4,6 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { useRequirePayment } from '@/components/hooks/useRequirePayment';
+import { useSessionManager } from '@/components/hooks/useSessionManager';
 import Sidebar from '@/components/navigation/Sidebar';
 import TopBar from '@/components/navigation/TopBar';
 import DayCard from '@/components/plan/DayCard';
@@ -21,6 +22,7 @@ const WEEKS = [
 export default function PlanAction() {
   const navigate = useNavigate();
   const { isAuthenticated, hasPurchased, isLoading: authLoading, user } = useRequirePayment();
+  const { activeSessionId } = useSessionManager();
   const [profile, setProfile] = useState(null);
   const [session, setSession] = useState(null);
   const [currentDay, setCurrentDay] = useState(1);
@@ -30,19 +32,20 @@ export default function PlanAction() {
   const [docsReady, setDocsReady] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadData();
+    if (isAuthenticated && activeSessionId) {
+      loadData(activeSessionId);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, activeSessionId]);
 
-  const loadData = async () => {
+  const loadData = async (sessionId) => {
+    if (!sessionId) return;
     setIsLoading(true);
     try {
-      console.log('[PlanAction] 🚀 Loading data...');
-      
-      // 🔥 Charger la Session (contient plan_progress)
-      const sessions = await base44.entities.Session.filter({ created_by: user.email });
-      
+      console.log('[PlanAction] 🚀 Loading data for session:', sessionId);
+
+      // 🔥 Charger la Session active (contient plan_progress)
+      const sessions = await base44.entities.Session.filter({ id: sessionId });
+
       if (sessions.length > 0) {
         const userSession = sessions[0];
         setSession(userSession);

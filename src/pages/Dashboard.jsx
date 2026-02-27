@@ -21,7 +21,6 @@ import {
   Plus,
   Lock,
   Download,
-  MessageSquare,
   ShoppingCart,
   TrendingUp,
   Crown
@@ -65,11 +64,6 @@ export default function Dashboard() {
 
   // Session view mode
   const [viewMode, setViewMode] = useState('detail'); // 'detail' | 'grid'
-
-  // Feedback
-  const [feedbackText, setFeedbackText] = useState('');
-  const [feedbackSending, setFeedbackSending] = useState(false);
-  const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -368,26 +362,6 @@ export default function Dashboard() {
 
   const remaining = Math.max(0, targetNum - currentRevenue);
   const revenuePercent = targetNum > 0 ? Math.min(100, Math.round((currentRevenue / targetNum) * 100)) : 0;
-
-  const handleSendFeedback = async () => {
-    if (!feedbackText.trim() || !user) return;
-    setFeedbackSending(true);
-    try {
-      await base44.entities.Feedback.create({
-        message: feedbackText.trim(),
-        user_email: user.email,
-        user_name: profile?.first_name || user.full_name || '',
-        session_id: activeSessionId || null
-      });
-      setFeedbackSent(true);
-      setFeedbackText('');
-      setTimeout(() => setFeedbackSent(false), 4000);
-    } catch (err) {
-      console.error('[Dashboard] Error sending feedback:', err);
-    } finally {
-      setFeedbackSending(false);
-    }
-  };
 
   if (authLoading || loading || sessionsLoading) {
     return (
@@ -845,49 +819,6 @@ export default function Dashboard() {
                 </Link>
               </motion.div>
 
-              {/* ============ FEEDBACK ============ */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-gray-900">Un retour ? Une idee ?</h3>
-                    <p className="text-xs text-gray-500">Aide-nous a ameliorer Passionia</p>
-                  </div>
-                </div>
-
-                {feedbackSent ? (
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-                    <p className="text-sm font-semibold text-green-700">Merci pour ton retour !</p>
-                    <p className="text-xs text-green-600 mt-1">On lit tout et on prend en compte.</p>
-                  </div>
-                ) : (
-                  <>
-                    <textarea
-                      value={feedbackText}
-                      onChange={(e) => setFeedbackText(e.target.value)}
-                      placeholder="Dis-nous ce qui te plait, ce qu'on pourrait ameliorer, ou une fonctionnalite que tu aimerais..."
-                      className="w-full border border-gray-200 rounded-xl p-3 text-sm text-gray-700 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all bg-white"
-                      rows={3}
-                    />
-                    <div className="flex justify-end mt-3">
-                      <button
-                        onClick={handleSendFeedback}
-                        disabled={feedbackSending || !feedbackText.trim()}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        {feedbackSending ? (
-                          <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Envoi...</>
-                        ) : (
-                          <><Send className="w-3.5 h-3.5" /> Envoyer</>
-                        )}
-                      </button>
-                    </div>
-                  </>
-                )}
-              </motion.div>
             </>
           )}
 

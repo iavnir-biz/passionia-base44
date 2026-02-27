@@ -25,6 +25,8 @@ import {
   Clock
 } from 'lucide-react';
 
+const JOURNAL_STORAGE_KEY = (sessionId) => `passionia_journal_${sessionId}`;
+
 const CATEGORIES = [
   { id: 'note', label: 'Note libre', icon: StickyNote, color: 'bg-gray-100 text-gray-700 border-gray-200', activeColor: 'bg-gray-900 text-white', dot: 'bg-gray-400' },
   { id: 'link', label: 'Lien utile', icon: Link2, color: 'bg-blue-50 text-blue-700 border-blue-200', activeColor: 'bg-blue-600 text-white', dot: 'bg-blue-400' },
@@ -87,11 +89,27 @@ export default function Journal() {
     if (!sessionId) return;
     setLoading(true);
     try {
+      // Load from localStorage first for immediate display
+      const localRaw = localStorage.getItem(JOURNAL_STORAGE_KEY(sessionId));
+      if (localRaw) {
+        try {
+          const localEntries = JSON.parse(localRaw);
+          if (Array.isArray(localEntries)) {
+            setEntries(localEntries);
+          }
+        } catch {}
+      }
+
+      // Then sync with backend
       const sessions = await base44.entities.Session.filter({ id: sessionId });
       if (sessions.length > 0) {
         setFullSession(sessions[0]);
         const journalData = sessions[0].journal_entries || [];
-        setEntries(Array.isArray(journalData) ? journalData : []);
+        const backendEntries = Array.isArray(journalData) ? journalData : [];
+        if (backendEntries.length > 0) {
+          setEntries(backendEntries);
+          localStorage.setItem(JOURNAL_STORAGE_KEY(sessionId), JSON.stringify(backendEntries));
+        }
       }
     } catch (err) {
       console.error('[Journal] Error loading session:', err);
@@ -102,6 +120,8 @@ export default function Journal() {
 
   const saveEntries = useCallback(async (updatedEntries) => {
     if (!activeSessionId) return;
+    // Always persist to localStorage immediately
+    localStorage.setItem(JOURNAL_STORAGE_KEY(activeSessionId), JSON.stringify(updatedEntries));
     setSaving(true);
     try {
       await base44.entities.Session.update(activeSessionId, {

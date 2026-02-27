@@ -287,7 +287,7 @@ export default function Dashboard() {
       return {
         title: firstUnchecked.text.replace(/^✅\s+/, ''),
         description: firstUnchecked.details || "Clique pour plus de details",
-        page: firstUnchecked.action?.page || "PlanAction"
+        page: "PlanAction"
       };
     }
 

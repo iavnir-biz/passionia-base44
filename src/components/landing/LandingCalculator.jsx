@@ -25,8 +25,8 @@ export default function LandingCalculator() {
 
   return (
     <div ref={ref} className="landing-fade" style={{
-      background: '#fff',
-      padding: '0 24px 80px',
+      background: '#111111',
+      padding: '80px 24px',
     }}>
       <div style={{
         maxWidth: '700px',

@@ -116,7 +116,7 @@ export default function LandingTestimonialsScroll() {
           letterSpacing: '-0.03em',
           color: '#fff',
         }}>
-          Ils ont lancé grâce à{' '}
+          ils ont lancé grâce à{' '}
           <span style={{
             fontStyle: 'italic',
             fontWeight: 500,
@@ -125,7 +125,6 @@ export default function LandingTestimonialsScroll() {
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
           }}>NOAH™</span>
-          {' '}💜
         </h2>
       </div>
 

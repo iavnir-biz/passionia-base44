@@ -28,24 +28,24 @@ export default function LandingVideo() {
           border-radius: 50%;
           pointer-events: none;
           z-index: 0;
-          filter: blur(60px);
-          opacity: 0.5;
+          filter: blur(45px);
+          opacity: 0.75;
         }
         .neon-circle-1 {
-          width: 280px; height: 280px;
-          background: radial-gradient(circle, rgba(249,115,22,0.45) 0%, transparent 70%);
+          width: 320px; height: 320px;
+          background: radial-gradient(circle, rgba(249,115,22,0.6) 0%, transparent 70%);
           top: 10%; left: -5%;
           animation: neonFloat1 6s ease-in-out infinite;
         }
         .neon-circle-2 {
-          width: 220px; height: 220px;
-          background: radial-gradient(circle, rgba(236,72,153,0.4) 0%, transparent 70%);
+          width: 260px; height: 260px;
+          background: radial-gradient(circle, rgba(236,72,153,0.55) 0%, transparent 70%);
           top: 30%; right: -3%;
           animation: neonFloat2 7s ease-in-out infinite;
         }
         .neon-circle-3 {
-          width: 200px; height: 200px;
-          background: radial-gradient(circle, rgba(167,139,250,0.4) 0%, transparent 70%);
+          width: 250px; height: 250px;
+          background: radial-gradient(circle, rgba(167,139,250,0.55) 0%, transparent 70%);
           bottom: 5%; left: 15%;
           animation: neonFloat3 8s ease-in-out infinite;
         }

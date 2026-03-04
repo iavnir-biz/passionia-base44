@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { AnimatedTooltip } from '@/components/ui/animated-tooltip';
 
 export default function LandingHero({ onCTA }) {
   const ref = useRef(null);
@@ -122,23 +123,32 @@ export default function LandingHero({ onCTA }) {
         }
       `}</style>
 
-      {/* Social proof */}
+      {/* Social proof with animated avatars */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '16px',
+        gap: '14px',
         marginTop: '24px',
         flexWrap: 'wrap'
       }}>
-        <div style={{ display: 'flex', gap: '2px' }}>
-          {[1,2,3,4,5].map(i => (
-            <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#1a1a1a" stroke="none">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-          ))}
+        <AnimatedTooltip items={[
+          { id: 1, name: "Sophie M.", designation: "Coach bien-être", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" },
+          { id: 2, name: "Thomas L.", designation: "Formateur fitness", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" },
+          { id: 3, name: "Marie P.", designation: "Photographe", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" },
+          { id: 4, name: "Lucas B.", designation: "Coach sportif", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" },
+          { id: 5, name: "Émilie V.", designation: "Designer", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face" },
+        ]} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '8px' }}>
+          <div style={{ display: 'flex', gap: '2px' }}>
+            {[1,2,3,4,5].map(i => (
+              <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#1a1a1a" stroke="none">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            ))}
+          </div>
+          <span style={{ fontSize: '13px', color: '#999' }}>+500 créateurs ont lancé leur business</span>
         </div>
-        <span style={{ fontSize: '13px', color: '#999' }}>+500 créateurs ont lancé leur business</span>
       </div>
     </section>
   );

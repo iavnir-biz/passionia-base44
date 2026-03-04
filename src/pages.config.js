@@ -67,6 +67,7 @@ import EtComment from './pages/EtComment';
 import GenerationProgress from './pages/GenerationProgress';
 import Home from './pages/Home';
 import Journal from './pages/Journal';
+import LandingNoah from './pages/LandingNoah';
 import MarketAnalysis from './pages/MarketAnalysis';
 import MonetiserSavoir from './pages/MonetiserSavoir';
 import MyOffers from './pages/MyOffers';
@@ -116,7 +117,7 @@ import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import LandingNoah from './pages/LandingNoah';
+import LandingNoah2 from './pages/LandingNoah2';
 
 
 export const PAGES = {
@@ -140,6 +141,7 @@ export const PAGES = {
     "GenerationProgress": GenerationProgress,
     "Home": Home,
     "Journal": Journal,
+    "LandingNoah": LandingNoah,
     "MarketAnalysis": MarketAnalysis,
     "MonetiserSavoir": MonetiserSavoir,
     "MyOffers": MyOffers,
@@ -189,7 +191,7 @@ export const PAGES = {
     "UpsellCoaching": UpsellCoaching,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "LandingNoah": LandingNoah,
+    "LandingNoah2": LandingNoah2,
 }
 
 export const pagesConfig = {

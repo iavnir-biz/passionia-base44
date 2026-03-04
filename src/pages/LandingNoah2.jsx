@@ -65,37 +65,7 @@ export default function LandingNoah2() {
         </button>
       </div>
 
-      {/* Navbar */}
-      <nav style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '16px 32px',
-        maxWidth: '1200px',
-        margin: '0 auto'
-      }}>
-        <span style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.5px' }}>
-          NOAH<span style={{ fontSize: '14px', verticalAlign: 'super' }}>™</span>
-        </span>
-        <button
-          onClick={handleCTA}
-          style={{
-            background: '#1a1a1a',
-            color: '#fff',
-            border: 'none',
-            padding: '10px 24px',
-            borderRadius: '100px',
-            fontSize: '14px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-          onMouseOver={e => e.target.style.opacity = '0.85'}
-          onMouseOut={e => e.target.style.opacity = '1'}
-        >
-          Accéder à NOAH™ — 29€
-        </button>
-      </nav>
+
 
       <LandingHero onCTA={handleCTA} />
       <LandingVideo />

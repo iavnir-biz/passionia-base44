@@ -12,14 +12,17 @@ import LandingFAQ from '../components/landing/LandingFAQ';
 import LandingTestimonialsScroll from '../components/landing/LandingTestimonialsScroll';
 import LandingFooter from '../components/landing/LandingFooter';
 import LandingVideo from '../components/landing/LandingVideo';
+import CheckoutModal from '../components/landing/CheckoutModal';
 
 export default function LandingNoah2() {
+  const [showCheckout, setShowCheckout] = useState(false);
+
   const scrollToCTA = () => {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleCTA = () => {
-    base44.auth.redirectToLogin(window.location.origin + '/OnboardingFirstName');
+    setShowCheckout(true);
   };
 
   return (
@@ -80,6 +83,8 @@ export default function LandingNoah2() {
 
       <LandingTestimonialsScroll />
       <LandingFooter onCTA={handleCTA} />
+
+      <CheckoutModal isOpen={showCheckout} onClose={() => setShowCheckout(false)} />
 
       <style>{`
         .landing-fade {

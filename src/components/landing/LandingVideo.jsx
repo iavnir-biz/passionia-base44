@@ -79,6 +79,7 @@ export default function LandingVideo() {
       {/* Video frame — Amplemarket style */}
       <div style={{
         position: 'relative',
+        zIndex: 1,
         borderRadius: '20px',
         overflow: 'hidden',
         border: '1px solid #e8e8e8',

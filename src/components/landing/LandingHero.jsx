@@ -1,100 +1,113 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
-import useFadeIn from './useFadeIn';
 
 export default function LandingHero({ onCTA }) {
-  const ref = useFadeIn();
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) e.target.classList.add('visible'); }, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
 
   return (
-    <section style={{ padding: '80px 24px 100px', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
-      <div ref={ref} className="landing-fade">
-        {/* Badge */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: '#f5f5f5',
-          borderRadius: '100px',
-          padding: '8px 20px',
-          marginBottom: '32px',
-          fontSize: '14px',
-          fontWeight: 500,
-          color: '#666'
-        }}>
-          <span style={{
-            background: '#1a1a1a',
-            color: '#fff',
-            padding: '2px 10px',
-            borderRadius: '100px',
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '0.5px'
-          }}>NOUVEAU</span>
-          Pour ceux qui veulent monétiser leur savoir-faire →
-        </div>
+    <section ref={ref} className="landing-fade" style={{
+      textAlign: 'center',
+      padding: '80px 24px 60px',
+      maxWidth: '820px',
+      margin: '0 auto'
+    }}>
+      {/* Badge pill */}
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '8px',
+        background: '#f5f5f5',
+        border: '1px solid #e8e8e8',
+        borderRadius: '100px',
+        padding: '6px 16px',
+        fontSize: '13px',
+        color: '#666',
+        marginBottom: '32px'
+      }}>
+        <span style={{ background: '#1a1a1a', color: '#fff', padding: '2px 8px', borderRadius: '100px', fontSize: '11px', fontWeight: 600 }}>NEW</span>
+        Transforme ton savoir-faire en revenus avec l'IA →
+      </div>
 
-        {/* Titre — Style Amplemarket : gros, serif pour "italique" */}
-        <h1 style={{
-          fontSize: 'clamp(36px, 5.5vw, 64px)',
-          fontWeight: 600,
-          lineHeight: 1.1,
-          letterSpacing: '-1.5px',
-          marginBottom: '28px',
-          color: '#1a1a1a'
-        }}>
-          Le système qui génère{' '}
-          <span style={{ fontStyle: 'italic', fontWeight: 400 }}>tes 4 offres</span>{' '}
-          et t'aide à viser{' '}
-          <span style={{ fontStyle: 'italic', fontWeight: 400 }}>+4 000€/mois</span>
-        </h1>
+      {/* Title — mixed weight like Amplemarket */}
+      <h1 style={{
+        fontSize: 'clamp(36px, 5.5vw, 60px)',
+        fontWeight: 400,
+        lineHeight: 1.15,
+        letterSpacing: '-0.03em',
+        color: '#1a1a1a',
+        marginBottom: '24px'
+      }}>
+        Génère tes <span style={{ fontStyle: 'italic' }}>4 offres</span> et fais ta première vente en 24h
+      </h1>
 
-        <p style={{
-          fontSize: '18px',
-          color: '#888',
-          maxWidth: '600px',
-          margin: '0 auto 40px',
-          lineHeight: 1.6
-        }}>
-          NOAH™ transforme ton savoir-faire en offres structurées, prêtes à vendre — avec les prix, pages de vente, emails et plan d'action.
-        </p>
+      <p style={{
+        fontSize: '18px',
+        color: '#888',
+        lineHeight: 1.6,
+        maxWidth: '600px',
+        margin: '0 auto 40px'
+      }}>
+        NOAH™ analyse ton expertise, structure tes offres, rédige tes contenus de vente et te guide pas à pas — pour viser +4 000€/mois.
+      </p>
 
-        {/* CTA style Amplemarket — bouton noir arrondi */}
+      {/* CTA bar like Amplemarket */}
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        background: '#f8f8f8',
+        borderRadius: '100px',
+        padding: '6px',
+        border: '1px solid #e5e5e5'
+      }}>
+        <span style={{ padding: '0 20px', color: '#999', fontSize: '15px' }}>
+          100% gratuit pour commencer
+        </span>
         <button
           onClick={onCTA}
           style={{
             background: '#1a1a1a',
             color: '#fff',
             border: 'none',
-            padding: '16px 36px',
+            padding: '14px 28px',
             borderRadius: '100px',
-            fontSize: '16px',
+            fontSize: '15px',
             fontWeight: 600,
             cursor: 'pointer',
-            transition: 'all 0.2s',
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
-            gap: '10px'
+            gap: '8px',
+            transition: 'opacity 0.2s'
           }}
-          onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.03)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.15)'; }}
-          onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
+          onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+          onMouseOut={e => e.currentTarget.style.opacity = '1'}
         >
-          Commencer gratuitement <ArrowRight size={18} />
+          Commencer <ArrowRight size={16} />
         </button>
+      </div>
 
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '24px',
-          marginTop: '24px',
-          flexWrap: 'wrap'
-        }}>
-          {['100% gratuit', 'Résultats en 5 min', 'Aucune compétence technique'].map((text, i) => (
-            <span key={i} style={{ fontSize: '13px', color: '#999', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#22c55e', fontSize: '16px' }}>✓</span> {text}
-            </span>
+      {/* Social proof */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '16px',
+        marginTop: '24px',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ display: 'flex', gap: '2px' }}>
+          {[1,2,3,4,5].map(i => (
+            <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#1a1a1a" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
           ))}
         </div>
+        <span style={{ fontSize: '13px', color: '#999' }}>+500 créateurs ont lancé leur business</span>
       </div>
     </section>
   );

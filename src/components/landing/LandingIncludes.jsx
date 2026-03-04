@@ -1,55 +1,75 @@
-import React from 'react';
-import { Package, FileText, Mail, MessageSquare, BarChart3, CalendarDays } from 'lucide-react';
-import useFadeIn from './useFadeIn';
-
-const items = [
-  { icon: Package, title: "4 offres complètes", desc: "Structurées, tarifées, positionnées — prêtes à vendre." },
-  { icon: FileText, title: "Page de vente", desc: "Texte de vente généré pour convertir tes visiteurs." },
-  { icon: Mail, title: "5 emails marketing", desc: "Prêts à envoyer pour ta séquence de lancement." },
-  { icon: MessageSquare, title: "Messages de vente", desc: "Scripts pour réseaux sociaux et conversations." },
-  { icon: BarChart3, title: "Analyse de marché", desc: "Validation de ton idée avec données concrètes." },
-  { icon: CalendarDays, title: "Plan d'action 7 jours", desc: "Étape par étape, une action par jour." }
-];
+import React, { useEffect, useRef } from 'react';
+import { Check } from 'lucide-react';
 
 export default function LandingIncludes() {
-  const ref = useFadeIn();
+  const ref = useRef(null);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) e.target.classList.add('visible'); }, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const items = [
+    "4 offres complètes générées par IA",
+    "Pages de vente personnalisées",
+    "5 emails marketing prêts à l'emploi",
+    "Scripts de vente pour réseaux sociaux",
+    "Avatars clients détaillés",
+    "Validation marché avec données réelles",
+    "Plan d'action 7 jours",
+    "Accès à vie + mises à jour"
+  ];
 
   return (
-    <section style={{ padding: '100px 24px' }}>
-      <div ref={ref} className="landing-fade" style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#aaa', marginBottom: '16px' }}>
-          Ce que tu obtiens
-        </p>
-        <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 600, letterSpacing: '-1px', lineHeight: 1.15, marginBottom: '64px' }}>
-          Tout ce dont tu as besoin{' '}
-          <span style={{ fontStyle: 'italic', fontWeight: 400 }}>pour lancer</span>
-        </h2>
+    <section ref={ref} className="landing-fade" style={{
+      padding: '80px 24px',
+      maxWidth: '700px',
+      margin: '0 auto',
+      textAlign: 'center'
+    }}>
+      <p style={{
+        fontSize: '13px',
+        fontWeight: 600,
+        textTransform: 'uppercase',
+        letterSpacing: '1.5px',
+        color: '#999',
+        marginBottom: '16px'
+      }}>Ce que tu obtiens</p>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
-          gap: '20px',
-          textAlign: 'left'
-        }}>
-          {items.map((item, i) => {
-            const Icon = item.icon;
-            return (
-              <div key={i} style={{
-                background: '#fafafa',
-                borderRadius: '16px',
-                padding: '28px',
-                transition: 'all 0.25s'
-              }}
-              onMouseOver={e => { e.currentTarget.style.background = '#f0f0f0'; }}
-              onMouseOut={e => { e.currentTarget.style.background = '#fafafa'; }}
-              >
-                <Icon size={24} color="#1a1a1a" style={{ marginBottom: '14px' }} />
-                <h3 style={{ fontSize: '17px', fontWeight: 600, marginBottom: '8px', letterSpacing: '-0.3px' }}>{item.title}</h3>
-                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.5 }}>{item.desc}</p>
-              </div>
-            );
-          })}
-        </div>
+      <h2 style={{
+        fontSize: 'clamp(28px, 4vw, 44px)',
+        fontWeight: 400,
+        lineHeight: 1.2,
+        letterSpacing: '-0.02em',
+        marginBottom: '48px'
+      }}>
+        Tout ce qu'il faut pour <span style={{ fontStyle: 'italic' }}>lancer</span>
+      </h2>
+
+      <div style={{ textAlign: 'left' }}>
+        {items.map((item, i) => (
+          <div key={i} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            padding: '16px 0',
+            borderBottom: i < items.length - 1 ? '1px solid #f0f0f0' : 'none'
+          }}>
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: '#f0faf0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Check size={14} color="#2d8a4e" strokeWidth={3} />
+            </div>
+            <span style={{ fontSize: '16px', color: '#333' }}>{item}</span>
+          </div>
+        ))}
       </div>
     </section>
   );

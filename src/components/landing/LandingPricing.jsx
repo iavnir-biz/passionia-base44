@@ -46,14 +46,41 @@ export default function LandingPricing({ onCTA }) {
         Commence <span style={{ fontStyle: 'italic' }}>maintenant</span>
       </h2>
 
+      {/* Gradient arrow pointing down */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: '24px',
+      }}>
+        <svg width="40" height="48" viewBox="0 0 40 48" fill="none">
+          <defs>
+            <linearGradient id="arrowGrad" x1="0" y1="0" x2="40" y2="48" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#f97316" />
+              <stop offset="50%" stopColor="#ec4899" />
+              <stop offset="100%" stopColor="#a78bfa" />
+            </linearGradient>
+          </defs>
+          <path d="M20 0 L20 36 M8 26 L20 40 L32 26" stroke="url(#arrowGrad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+      </div>
+
       {/* Pricing card */}
       <div style={{
         background: '#fff',
-        border: '2px solid #1a1a1a',
+        border: '2px solid transparent',
         borderRadius: '24px',
         padding: '40px 32px',
-        position: 'relative'
+        position: 'relative',
+        backgroundClip: 'padding-box',
       }}>
+        {/* Gradient border overlay */}
+        <div style={{
+          position: 'absolute',
+          inset: '-2px',
+          borderRadius: '26px',
+          background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+          zIndex: -1,
+        }} />
         {/* Badge */}
         <div style={{
           position: 'absolute',

@@ -8,7 +8,7 @@ import LandingIncludes from '../components/landing/LandingIncludes';
 import LandingTestimonials from '../components/landing/LandingTestimonials';
 import LandingPricing from '../components/landing/LandingPricing';
 import LandingFAQ from '../components/landing/LandingFAQ';
-import LandingMarquee from '../components/landing/LandingMarquee';
+
 import LandingFooter from '../components/landing/LandingFooter';
 import LandingVideo from '../components/landing/LandingVideo';
 
@@ -106,7 +106,7 @@ export default function LandingNoah2() {
       <LandingTestimonials />
       <LandingPricing onCTA={handleCTA} />
       <LandingFAQ />
-      <LandingMarquee />
+
       <LandingFooter onCTA={handleCTA} />
 
       <style>{`

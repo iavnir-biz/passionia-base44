@@ -90,16 +90,18 @@ export default function LandingFooter({ onCTA }) {
             Offres, pages de vente, emails — tout est généré pour toi.
           </p>
 
-          {/* CTA bar like Amplemarket */}
-          <div style={{
+          {/* CTA bar — responsive */}
+          <div className="footer-cta-bar" style={{
             display: 'inline-flex',
             alignItems: 'center',
             background: 'rgba(255,255,255,0.05)',
             borderRadius: '100px',
             padding: '6px',
             border: '1px solid rgba(255,255,255,0.08)',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
           }}>
-            <span style={{
+            <span className="footer-cta-price" style={{
               padding: '0 22px',
               color: 'rgba(255,255,255,0.35)',
               fontSize: '15px',
@@ -121,6 +123,7 @@ export default function LandingFooter({ onCTA }) {
                 alignItems: 'center',
                 gap: '8px',
                 transition: 'opacity 0.2s',
+                whiteSpace: 'nowrap',
               }}
               onMouseOver={e => e.currentTarget.style.opacity = '0.9'}
               onMouseOut={e => e.currentTarget.style.opacity = '1'}
@@ -128,6 +131,27 @@ export default function LandingFooter({ onCTA }) {
               Accéder à NOAH™ — 29€ <ArrowRight size={16} />
             </button>
           </div>
+
+          <style>{`
+            @media (max-width: 600px) {
+              .footer-cta-bar {
+                flex-direction: column !important;
+                border-radius: 20px !important;
+                gap: 4px;
+                width: 100%;
+                max-width: 320px;
+              }
+              .footer-cta-price {
+                padding: 10px 16px !important;
+                font-size: 13px !important;
+                text-align: center;
+              }
+              .footer-cta-bar button {
+                width: 100% !important;
+                justify-content: center !important;
+              }
+            }
+          `}</style>
 
           {/* Social proof */}
           <div style={{

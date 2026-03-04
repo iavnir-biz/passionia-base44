@@ -125,15 +125,19 @@ export default function LandingTestimonialsScroll() {
         </h2>
       </div>
 
-      <div style={{
+      <div className="testimonials-columns" style={{
         display: 'flex',
         gap: '16px',
         maxWidth: '1100px',
         margin: '0 auto',
       }}>
         <ScrollColumn items={testimonials[0]} direction="up" speed={40} />
-        <ScrollColumn items={testimonials[1]} direction="down" speed={45} />
-        <ScrollColumn items={testimonials[2]} direction="up" speed={38} />
+        <div className="testimonials-col-2">
+          <ScrollColumn items={testimonials[1]} direction="down" speed={45} />
+        </div>
+        <div className="testimonials-col-3">
+          <ScrollColumn items={testimonials[2]} direction="up" speed={38} />
+        </div>
       </div>
 
       <style>{`
@@ -146,8 +150,13 @@ export default function LandingTestimonialsScroll() {
           100% { transform: translateY(0); }
         }
         @media (max-width: 768px) {
-          .testimonials-columns {
-            flex-direction: column;
+          .testimonials-col-3 {
+            display: none;
+          }
+        }
+        @media (max-width: 520px) {
+          .testimonials-col-2 {
+            display: none;
           }
         }
       `}</style>

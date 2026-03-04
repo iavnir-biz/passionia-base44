@@ -63,16 +63,18 @@ export default function LandingHero({ onCTA }) {
         NOAH™ analyse ton expertise, structure tes offres, rédige tes contenus de vente et te guide pas à pas — pour viser +4 000€/mois.
       </p>
 
-      {/* CTA bar like Amplemarket */}
-      <div style={{
+      {/* CTA bar — responsive */}
+      <div className="hero-cta-bar" style={{
         display: 'inline-flex',
         alignItems: 'center',
         background: '#f8f8f8',
         borderRadius: '100px',
         padding: '6px',
-        border: '1px solid #e5e5e5'
+        border: '1px solid #e5e5e5',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
       }}>
-        <span style={{ padding: '0 20px', color: '#999', fontSize: '15px' }}>
+        <span className="hero-cta-price" style={{ padding: '0 20px', color: '#999', fontSize: '15px' }}>
           29€ · sans engagement · paiement unique
         </span>
         <button
@@ -89,7 +91,8 @@ export default function LandingHero({ onCTA }) {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            transition: 'opacity 0.2s'
+            transition: 'opacity 0.2s',
+            whiteSpace: 'nowrap',
           }}
           onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
           onMouseOut={e => e.currentTarget.style.opacity = '1'}
@@ -97,6 +100,27 @@ export default function LandingHero({ onCTA }) {
           Accéder à NOAH™ <ArrowRight size={16} />
         </button>
       </div>
+
+      <style>{`
+        @media (max-width: 600px) {
+          .hero-cta-bar {
+            flex-direction: column !important;
+            border-radius: 20px !important;
+            gap: 4px;
+            width: 100%;
+            max-width: 320px;
+          }
+          .hero-cta-price {
+            padding: 10px 16px !important;
+            font-size: 13px !important;
+            text-align: center;
+          }
+          .hero-cta-bar button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+      `}</style>
 
       {/* Social proof */}
       <div style={{

@@ -32,19 +32,19 @@ export default function LandingVideo() {
           opacity: 0.75;
         }
         .neon-circle-1 {
-          width: 320px; height: 320px;
+          width: min(320px, 60vw); height: min(320px, 60vw);
           background: radial-gradient(circle, rgba(249,115,22,0.6) 0%, transparent 70%);
           top: 10%; left: -5%;
           animation: neonFloat1 6s ease-in-out infinite;
         }
         .neon-circle-2 {
-          width: 260px; height: 260px;
+          width: min(260px, 50vw); height: min(260px, 50vw);
           background: radial-gradient(circle, rgba(236,72,153,0.55) 0%, transparent 70%);
           top: 30%; right: -3%;
           animation: neonFloat2 7s ease-in-out infinite;
         }
         .neon-circle-3 {
-          width: 250px; height: 250px;
+          width: min(250px, 48vw); height: min(250px, 48vw);
           background: radial-gradient(circle, rgba(167,139,250,0.55) 0%, transparent 70%);
           bottom: 5%; left: 15%;
           animation: neonFloat3 8s ease-in-out infinite;

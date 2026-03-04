@@ -27,7 +27,7 @@ export default function LandingNoah2() {
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* Top announcement bar */}
-      <div style={{
+      <div className="announcement-bar" style={{
         background: '#1a1a1a',
         color: '#fff',
         textAlign: 'center',
@@ -44,7 +44,7 @@ export default function LandingNoah2() {
         flexWrap: 'wrap'
       }}>
         <span style={{ opacity: 0.9 }}>🚀</span>
-        <span>Offre de lancement — 29€ paiement unique · Accès immédiat</span>
+        <span className="announcement-text">Offre de lancement — 29€ paiement unique · Accès immédiat</span>
         <button
           onClick={scrollToCTA}
           style={{
@@ -90,6 +90,11 @@ export default function LandingNoah2() {
         .landing-fade.visible {
           opacity: 1;
           transform: translateY(0);
+        }
+        @media (max-width: 480px) {
+          .announcement-text {
+            font-size: 12px !important;
+          }
         }
       `}</style>
     </div>

@@ -10,15 +10,14 @@ export default function LandingPricing({ onCTA }) {
   }, []);
 
   const included = [
-    "Génération de tes 4 offres complètes",
-    "Pages de vente rédigées",
-    "Séquence de 5 emails marketing",
-    "Scripts de vente prêts à l'emploi",
-    "Avatars clients détaillés",
+    "Tes 4 offres sur-mesures structurées :\n1 offre d'entrée (7€–37€)\n1 offre en extra (7€–27€)\n1 offre intermédiaire (97€–297€)\n1 offre premium (1 000€–3 000€)",
+    "1 structure d'ascension claire",
     "Plan d'action 7 jours",
     "Validation marché par IA",
-    "Accès à vie + mises à jour"
+    "Accès à vie + mises à jour",
   ];
+
+  const closing = "Tu comprends quoi vendre.\nÀ qui.\nEt dans quel ordre.";
 
   return (
     <section id="pricing" ref={ref} className="landing-fade" style={{
@@ -83,19 +82,37 @@ export default function LandingPricing({ onCTA }) {
         </p>
 
         {/* Features list */}
-        <div style={{ textAlign: 'left', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'left', marginBottom: '24px' }}>
           {included.map((item, i) => (
             <div key={i} style={{
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               gap: '12px',
               padding: '10px 0',
               borderBottom: i < included.length - 1 ? '1px solid #f5f5f5' : 'none'
             }}>
-              <Check size={16} color="#1a1a1a" strokeWidth={2.5} />
-              <span style={{ fontSize: '14px', color: '#444' }}>{item}</span>
+              <Check size={16} color="#1a1a1a" strokeWidth={2.5} style={{ marginTop: '2px', flexShrink: 0 }} />
+              <span style={{ fontSize: '14px', color: '#444', whiteSpace: 'pre-line', lineHeight: 1.6 }}>{item}</span>
             </div>
           ))}
+        </div>
+
+        {/* Closing statement */}
+        <div style={{
+          background: '#fafafa',
+          borderRadius: '12px',
+          padding: '16px 20px',
+          marginBottom: '32px',
+          textAlign: 'center',
+        }}>
+          <p style={{
+            fontSize: '15px',
+            fontWeight: 600,
+            color: '#1a1a1a',
+            lineHeight: 1.7,
+            margin: 0,
+            whiteSpace: 'pre-line',
+          }}>{closing}</p>
         </div>
 
         {/* CTA */}

@@ -1,11 +1,35 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function LandingHowItWorks() {
   const ref = useRef(null);
+  const [progress, setProgress] = useState(0);
+
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) e.target.classList.add('visible'); }, { threshold: 0.1 });
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    }, { threshold: 0.1 });
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const sectionTop = rect.top;
+      const sectionHeight = rect.height;
+      const windowHeight = window.innerHeight;
+
+      // Calculate progress from when section enters view to when it leaves
+      const start = windowHeight * 0.7;
+      const end = -sectionHeight * 0.3;
+      const raw = (start - sectionTop) / (start - end);
+      setProgress(Math.min(1, Math.max(0, raw)));
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const steps = [
@@ -16,10 +40,10 @@ export default function LandingHowItWorks() {
 
   return (
     <section ref={ref} className="landing-fade" style={{
-      padding: '80px 24px',
+      padding: '100px 24px',
       background: '#fafafa'
     }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
         <p style={{
           fontSize: '13px',
           fontWeight: 600,
@@ -34,40 +58,97 @@ export default function LandingHowItWorks() {
           fontWeight: 400,
           lineHeight: 1.2,
           letterSpacing: '-0.02em',
-          marginBottom: '56px'
+          marginBottom: '64px'
         }}>
           3 étapes. <span style={{ fontStyle: 'italic' }}>5 minutes.</span> Tout est prêt.
         </h2>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          {steps.map((s, i) => (
-            <div key={i} style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '24px',
-              textAlign: 'left',
-              padding: '28px',
-              background: '#fff',
-              borderRadius: '20px',
-              border: '1px solid #eee'
-            }}>
-              <span style={{
-                fontFamily: 'Inter',
-                fontSize: '13px',
-                fontWeight: 700,
-                color: '#bbb',
-                letterSpacing: '0.5px',
-                flexShrink: 0,
-                paddingTop: '2px'
-              }}>
-                {s.num}
-              </span>
-              <div>
-                <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '6px', letterSpacing: '-0.01em' }}>{s.title}</h3>
-                <p style={{ fontSize: '15px', color: '#888', lineHeight: 1.5 }}>{s.desc}</p>
-              </div>
-            </div>
-          ))}
+        {/* Timeline */}
+        <div style={{ position: 'relative', textAlign: 'left' }}>
+          {/* Track line (background) */}
+          <div style={{
+            position: 'absolute',
+            left: '15px',
+            top: '8px',
+            bottom: '8px',
+            width: '2px',
+            background: '#e5e5e5',
+            borderRadius: '2px',
+          }} />
+
+          {/* Progress line (fills on scroll) */}
+          <div style={{
+            position: 'absolute',
+            left: '15px',
+            top: '8px',
+            bottom: '8px',
+            width: '2px',
+            background: '#1a1a1a',
+            borderRadius: '2px',
+            transformOrigin: 'top',
+            transform: `scaleY(${progress})`,
+            transition: 'transform 0.1s ease-out',
+          }} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+            {steps.map((s, i) => {
+              const stepThreshold = i / steps.length;
+              const isActive = progress > stepThreshold;
+
+              return (
+                <div key={i} style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '28px',
+                  position: 'relative',
+                }}>
+                  {/* Dot */}
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: isActive ? '#1a1a1a' : '#fff',
+                    border: `2px solid ${isActive ? '#1a1a1a' : '#d4d4d4'}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    transition: 'all 0.4s ease',
+                    zIndex: 1,
+                  }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: isActive ? '#fff' : '#bbb',
+                      transition: 'color 0.4s ease',
+                    }}>{s.num}</span>
+                  </div>
+
+                  {/* Content */}
+                  <div style={{
+                    paddingTop: '4px',
+                    opacity: isActive ? 1 : 0.4,
+                    transform: isActive ? 'translateY(0)' : 'translateY(4px)',
+                    transition: 'all 0.5s ease',
+                  }}>
+                    <h3 style={{
+                      fontSize: '20px',
+                      fontWeight: 600,
+                      marginBottom: '8px',
+                      letterSpacing: '-0.01em',
+                      color: '#1a1a1a',
+                    }}>{s.title}</h3>
+                    <p style={{
+                      fontSize: '15px',
+                      color: '#888',
+                      lineHeight: 1.6,
+                      margin: 0,
+                    }}>{s.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

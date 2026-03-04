@@ -206,32 +206,24 @@ export default function LandingSolution() {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
+          gap: '14px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{
+          <img
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/cb83f90ec_Capturedecran2026-03-04a221151.png"
+            alt="Marine D."
+            style={{
               width: '44px',
               height: '44px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #f97316, #a78bfa)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '18px',
-              fontWeight: 700,
-              color: '#fff',
-            }}>M</div>
-            <div>
-              <p style={{ fontSize: '15px', fontWeight: 600, color: '#fff', margin: 0 }}>Marine D.</p>
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>Coach bien-être · Créatrice</p>
-            </div>
+              objectFit: 'cover',
+              flexShrink: 0,
+            }}
+          />
+          <div>
+            <p style={{ fontSize: '15px', fontWeight: 600, color: '#fff', margin: 0 }}>Marine D.</p>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>Coach bien-être</p>
           </div>
-          <span style={{
-            fontSize: '24px',
-            fontWeight: 700,
-            color: 'rgba(255,255,255,0.15)',
-            letterSpacing: '-0.02em',
-          }}>NOAH™</span>
         </div>
       </div>
 

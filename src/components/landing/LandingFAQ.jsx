@@ -109,7 +109,7 @@ export default function LandingFAQ() {
           marginBottom: '56px',
           fontStyle: 'italic',
         }}>
-          Frequently<br />asked questions
+          Questions<br />fréquentes
         </h2>
 
         {faqs.map((f, i) => (

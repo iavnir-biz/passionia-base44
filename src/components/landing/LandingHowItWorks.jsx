@@ -41,7 +41,7 @@ export default function LandingHowItWorks() {
   return (
     <section ref={ref} className="landing-fade" style={{
       padding: '100px 24px',
-      background: '#fafafa'
+      background: '#fff'
     }}>
       <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
         <p style={{

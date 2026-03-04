@@ -167,6 +167,36 @@ export default function LandingSolution() {
           ))}
         </div>
       </div>
+
+      {/* Marquee section */}
+      <div style={{ marginTop: '64px' }}>
+        <p style={{
+          fontSize: 'clamp(20px, 3vw, 28px)',
+          fontWeight: 400,
+          color: '#fff',
+          letterSpacing: '-0.02em',
+          marginBottom: '28px',
+        }}>
+          Tout est <span style={{ fontStyle: 'italic' }}>inclus</span>
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <MarqueeRow items={marqueeItems} direction="left" duration={35} />
+          <MarqueeRow items={[...marqueeItems].reverse()} direction="right" duration={40} />
+          <MarqueeRow items={marqueeItems.slice(3).concat(marqueeItems.slice(0, 3))} direction="left" duration={32} />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes marquee-left {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.33%); }
+        }
+        @keyframes marquee-right {
+          0% { transform: translateX(-33.33%); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
+      </div>
     </section>
   );
 }

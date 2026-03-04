@@ -109,16 +109,6 @@ export default function LandingTestimonialsScroll() {
       overflow: 'hidden',
     }}>
       <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <p style={{
-          fontSize: '14px',
-          color: 'rgba(255,255,255,0.4)',
-          marginBottom: '12px',
-          fontWeight: 500,
-          textTransform: 'uppercase',
-          letterSpacing: '1px',
-        }}>
-          Témoignages
-        </p>
         <h2 style={{
           fontSize: 'clamp(28px, 4.5vw, 48px)',
           fontWeight: 400,

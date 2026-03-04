@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import LandingHero from '@/components/landing/LandingHero';
-import LandingProblem from '@/components/landing/LandingProblem';
-import LandingSolution from '@/components/landing/LandingSolution';
-import LandingHowItWorks from '@/components/landing/LandingHowItWorks';
-import LandingIncludes from '@/components/landing/LandingIncludes';
-import LandingTestimonials from '@/components/landing/LandingTestimonials';
-import LandingPricing from '@/components/landing/LandingPricing';
-import LandingFAQ from '@/components/landing/LandingFAQ';
-import LandingFooter from '@/components/landing/LandingFooter';
+import LandingHero from '../components/landing/LandingHero';
+import LandingProblem from '../components/landing/LandingProblem';
+import LandingSolution from '../components/landing/LandingSolution';
+import LandingHowItWorks from '../components/landing/LandingHowItWorks';
+import LandingIncludes from '../components/landing/LandingIncludes';
+import LandingTestimonials from '../components/landing/LandingTestimonials';
+import LandingPricing from '../components/landing/LandingPricing';
+import LandingFAQ from '../components/landing/LandingFAQ';
+import LandingFooter from '../components/landing/LandingFooter';
 
 export default function LandingNoah() {
   const scrollToCTA = () => {

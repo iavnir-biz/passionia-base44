@@ -196,7 +196,6 @@ export default function LandingSolution() {
           100% { transform: translateX(0); }
         }
       `}</style>
-      </div>
     </section>
   );
 }

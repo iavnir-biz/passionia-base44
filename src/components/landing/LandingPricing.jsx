@@ -12,6 +12,7 @@ export default function LandingPricing({ onCTA }) {
   const included = [
     "Tes 4 offres sur-mesures structurées :\n1 offre d'entrée (7€–37€)\n1 offre en extra (7€–27€)\n1 offre intermédiaire (97€–297€)\n1 offre premium (1 000€–3 000€)",
     "1 structure d'ascension claire",
+    "Messages de vente déjà rédigés pour vendre",
     "Plan d'action 7 jours",
     "Validation marché par IA",
     "Accès à vie + mises à jour",

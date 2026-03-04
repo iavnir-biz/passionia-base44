@@ -15,7 +15,54 @@ export default function LandingVideo() {
       padding: '0 24px 80px',
       maxWidth: '900px',
       margin: '0 auto',
+      position: 'relative',
     }}>
+      {/* Neon circles behind video */}
+      <div className="neon-circle neon-circle-1" />
+      <div className="neon-circle neon-circle-2" />
+      <div className="neon-circle neon-circle-3" />
+
+      <style>{`
+        .neon-circle {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(60px);
+          opacity: 0.5;
+        }
+        .neon-circle-1 {
+          width: 280px; height: 280px;
+          background: radial-gradient(circle, rgba(249,115,22,0.45) 0%, transparent 70%);
+          top: 10%; left: -5%;
+          animation: neonFloat1 6s ease-in-out infinite;
+        }
+        .neon-circle-2 {
+          width: 220px; height: 220px;
+          background: radial-gradient(circle, rgba(236,72,153,0.4) 0%, transparent 70%);
+          top: 30%; right: -3%;
+          animation: neonFloat2 7s ease-in-out infinite;
+        }
+        .neon-circle-3 {
+          width: 200px; height: 200px;
+          background: radial-gradient(circle, rgba(167,139,250,0.4) 0%, transparent 70%);
+          bottom: 5%; left: 15%;
+          animation: neonFloat3 8s ease-in-out infinite;
+        }
+        @keyframes neonFloat1 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(20px, -15px) scale(1.08); }
+        }
+        @keyframes neonFloat2 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-15px, 20px) scale(1.05); }
+        }
+        @keyframes neonFloat3 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(15px, 12px) scale(1.1); }
+        }
+      `}</style>
+
       {/* Label */}
       <p style={{
         textAlign: 'center',

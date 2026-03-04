@@ -186,6 +186,56 @@ export default function LandingSolution() {
         </div>
       </div>
 
+      {/* Testimonial */}
+      <div style={{
+        maxWidth: '800px',
+        margin: '72px auto 0',
+        padding: '0 24px',
+        position: 'relative',
+        zIndex: 1,
+      }}>
+        <p style={{
+          fontSize: 'clamp(22px, 3.5vw, 32px)',
+          fontWeight: 500,
+          color: '#fff',
+          lineHeight: 1.4,
+          letterSpacing: '-0.02em',
+          marginBottom: '32px',
+        }}>
+          "En 20 minutes, j'avais mes 4 offres, mes prix, mes messages de vente et mon plan d'action. J'ai lancé ma première vente le lendemain. C'est le futur de l'entrepreneuriat."
+        </p>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #f97316, #a78bfa)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '18px',
+              fontWeight: 700,
+              color: '#fff',
+            }}>M</div>
+            <div>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: '#fff', margin: 0 }}>Marine D.</p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>Coach bien-être · Créatrice</p>
+            </div>
+          </div>
+          <span style={{
+            fontSize: '24px',
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.15)',
+            letterSpacing: '-0.02em',
+          }}>NOAH™</span>
+        </div>
+      </div>
+
       <style>{`
         @keyframes marquee-left {
           0% { transform: translateX(0); }

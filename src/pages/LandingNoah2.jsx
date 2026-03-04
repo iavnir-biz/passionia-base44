@@ -4,6 +4,7 @@ import LandingHero from '../components/landing/LandingHero';
 import LandingProblem from '../components/landing/LandingProblem';
 import LandingSolution from '../components/landing/LandingSolution';
 import LandingHowItWorks from '../components/landing/LandingHowItWorks';
+import LandingCalculator from '../components/landing/LandingCalculator';
 
 import LandingPricing from '../components/landing/LandingPricing';
 import LandingFAQ from '../components/landing/LandingFAQ';

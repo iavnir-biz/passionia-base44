@@ -169,7 +169,7 @@ export default function LandingSolution() {
       </div>
 
       {/* Marquee section */}
-      <div style={{ marginTop: '64px' }}>
+      <div style={{ maxWidth: '1000px', margin: '64px auto 0', position: 'relative', zIndex: 1 }}>
         <p style={{
           fontSize: 'clamp(20px, 3vw, 28px)',
           fontWeight: 400,
@@ -179,10 +179,9 @@ export default function LandingSolution() {
         }}>
           Tout est <span style={{ fontStyle: 'italic' }}>inclus</span>
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', overflow: 'hidden', borderRadius: '12px' }}>
           <MarqueeRow items={marqueeItems} direction="left" duration={35} />
           <MarqueeRow items={[...marqueeItems].reverse()} direction="right" duration={40} />
-          <MarqueeRow items={marqueeItems.slice(3).concat(marqueeItems.slice(0, 3))} direction="left" duration={32} />
         </div>
       </div>
 

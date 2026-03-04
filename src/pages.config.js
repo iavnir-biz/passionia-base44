@@ -58,6 +58,7 @@ import CTAPAYWALL from './pages/CTAPAYWALL';
 import ChooseYourPath from './pages/ChooseYourPath';
 import ChooseYourPathNew from './pages/ChooseYourPathNew';
 import DailyActions from './pages/DailyActions';
+import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
 import DoneForYouElite from './pages/DoneForYouElite';
 import DownsellSession from './pages/DownsellSession';
@@ -115,7 +116,7 @@ import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
-import Dashboard from './pages/Dashboard';
+import LandingNoah from './pages/LandingNoah';
 
 
 export const PAGES = {
@@ -130,6 +131,7 @@ export const PAGES = {
     "ChooseYourPath": ChooseYourPath,
     "ChooseYourPathNew": ChooseYourPathNew,
     "DailyActions": DailyActions,
+    "Dashboard": Dashboard,
     "Documents": Documents,
     "DoneForYouElite": DoneForYouElite,
     "DownsellSession": DownsellSession,
@@ -187,7 +189,7 @@ export const PAGES = {
     "UpsellCoaching": UpsellCoaching,
     "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
-    "Dashboard": Dashboard,
+    "LandingNoah": LandingNoah,
 }
 
 export const pagesConfig = {

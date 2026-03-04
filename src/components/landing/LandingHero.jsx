@@ -43,7 +43,14 @@ export default function LandingHero({ onCTA }) {
         color: '#1a1a1a',
         marginBottom: '24px'
       }}>
-        Génère tes <span style={{ fontStyle: 'italic' }}>4 offres</span> et fais ta première vente en 24h
+        Génère tes <span style={{
+          fontStyle: 'italic',
+          fontWeight: 500,
+          background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}>4 offres</span> et fais ta première vente en 24h
       </h1>
 
       <p style={{

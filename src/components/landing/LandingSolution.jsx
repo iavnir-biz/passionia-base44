@@ -1,6 +1,55 @@
 import React, { useEffect, useRef } from 'react';
 import { Zap, FileText, Mail, MessageSquare, Users, Clock } from 'lucide-react';
 
+const marqueeItems = [
+  { text: "1 offre d'entrée (7€–37€)", color: "#f97316" },
+  { text: "1 offre en extra (7€–27€)", color: "#a78bfa" },
+  { text: "1 offre intermédiaire (97€–297€)", color: "#3b82f6" },
+  { text: "1 offre premium (1 000€–3 000€)", color: "#ec4899" },
+  { text: "1 structure d'ascension claire", color: "#10b981" },
+  { text: "Messages de vente déjà rédigés", color: "#f59e0b" },
+  { text: "Plan d'action 7 jours", color: "#6366f1" },
+  { text: "Validation marché par IA", color: "#14b8a6" },
+  { text: "Accès à vie + mises à jour", color: "#f43f5e" },
+];
+
+function MarqueeRow({ items, direction = 'left', duration = 30 }) {
+  const doubled = [...items, ...items, ...items];
+  return (
+    <div style={{ overflow: 'hidden', width: '100%', padding: '6px 0' }}>
+      <div style={{
+        display: 'flex',
+        gap: '12px',
+        width: 'max-content',
+        animation: `marquee-${direction} ${duration}s linear infinite`,
+      }}>
+        {doubled.map((item, i) => (
+          <div key={i} style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '100px',
+            padding: '8px 18px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}>
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: item.color,
+              flexShrink: 0,
+            }} />
+            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>{item.text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function LandingSolution() {
   const ref = useRef(null);
   useEffect(() => {

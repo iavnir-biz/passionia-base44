@@ -120,11 +120,8 @@ export default function LandingTestimonialsScroll() {
           <span style={{
             fontStyle: 'italic',
             fontWeight: 500,
-            background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}>NOAH™</span>
+            color: '#fff',
+          }}>noah™</span>
         </h2>
       </div>
 

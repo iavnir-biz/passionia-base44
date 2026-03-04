@@ -10,6 +10,7 @@ import LandingPricing from '../components/landing/LandingPricing';
 import LandingFAQ from '../components/landing/LandingFAQ';
 import LandingMarquee from '../components/landing/LandingMarquee';
 import LandingFooter from '../components/landing/LandingFooter';
+import LandingVideo from '../components/landing/LandingVideo';
 
 export default function LandingNoah2() {
   const scrollToCTA = () => {
@@ -42,7 +43,7 @@ export default function LandingNoah2() {
         flexWrap: 'wrap'
       }}>
         <span style={{ opacity: 0.9 }}>🚀</span>
-        <span>-20€ immédiat — Offre valable jusqu'au 4 à minuit</span>
+        <span>Offre de lancement — 29€ paiement unique · Accès immédiat</span>
         <button
           onClick={scrollToCTA}
           style={{
@@ -60,7 +61,7 @@ export default function LandingNoah2() {
           onMouseOver={e => e.target.style.background = 'rgba(255,255,255,0.25)'}
           onMouseOut={e => e.target.style.background = 'rgba(255,255,255,0.15)'}
         >
-          Obtenir le coupon →
+          Voir l'offre →
         </button>
       </div>
 
@@ -92,11 +93,12 @@ export default function LandingNoah2() {
           onMouseOver={e => e.target.style.opacity = '0.85'}
           onMouseOut={e => e.target.style.opacity = '1'}
         >
-          Commencer gratuitement
+          Accéder à NOAH™ — 29€
         </button>
       </nav>
 
       <LandingHero onCTA={handleCTA} />
+      <LandingVideo />
       <LandingProblem />
       <LandingSolution />
       <LandingHowItWorks />

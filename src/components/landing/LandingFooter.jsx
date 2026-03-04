@@ -104,7 +104,7 @@ export default function LandingFooter({ onCTA }) {
               color: 'rgba(255,255,255,0.35)',
               fontSize: '15px',
             }}>
-              100% gratuit pour commencer
+              29€ · sans engagement · paiement unique
             </span>
             <button
               onClick={onCTA}
@@ -125,7 +125,7 @@ export default function LandingFooter({ onCTA }) {
               onMouseOver={e => e.currentTarget.style.opacity = '0.9'}
               onMouseOut={e => e.currentTarget.style.opacity = '1'}
             >
-              Commencer <ArrowRight size={16} />
+              Accéder à NOAH™ — 29€ <ArrowRight size={16} />
             </button>
           </div>
 

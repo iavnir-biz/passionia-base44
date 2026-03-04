@@ -72,12 +72,15 @@ export default function LandingPricing({ onCTA }) {
         </div>
 
         <div style={{ marginBottom: '8px' }}>
-          <span style={{ textDecoration: 'line-through', color: '#bbb', fontSize: '20px' }}>67€</span>
+          <span style={{ textDecoration: 'line-through', color: '#bbb', fontSize: '20px' }}>47€</span>
         </div>
-        <div style={{ marginBottom: '32px' }}>
-          <span style={{ fontSize: '56px', fontWeight: 700, letterSpacing: '-0.03em' }}>47€</span>
+        <div style={{ marginBottom: '8px' }}>
+          <span style={{ fontSize: '56px', fontWeight: 700, letterSpacing: '-0.03em' }}>29€</span>
           <span style={{ fontSize: '16px', color: '#888', marginLeft: '8px' }}>paiement unique</span>
         </div>
+        <p style={{ fontSize: '13px', color: '#aaa', marginBottom: '24px' }}>
+          Sans engagement · Accès immédiat
+        </p>
 
         {/* Features list */}
         <div style={{ textAlign: 'left', marginBottom: '32px' }}>
@@ -117,7 +120,7 @@ export default function LandingPricing({ onCTA }) {
           onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
           onMouseOut={e => e.currentTarget.style.opacity = '1'}
         >
-          Accéder à NOAH™ — 47€ <ArrowRight size={16} />
+          Accéder à NOAH™ — 29€ <ArrowRight size={16} />
         </button>
 
         <p style={{ marginTop: '12px', fontSize: '13px', color: '#bbb' }}>

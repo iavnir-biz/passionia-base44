@@ -66,7 +66,7 @@ export default function LandingHero({ onCTA }) {
         border: '1px solid #e5e5e5'
       }}>
         <span style={{ padding: '0 20px', color: '#999', fontSize: '15px' }}>
-          100% gratuit pour commencer
+          29€ · sans engagement · paiement unique
         </span>
         <button
           onClick={onCTA}
@@ -87,7 +87,7 @@ export default function LandingHero({ onCTA }) {
           onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
           onMouseOut={e => e.currentTarget.style.opacity = '1'}
         >
-          Commencer <ArrowRight size={16} />
+          Accéder à NOAH™ <ArrowRight size={16} />
         </button>
       </div>
 

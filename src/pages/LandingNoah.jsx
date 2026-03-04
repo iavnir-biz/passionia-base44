@@ -1,208 +1,229 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import React, { useEffect, useRef } from 'react';
+import { Check, Star, ArrowRight, Clock, Shield, Zap, Users, FileText, Mail, MessageSquare } from 'lucide-react';
 
 export default function LandingNoah() {
-  const [visibleSections, setVisibleSections] = useState({});
-  const sectionRefs = useRef([]);
+  const sectionsRef = useRef([]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setVisibleSections((prev) => ({
-              ...prev,
-              [entry.target.dataset.section]: true,
-            }));
+            entry.target.classList.add('animate-visible');
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+      { threshold: 0.1 }
     );
 
-    sectionRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
+    sectionsRef.current.forEach((section) => {
+      if (section) observer.observe(section);
     });
 
     return () => observer.disconnect();
   }, []);
 
-  const addRef = (el, index) => {
-    sectionRefs.current[index] = el;
+  const addToRefs = (el) => {
+    if (el && !sectionsRef.current.includes(el)) {
+      sectionsRef.current.push(el);
+    }
   };
 
-  const handleCTA = () => {
-    base44.auth.redirectToLogin(window.location.origin + '/OnboardingFirstName');
+  const scrollToCTA = () => {
+    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <div style={{ 
-      fontFamily: "'DM Sans', sans-serif",
-      color: '#0A0A0A',
-      backgroundColor: '#FFFFFF',
-      minHeight: '100vh',
-      overflowX: 'hidden'
-    }}>
-      {/* Google Fonts */}
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <div className="landing-noah">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+        .landing-noah {
+          font-family: 'DM Sans', sans-serif;
+          color: #0A0A0A;
+          background: #FFFFFF;
+          line-height: 1.6;
+        }
+
+        .landing-noah h1, .landing-noah h2, .landing-noah h3 {
+          font-family: 'Playfair Display', serif;
+          font-weight: 600;
+          line-height: 1.2;
+        }
+
+        .animate-section {
+          opacity: 0;
+          transform: translateY(30px);
+          transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .animate-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .text-accent { color: #4A7C59; }
+        .bg-accent { background-color: #4A7C59; }
+        .border-accent { border-color: #4A7C59; }
+        .text-gray { color: #6B6B6B; }
+        .text-deep { color: #0A0A0A; }
+
+        .btn-primary {
+          background-color: #4A7C59;
+          color: white;
+          padding: 18px 40px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 16px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .btn-primary:hover {
+          background-color: #3d6a4a;
+          transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+          background: transparent;
+          color: #0A0A0A;
+          padding: 16px 36px;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 16px;
+          border: 2px solid #0A0A0A;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+          background: #0A0A0A;
+          color: white;
+        }
+
+        .section-padding {
+          padding: 100px 20px;
+        }
+
+        @media (max-width: 768px) {
+          .section-padding {
+            padding: 60px 16px;
+          }
+        }
+      `}</style>
 
       {/* BARRE D'URGENCE */}
       <div style={{
         position: 'sticky',
         top: 0,
-        zIndex: 1000,
-        backgroundColor: '#0A0A0A',
-        color: '#FFFFFF',
+        zIndex: 100,
+        background: '#0A0A0A',
         padding: '12px 20px',
-        textAlign: 'center',
-        fontSize: '14px',
-        fontWeight: 500
+        textAlign: 'center'
       }}>
-        <span>-20€ immédiat — Offre valable jusqu'au 4 à minuit </span>
-        <a 
-          href="#pricing" 
-          style={{ 
-            color: '#FFFFFF', 
+        <span style={{ color: 'white', fontSize: '14px', fontWeight: 500 }}>
+          -20€ immédiat — Offre valable jusqu'au 4 à minuit
+        </span>
+        <button 
+          onClick={scrollToCTA}
+          style={{
+            color: 'white',
+            background: 'none',
+            border: 'none',
+            marginLeft: '16px',
             textDecoration: 'underline',
-            marginLeft: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
             fontWeight: 600
           }}
         >
           👉 Obtenir le coupon
-        </a>
+        </button>
       </div>
 
       {/* SECTION HERO */}
-      <section
-        ref={(el) => addRef(el, 0)}
-        data-section="hero"
-        style={{
-          padding: '120px 24px 100px',
-          maxWidth: '900px',
-          margin: '0 auto',
-          textAlign: 'center',
-          opacity: visibleSections.hero ? 1 : 0,
-          transform: visibleSections.hero ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        {/* Badge */}
-        <p style={{
-          fontSize: '12px',
-          letterSpacing: '2px',
-          textTransform: 'uppercase',
-          color: '#6B6B6B',
-          marginBottom: '32px'
-        }}>
-          Pour ceux qui ont un savoir-faire et veulent le monétiser simplement
-        </p>
+      <section className="section-padding" style={{ textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
+        <div ref={addToRefs} className="animate-section">
+          <p style={{
+            textTransform: 'uppercase',
+            letterSpacing: '2px',
+            fontSize: '12px',
+            color: '#6B6B6B',
+            marginBottom: '24px'
+          }}>
+            Pour ceux qui ont un savoir-faire et veulent le monétiser simplement
+          </p>
 
-        {/* Titre H1 */}
-        <h1 style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: 'clamp(32px, 5vw, 56px)',
-          fontWeight: 600,
-          lineHeight: 1.2,
-          marginBottom: '28px',
-          color: '#0A0A0A'
-        }}>
-          Le système NOAH™ génère tes 4 offres et t'aide à faire ta première vente en 24h — pour viser +4 000€/mois
-        </h1>
+          <h1 style={{
+            fontSize: 'clamp(32px, 5vw, 56px)',
+            marginBottom: '24px',
+            color: '#0A0A0A'
+          }}>
+            Le système NOAH™ génère tes 4 offres et t'aide à faire ta première vente en 24h — pour viser <span className="text-accent">+4 000€/mois</span>
+          </h1>
 
-        {/* Sous-titre */}
-        <p style={{
-          fontSize: '18px',
-          color: '#6B6B6B',
-          lineHeight: 1.6,
-          maxWidth: '680px',
-          margin: '0 auto 40px'
-        }}>
-          Si ton savoir-faire reste dans ta tête, il ne te rapporte rien. NOAH™ transforme ce que tu sais en offres structurées, prêtes à vendre — en quelques minutes.
-        </p>
+          <p style={{
+            fontSize: '18px',
+            color: '#6B6B6B',
+            maxWidth: '700px',
+            margin: '0 auto 40px'
+          }}>
+            Si ton savoir-faire dort dans un coin de ta tête, NOAH™ le transforme en offres prêtes à vendre — avec les prix, les pages de vente, les emails et un plan d'action semaine par semaine.
+          </p>
 
-        {/* CTA Principal */}
-        <button
-          onClick={handleCTA}
-          style={{
-            backgroundColor: '#4A7C59',
-            color: '#FFFFFF',
-            border: 'none',
-            padding: '18px 48px',
-            fontSize: '16px',
-            fontWeight: 600,
-            borderRadius: '4px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            fontFamily: "'DM Sans', sans-serif"
-          }}
-          onMouseOver={(e) => e.target.style.backgroundColor = '#3d6a4a'}
-          onMouseOut={(e) => e.target.style.backgroundColor = '#4A7C59'}
-        >
-          Commencer gratuitement →
-        </button>
+          <button className="btn-primary" onClick={scrollToCTA}>
+            Découvrir NOAH™ <ArrowRight size={18} />
+          </button>
 
-        <p style={{
-          fontSize: '13px',
-          color: '#6B6B6B',
-          marginTop: '16px'
-        }}>
-          Analyse gratuite • Résultats en 5 min
-        </p>
+          <p style={{ marginTop: '16px', fontSize: '13px', color: '#6B6B6B' }}>
+            ✓ 100% gratuit pour commencer · ✓ Résultats en 5 minutes
+          </p>
+        </div>
       </section>
 
       {/* SECTION PROBLÈME */}
-      <section
-        ref={(el) => addRef(el, 1)}
-        data-section="problem"
-        style={{
-          padding: '100px 24px',
-          backgroundColor: '#FAFAFA',
-          opacity: visibleSections.problem ? 1 : 0,
-          transform: visibleSections.problem ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <p style={{
-            fontSize: '12px',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            color: '#6B6B6B',
-            marginBottom: '24px',
-            textAlign: 'center'
-          }}>
-            Le problème
-          </p>
-
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 500,
-            lineHeight: 1.3,
-            textAlign: 'center',
-            marginBottom: '48px'
-          }}>
-            Tu as un talent. Mais tu ne sais pas comment le vendre.
+      <section className="section-padding" style={{ background: '#FAFAFA' }}>
+        <div ref={addToRefs} className="animate-section" style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', marginBottom: '40px' }}>
+            Tu as un savoir-faire précieux...<br />mais tu ne sais pas comment le vendre
           </h2>
 
           <div style={{
             display: 'grid',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '30px',
+            textAlign: 'left',
+            marginTop: '50px'
           }}>
             {[
-              "Tu sais que tu pourrais aider des gens — mais tu ne sais pas quoi proposer exactement.",
-              "Tu as déjà pensé à créer une formation, un coaching... mais tu bloques sur le \"comment\".",
-              "Tu vois d'autres le faire. Et tu te demandes : \"Pourquoi pas moi ?\""
-            ].map((text, i) => (
+              "Tu ne sais pas quel prix fixer",
+              "Tu n'as pas de page de vente",
+              "Tu ne sais pas par où commencer",
+              "Tu as peur de ne pas être légitime",
+              "Tu manques de temps pour tout créer",
+              "Tu te perds dans la technique"
+            ].map((problem, i) => (
               <div key={i} style={{
-                padding: '28px 32px',
-                backgroundColor: '#FFFFFF',
-                borderLeft: '3px solid #4A7C59',
-                fontSize: '17px',
-                lineHeight: 1.6,
-                color: '#0A0A0A'
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
               }}>
-                {text}
+                <span style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  background: '#FEE2E2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  fontSize: '14px'
+                }}>✗</span>
+                <span style={{ color: '#6B6B6B' }}>{problem}</span>
               </div>
             ))}
           </div>
@@ -210,83 +231,76 @@ export default function LandingNoah() {
       </section>
 
       {/* SECTION SOLUTION */}
-      <section
-        ref={(el) => addRef(el, 2)}
-        data-section="solution"
-        style={{
-          padding: '100px 24px',
-          opacity: visibleSections.solution ? 1 : 0,
-          transform: visibleSections.solution ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{
-            fontSize: '12px',
-            letterSpacing: '2px',
+      <section className="section-padding">
+        <div ref={addToRefs} className="animate-section" style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <p className="text-accent" style={{
             textTransform: 'uppercase',
-            color: '#6B6B6B',
-            marginBottom: '24px'
+            letterSpacing: '2px',
+            fontSize: '12px',
+            marginBottom: '16px',
+            fontWeight: 600
           }}>
             La solution
           </p>
 
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 500,
-            lineHeight: 1.3,
-            marginBottom: '24px'
-          }}>
-            NOAH™ fait le travail pour toi.
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', marginBottom: '24px' }}>
+            NOAH™ fait tout le travail stratégique pour toi
           </h2>
 
-          <p style={{
-            fontSize: '18px',
-            color: '#6B6B6B',
-            lineHeight: 1.6,
-            maxWidth: '650px',
-            margin: '0 auto 64px'
-          }}>
-            En quelques minutes, tu réponds à quelques questions simples. L'IA analyse ton savoir-faire et génère un système complet d'offres — structuré, tarifé, prêt à vendre.
+          <p style={{ color: '#6B6B6B', fontSize: '18px', maxWidth: '600px', margin: '0 auto 60px' }}>
+            En quelques minutes, l'IA analyse ton expertise et génère un business complet, prêt à vendre.
           </p>
 
-          {/* Les 4 piliers */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '32px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '40px',
             textAlign: 'left'
           }}>
             {[
-              { num: '01', title: 'Produit Principal', desc: 'Ton offre d\'entrée accessible (27-97€)' },
-              { num: '02', title: 'Petit Extra', desc: 'Un bonus irrésistible ajouté au panier' },
-              { num: '03', title: 'Offre Supérieure', desc: 'Pour ceux qui veulent aller plus loin' },
-              { num: '04', title: 'Premium', desc: 'Ton accompagnement haut de gamme' }
+              {
+                icon: <Zap size={28} />,
+                title: "4 offres structurées",
+                desc: "Produit principal, order bump, upsell et premium — avec les prix optimaux pour ton marché."
+              },
+              {
+                icon: <FileText size={28} />,
+                title: "Pages de vente complètes",
+                desc: "Textes persuasifs générés automatiquement, prêts à copier-coller."
+              },
+              {
+                icon: <Mail size={28} />,
+                title: "Séquence emails",
+                desc: "5 emails de vente rédigés pour convertir tes prospects en clients."
+              },
+              {
+                icon: <MessageSquare size={28} />,
+                title: "Messages de vente",
+                desc: "Scripts pour réseaux sociaux et conversations directes."
+              },
+              {
+                icon: <Users size={28} />,
+                title: "Avatars clients",
+                desc: "Profils détaillés de tes clients idéaux pour mieux les cibler."
+              },
+              {
+                icon: <Clock size={28} />,
+                title: "Plan d'action 7 jours",
+                desc: "Étape par étape, tu sais exactement quoi faire chaque jour."
+              }
             ].map((item, i) => (
-              <div key={i} style={{ padding: '8px 0' }}>
-                <span style={{
-                  fontSize: '12px',
-                  color: '#4A7C59',
-                  fontWeight: 600,
-                  letterSpacing: '1px'
-                }}>
-                  {item.num}
-                </span>
-                <h3 style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: '22px',
-                  fontWeight: 500,
-                  margin: '8px 0 12px',
-                  color: '#0A0A0A'
-                }}>
+              <div key={i} style={{
+                padding: '30px',
+                border: '1px solid #E5E5E5',
+                borderRadius: '12px'
+              }}>
+                <div className="text-accent" style={{ marginBottom: '16px' }}>
+                  {item.icon}
+                </div>
+                <h3 style={{ fontSize: '20px', marginBottom: '12px', fontFamily: 'DM Sans' }}>
                   {item.title}
                 </h3>
-                <p style={{
-                  fontSize: '15px',
-                  color: '#6B6B6B',
-                  lineHeight: 1.5
-                }}>
+                <p style={{ color: '#6B6B6B', fontSize: '15px' }}>
                   {item.desc}
                 </p>
               </div>
@@ -296,165 +310,45 @@ export default function LandingNoah() {
       </section>
 
       {/* SECTION COMMENT ÇA MARCHE */}
-      <section
-        ref={(el) => addRef(el, 3)}
-        data-section="how"
-        style={{
-          padding: '100px 24px',
-          backgroundColor: '#FAFAFA',
-          opacity: visibleSections.how ? 1 : 0,
-          transform: visibleSections.how ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <p style={{
-            fontSize: '12px',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            color: '#6B6B6B',
-            marginBottom: '24px',
-            textAlign: 'center'
-          }}>
-            Comment ça marche
-          </p>
-
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 500,
-            lineHeight: 1.3,
-            textAlign: 'center',
-            marginBottom: '64px'
-          }}>
-            3 étapes. 5 minutes. Tout est prêt.
+      <section className="section-padding" style={{ background: '#FAFAFA' }}>
+        <div ref={addToRefs} className="animate-section" style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', marginBottom: '60px' }}>
+            Comment ça marche ?
           </h2>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
             {[
-              { step: '1', title: 'Tu réponds à quelques questions', desc: 'NOAH™ te pose des questions simples sur ton savoir-faire, ton audience idéale, et tes objectifs.' },
-              { step: '2', title: 'L\'IA génère ton système d\'offres', desc: 'En quelques secondes, tu obtiens 4 offres structurées avec prix, description et positionnement.' },
-              { step: '3', title: 'Tu lances ta première vente', desc: 'Avec ton plan d\'action personnalisé, tu sais exactement quoi faire pour vendre dès cette semaine.' }
+              { step: "1", title: "Réponds à quelques questions", desc: "5 minutes pour décrire ton expertise et tes objectifs" },
+              { step: "2", title: "NOAH™ analyse et génère", desc: "L'IA crée tes 4 offres, valide ton marché et rédige tous tes contenus" },
+              { step: "3", title: "Lance ta première vente", desc: "Suis le plan d'action jour par jour et fais ta première vente en 24h" }
             ].map((item, i) => (
               <div key={i} style={{
                 display: 'flex',
-                gap: '32px',
-                alignItems: 'flex-start'
+                alignItems: 'flex-start',
+                gap: '24px',
+                textAlign: 'left'
               }}>
                 <div style={{
                   width: '48px',
                   height: '48px',
                   borderRadius: '50%',
-                  backgroundColor: '#4A7C59',
-                  color: '#FFFFFF',
+                  background: '#4A7C59',
+                  color: 'white',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '18px',
-                  fontWeight: 600,
+                  fontWeight: 700,
+                  fontSize: '20px',
                   flexShrink: 0
                 }}>
                   {item.step}
                 </div>
                 <div>
-                  <h3 style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontSize: '24px',
-                    fontWeight: 500,
-                    marginBottom: '12px',
-                    color: '#0A0A0A'
-                  }}>
+                  <h3 style={{ fontSize: '22px', marginBottom: '8px', fontFamily: 'DM Sans', fontWeight: 600 }}>
                     {item.title}
                   </h3>
-                  <p style={{
-                    fontSize: '16px',
-                    color: '#6B6B6B',
-                    lineHeight: 1.6
-                  }}>
-                    {item.desc}
-                  </p>
+                  <p style={{ color: '#6B6B6B' }}>{item.desc}</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION CE QUE TU OBTIENS */}
-      <section
-        ref={(el) => addRef(el, 4)}
-        data-section="includes"
-        style={{
-          padding: '100px 24px',
-          opacity: visibleSections.includes ? 1 : 0,
-          transform: visibleSections.includes ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <p style={{
-            fontSize: '12px',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            color: '#6B6B6B',
-            marginBottom: '24px',
-            textAlign: 'center'
-          }}>
-            Ce que tu obtiens
-          </p>
-
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 500,
-            lineHeight: 1.3,
-            textAlign: 'center',
-            marginBottom: '64px'
-          }}>
-            Tout ce dont tu as besoin pour lancer
-          </h2>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px'
-          }}>
-            {[
-              { title: '4 offres complètes', desc: 'Structurées, tarifées, positionnées — prêtes à vendre' },
-              { title: 'Page de vente', desc: 'Texte de vente généré pour convertir tes visiteurs' },
-              { title: 'Emails marketing', desc: '5 emails prêts à envoyer pour ta séquence de lancement' },
-              { title: 'Messages de vente', desc: 'Scripts pour réseaux sociaux et conversations' },
-              { title: 'Analyse de marché', desc: 'Validation de ton idée avec données concrètes' },
-              { title: 'Plan d\'action 7 jours', desc: 'Étape par étape, une action par jour' }
-            ].map((item, i) => (
-              <div key={i} style={{
-                padding: '32px',
-                border: '1px solid #E8E8E8',
-                borderRadius: '4px'
-              }}>
-                <div style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: '#4A7C59',
-                  marginBottom: '20px'
-                }} />
-                <h3 style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: '20px',
-                  fontWeight: 500,
-                  marginBottom: '12px',
-                  color: '#0A0A0A'
-                }}>
-                  {item.title}
-                </h3>
-                <p style={{
-                  fontSize: '15px',
-                  color: '#6B6B6B',
-                  lineHeight: 1.5
-                }}>
-                  {item.desc}
-                </p>
               </div>
             ))}
           </div>
@@ -462,79 +356,54 @@ export default function LandingNoah() {
       </section>
 
       {/* SECTION TÉMOIGNAGES */}
-      <section
-        ref={(el) => addRef(el, 5)}
-        data-section="testimonials"
-        style={{
-          padding: '100px 24px',
-          backgroundColor: '#FAFAFA',
-          opacity: visibleSections.testimonials ? 1 : 0,
-          transform: visibleSections.testimonials ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <p style={{
-            fontSize: '12px',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            color: '#6B6B6B',
-            marginBottom: '24px',
-            textAlign: 'center'
-          }}>
-            Ils l'ont fait
-          </p>
-
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 500,
-            lineHeight: 1.3,
-            textAlign: 'center',
-            marginBottom: '64px'
-          }}>
-            Ce qu'ils disent de NOAH™
+      <section className="section-padding">
+        <div ref={addToRefs} className="animate-section" style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', marginBottom: '60px' }}>
+            Ils ont transformé leur expertise
           </h2>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '32px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '30px'
           }}>
             {[
-              { quote: "En 10 minutes, j'avais mes 4 offres structurées. J'ai fait ma première vente 3 jours après.", name: "Marie L.", role: "Coach bien-être" },
-              { quote: "Je tournais en rond depuis 6 mois. NOAH™ m'a débloqué en une soirée. Incroyable.", name: "Thomas R.", role: "Formateur Excel" },
-              { quote: "Le plan d'action est ultra concret. Je savais exactement quoi faire chaque jour.", name: "Sophie M.", role: "Experte nutrition" }
-            ].map((item, i) => (
+              {
+                name: "Marie L.",
+                role: "Coach en nutrition",
+                text: "En 2 semaines, j'ai fait ma première vente à 297€. NOAH™ m'a donné la clarté qui me manquait depuis des mois.",
+                stars: 5
+              },
+              {
+                name: "Thomas B.",
+                role: "Expert Excel",
+                text: "Je pensais que mon savoir était trop « basique » pour être vendu. NOAH™ m'a prouvé le contraire — 1 200€ le premier mois.",
+                stars: 5
+              },
+              {
+                name: "Sophie M.",
+                role: "Formatrice langue des signes",
+                text: "Le plan d'action est incroyable. Chaque jour, je savais exactement quoi faire. Plus d'excuse pour procrastiner.",
+                stars: 5
+              }
+            ].map((t, i) => (
               <div key={i} style={{
                 padding: '32px',
-                backgroundColor: '#FFFFFF',
-                borderRadius: '4px'
+                border: '1px solid #E5E5E5',
+                borderRadius: '12px',
+                textAlign: 'left'
               }}>
-                <p style={{
-                  fontSize: '17px',
-                  lineHeight: 1.6,
-                  color: '#0A0A0A',
-                  marginBottom: '24px',
-                  fontStyle: 'italic'
-                }}>
-                  "{item.quote}"
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
+                  {[...Array(t.stars)].map((_, j) => (
+                    <Star key={j} size={18} fill="#4A7C59" color="#4A7C59" />
+                  ))}
+                </div>
+                <p style={{ fontSize: '16px', marginBottom: '20px', fontStyle: 'italic' }}>
+                  "{t.text}"
                 </p>
                 <div>
-                  <p style={{
-                    fontSize: '15px',
-                    fontWeight: 600,
-                    color: '#0A0A0A',
-                    marginBottom: '4px'
-                  }}>
-                    {item.name}
-                  </p>
-                  <p style={{
-                    fontSize: '14px',
-                    color: '#6B6B6B'
-                  }}>
-                    {item.role}
-                  </p>
+                  <p style={{ fontWeight: 600 }}>{t.name}</p>
+                  <p style={{ color: '#6B6B6B', fontSize: '14px' }}>{t.role}</p>
                 </div>
               </div>
             ))}
@@ -543,334 +412,156 @@ export default function LandingNoah() {
       </section>
 
       {/* SECTION PRICING */}
-      <section
-        id="pricing"
-        ref={(el) => addRef(el, 6)}
-        data-section="pricing"
-        style={{
-          padding: '100px 24px',
-          opacity: visibleSections.pricing ? 1 : 0,
-          transform: visibleSections.pricing ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{
-            fontSize: '12px',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            color: '#6B6B6B',
-            marginBottom: '24px'
-          }}>
-            Tarif
+      <section id="pricing" className="section-padding" style={{ background: '#FAFAFA' }}>
+        <div ref={addToRefs} className="animate-section" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', marginBottom: '16px' }}>
+            Accède à NOAH™ maintenant
+          </h2>
+          <p style={{ color: '#6B6B6B', marginBottom: '40px' }}>
+            Paiement unique. Accès à vie. Mises à jour incluses.
           </p>
 
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 500,
-            lineHeight: 1.3,
-            marginBottom: '48px'
-          }}>
-            Commence maintenant
-          </h2>
-
-          {/* Carte prix */}
           <div style={{
-            padding: '48px 40px',
-            border: '2px solid #0A0A0A',
-            borderRadius: '8px',
-            marginBottom: '32px'
+            background: 'white',
+            border: '2px solid #4A7C59',
+            borderRadius: '16px',
+            padding: '40px',
+            position: 'relative'
           }}>
-            <p style={{
-              fontSize: '14px',
-              color: '#6B6B6B',
-              marginBottom: '16px',
-              textDecoration: 'line-through'
-            }}>
-              Valeur totale : 497€
-            </p>
-            
             <div style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'center',
-              gap: '8px',
-              marginBottom: '8px'
+              position: 'absolute',
+              top: '-14px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: '#4A7C59',
+              color: 'white',
+              padding: '6px 20px',
+              borderRadius: '20px',
+              fontSize: '13px',
+              fontWeight: 600
             }}>
-              <span style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: '56px',
-                fontWeight: 600,
-                color: '#0A0A0A'
-              }}>
-                47€
-              </span>
-              <span style={{
-                fontSize: '18px',
-                color: '#6B6B6B'
-              }}>
-                paiement unique
-              </span>
+              OFFRE LIMITÉE
             </div>
 
-            <p style={{
-              fontSize: '14px',
-              color: '#4A7C59',
-              fontWeight: 600,
-              marginBottom: '32px'
-            }}>
-              → 27€ avec le coupon -20€
-            </p>
+            <div style={{ marginBottom: '24px' }}>
+              <span style={{ textDecoration: 'line-through', color: '#6B6B6B', fontSize: '24px' }}>67€</span>
+              <span style={{ fontSize: '56px', fontWeight: 700, marginLeft: '12px' }}>47€</span>
+            </div>
 
-            <button
-              onClick={handleCTA}
-              style={{
-                width: '100%',
-                backgroundColor: '#4A7C59',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '18px 48px',
-                fontSize: '16px',
-                fontWeight: 600,
-                borderRadius: '4px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                fontFamily: "'DM Sans', sans-serif",
-                marginBottom: '16px'
-              }}
-              onMouseOver={(e) => e.target.style.backgroundColor = '#3d6a4a'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#4A7C59'}
-            >
-              Obtenir NOAH™ maintenant →
+            <ul style={{ textAlign: 'left', marginBottom: '32px' }}>
+              {[
+                "Génération complète de tes 4 offres",
+                "Pages de vente rédigées",
+                "Séquence de 5 emails",
+                "Messages de vente",
+                "Avatars clients détaillés",
+                "Plan d'action 7 jours",
+                "Validation marché IA",
+                "Accès à vie + mises à jour"
+              ].map((item, i) => (
+                <li key={i} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 0',
+                  borderBottom: i < 7 ? '1px solid #F0F0F0' : 'none'
+                }}>
+                  <Check size={20} className="text-accent" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+              Accéder à NOAH™ — 47€ <ArrowRight size={18} />
             </button>
 
-            <p style={{
-              fontSize: '13px',
-              color: '#6B6B6B'
-            }}>
-              Accès immédiat • Garantie 30 jours
+            <p style={{ marginTop: '16px', fontSize: '13px', color: '#6B6B6B' }}>
+              🔒 Paiement sécurisé par Stripe
             </p>
-          </div>
-
-          {/* Liste inclus */}
-          <div style={{ textAlign: 'left' }}>
-            {[
-              '4 offres complètes générées par IA',
-              'Page de vente personnalisée',
-              '5 emails marketing prêts à l\'emploi',
-              'Scripts de vente pour réseaux sociaux',
-              'Analyse et validation de marché',
-              'Plan d\'action 7 jours'
-            ].map((item, i) => (
-              <div key={i} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 0',
-                borderBottom: i < 5 ? '1px solid #E8E8E8' : 'none'
-              }}>
-                <span style={{ color: '#4A7C59', fontSize: '18px' }}>✓</span>
-                <span style={{ fontSize: '15px', color: '#0A0A0A' }}>{item}</span>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
       {/* SECTION GARANTIE */}
-      <section
-        ref={(el) => addRef(el, 7)}
-        data-section="guarantee"
-        style={{
-          padding: '80px 24px',
-          backgroundColor: '#FAFAFA',
-          opacity: visibleSections.guarantee ? 1 : 0,
-          transform: visibleSections.guarantee ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
-          <h3 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: '28px',
-            fontWeight: 500,
-            marginBottom: '20px'
-          }}>
-            Garantie 30 jours — satisfait ou remboursé
-          </h3>
-          <p style={{
-            fontSize: '16px',
-            color: '#6B6B6B',
-            lineHeight: 1.6
-          }}>
-            Si NOAH™ ne t'aide pas à structurer ton offre et avancer vers ta première vente, 
-            tu es remboursé intégralement. Pas de questions. Pas de conditions.
+      <section className="section-padding">
+        <div ref={addToRefs} className="animate-section" style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+          <Shield size={48} className="text-accent" style={{ marginBottom: '24px' }} />
+          <h2 style={{ fontSize: 'clamp(24px, 3vw, 36px)', marginBottom: '16px' }}>
+            Garantie satisfait ou remboursé 30 jours
+          </h2>
+          <p style={{ color: '#6B6B6B', fontSize: '18px' }}>
+            Si NOAH™ ne t'aide pas à clarifier et structurer ton offre, on te rembourse intégralement. Sans question. Tu n'as rien à perdre.
           </p>
         </div>
       </section>
 
       {/* SECTION FAQ */}
-      <section
-        ref={(el) => addRef(el, 8)}
-        data-section="faq"
-        style={{
-          padding: '100px 24px',
-          opacity: visibleSections.faq ? 1 : 0,
-          transform: visibleSections.faq ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 500,
-            lineHeight: 1.3,
-            textAlign: 'center',
-            marginBottom: '64px'
-          }}>
+      <section className="section-padding" style={{ background: '#FAFAFA' }}>
+        <div ref={addToRefs} className="animate-section" style={{ maxWidth: '700px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', marginBottom: '50px', textAlign: 'center' }}>
             Questions fréquentes
           </h2>
 
           {[
-            { q: "Je n'ai pas encore d'idée précise, ça fonctionne quand même ?", a: "Oui. NOAH™ te pose les bonnes questions pour faire émerger ton savoir-faire et le structurer en offres vendables." },
-            { q: "Combien de temps ça prend ?", a: "L'analyse prend 5 minutes. La génération de tes offres est instantanée. Tu peux lancer ta première action dans l'heure." },
-            { q: "Et si ça ne marche pas pour moi ?", a: "Tu as 30 jours pour tester. Si tu n'es pas satisfait, tu es remboursé intégralement — sans justification." },
-            { q: "J'ai besoin de compétences techniques ?", a: "Aucune. Si tu sais répondre à des questions simples, tu sais utiliser NOAH™." },
-            { q: "C'est vraiment pour moi si je débute ?", a: "Surtout si tu débutes. NOAH™ est conçu pour ceux qui n'ont jamais vendu leur savoir-faire mais veulent se lancer." }
+            {
+              q: "J'ai besoin de compétences techniques ?",
+              a: "Non. NOAH™ te guide pas à pas. Tu n'as qu'à répondre aux questions et copier-coller les contenus générés."
+            },
+            {
+              q: "Combien de temps pour voir des résultats ?",
+              a: "La génération prend 5 minutes. Avec le plan d'action, tu peux faire ta première vente en 24h à 7 jours."
+            },
+            {
+              q: "Mon domaine est-il compatible ?",
+              a: "Si tu as une expertise que d'autres veulent apprendre (cuisine, langues, fitness, business, créativité...), oui."
+            },
+            {
+              q: "C'est un abonnement ?",
+              a: "Non. Paiement unique de 47€, accès à vie, mises à jour incluses."
+            }
           ].map((item, i) => (
-            <FAQItem key={i} question={item.q} answer={item.a} />
+            <div key={i} style={{
+              padding: '24px 0',
+              borderBottom: '1px solid #E5E5E5'
+            }}>
+              <h3 style={{ fontSize: '18px', marginBottom: '12px', fontFamily: 'DM Sans', fontWeight: 600 }}>
+                {item.q}
+              </h3>
+              <p style={{ color: '#6B6B6B' }}>{item.a}</p>
+            </div>
           ))}
         </div>
       </section>
 
       {/* SECTION CTA FINAL */}
-      <section
-        ref={(el) => addRef(el, 9)}
-        data-section="final"
-        style={{
-          padding: '100px 24px',
-          backgroundColor: '#0A0A0A',
-          color: '#FFFFFF',
-          textAlign: 'center',
-          opacity: visibleSections.final ? 1 : 0,
-          transform: visibleSections.final ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.8s ease, transform 0.8s ease'
-        }}
-      >
-        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-          <h2 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(28px, 4vw, 42px)',
-            fontWeight: 500,
-            lineHeight: 1.3,
-            marginBottom: '24px'
-          }}>
+      <section className="section-padding" style={{ background: '#0A0A0A', color: 'white', textAlign: 'center' }}>
+        <div ref={addToRefs} className="animate-section" style={{ maxWidth: '700px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', marginBottom: '24px', color: 'white' }}>
             Prêt à transformer ton savoir-faire en revenus ?
           </h2>
-          <p style={{
-            fontSize: '18px',
-            color: 'rgba(255,255,255,0.7)',
-            lineHeight: 1.6,
-            marginBottom: '40px'
-          }}>
-            Rejoins les créateurs qui ont déjà utilisé NOAH™ pour lancer leur activité.
+          <p style={{ color: '#AAAAAA', marginBottom: '40px', fontSize: '18px' }}>
+            Rejoins les centaines de créateurs qui ont lancé leur business grâce à NOAH™.
           </p>
-          <button
-            onClick={handleCTA}
-            style={{
-              backgroundColor: '#4A7C59',
-              color: '#FFFFFF',
-              border: 'none',
-              padding: '18px 48px',
-              fontSize: '16px',
-              fontWeight: 600,
-              borderRadius: '4px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              fontFamily: "'DM Sans', sans-serif"
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#5a8c69'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#4A7C59'}
-          >
-            Commencer maintenant — 27€ →
+          <button className="btn-primary" style={{ background: '#4A7C59' }}>
+            Commencer maintenant — 47€ <ArrowRight size={18} />
           </button>
         </div>
       </section>
 
       {/* FOOTER */}
       <footer style={{
-        padding: '40px 24px',
-        backgroundColor: '#0A0A0A',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        textAlign: 'center'
+        padding: '40px 20px',
+        textAlign: 'center',
+        borderTop: '1px solid #E5E5E5'
       }}>
-        <p style={{
-          fontSize: '14px',
-          color: 'rgba(255,255,255,0.5)'
-        }}>
-          © 2024 NOAH™ — Tous droits réservés
+        <p style={{ color: '#6B6B6B', fontSize: '14px' }}>
+          © 2026 NOAH™ — Tous droits réservés
+        </p>
+        <p style={{ color: '#AAAAAA', fontSize: '12px', marginTop: '8px' }}>
+          Contact : support@noah.ai · Mentions légales · CGV
         </p>
       </footer>
-    </div>
-  );
-}
-
-function FAQItem({ question, answer }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div style={{
-      borderBottom: '1px solid #E8E8E8',
-      padding: '24px 0'
-    }}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          padding: 0,
-          fontFamily: "'DM Sans', sans-serif"
-        }}
-      >
-        <span style={{
-          fontSize: '17px',
-          fontWeight: 500,
-          color: '#0A0A0A',
-          paddingRight: '24px'
-        }}>
-          {question}
-        </span>
-        <span style={{
-          fontSize: '24px',
-          color: '#6B6B6B',
-          transition: 'transform 0.3s ease',
-          transform: isOpen ? 'rotate(45deg)' : 'rotate(0)'
-        }}>
-          +
-        </span>
-      </button>
-      <div style={{
-        maxHeight: isOpen ? '200px' : '0',
-        overflow: 'hidden',
-        transition: 'max-height 0.3s ease'
-      }}>
-        <p style={{
-          fontSize: '15px',
-          color: '#6B6B6B',
-          lineHeight: 1.6,
-          paddingTop: '16px'
-        }}>
-          {answer}
-        </p>
-      </div>
     </div>
   );
 }

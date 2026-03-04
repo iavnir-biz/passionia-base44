@@ -73,18 +73,18 @@ function MarqueeRow({ items, direction = 'left', speed = 40 }) {
 export default function LandingMarquee() {
   return (
     <section style={{
-      background: '#111',
+      background: '#141414',
       padding: '60px 0',
       overflow: 'hidden',
     }}>
       <p style={{
         textAlign: 'center',
-        fontSize: '15px',
+        fontSize: '16px',
         color: 'rgba(255,255,255,0.5)',
         marginBottom: '32px',
         fontWeight: 500,
       }}>
-        Ne rate aucune opportunité
+        Tout ce à quoi tu auras accès
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

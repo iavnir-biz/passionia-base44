@@ -73,6 +73,7 @@ export default function LandingNoah2() {
       <LandingProblem />
       <LandingSolution />
       <LandingHowItWorks />
+      <LandingCalculator />
 
       <LandingPricing onCTA={handleCTA} />
       <LandingFAQ />

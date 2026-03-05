@@ -388,6 +388,46 @@ export default function OnboardingDynamic() {
           </AnimatePresence>
         </div>
       </div>
+      <style>{`
+        .od-neon {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(60px);
+          opacity: 0.5;
+        }
+        .od-neon-1 {
+          width: min(280px, 55vw); height: min(280px, 55vw);
+          background: radial-gradient(circle, rgba(249,115,22,0.5) 0%, transparent 70%);
+          top: 8%; left: -8%;
+          animation: odFloat1 7s ease-in-out infinite;
+        }
+        .od-neon-2 {
+          width: min(220px, 45vw); height: min(220px, 45vw);
+          background: radial-gradient(circle, rgba(236,72,153,0.45) 0%, transparent 70%);
+          bottom: 15%; right: -5%;
+          animation: odFloat2 8s ease-in-out infinite;
+        }
+        .od-neon-3 {
+          width: min(200px, 42vw); height: min(200px, 42vw);
+          background: radial-gradient(circle, rgba(167,139,250,0.45) 0%, transparent 70%);
+          bottom: 5%; left: 10%;
+          animation: odFloat3 9s ease-in-out infinite;
+        }
+        @keyframes odFloat1 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(18px, -12px) scale(1.06); }
+        }
+        @keyframes odFloat2 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-12px, 16px) scale(1.05); }
+        }
+        @keyframes odFloat3 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(14px, 10px) scale(1.08); }
+        }
+      `}</style>
     </div>
   );
 }

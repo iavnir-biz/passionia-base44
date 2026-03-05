@@ -1,855 +1,466 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { useRequirePayment } from '@/components/hooks/useRequirePayment';
-import { useSessionManager } from '@/components/hooks/useSessionManager';
-import { calculateProgressFromSession, getCurrentDay } from '@/utils/progressUtils';
-import { motion } from "framer-motion";
+import { useAuth } from '@/lib/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Target,
-  ArrowRight,
-  CheckCircle,
-  User,
-  MessageCircle,
-  Send,
-  Package,
-  Users,
-  FileText,
-  Loader2,
-  Sparkles,
-  Plus,
-  Lock,
-  Download,
-  ShoppingCart,
-  TrendingUp,
-  Crown
-} from "lucide-react";
-import Sidebar from '@/components/navigation/Sidebar';
-import TopBar from '@/components/navigation/TopBar';
-import ProgressBar from '@/components/ui/ProgressBar';
-import GlowButton from '@/components/ui/GlowButton';
-import SessionCard from '@/components/sessions/SessionCard';
-import SessionCounter from '@/components/sessions/SessionCounter';
-import SessionPaywallModal from '@/components/sessions/SessionPaywallModal';
+  Package, MessageCircle, Calendar, FileText,
+  Copy, Check, Loader2, Sparkles, ChevronDown, ChevronUp,
+  CheckCircle2, Circle, ArrowRight, Download, User
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { NoahBrainIcon } from '@/components/NoahBrainIcon';
 
+// ─── Tabs config ─────────────────────────────────────────────────────────────
+const TABS = [
+  { id: 'offers',   label: 'Mes Offres',        icon: Package },
+  { id: 'messages', label: 'Messages de Vente',  icon: MessageCircle },
+  { id: 'plan',     label: 'Plan 7 Jours',       icon: Calendar },
+  { id: 'salespage',label: 'Page de Vente',      icon: FileText },
+];
+
+// ─── Copy helper ─────────────────────────────────────────────────────────────
+function CopyButton({ text }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <button onClick={handleCopy} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+      {copied ? <><Check className="w-3.5 h-3.5 text-green-500" /> Copié</> : <><Copy className="w-3.5 h-3.5" /> Copier</>}
+    </button>
+  );
+}
+
+// ─── Offer card ──────────────────────────────────────────────────────────────
+function OfferCard({ offer, badge, color }) {
+  const [expanded, setExpanded] = useState(false);
+  if (!offer) return null;
+
+  const psso = [
+    offer.problem && { label: 'Problème', value: offer.problem },
+    offer.solution && { label: 'Solution', value: offer.solution },
+    (offer.subtitle || offer.description) && { label: 'Offre', value: offer.subtitle || offer.description },
+    offer.transformation && { label: 'Transformation', value: offer.transformation },
+  ].filter(Boolean);
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div>
+            <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full mb-2 ${color}`}>
+              {badge}
+            </span>
+            <h3 className="font-bold text-gray-900 text-base leading-tight">{offer.title}</h3>
+            {offer.price && <p className="text-2xl font-black text-gray-900 mt-1">{offer.price}</p>}
+          </div>
+        </div>
+
+        {/* PSSO */}
+        {psso.length > 0 && (
+          <div className="space-y-2 mt-3">
+            {psso.map((item, i) => (
+              <div key={i} className="bg-gray-50 rounded-xl p-3">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">{item.label}</p>
+                <p className="text-sm text-gray-700 leading-relaxed">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Deliverables */}
+        {offer.deliverables?.length > 0 && (
+          <div className="mt-3">
+            <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors">
+              {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {expanded ? 'Masquer' : 'Voir'} le contenu ({offer.deliverables.length})
+            </button>
+            {expanded && (
+              <div className="mt-2 space-y-1">
+                {offer.deliverables.map((d, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                    <CheckCircle2 className="w-4 h-4 text-[#61f7a2] flex-shrink-0 mt-0.5" />
+                    <span>{typeof d === 'string' ? d : d.description || d.name || ''}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Message card ─────────────────────────────────────────────────────────────
+function MessageCard({ message, index }) {
+  const text = message.content || message.message || message.text || '';
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl p-5">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div>
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Message {index + 1}</span>
+          {message.title && <h3 className="font-bold text-gray-900 text-sm mt-0.5">{message.title}</h3>}
+          {message.objective && <p className="text-xs text-gray-500 mt-0.5">{message.objective}</p>}
+        </div>
+        <CopyButton text={text} />
+      </div>
+      <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+        {text}
+      </div>
+    </div>
+  );
+}
+
+// ─── Plan day card ─────────────────────────────────────────────────────────────
+function PlanDayCard({ day, dayData, onToggle }) {
+  const [expanded, setExpanded] = useState(day === 1);
+  const checklist = dayData?.checklist || [];
+  const done = checklist.filter(i => i.checked || i.autoChecked).length;
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ${done === checklist.length && checklist.length > 0 ? 'bg-[#61f7a2] text-white' : 'bg-gray-100 text-gray-700'}`}>
+            {done === checklist.length && checklist.length > 0 ? <CheckCircle2 className="w-5 h-5" /> : `J${day}`}
+          </div>
+          <div>
+            <p className="font-bold text-gray-900 text-sm">Jour {day}</p>
+            {dayData?.title && <p className="text-xs text-gray-500 mt-0.5">{dayData.title}</p>}
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {checklist.length > 0 && (
+            <span className="text-xs text-gray-400">{done}/{checklist.length}</span>
+          )}
+          {expanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-gray-100 p-5 space-y-3">
+          {checklist.length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-2">Les tâches de ce jour seront disponibles après génération.</p>
+          )}
+          {checklist.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => onToggle(day, i)}
+              className="w-full flex items-start gap-3 text-left group"
+            >
+              <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${item.checked || item.autoChecked ? 'bg-[#61f7a2] border-[#61f7a2]' : 'border-gray-300 group-hover:border-gray-500'}`}>
+                {(item.checked || item.autoChecked) && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+              </div>
+              <span className={`text-sm leading-relaxed ${item.checked || item.autoChecked ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
+                {item.text?.replace(/^✅\s+/, '') || item.action || ''}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { isAuthenticated, hasPurchased, isLoading: authLoading } = useRequirePayment();
-
-  const {
-    sessions,
-    activeSessionId,
-    activeSession,
-    loading: sessionsLoading,
-    current,
-    max,
-    has_purchased: isPaid,
-    canCreate,
-    loadSessions,
-    createSession,
-    renameSession,
-    switchSession
-  } = useSessionManager();
+  const { isAuthenticated, isLoadingAuth, navigateToLogin } = useAuth();
 
   const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [fullSession, setFullSession] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // Modals
-  const [paywallOpen, setPaywallOpen] = useState(false);
-  const [paywallType, setPaywallType] = useState('upgrade_required');
-
-  // Session view mode
-  const [viewMode, setViewMode] = useState('detail'); // 'detail' | 'grid'
+  const [activeTab, setActiveTab] = useState('offers');
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadUserData();
+    if (!isLoadingAuth) {
+      if (!isAuthenticated) { navigateToLogin(); return; }
+      loadData();
     }
-  }, [isAuthenticated]);
+  }, [isLoadingAuth, isAuthenticated]);
 
-  // Load full session data when activeSessionId changes
-  useEffect(() => {
-    if (activeSessionId) {
-      loadFullSession(activeSessionId);
-    }
-  }, [activeSessionId]);
-
-  // Polling si generation en cours
-  useEffect(() => {
-    if (fullSession?.generation_in_progress) {
-      const interval = setInterval(() => {
-        loadFullSession(activeSessionId);
-      }, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [fullSession?.generation_in_progress, activeSessionId]);
-
-  const loadUserData = async () => {
+  const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
+      // Check profile setup
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
-      if (profiles.length > 0) {
-        setProfile(profiles[0]);
-      }
-
       if (profiles.length === 0 || !profiles[0].first_name) {
-        navigate(createPageUrl('SetupProfile') + '?redirect=Dashboard');
+        navigate(createPageUrl('SetupProfile'));
         return;
       }
+
+      // Load session
+      const sessionId = currentUser.sessionId || localStorage.getItem('passionia_active_session_id');
+      if (!sessionId) {
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      const sessions = await base44.entities.Session.filter({ id: sessionId });
+      if (sessions.length === 0) {
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      const userSession = sessions[0];
+
+      // Not done onboarding → go back
+      if (!userSession.is_onboarding_done) {
+        navigate(createPageUrl('OnboardingFirstName'));
+        return;
+      }
+
+      // Generation in progress → go to progress page
+      if (userSession.generation_in_progress) {
+        navigate(createPageUrl('GenerationProgress'));
+        return;
+      }
+
+      setSession(userSession);
     } catch (error) {
-      console.error('[Dashboard] Error loading user:', error);
+      console.error('[Dashboard] Error:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const loadFullSession = useCallback(async (sessionId) => {
-    if (!sessionId) return;
+  const handleTogglePlanItem = async (day, itemIndex) => {
+    if (!session) return;
+    const newProgress = JSON.parse(JSON.stringify(session.plan_progress || {}));
+    if (!newProgress[day]) newProgress[day] = { checklist: [] };
+    if (!newProgress[day].checklist[itemIndex]) return;
+    newProgress[day].checklist[itemIndex].checked = !newProgress[day].checklist[itemIndex].checked;
+    setSession({ ...session, plan_progress: newProgress });
     try {
-      const sessions = await base44.entities.Session.filter({ id: sessionId });
-      if (sessions.length > 0) {
-        setFullSession(sessions[0]);
-      }
-    } catch (err) {
-      console.error('[Dashboard] Error loading full session:', err);
-    }
-  }, []);
-
-  // Session actions
-  const handleCreateSession = async () => {
-    if (!canCreate) {
-      setPaywallType(isPaid ? 'limit_reached' : 'upgrade_required');
-      setPaywallOpen(true);
-      return;
-    }
-
-    const result = await createSession();
-    if (result.success) {
-      navigate(createPageUrl('OnboardingFirstName'));
-    } else if (result.error === 'upgrade_required') {
-      setPaywallType('upgrade_required');
-      setPaywallOpen(true);
-    } else if (result.error === 'limit_reached') {
-      setPaywallType('limit_reached');
-      setPaywallOpen(true);
-    }
+      await base44.entities.Session.update(session.id, { plan_progress: newProgress });
+    } catch { toast.error('Erreur de sauvegarde'); }
   };
 
-  const handleSelectSession = (sessionId) => {
-    switchSession(sessionId);
-    setViewMode('detail');
-  };
-
-  // Download all documents
-  const handleDownloadAll = () => {
-    if (!fullSession) return;
-
-    const sections = [];
-    const sessionName = activeSession?.session_name || 'Session';
-    const skill = fullSession.skill || fullSession.onboarding_full?.coreSkill || '';
-
-    sections.push(`=== ${sessionName} - Documents generes par Noah ===`);
-    sections.push(`Competence : ${skill}`);
-    sections.push(`Date : ${new Date().toLocaleDateString('fr-FR')}`);
-    sections.push('');
-
-    // SWOT
-    if (fullSession.complete_market_analysis) {
-      sections.push('━━━ ANALYSE SWOT ━━━');
-      const ma = fullSession.complete_market_analysis;
-      if (ma.market_overview) {
-        sections.push(`Marche : ${ma.market_overview.definition || ''}`);
-        sections.push(`Taille : ${ma.market_overview.size || ''}`);
-      }
-      if (ma.swot) {
-        sections.push(`Forces : ${(ma.swot.strengths || []).map(s => s.text || s).join(', ')}`);
-        sections.push(`Faiblesses : ${(ma.swot.weaknesses || []).map(s => s.text || s).join(', ')}`);
-        sections.push(`Opportunites : ${(ma.swot.opportunities || []).map(s => s.text || s).join(', ')}`);
-        sections.push(`Menaces : ${(ma.swot.threats || []).map(s => s.text || s).join(', ')}`);
-      }
-      sections.push('');
-    }
-
-    // Avatars
-    if (fullSession.generated_avatars) {
-      sections.push('━━━ AVATARS CLIENTS ━━━');
-      const avatars = Array.isArray(fullSession.generated_avatars) ? fullSession.generated_avatars : [];
-      avatars.forEach((a, i) => {
-        sections.push(`\nAvatar ${i + 1} : ${a.identity?.name || a.name || `Avatar ${i + 1}`}`);
-        if (a.identity) {
-          sections.push(`  Age : ${a.identity.age_range || ''}`);
-          sections.push(`  Situation : ${a.identity.life_situation || ''}`);
-        }
-        if (a.in_their_head) {
-          sections.push(`  Emotion dominante : ${a.in_their_head.dominant_emotion || ''}`);
-          sections.push(`  Phrase interieure : ${a.in_their_head.inner_phrase || ''}`);
-        }
-      });
-      sections.push('');
-    }
-
-    // Offres
-    if (fullSession.finalized_offer) {
-      sections.push('━━━ OFFRES ━━━');
-      const offer = fullSession.finalized_offer;
-      if (offer.mainProduct) {
-        sections.push(`Offre principale : ${offer.mainProduct.title || ''}`);
-        sections.push(`  Prix : ${offer.mainProduct.price || ''}`);
-        sections.push(`  Description : ${offer.mainProduct.subtitle || ''}`);
-      }
-      if (offer.orderBump) {
-        sections.push(`Order Bump : ${offer.orderBump.title || ''} - ${offer.orderBump.price || ''}`);
-      }
-      if (offer.upsells) {
-        offer.upsells.forEach((u, i) => {
-          sections.push(`Upsell ${i + 1} : ${u.title || ''} - ${u.price || ''}`);
-        });
-      }
-      sections.push('');
-    }
-
-    // Messages
-    if (fullSession.generated_sales_messages) {
-      sections.push('━━━ MESSAGES DE VENTE ━━━');
-      const msgs = Array.isArray(fullSession.generated_sales_messages) ? fullSession.generated_sales_messages : [];
-      msgs.forEach((m, i) => {
-        sections.push(`\nMessage ${i + 1} : ${m.title || m.name || ''}`);
-        sections.push(`Objectif : ${m.objective || ''}`);
-        sections.push(`Contenu :`);
-        sections.push(m.content || m.message || m.text || '');
-      });
-      sections.push('');
-    }
-
-    // Emails
-    if (fullSession.generated_marketing_emails) {
-      sections.push('━━━ EMAILS MARKETING ━━━');
-      const emails = Array.isArray(fullSession.generated_marketing_emails) ? fullSession.generated_marketing_emails : [];
-      emails.forEach((e, i) => {
-        sections.push(`\nEmail ${i + 1} : ${e.title || e.name || ''}`);
-        sections.push(`Objet : ${e.subject || ''}`);
-        sections.push(`Contenu :`);
-        sections.push(e.body || e.content || '');
-      });
-      sections.push('');
-    }
-
-    const content = sections.join('\n');
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${sessionName.replace(/\s+/g, '_')}_documents_noah.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  // Existing logic for active session
-  const getNextIncompleteTask = () => {
-    if (!fullSession?.plan_progress) {
-      return {
-        title: "Rejoindre la communaute et se presenter",
-        description: "Commence par te connecter avec d'autres entrepreneurs",
-        page: "PlanAction"
-      };
-    }
-
-    const currentDay = getCurrentDay(fullSession);
-    const dayProgress = fullSession.plan_progress[currentDay];
-
-    if (!dayProgress?.checklist) {
-      return {
-        title: "Commencer le jour " + currentDay,
-        description: "Clique pour voir tes missions du jour",
-        page: "PlanAction"
-      };
-    }
-
-    const firstUnchecked = dayProgress.checklist.find(
-      (item) => !item.checked && !item.autoChecked
-    );
-
-    if (firstUnchecked) {
-      return {
-        title: firstUnchecked.text.replace(/^✅\s+/, ''),
-        description: firstUnchecked.details || "Clique pour plus de details",
-        page: firstUnchecked.action?.page || "PlanAction"
-      };
-    }
-
-    return {
-      title: "Valider le jour " + currentDay,
-      description: "Tu as tout fait ! Marque ce jour comme termine",
-      page: "PlanAction"
-    };
-  };
-
-  const livrables = [
-    { title: "Analyse SWOT", page: "MarketAnalysis", icon: Target, field: "complete_market_analysis" },
-    { title: "3 Avatars", page: "AvatarClients", icon: Users, field: "generated_avatars" },
-    { title: "4 Offres", page: "MyOffers", icon: Package, field: "my_generated_offers" },
-    { title: "Messages", page: "SalesMessages", icon: MessageCircle, field: "generated_sales_messages" },
-    { title: "Emails", page: "EmailsMarketing", icon: Send, field: "generated_marketing_emails" },
-    { title: "Page de vente", page: "SalesPage", icon: FileText, field: "generated_sales_pages" }
-  ];
-
-  const countGenerated = () => livrables.filter(item => fullSession?.[item.field]).length;
-
-  // Revenue / goal data
-  const onboarding = fullSession?.onboarding_full || {};
-  const targetIncome = onboarding.targetIncome;
-  const targetDelay = onboarding.targetIncomeDelay;
-
-  // Revenue tracker (interactive)
-  const targetNum = Number(targetIncome) || 0;
-  const [currentRevenue, setCurrentRevenue] = useState(0);
-  const [revenueInputValue, setRevenueInputValue] = useState('');
-  const [savingRevenue, setSavingRevenue] = useState(false);
-
-  // Load saved revenue from session
-  useEffect(() => {
-    if (fullSession?.current_revenue != null) {
-      setCurrentRevenue(fullSession.current_revenue);
-      setRevenueInputValue(String(fullSession.current_revenue));
-    }
-  }, [fullSession?.current_revenue]);
-
-  const saveRevenue = useCallback(async (value) => {
-    if (!activeSessionId) return;
-    setSavingRevenue(true);
-    try {
-      await base44.entities.Session.update(activeSessionId, {
-        current_revenue: value
-      });
-    } catch (err) {
-      console.error('[Dashboard] Error saving revenue:', err);
-    } finally {
-      setSavingRevenue(false);
-    }
-  }, [activeSessionId]);
-
-  const handleSliderChange = (e) => {
-    const val = Number(e.target.value);
-    setCurrentRevenue(val);
-    setRevenueInputValue(String(val));
-  };
-
-  const handleSliderRelease = () => {
-    saveRevenue(currentRevenue);
-  };
-
-  const handleRevenueInput = (e) => {
-    const raw = e.target.value.replace(/[^0-9]/g, '');
-    setRevenueInputValue(raw);
-    const val = Math.min(Number(raw) || 0, targetNum);
-    setCurrentRevenue(val);
-  };
-
-  const handleRevenueInputBlur = () => {
-    const val = Math.min(Number(revenueInputValue) || 0, targetNum);
-    setCurrentRevenue(val);
-    setRevenueInputValue(String(val));
-    saveRevenue(val);
-  };
-
-  const remaining = Math.max(0, targetNum - currentRevenue);
-  const revenuePercent = targetNum > 0 ? Math.min(100, Math.round((currentRevenue / targetNum) * 100)) : 0;
-
-  if (authLoading || loading || sessionsLoading) {
+  // ─── Loading ────────────────────────────────────────────────────────────────
+  if (isLoadingAuth || loading) {
     return (
-      <div className="flex min-h-screen bg-white">
-        <Sidebar currentPage="Dashboard" progress={0} />
-        <div className="flex-1 ml-0 lg:ml-72 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
-        </div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2]" />
       </div>
     );
   }
 
-  const currentMission = getNextIncompleteTask();
+  // ─── No results yet ──────────────────────────────────────────────────────────
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+        <NoahBrainIcon size={80} isThinking={false} />
+        <h2 className="text-xl font-bold text-gray-900 mt-6 mb-2">Tes offres ne sont pas encore générées</h2>
+        <p className="text-gray-500 text-sm mb-6">Complète l'onboarding pour que Noah génère ton kit complet.</p>
+        <button
+          onClick={() => navigate(createPageUrl('OnboardingFirstName'))}
+          className="bg-[#1a1a1a] text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2"
+        >
+          <Sparkles className="w-5 h-5 text-[#61f7a2]" />
+          Démarrer l'onboarding
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+    );
+  }
+
+  const offer = session.finalized_offer || session.my_generated_offers || {};
+  const messages = session.generated_sales_messages || [];
+  const planProgress = session.plan_progress || {};
+  const salesPages = session.generated_sales_pages;
+
+  const offerCards = [
+    { key: 'orderBump', badge: 'Petit Extra', color: 'bg-blue-100 text-blue-700', data: offer.orderBump },
+    { key: 'mainProduct', badge: 'Produit Principal', color: 'bg-[#61f7a2]/20 text-[#1a9e5c]', data: offer.mainProduct },
+    { key: 'upsell1', badge: 'Offre Supérieure', color: 'bg-purple-100 text-purple-700', data: offer.upsell1 || offer.upsell },
+    { key: 'upsell3', badge: 'Offre Premium', color: 'bg-amber-100 text-amber-700', data: offer.upsell3 || offer.premium },
+  ].filter(o => o.data);
+
+  const firstName = user?.firstName || user?.full_name?.split(' ')[0] || '';
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar
-        currentPage="Dashboard"
-        progress={calculateProgressFromSession(fullSession)}
-        user={user}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
-
-      <div className="flex-1 w-full ml-0 lg:ml-72">
-        <TopBar
-          title="Dashboard"
-          subtitle={`Bienvenue ${user?.full_name?.split(' ')[0] || ''} !`}
-          user={user}
-          onMenuClick={() => setIsSidebarOpen(true)}
-          session={fullSession}
-        />
-
-        <main className="p-4 sm:p-8 max-w-6xl mx-auto">
-
-          {/* GREETING avec photo */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 flex items-center gap-4">
-            <div className="flex-shrink-0">
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="Profil" className="w-16 h-16 rounded-full object-cover border-2 border-gray-200" />
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
-                  <User className="w-8 h-8 text-white" />
-                </div>
-              )}
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Top bar */}
+      <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <NoahBrainIcon size={36} isThinking={false} />
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 flex items-center gap-3">
-                Hello {profile?.first_name || user?.first_name || ''} <span className="text-3xl sm:text-4xl">👋</span>
-              </h1>
-              {fullSession?.generation_in_progress && (
-                <p className="text-sm text-[#61f7a2] font-medium flex items-center gap-2 mt-1">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Noah genere tes documents...
-                </p>
-              )}
+              <p className="text-xs text-gray-400">Bonjour {firstName} 👋</p>
+              <p className="text-sm font-bold text-gray-900">Ton kit Passion IA</p>
             </div>
-          </motion.div>
-
-          {/* OBJECTIF REVENU - barre interactive */}
-          {targetIncome && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="mb-8 bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 sm:p-8"
-            >
-              {/* Header : objectif + delai */}
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <p className="text-sm text-gray-500 font-medium mb-2">Ton objectif mensuel</p>
-                  <p className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
-                    {Number(targetIncome).toLocaleString('fr-FR')} <span className="text-[#61f7a2]">EUR</span>
-                  </p>
-                </div>
-                {targetDelay && (
-                  <div className="text-right flex-shrink-0 ml-4">
-                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Delai</p>
-                    <p className="text-2xl font-bold text-gray-900">{targetDelay} <span className="text-sm font-medium text-gray-500">mois</span></p>
-                  </div>
-                )}
-              </div>
-
-              {/* Barre interactive */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-gray-500 font-medium">Tes revenus ce mois</span>
-                  <span className="text-xs font-bold text-gray-700">{revenuePercent}%</span>
-                </div>
-
-                {/* Slider visuel */}
-                <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-1">
-                  <div
-                    className={`absolute inset-y-0 left-0 rounded-full transition-all duration-200 ${
-                      revenuePercent >= 100
-                        ? 'bg-gradient-to-r from-[#61f7a2] to-[#3dd980]'
-                        : revenuePercent >= 50
-                          ? 'bg-gradient-to-r from-[#61f7a2] to-[#4de88f]'
-                          : 'bg-gradient-to-r from-amber-400 to-orange-400'
-                    }`}
-                    style={{ width: `${revenuePercent}%` }}
-                  />
-                  <input
-                    type="range"
-                    min={0}
-                    max={targetNum}
-                    step={1}
-                    value={currentRevenue}
-                    onChange={handleSliderChange}
-                    onMouseUp={handleSliderRelease}
-                    onTouchEnd={handleSliderRelease}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-gray-400">0 EUR</span>
-                  <span className="text-xs text-gray-400">{Number(targetIncome).toLocaleString('fr-FR')} EUR</span>
-                </div>
-
-                {/* Input direct + infos */}
-                <div className="flex items-center justify-between mt-4 gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={revenueInputValue}
-                        onChange={handleRevenueInput}
-                        onBlur={handleRevenueInputBlur}
-                        onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
-                        className="w-28 sm:w-32 border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold text-gray-900 text-right focus:outline-none focus:ring-2 focus:ring-[#61f7a2]/30 focus:border-[#61f7a2] transition-all"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">EUR</span>
-                    </div>
-                    {savingRevenue && <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />}
-                  </div>
-
-                  <div className="text-right">
-                    {remaining > 0 ? (
-                      <p className="text-sm text-gray-600">
-                        Encore <span className="font-bold text-gray-900">{remaining.toLocaleString('fr-FR')} EUR</span>
-                      </p>
-                    ) : (
-                      <p className="text-sm font-bold text-[#61f7a2]">
-                        Objectif atteint !
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ============ SESSIONS SECTION ============ */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-8"
+          </div>
+          <button
+            onClick={() => navigate(createPageUrl('Settings'))}
+            className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
           >
-            {/* Header sessions */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-bold text-gray-900">Mes sessions</h2>
-                <div className="w-40">
-                  <SessionCounter current={current} max={max} isPaid={isPaid} />
-                </div>
-              </div>
+            <User className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
 
-              <div className="flex items-center gap-2">
-                {/* Toggle view */}
-                {sessions.length > 1 && (
-                  <button
-                    onClick={() => setViewMode(viewMode === 'grid' ? 'detail' : 'grid')}
-                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                  >
-                    {viewMode === 'grid' ? 'Vue detail' : 'Vue grille'}
-                  </button>
-                )}
-
-                {/* Bouton nouvelle session */}
-                {isPaid ? (
-                  <button
-                    onClick={handleCreateSession}
-                    disabled={!canCreate}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                      canCreate
-                        ? 'bg-[#61f7a2] text-gray-900 hover:bg-[#4de88f] hover:scale-105'
-                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    }`}
-                    title={canCreate ? 'Creer une nouvelle session' : `${current}/${max} sessions utilisees`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Nouvelle session
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => { setPaywallType('upgrade_required'); setPaywallOpen(true); }}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-xl text-sm font-semibold hover:scale-105 transition-transform"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    Passer Premium
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Info message pour gratuit */}
-            {!isPaid && sessions.length > 0 && (
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 mb-4">
-                <div className="flex items-start gap-3">
-                  <Lock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-amber-900 font-semibold text-sm mb-1">
-                      Passe Premium pour debloquer 3 sessions
-                    </p>
-                    <p className="text-amber-700 text-xs">
-                      Genere de nouvelles offres avec Noah.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Info message pour payant 3/3 */}
-            {isPaid && !canCreate && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-                <div className="flex items-start gap-3">
-                  <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-blue-800 text-sm">
-                    Tu as utilise tes {max} sessions. Elles restent accessibles ici.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Sessions grid */}
-            {viewMode === 'grid' && sessions.length > 1 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sessions.map((s, index) => (
-                  <SessionCard
-                    key={s.id}
-                    session={s}
-                    isActive={s.id === activeSessionId}
-                    isPaid={isPaid}
-                    onSelect={handleSelectSession}
-                    onRename={renameSession}
-                    index={index}
-                  />
-                ))}
-              </div>
-            ) : sessions.length > 1 ? (
-              /* Session tabs pour vue detail */
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-                {sessions.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => handleSelectSession(s.id)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                      s.id === activeSessionId
-                        ? 'bg-[#61f7a2]/10 text-gray-900 border-2 border-[#61f7a2]'
-                        : 'bg-gray-100 text-gray-600 border-2 border-transparent hover:bg-gray-200'
-                    }`}
-                  >
-                    <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold ${
-                      s.id === activeSessionId ? 'bg-[#61f7a2] text-white' : 'bg-gray-300 text-white'
-                    }`}>
-                      {s.session_number}
-                    </span>
-                    {s.session_name}
-                    {s.generation_in_progress && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </motion.div>
-
-          {/* BANNER generation */}
-          {fullSession?.generation_in_progress && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-8 flex gap-3">
-              <Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-blue-900 font-semibold mb-1">Generation en cours...</p>
-                <p className="text-blue-700 text-sm">Noah genere tes documents. Ca prend 1-2 minutes.</p>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ============ ACTIVE SESSION DETAIL ============ */}
-          {fullSession && (
-            <>
-              {/* Session info header */}
-              {sessions.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-6"
+        {/* Tabs */}
+        <div className="max-w-3xl mx-auto px-4 pb-0">
+          <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+            {TABS.map(tab => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors flex-shrink-0 ${
+                    activeTab === tab.id
+                      ? 'border-[#61f7a2] text-gray-900'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
                 >
-                  <h3 className="text-lg font-bold text-gray-900">
-                    {activeSession?.session_name || `Session ${activeSession?.session_number || 1}`}
-                  </h3>
-                  {activeSession?.skill && (
-                    <p className="text-sm text-gray-500">{activeSession.skill}</p>
-                  )}
-                </motion.div>
-              )}
-
-              {/* MISSION DU JOUR */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                className="bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3dd980] rounded-3xl px-6 py-8 md:p-10 mb-8 shadow-2xl">
-                <div className="text-left mb-6">
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 flex items-center gap-2">
-                    <Target className="w-8 h-8" />
-                    Ta mission aujourd'hui
-                  </h2>
-                  <p className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
-                    {currentMission.title}
-                  </p>
-                  <p className="text-white/90 text-lg line-clamp-2">{currentMission.description}</p>
-                </div>
-                <GlowButton onClick={() => navigate(createPageUrl(currentMission.page))} size="lg"
-                  className="bg-white text-gray-900 hover:bg-gray-100 w-full md:w-auto px-6 md:px-12 py-3 md:py-4 text-lg md:text-xl font-bold">
-                  👉 Lancer cette mission
-                </GlowButton>
-              </motion.div>
-
-              {/* PROGRESSION */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl border border-gray-200 p-6 mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Ta progression</p>
-                    <p className="text-2xl font-bold text-gray-900">Jour {getCurrentDay(fullSession)} / 7</p>
-                  </div>
-                  <p className="text-3xl font-bold text-[#61f7a2]">{calculateProgressFromSession(fullSession)}%</p>
-                </div>
-                <ProgressBar value={calculateProgressFromSession(fullSession)} max={100} className="mb-3" />
-                <p className="text-center text-gray-700 font-medium">Tu es exactement la ou tu dois etre.</p>
-              </motion.div>
-
-              {/* LIVRABLES + PRODUITS - Layout deux colonnes */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                {/* COLONNE GAUCHE : Tes documents IA */}
-                <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">Tes documents IA</h3>
-                    <div className="flex items-center gap-3">
-                      {countGenerated() > 0 && (
-                        <button
-                          onClick={handleDownloadAll}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-700 rounded-lg text-xs font-medium transition-colors border border-gray-200"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          Telecharger
-                        </button>
-                      )}
-                      <span className="text-sm text-gray-600"><span className="font-bold text-[#61f7a2]">{countGenerated()}</span> / {livrables.length}</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 flex-1">
-                    {livrables.map((item) => {
-                      const Icon = item.icon;
-                      const isGenerated = fullSession?.[item.field];
-                      return (
-                        <Link key={item.page} to={createPageUrl(item.page)}
-                          className={`flex items-center gap-3 p-3 bg-white border rounded-xl transition-all ${
-                            isGenerated ? 'border-gray-300 hover:border-[#61f7a2] hover:shadow-md' : 'border-gray-200 opacity-60'
-                          }`}>
-                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isGenerated ? 'bg-gray-100' : 'bg-gray-50'}`}>
-                            <Icon className={`w-4 h-4 ${isGenerated ? 'text-gray-700' : 'text-gray-400'}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-medium text-gray-900 text-xs sm:text-sm truncate">{item.title}</span>
-                              {isGenerated ? <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" /> : <Loader2 className="w-3.5 h-3.5 text-gray-400 animate-spin flex-shrink-0" />}
-                            </div>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* COLONNE DROITE : Tes 4 produits choisis */}
-                <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 sm:p-6 flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900">Tes 4 produits</h3>
-                    <Link to={createPageUrl('MyOffers')} className="text-xs font-medium text-[#61f7a2] hover:text-[#4de88f] transition-colors flex items-center gap-1">
-                      Voir le detail <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 flex-1">
-                    {[
-                      { key: 'mainProduct', label: 'Produit Principal', icon: Package, gradient: 'from-blue-500 to-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
-                      { key: 'orderBump', label: 'Produit Extra', icon: ShoppingCart, gradient: 'from-green-500 to-green-600', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' },
-                      { key: 'upsell1', label: 'Produit Superieur', icon: TrendingUp, gradient: 'from-purple-500 to-purple-600', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700' },
-                      { key: 'upsell3', label: 'Produit Premium', icon: Crown, gradient: 'from-yellow-500 to-amber-600', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' }
-                    ].map((product) => {
-                      const PIcon = product.icon;
-                      const offer = fullSession?.finalized_offer?.[product.key];
-                      const hasOffer = !!offer;
-                      return (
-                        <Link
-                          key={product.key}
-                          to={createPageUrl('MyOffers')}
-                          className={`flex flex-col p-3 bg-white border rounded-xl transition-all hover:shadow-md ${
-                            hasOffer ? `${product.border} hover:border-[#61f7a2]` : 'border-gray-200 opacity-60'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${product.gradient} flex items-center justify-center flex-shrink-0`}>
-                              <PIcon className="w-4 h-4 text-white" />
-                            </div>
-                            <span className={`text-xs font-semibold ${hasOffer ? 'text-gray-900' : 'text-gray-400'} truncate`}>
-                              {product.label}
-                            </span>
-                          </div>
-                          {hasOffer ? (
-                            <div className="flex-1 flex flex-col justify-between min-w-0">
-                              <p className="text-xs font-bold text-gray-900 truncate leading-tight mb-1">
-                                {offer.title}
-                              </p>
-                              <p className={`text-sm font-bold ${product.text}`}>
-                                {offer.price}
-                              </p>
-                            </div>
-                          ) : (
-                            <p className="text-xs text-gray-400 italic">Non defini</p>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-
-              </motion.div>
-
-              {/* PLAN 7 JOURS */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-                className="bg-gray-50 rounded-2xl border border-gray-200 p-6 mb-8">
-                <p className="text-lg font-bold text-gray-900 mb-4">Tu es au jour {getCurrentDay(fullSession)}</p>
-                <div className="flex items-center gap-2 mb-6">
-                  {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                    <div key={day} className={`flex-1 h-2 rounded-full transition-all ${
-                      day < getCurrentDay(fullSession) ? 'bg-[#61f7a2]' : day === getCurrentDay(fullSession) ? 'bg-[#61f7a2] ring-4 ring-[#61f7a2]/30' : 'bg-gray-200'
-                    }`} />
-                  ))}
-                </div>
-                <Link to={createPageUrl('PlanAction')}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 rounded-xl hover:border-[#61f7a2] hover:shadow-md transition-all font-medium text-gray-900">
-                  Voir le plan complet
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </motion.div>
-
-            </>
-          )}
-
-          {/* No session state */}
-          {!fullSession && !loading && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-16"
-            >
-              <div className="w-20 h-20 rounded-2xl bg-gray-100 mx-auto mb-6 flex items-center justify-center">
-                <Sparkles className="w-10 h-10 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Aucune session</h3>
-              <p className="text-gray-600 mb-6">Commence ton parcours pour generer tes offres avec Noah.</p>
-              <GlowButton onClick={handleCreateSession} size="lg">
-                <Plus className="w-5 h-5" />
-                Commencer mon parcours
-              </GlowButton>
-            </motion.div>
-          )}
-
-        </main>
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* Modals */}
-      <SessionPaywallModal
-        isOpen={paywallOpen}
-        onClose={() => setPaywallOpen(false)}
-        type={paywallType}
-      />
+      {/* Content */}
+      <main className="max-w-3xl mx-auto px-4 py-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+          >
+
+            {/* ── Tab: Mes Offres ─────────────────────────────────────────── */}
+            {activeTab === 'offers' && (
+              <div className="space-y-4">
+                <div className="mb-4">
+                  <h2 className="text-lg font-bold text-gray-900">Tes 4 offres</h2>
+                  <p className="text-sm text-gray-500 mt-0.5">Structurées avec la formule PSSO — prêtes à vendre</p>
+                </div>
+                {offerCards.length === 0 ? (
+                  <div className="text-center py-12 text-gray-400">
+                    <Package className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">Les offres ne sont pas encore disponibles.</p>
+                    <button
+                      onClick={() => navigate(createPageUrl('GenerationProgress'))}
+                      className="mt-4 text-[#61f7a2] text-sm font-medium"
+                    >
+                      Voir la génération →
+                    </button>
+                  </div>
+                ) : (
+                  offerCards.map(({ key, badge, color, data }) => (
+                    <OfferCard key={key} offer={data} badge={badge} color={color} />
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* ── Tab: Messages de Vente ──────────────────────────────────── */}
+            {activeTab === 'messages' && (
+              <div className="space-y-4">
+                <div className="mb-4">
+                  <h2 className="text-lg font-bold text-gray-900">Messages de vente</h2>
+                  <p className="text-sm text-gray-500 mt-0.5">Copie-colle directement en DM ou email</p>
+                </div>
+                {messages.length === 0 ? (
+                  <div className="text-center py-12 text-gray-400">
+                    <MessageCircle className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">Les messages ne sont pas encore disponibles.</p>
+                  </div>
+                ) : (
+                  messages.map((msg, i) => <MessageCard key={i} message={msg} index={i} />)
+                )}
+              </div>
+            )}
+
+            {/* ── Tab: Plan 7 Jours ───────────────────────────────────────── */}
+            {activeTab === 'plan' && (
+              <div className="space-y-4">
+                <div className="mb-4">
+                  <h2 className="text-lg font-bold text-gray-900">Plan d'action 7 jours</h2>
+                  <p className="text-sm text-gray-500 mt-0.5">Coche chaque action pour progresser vers ta première vente</p>
+                </div>
+                {[1, 2, 3, 4, 5, 6, 7].map(day => (
+                  <PlanDayCard
+                    key={day}
+                    day={day}
+                    dayData={planProgress[day] || planProgress[String(day)]}
+                    onToggle={handleTogglePlanItem}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* ── Tab: Page de Vente ──────────────────────────────────────── */}
+            {activeTab === 'salespage' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Ta page de vente</h2>
+                    <p className="text-sm text-gray-500 mt-0.5">Formule PSSO complète — prête à publier</p>
+                  </div>
+                  {salesPages && (
+                    <button
+                      onClick={() => {
+                        const text = typeof salesPages === 'string' ? salesPages : JSON.stringify(salesPages, null, 2);
+                        navigator.clipboard.writeText(text);
+                        toast.success('Page copiée !');
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                    >
+                      <Copy className="w-4 h-4" />
+                      Copier tout
+                    </button>
+                  )}
+                </div>
+
+                {!salesPages ? (
+                  <div className="text-center py-12 text-gray-400">
+                    <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">La page de vente n'est pas encore disponible.</p>
+                  </div>
+                ) : typeof salesPages === 'string' ? (
+                  <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                    <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
+                      {salesPages}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {Object.entries(salesPages).map(([section, content]) => (
+                      <div key={section} className="bg-white border border-gray-200 rounded-2xl p-5">
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">{section}</p>
+                          <CopyButton text={typeof content === 'string' ? content : JSON.stringify(content)} />
+                        </div>
+                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                          {typeof content === 'string' ? content : JSON.stringify(content, null, 2)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+          </motion.div>
+        </AnimatePresence>
+      </main>
     </div>
   );
 }

@@ -136,6 +136,14 @@ html, body {
 .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
 .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
 
+/* Fix gradient text clipping on descenders and italic */
+span[style*="WebkitBackgroundClip"],
+span[style*="-webkit-background-clip"] {
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+  display: inline-block;
+}
+
 /* Hide scrollbar for horizontal scroll areas */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */

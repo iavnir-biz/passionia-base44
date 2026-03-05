@@ -59,12 +59,12 @@ export default function LandingSolution() {
   }, []);
 
   const features = [
-    { icon: <Zap size={22} />, title: "4 offres structurées", desc: "Produit, bump, upsell et premium — avec les prix optimaux." },
-    { icon: <FileText size={22} />, title: "Pages de vente", desc: "Textes persuasifs générés, prêts à copier-coller." },
-    { icon: <Mail size={22} />, title: "Séquence emails", desc: "5 emails de vente pour convertir tes prospects." },
-    { icon: <MessageSquare size={22} />, title: "Messages de vente", desc: "Scripts pour réseaux sociaux et conversations." },
+    { icon: <Zap size={22} />, title: "4 offres structurées", desc: "Offre principale, petit extra, offre supérieure, offre premium — avec les prix optimaux." },
+    { icon: <Clock size={22} />, title: "Plan d'action 7 jours", desc: "Étape par étape, une action par jour." },
     { icon: <Users size={22} />, title: "Avatars clients", desc: "Profils détaillés de tes clients idéaux." },
-    { icon: <Clock size={22} />, title: "Plan d'action 7 jours", desc: "Étape par étape, une action par jour." }
+    { icon: <MessageSquare size={22} />, title: "Messages de vente", desc: "Scripts pour réseaux sociaux et conversations." },
+    { icon: <FileText size={22} />, title: "Pages de vente", desc: "Textes persuasifs générés, prêts à copier-coller." },
+    { icon: <Mail size={22} />, title: "Analyse de marché détaillée", desc: "Validation de ton idée et étude de marché complète." },
   ];
 
   return (
@@ -114,7 +114,7 @@ export default function LandingSolution() {
           marginBottom: '16px',
           color: '#fff',
         }}>
-          NOAH™ fait{' '}
+          Notre IA fait{' '}
           <span style={{
             fontStyle: 'italic',
             fontWeight: 500,
@@ -127,7 +127,7 @@ export default function LandingSolution() {
         </h2>
 
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '17px', maxWidth: '550px', margin: '0 auto 56px', lineHeight: 1.6 }}>
-          En quelques minutes, l'IA analyse ton expertise et génère un business complet, prêt à vendre.
+          En quelques minutes, notre IA analyse ton expertise et génère un business complet, prêt à vendre.
         </p>
 
         <div style={{

@@ -1,51 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { User, Upload, Loader2, CheckCircle } from 'lucide-react';
-import GlowButton from '@/components/ui/GlowButton';
+import { User, Upload, Loader2, ArrowRight, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SetupProfile() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     first_name: '',
-    last_name: '',
     avatar_url: ''
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      // Vérifier si profil existe
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       if (profiles.length > 0) {
-        const existingProfile = profiles[0];
-        setProfile(existingProfile);
+        const existing = profiles[0];
+        setProfile(existing);
         setFormData({
-          first_name: existingProfile.first_name || currentUser.firstName || '',
-          last_name: existingProfile.last_name || '',
-          avatar_url: existingProfile.avatar_url || currentUser.profile_picture || ''
+          first_name: existing.first_name || currentUser.firstName || '',
+          avatar_url: existing.avatar_url || currentUser.profile_picture || ''
         });
       } else {
-        // Pré-remplir avec user.firstName si dispo
         setFormData({
           first_name: currentUser.firstName || '',
-          last_name: '',
           avatar_url: currentUser.profile_picture || ''
         });
       }
@@ -59,11 +50,10 @@ export default function SetupProfile() {
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData({ ...formData, avatar_url: file_url });
+      setFormData(prev => ({ ...prev, avatar_url: file_url }));
       toast.success('Photo ajoutée !');
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -81,33 +71,24 @@ export default function SetupProfile() {
 
     setSaving(true);
     try {
-      // 1. Sauvegarder le profil
       if (profile) {
         await base44.entities.UserProfile.update(profile.id, {
           first_name: formData.first_name,
-          last_name: formData.last_name,
           avatar_url: formData.avatar_url
         });
       } else {
         await base44.entities.UserProfile.create({
           first_name: formData.first_name,
-          last_name: formData.last_name,
           avatar_url: formData.avatar_url
         });
       }
 
-      // Update User.full_name pour synchronisation
-      await base44.auth.updateMe({ 
-        full_name: `${formData.first_name} ${formData.last_name}`.trim(),
-        profile_picture: formData.avatar_url 
+      await base44.auth.updateMe({
+        full_name: formData.first_name.trim(),
+        profile_picture: formData.avatar_url
       });
 
-      toast.success('Profil enregistré !');
-
-      // Redirect vers UpsellCoaching (page d'upsell coaching)
-      console.log('[SetupProfile] Profil sauvegardé → UpsellCoaching');
-      navigate(createPageUrl('UpsellCoaching'));
-      
+      navigate(createPageUrl('Dashboard'));
     } catch (error) {
       console.error('Error saving profile:', error);
       toast.error('Erreur lors de la sauvegarde');
@@ -115,130 +96,189 @@ export default function SetupProfile() {
     }
   };
 
-  const handleSkip = async () => {
-    // Redirect vers UpsellCoaching (page d'upsell coaching)
-    console.log('[SetupProfile] Skip → UpsellCoaching');
-    navigate(createPageUrl('UpsellCoaching'));
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#61f7a2] animate-spin" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#1a1a1a] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-6">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12"
+         style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+      {/* Neon circles */}
+      <div style={{ position: 'fixed', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)', top: '5%', right: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%)', bottom: '10%', left: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%)', top: '40%', left: '50%', transform: 'translateX(-50%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+
+      <div className="max-w-md w-full relative z-10">
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ textAlign: 'center', marginBottom: '32px' }}
+        >
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            background: '#f5f5f5', border: '1px solid #e8e8e8', borderRadius: '100px',
+            padding: '6px 16px', fontSize: '13px', color: '#666'
+          }}>
+            <span style={{ fontSize: '16px' }}>👋</span>
+            Dernière étape
+          </div>
+        </motion.div>
+
+        {/* Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          style={{ textAlign: 'center', marginBottom: '40px' }}
+        >
+          <h1 style={{
+            fontSize: 'clamp(28px, 5vw, 40px)',
+            fontWeight: 400,
+            lineHeight: 1.15,
+            letterSpacing: '-0.03em',
+            color: '#1a1a1a',
+            marginBottom: '12px'
+          }}>
+            Personnalise ton{' '}
+            <span style={{
+              fontStyle: 'italic',
+              fontWeight: 500,
+              background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>espace</span>
+          </h1>
+          <p style={{ fontSize: '16px', color: '#888', lineHeight: 1.6 }}>
+            Ajoute ta photo pour personnaliser ton dashboard.
+          </p>
+        </motion.div>
+
+        {/* Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-3xl p-8 border border-gray-200 shadow-lg"
+          transition={{ delay: 0.2 }}
+          style={{
+            background: '#fff', border: '1px solid #e5e5e5', borderRadius: '20px',
+            padding: '32px', marginBottom: '24px'
+          }}
         >
-          {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
-              <User className="w-8 h-8 text-white" />
-            </div>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            Complète ton profil
-          </h1>
-          <p className="text-gray-600 text-center mb-8">
-            Personnalise ton espace pour commencer
-          </p>
-
           {/* Avatar Upload */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Photo de profil
-            </label>
-            <div className="flex items-center gap-4">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px' }}>
+            <div style={{ position: 'relative', marginBottom: '16px' }}>
               {formData.avatar_url ? (
                 <img
                   src={formData.avatar_url}
                   alt="Avatar"
-                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                  style={{
+                    width: '100px', height: '100px', borderRadius: '50%',
+                    objectFit: 'cover', border: '3px solid #e5e5e5'
+                  }}
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center">
-                  <User className="w-10 h-10 text-white" />
+                <div style={{
+                  width: '100px', height: '100px', borderRadius: '50%',
+                  background: '#f5f5f5', border: '2px dashed #d5d5d5',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <User style={{ width: '40px', height: '40px', color: '#ccc' }} />
                 </div>
               )}
-              <label className="flex-1 cursor-pointer">
-                <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 transition-all">
-                  {uploading ? (
-                    <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
-                  ) : (
-                    <Upload className="w-4 h-4 text-gray-600" />
-                  )}
-                  <span className="text-sm font-medium text-gray-700">
-                    {uploading ? 'Upload...' : 'Choisir une photo'}
-                  </span>
-                </div>
+              <label style={{
+                position: 'absolute', bottom: '0', right: '0',
+                width: '32px', height: '32px', borderRadius: '50%',
+                background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', border: '2px solid #fff'
+              }}>
+                {uploading ? (
+                  <Loader2 style={{ width: '14px', height: '14px', color: '#fff' }} className="animate-spin" />
+                ) : (
+                  <Camera style={{ width: '14px', height: '14px', color: '#fff' }} />
+                )}
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleFileUpload}
-                  className="hidden"
+                  style={{ display: 'none' }}
                   disabled={uploading}
                 />
               </label>
             </div>
+            <button
+              onClick={() => document.querySelector('input[type="file"]').click()}
+              disabled={uploading}
+              style={{
+                background: 'none', border: 'none', fontSize: '13px',
+                color: '#888', cursor: 'pointer', fontWeight: 500,
+                fontFamily: "'Inter', sans-serif"
+              }}
+            >
+              {uploading ? 'Upload en cours...' : formData.avatar_url ? 'Changer la photo' : 'Ajouter une photo'}
+            </button>
           </div>
 
-          {/* First Name */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Prénom <span className="text-red-500">*</span>
+          {/* First Name — pre-filled */}
+          <div style={{ marginBottom: '8px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#666', marginBottom: '8px' }}>
+              Prénom
             </label>
             <input
               type="text"
               value={formData.first_name}
-              onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-              placeholder="Comment tu t'appelles ?"
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 text-gray-900 focus:outline-none focus:border-[#61f7a2] focus:ring-1 focus:ring-[#61f7a2] transition-all"
+              onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+              placeholder="Ton prénom"
+              style={{
+                width: '100%', padding: '14px 16px', borderRadius: '14px',
+                border: '1px solid #e5e5e5', fontSize: '15px', color: '#1a1a1a',
+                outline: 'none', fontFamily: "'Inter', sans-serif",
+                transition: 'border-color 0.2s', background: '#fff',
+                boxSizing: 'border-box'
+              }}
+              onFocus={e => e.target.style.borderColor = '#1a1a1a'}
+              onBlur={e => e.target.style.borderColor = '#e5e5e5'}
             />
           </div>
+        </motion.div>
 
-          {/* Last Name */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nom (optionnel)
-            </label>
-            <input
-              type="text"
-              value={formData.last_name}
-              onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-              placeholder="Ton nom de famille"
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 text-gray-900 focus:outline-none focus:border-[#61f7a2] focus:ring-1 focus:ring-[#61f7a2] transition-all"
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="space-y-3">
-            <GlowButton
-              onClick={handleSave}
-              loading={saving}
-              disabled={!formData.first_name.trim()}
-              icon={CheckCircle}
-              className="w-full"
-              size="lg"
-            >
-              Enregistrer et continuer
-            </GlowButton>
-            <button
-              onClick={handleSkip}
-              className="w-full py-3 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-              disabled={saving}
-            >
-              Passer cette étape
-            </button>
-          </div>
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          style={{ textAlign: 'center' }}
+        >
+          <button
+            onClick={handleSave}
+            disabled={saving || !formData.first_name.trim()}
+            style={{
+              background: '#1a1a1a', color: '#fff', border: 'none',
+              padding: '16px 36px', borderRadius: '100px', fontSize: '15px',
+              fontWeight: 600, cursor: 'pointer', display: 'inline-flex',
+              alignItems: 'center', gap: '8px', transition: 'opacity 0.2s',
+              fontFamily: "'Inter', sans-serif",
+              opacity: saving || !formData.first_name.trim() ? 0.5 : 1
+            }}
+            onMouseOver={e => { if (!saving) e.currentTarget.style.opacity = '0.85'; }}
+            onMouseOut={e => { if (!saving) e.currentTarget.style.opacity = '1'; }}
+          >
+            {saving ? (
+              <>
+                <Loader2 style={{ width: '16px', height: '16px' }} className="animate-spin" />
+                Chargement...
+              </>
+            ) : (
+              <>
+                Accéder à mon dashboard <ArrowRight size={16} />
+              </>
+            )}
+          </button>
         </motion.div>
       </div>
     </div>

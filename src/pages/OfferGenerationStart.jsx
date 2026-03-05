@@ -2,26 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Sparkles, Zap, Check, TrendingUp, Gift, Award, Crown } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Brain, Sparkles, Zap, Check, Gift, Award, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function OfferGenerationStart() {
   const navigate = useNavigate();
-  const [dots, setDots] = useState(0);
-  const [currentMessage, setCurrentMessage] = useState(0);
   const [error, setError] = useState(null);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  // Timer pour afficher le temps écoulé
   useEffect(() => {
-    const timerInterval = setInterval(() => {
-      setElapsedTime(prev => prev + 1);
-    }, 1000);
-
+    const timerInterval = setInterval(() => setElapsedTime(prev => prev + 1), 1000);
     return () => clearInterval(timerInterval);
   }, []);
 
@@ -31,136 +24,32 @@ export default function OfferGenerationStart() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Témoignages clients
-  const testimonials = [
-    {
-      name: "Sandra",
-      skill: "Yoga",
-      result: "2 500€ de ventes avec son petit produit",
-      icon: "🧘‍♀️"
-    },
-    {
-      name: "Jérôme",
-      skill: "Techniques de sommeil",
-      result: "A quitté son job pour enseigner aux sportifs",
-      icon: "😴"
-    },
-    {
-      name: "Marie",
-      skill: "Pâtisserie",
-      result: "4 200€ en 3 mois avec ses formations",
-      icon: "🍰"
-    },
-    {
-      name: "Thomas",
-      skill: "Photographie",
-      result: "15 clients en 2 semaines avec son offre starter",
-      icon: "📸"
-    },
-    {
-      name: "Léa",
-      skill: "Développement web",
-      result: "8 000€ le premier mois avec son système d'offres",
-      icon: "💻"
-    }
-  ];
-
-  // Étapes de préparation avec explications
   const preparationSteps = [
-    {
-      title: "Low Ticket",
-      description: "Une petite offre pour attirer et convertir facilement tes premiers clients",
-      icon: Gift,
-      color: "from-green-500 to-green-600",
-      status: "in-progress"
-    },
-    {
-      title: "Order Bump",
-      description: "Un complément irrésistible qui booste ton panier moyen de 30-40%",
-      icon: Sparkles,
-      color: "from-purple-500 to-purple-600",
-      status: "pending"
-    },
-    {
-      title: "Offre Supérieure",
-      description: "Pour les clients prêts à aller plus loin avec toi (×2-3 ton revenu)",
-      icon: Award,
-      color: "from-orange-500 to-orange-600",
-      status: "pending"
-    },
-    {
-      title: "Offre Premium",
-      description: "Ton accompagnement VIP qui maximise ton revenu par client",
-      icon: Crown,
-      color: "from-yellow-500 to-yellow-600",
-      status: "pending"
-    }
-  ];
-
-  const messages = [
-    "J'analyse ton marché",
-    "Je structure tes offres",
-    "Je fixe tes prix",
-    "Je valide la demande",
-    "Je projette ton potentiel de revenus",
-    "J'élabore ton plan d'action personnalisé"
+    { title: "Low Ticket", description: "Une petite offre pour attirer et convertir tes premiers clients", icon: Gift, status: "in-progress" },
+    { title: "Order Bump", description: "Un complément irrésistible qui booste ton panier moyen", icon: Sparkles, status: "pending" },
+    { title: "Offre Supérieure", description: "Pour les clients prêts à aller plus loin (×2-3 ton revenu)", icon: Award, status: "pending" },
+    { title: "Offre Premium", description: "Ton accompagnement VIP qui maximise ton revenu", icon: Crown, status: "pending" }
   ];
 
   useEffect(() => {
-    const dotsInterval = setInterval(() => {
-      setDots(prev => (prev + 1) % 4);
-    }, 500);
-
     generateOffer();
-
-    return () => {
-      clearInterval(dotsInterval);
-    };
   }, []);
 
-  // Rotation des témoignages toutes les 4 secondes
-  useEffect(() => {
-    const testimonialInterval = setInterval(() => {
-      setCurrentTestimonial(prev => (prev + 1) % testimonials.length);
-    }, 4000);
-
-    return () => clearInterval(testimonialInterval);
-  }, []);
-
-  // Progression des étapes toutes les 3 secondes
   useEffect(() => {
     const stepInterval = setInterval(() => {
-      setCurrentStep(prev => {
-        if (prev < preparationSteps.length - 1) {
-          return prev + 1;
-        }
-        return prev;
-      });
+      setCurrentStep(prev => prev < preparationSteps.length - 1 ? prev + 1 : prev);
     }, 3000);
-
     return () => clearInterval(stepInterval);
   }, []);
 
-  // Helper: attente avec backoff exponentiel
   const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  // Helper: retry transparent pour les appels réseau
   const retryableCall = async (fn, { maxRetries = 3, baseDelay = 2000, label = 'call' } = {}) => {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        return await fn();
-      } catch (err) {
-        const isRetryable = err.message?.includes('429') ||
-                           err.message?.includes('Too Many') ||
-                           err.message?.includes('overloaded') ||
-                           err.message?.includes('529') ||
-                           err.message?.includes('timeout') ||
-                           err.message?.includes('network') ||
-                           err.message?.includes('fetch');
-
+      try { return await fn(); } catch (err) {
+        const isRetryable = err.message?.includes('429') || err.message?.includes('overloaded') || err.message?.includes('529') || err.message?.includes('timeout') || err.message?.includes('network') || err.message?.includes('fetch');
         if (isRetryable && attempt < maxRetries) {
-          const delay = baseDelay * Math.pow(2, attempt); // 2s, 4s, 8s
-          console.warn(`⚠️ [OFFER_START] ${label} attempt ${attempt + 1} failed, retry in ${delay}ms...`);
+          const delay = baseDelay * Math.pow(2, attempt);
           setIsRetrying(true);
           await wait(delay);
           continue;
@@ -172,463 +61,220 @@ export default function OfferGenerationStart() {
 
   const generateOffer = async () => {
     try {
-      const user = await retryableCall(
-        () => base44.auth.me(),
-        { label: 'auth.me', maxRetries: 2, baseDelay: 1500 }
-      );
-
-      // Utiliser activeSessionId (localStorage) avec fallback sur user.sessionId
+      const user = await retryableCall(() => base44.auth.me(), { label: 'auth.me', maxRetries: 2, baseDelay: 1500 });
       const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || user.sessionId;
-      if (!resolvedSessionId) {
-        console.error('❌ [OFFER_START] Pas de sessionId');
-        navigate(createPageUrl('OnboardingFirstName'));
-        return;
-      }
+      if (!resolvedSessionId) { navigate(createPageUrl('OnboardingFirstName')); return; }
 
-      // Charger session avec retry robuste
       let sessions = null;
       try {
-        sessions = await retryableCall(
-          () => base44.entities.Session.filter({ id: resolvedSessionId }),
-          { label: 'session.filter', maxRetries: 3, baseDelay: 2000 }
-        );
+        sessions = await retryableCall(() => base44.entities.Session.filter({ id: resolvedSessionId }), { label: 'session.filter', maxRetries: 3, baseDelay: 2000 });
       } catch (fetchError) {
-        console.error('❌ [OFFER_START] Fetch session failed after retries:', fetchError);
         setIsRetrying(false);
-        setError({
-          type: 'fetch_error',
-          message: 'Impossible de charger tes données. Vérifie ta connexion.'
-        });
+        setError({ type: 'fetch_error', message: 'Impossible de charger tes données. Vérifie ta connexion.' });
         return;
       }
 
       if (!sessions || sessions.length === 0) {
-        console.error('❌ [OFFER_START] Session introuvable:', user.sessionId);
         try {
-          const fallbackSessions = await retryableCall(
-            () => base44.entities.Session.filter({ created_by: user.email }),
-            { label: 'session.fallback', maxRetries: 2, baseDelay: 2000 }
-          );
+          const fallbackSessions = await retryableCall(() => base44.entities.Session.filter({ created_by: user.email }), { label: 'session.fallback', maxRetries: 2, baseDelay: 2000 });
           if (fallbackSessions.length > 0) {
-            console.warn('⚠️ [OFFER_START] Fallback sur created_by');
-            const latestSession = fallbackSessions.sort((a, b) =>
-              new Date(b.created_date) - new Date(a.created_date)
-            )[0];
+            const latestSession = fallbackSessions.sort((a, b) => new Date(b.created_date) - new Date(a.created_date))[0];
             await base44.auth.updateMe({ sessionId: latestSession.id });
             sessions = [latestSession];
-          } else {
-            navigate(createPageUrl('OnboardingFirstName'));
-            return;
-          }
-        } catch {
-          navigate(createPageUrl('OnboardingFirstName'));
-          return;
-        }
+          } else { navigate(createPageUrl('OnboardingFirstName')); return; }
+        } catch { navigate(createPageUrl('OnboardingFirstName')); return; }
       }
 
       const session = sessions[0];
       const sessionId = session.id;
 
-      console.log('✅ [OFFER_START] Session loaded:', {
-        sessionId,
-        historyLength: session.onboarding_history?.length || 0,
-        summaryKeys: Object.keys(session.onboarding_summary || {}),
-        fullKeys: Object.keys(session.onboarding_full || {}),
-        isDone: session.is_onboarding_done,
-        skill: session.skill
-      });
-
-      // ✅ Validation stricte étape par étape
       if (!session.is_onboarding_done || (session.onboarding_history?.length || 0) < 11) {
-        console.error('❌ [OfferGenerationStart] Onboarding incomplet:', {
-          isDone: session.is_onboarding_done,
-          historyLength: session.onboarding_history?.length || 0
-        });
-        navigate(createPageUrl('OnboardingDynamic'));
-        return;
+        navigate(createPageUrl('OnboardingDynamic')); return;
       }
 
-      // 🔥 Validation stricte + redirect intelligent
       const requiredFullKeys = ['targetIncome', 'perceivedObstacles', 'readinessScore'];
       const fullData = session.onboarding_full || {};
       const missingKeys = requiredFullKeys.filter(k => !fullData[k] && fullData[k] !== 0);
 
-      console.log('🔍 [OFFER_START]', {
-        sessionId,
-        missingFields: missingKeys,
-        fullDataKeys: Object.keys(fullData),
-        status: missingKeys.length === 0 ? 'ready' : 'incomplete'
-      });
-
       if (missingKeys.length > 0) {
-        const redirectMap = {
-          'targetIncome': 'OnboardingQ16TargetIncome',
-          'perceivedObstacles': 'OnboardingQ23Obstacles',
-          'readinessScore': 'OnboardingQ25Readiness'
-        };
-
-        const firstMissing = missingKeys[0];
-        const redirectPage = redirectMap[firstMissing] || 'OnboardingQ16TargetIncome';
-
-        console.log('🔄 [OFFER_START] Redirect:', redirectPage, 'missing:', missingKeys);
-        navigate(createPageUrl(redirectPage));
-        return;
+        const redirectMap = { 'targetIncome': 'OnboardingQ16TargetIncome', 'perceivedObstacles': 'OnboardingQ23Obstacles', 'readinessScore': 'OnboardingQ25Readiness' };
+        navigate(createPageUrl(redirectMap[missingKeys[0]] || 'OnboardingQ16TargetIncome')); return;
       }
 
-      const missingData = [];
+      if (!user.firstName) { navigate(createPageUrl('OnboardingFirstName')); return; }
+      if (!session.skill && !fullData.coreSkill && !session.onboarding_summary?.who_to_teach) { navigate(createPageUrl('OnboardingFirstName')); return; }
 
-      if (!user.firstName) {
-        missingData.push('firstName');
-      }
-
-      if (!session.skill && !fullData.coreSkill && !session.onboarding_summary?.who_to_teach) {
-        missingData.push('skill');
-      }
-
-      if (missingData.length > 0) {
-        console.error('❌ Données manquantes pour générer l\'offre:', missingData);
-
-        // Rediriger intelligemment selon ce qui manque
-        if (missingData.some(d => d.includes('onboarding_history'))) {
-          navigate(createPageUrl('OnboardingDynamic'));
-        } else if (missingData.some(d => d.includes('réponses statiques'))) {
-          navigate(createPageUrl('OnboardingQ12AgeRange'));
-        } else {
-          navigate(createPageUrl('OnboardingFirstName'));
-        }
-        return;
-      }
-
-      console.log('✅ [OfferGenerationStart] Toutes les données validées, génération...');
-
-      // 🔥 Generate Full Stack Offer avec retry automatique (P.S.S.O.)
       let response;
       try {
-        response = await retryableCall(
-          () => base44.functions.invoke('generateFullStackOffer', { sessionId }),
-          { label: 'generateFullStackOffer', maxRetries: 3, baseDelay: 3000 }
-        );
+        response = await retryableCall(() => base44.functions.invoke('generateFullStackOffer', { sessionId }), { label: 'generateFullStackOffer', maxRetries: 3, baseDelay: 3000 });
       } catch (genError) {
-        console.error('❌ [OFFER_START] Generation failed after retries:', genError);
         setIsRetrying(false);
-        setError({
-          type: 'generation_error',
-          message: 'La génération a pris trop de temps. Réessaye, ça devrait marcher !'
-        });
+        setError({ type: 'generation_error', message: 'La génération a pris trop de temps. Réessaye !' });
         return;
       }
-
       setIsRetrying(false);
 
-      console.log('📨 [OfferGenerationStart] Réponse génération:', {
-        hasError: !!response.data?.error,
-        error: response.data?.error,
-        success: response.data?.success,
-        fromCache: response.data?.fromCache
-      });
-
-      // Si erreur dans la réponse, retenter automatiquement 1 fois
       if (response.data?.error) {
-        console.warn('⚠️ [OfferGenerationStart] Erreur dans réponse, retry auto...');
         setIsRetrying(true);
         await wait(3000);
         try {
           response = await base44.functions.invoke('generateFullStackOffer', { sessionId });
           setIsRetrying(false);
           if (response.data?.error || !response.data?.success) {
-            setError({
-              type: 'generation_error',
-              message: 'La génération a rencontré un souci. Réessaye dans quelques instants.'
-            });
-            return;
+            setError({ type: 'generation_error', message: 'La génération a rencontré un souci. Réessaye.' }); return;
           }
         } catch {
           setIsRetrying(false);
-          setError({
-            type: 'generation_error',
-            message: 'La génération a rencontré un souci. Réessaye dans quelques instants.'
-          });
-          return;
+          setError({ type: 'generation_error', message: 'La génération a rencontré un souci. Réessaye.' }); return;
         }
       }
 
       if (!response.data?.success) {
-        console.error('❌ [OfferGenerationStart] Génération non confirmée');
-        setError({
-          type: 'generation_error',
-          message: 'La génération n\'a pas pu être confirmée. Réessaye.'
-        });
-        return;
+        setError({ type: 'generation_error', message: 'La génération n\'a pas pu être confirmée.' }); return;
       }
-
-      console.log('✅ [OfferGenerationStart] Génération réussie → Navigation');
       navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
-      console.error('❌ [OFFER_START] Error:', error);
       setIsRetrying(false);
-      setError({
-        type: 'generation_error',
-        message: error.message || 'Une erreur est survenue'
-      });
+      setError({ type: 'generation_error', message: error.message || 'Une erreur est survenue' });
     }
   };
 
   const handleRetry = () => {
-    setError(null);
-    setIsRetrying(false);
-    setElapsedTime(0);
-    setCurrentStep(0);
+    setError(null); setIsRetrying(false); setElapsedTime(0); setCurrentStep(0);
     generateOffer();
   };
 
-  // Écran d'erreur avec retry (affiché seulement après épuisement des retries automatiques)
   if (error) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-white flex items-center justify-center z-50"
+           style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
         <div className="text-center max-w-md px-6">
-          <div className="w-20 h-20 rounded-full bg-amber-50 mx-auto mb-6 flex items-center justify-center">
+          <div className="w-20 h-20 rounded-2xl bg-[#f8f8f8] mx-auto mb-6 flex items-center justify-center">
             <span className="text-4xl">🔄</span>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            Un petit souci temporaire
-          </h2>
-          <p className="text-gray-600 mb-6">
-            {error.message || 'La génération a pris plus de temps que prévu. Relance et tout devrait fonctionner !'}
-          </p>
-          <Button
-            onClick={handleRetry}
-            className="bg-[#61f7a2] hover:bg-[#4de88f] text-white px-8 py-3 rounded-xl font-semibold"
-          >
+          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-3">Un petit souci temporaire</h2>
+          <p className="text-[#888] mb-6">{error.message}</p>
+          <button onClick={handleRetry}
+            style={{ background: '#1a1a1a', color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '100px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
             Relancer la génération
-          </Button>
-          <p className="text-xs text-gray-400 mt-4">
-            Nos serveurs sont parfois très sollicités, ça passe en général au 2e essai
-          </p>
+          </button>
+          <p className="text-xs text-[#bbb] mt-4">Nos serveurs sont parfois très sollicités</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white overflow-x-hidden">
-      {/* Contenu principal */}
-      <div className="min-h-screen flex flex-col items-center justify-start pt-24 lg:pt-8 pb-12 px-6">
-        <div className="max-w-2xl w-full">
-          {/* Nova AI Avatar avec cerveau animé */}
+    <div className="min-h-screen bg-white overflow-x-hidden"
+         style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+      {/* Neon ambient */}
+      <div style={{ position: 'fixed', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%)', top: '5%', left: '-5%', filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'fixed', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.10) 0%, transparent 70%)', bottom: '10%', right: '-3%', filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'fixed', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(167,139,250,0.10) 0%, transparent 70%)', bottom: '5%', left: '15%', filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0 }} />
+
+      <div className="min-h-screen flex flex-col items-center justify-start pt-20 lg:pt-8 pb-12 px-6 relative z-10">
+        <div className="max-w-xl w-full">
+          {/* Animated icon */}
           <motion.div
-            animate={{ 
-              scale: [1, 1.08, 1],
-              rotate: [0, 3, -3, 0]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="relative mx-auto mb-8 w-28 h-28"
+            animate={{ scale: [1, 1.06, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="relative mx-auto mb-8 w-24 h-24"
           >
-            <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#61f7a2] via-[#4de88f] to-[#3ad87f] flex items-center justify-center shadow-2xl">
-              <motion.div
-                animate={{ 
-                  scale: [1, 1.15, 1],
-                  rotate: [0, 10, -10, 0]
-                }}
-                transition={{ 
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                <Brain className="w-14 h-14 text-white" />
+            <div className="w-24 h-24 rounded-2xl bg-[#1a1a1a] flex items-center justify-center shadow-xl">
+              <motion.div animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
+                <Brain className="w-12 h-12 text-white" />
               </motion.div>
             </div>
-            
-            {/* Ondes d'énergie autour */}
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute inset-0 rounded-3xl border-2 border-[#61f7a2]"
-                initial={{ scale: 1, opacity: 0.6 }}
-                animate={{ 
-                  scale: [1, 1.4, 1.8],
-                  opacity: [0.6, 0.3, 0]
-                }}
-                transition={{ 
-                  duration: 2,
-                  repeat: Infinity,
-                  delay: i * 0.6,
-                  ease: "easeOut"
-                }}
-              />
+            {[...Array(2)].map((_, i) => (
+              <motion.div key={i} className="absolute inset-0 rounded-2xl border border-[#1a1a1a]"
+                initial={{ scale: 1, opacity: 0.3 }}
+                animate={{ scale: [1, 1.5, 2], opacity: [0.3, 0.1, 0] }}
+                transition={{ duration: 2, repeat: Infinity, delay: i * 0.7, ease: "easeOut" }} />
             ))}
-            
-            {/* Particules qui tournent */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-              className="absolute -inset-8"
-            >
-              <Zap className="absolute top-0 left-1/2 w-5 h-5 text-[#61f7a2] opacity-80" />
-              <Sparkles className="absolute top-1/2 right-0 w-5 h-5 text-[#4de88f] opacity-80" />
-            </motion.div>
-            
-            {/* Glow effect pulsant */}
-            <motion.div
-              animate={{ 
-                scale: [1, 1.3, 1],
-                opacity: [0.4, 0.7, 0.4]
-              }}
-              transition={{ 
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="absolute inset-0 rounded-3xl bg-[#61f7a2] blur-2xl -z-10"
-            />
           </motion.div>
 
-          {/* Message */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="mb-6 text-center"
-          >
-            <p className="text-xl font-semibold text-gray-800 mb-2">
-              Noah construit ton offre…
-            </p>
-            
-            {/* Timer */}
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <div className="bg-gray-100 px-4 py-2 rounded-xl flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-gray-700 font-mono font-semibold text-lg">
-                  {formatTime(elapsedTime)}
-                </span>
-              </div>
+          {/* Message & Timer */}
+          <div className="text-center mb-6">
+            <p className="text-xl font-semibold text-[#1a1a1a] mb-3">Noah construit ton offre…</p>
+            <div className="inline-flex items-center gap-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-full px-4 py-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[#1a1a1a] font-mono font-semibold text-lg">{formatTime(elapsedTime)}</span>
             </div>
-            
-            {/* Loading dots */}
             <div className="flex items-center justify-center gap-2">
               {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  animate={{ 
-                    scale: [1, 1.5, 1],
-                    opacity: [0.3, 1, 0.3]
-                  }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    delay: i * 0.2
-                  }}
-                  className="w-2.5 h-2.5 rounded-full bg-[#61f7a2]"
-                />
+                <motion.div key={i}
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                  className="w-2 h-2 rounded-full bg-[#1a1a1a]" />
               ))}
             </div>
-          </motion.div>
+          </div>
 
-          {/* Encadré d'information */}
+          {/* Info banner */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 2 }}
-            className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-5 mb-6"
+            className="rounded-2xl p-5 mb-6 border border-[#e5e5e5] bg-[#f8f8f8]"
           >
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-xl">✨</span>
+              <div className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+                   style={{ background: 'linear-gradient(135deg, #f97316, #ec4899)' }}>
+                <span className="text-base">✨</span>
               </div>
               <div className="flex-1">
-                <h3 className="text-amber-900 font-bold text-base mb-2 flex items-center gap-2">
-                  🎯 Génération en cours...
-                </h3>
-                <p className="text-amber-800 text-sm leading-relaxed mb-1.5">
-                  Pour des offres <span className="font-semibold">ultra-personnalisées et optimales</span>, la génération peut prendre jusqu'à <span className="font-semibold">5 minutes</span>.
+                <h3 className="text-[#1a1a1a] font-bold text-sm mb-1">🎯 Génération en cours...</h3>
+                <p className="text-[#666] text-sm leading-relaxed mb-1">
+                  Pour des offres <span className="font-semibold">ultra-personnalisées</span>, la génération peut prendre jusqu'à <span className="font-semibold">5 minutes</span>.
                 </p>
-                <p className="text-amber-900 font-semibold text-sm">
-                  ⚠️ Ne ferme surtout pas cette page ! Laisse la magie opérer... 🪄
-                </p>
+                <p className="text-[#1a1a1a] font-semibold text-sm">⚠️ Ne ferme surtout pas cette page !</p>
               </div>
             </div>
           </motion.div>
 
-          {/* Étapes de préparation */}
-          <div className="space-y-3 mt-6">
+          {/* Steps */}
+          <div className="space-y-3">
             {preparationSteps.map((step, index) => {
               const Icon = step.icon;
               const isCompleted = index < currentStep;
               const isInProgress = index === currentStep;
-              
+
               return (
-                <motion.div
-                  key={index}
+                <motion.div key={index}
                   initial={{ opacity: 0, x: -20 }}
-                  animate={{ 
-                    opacity: index <= currentStep ? 1 : 0.4,
-                    x: 0 
-                  }}
-                  transition={{ 
-                    duration: 0.5,
-                    delay: index * 0.1 
-                  }}
-                  className={`relative rounded-xl p-4 transition-all duration-300 ${
-                    isCompleted 
-                      ? 'bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-200' 
-                      : isInProgress
-                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-200'
-                      : 'bg-white border-2 border-gray-200'
+                  animate={{ opacity: index <= currentStep ? 1 : 0.4, x: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className={`relative rounded-xl p-4 transition-all duration-300 border ${
+                    isCompleted ? 'bg-[#f0faf4] border-[#c6f0d4]' :
+                    isInProgress ? 'bg-[#f8f8f8] border-[#1a1a1a]' :
+                    'bg-white border-[#e5e5e5]'
                   }`}
                 >
                   <div className="flex items-start gap-4">
-                    {/* Icône */}
-                    <div className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center ${
-                      isInProgress ? 'animate-pulse' : ''
+                    <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
+                      isCompleted ? 'bg-[#1a1a1a]' : isInProgress ? 'bg-[#1a1a1a] animate-pulse' : 'bg-[#f0f0f0]'
                     }`}>
-                      {isCompleted ? (
-                        <Check className="w-6 h-6 text-white" />
-                      ) : (
-                        <Icon className="w-6 h-6 text-white" />
-                      )}
+                      {isCompleted ? <Check className="w-5 h-5 text-white" /> : <Icon className={`w-5 h-5 ${isInProgress ? 'text-white' : 'text-[#ccc]'}`} />}
                     </div>
-                    
-                    {/* Contenu */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                      <h3 className="font-semibold text-[#1a1a1a] mb-0.5 flex items-center gap-2 text-sm">
                         {step.title}
                         {isInProgress && (
-                          <motion.div
-                            animate={{ opacity: [0.5, 1, 0.5] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="flex gap-1"
-                          >
-                            <div className="w-1 h-1 rounded-full bg-blue-500" />
-                            <div className="w-1 h-1 rounded-full bg-blue-500" />
-                            <div className="w-1 h-1 rounded-full bg-blue-500" />
+                          <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }} className="flex gap-0.5">
+                            {[0,1,2].map(d => <div key={d} className="w-1 h-1 rounded-full bg-[#1a1a1a]" />)}
                           </motion.div>
                         )}
                       </h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        {step.description}
-                      </p>
+                      <p className="text-xs text-[#888] leading-relaxed">{step.description}</p>
                     </div>
-                    
-                    {/* Statut */}
-                    {isCompleted && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="flex-shrink-0"
-                      >
-                        <span className="text-green-600 font-semibold text-sm">✓</span>
-                      </motion.div>
-                    )}
                   </div>
-                  
-                  {/* Barre de progression pour l'étape en cours */}
+
                   {isInProgress && (
                     <motion.div
-                      className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-b-xl"
+                      className="absolute bottom-0 left-0 h-[2px] rounded-b-xl"
+                      style={{ background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)' }}
                       initial={{ width: '0%' }}
                       animate={{ width: '100%' }}
                       transition={{ duration: 3, ease: 'linear' }}

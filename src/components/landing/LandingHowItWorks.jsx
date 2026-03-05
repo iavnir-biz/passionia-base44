@@ -185,7 +185,7 @@ export default function LandingHowItWorks() {
                             marginLeft: '6px',
                             textAlign: 'center',
                           }}>
-                            app.iavenir.fr
+                            app.iavnir.fr
                           </div>
                         </div>
                         <img

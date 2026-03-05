@@ -32,7 +32,7 @@ export default function NoahWelcomeBanner() {
           padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)',
           fontWeight: 500, marginBottom: '16px', border: '1px solid rgba(255,255,255,0.08)'
         }}>
-          ✨ Nouveau
+          🚀 L'aventure commence
         </div>
         <h2 style={{
           fontSize: 'clamp(18px, 3vw, 24px)', fontWeight: 600, color: '#fff',
@@ -43,10 +43,10 @@ export default function NoahWelcomeBanner() {
             fontStyle: 'italic',
             background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-          }}>iAvenir Lab</span>
+          }}>iavnirLab</span>
         </h2>
         <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, maxWidth: '500px' }}>
-          La méthode complète pour vendre tes premiers produits de formation en ligne.
+          La méthode complète pour vendre tes premiers produits de formation en ligne et enfin vivre de ton savoir-faire.
         </p>
       </div>
     </motion.div>

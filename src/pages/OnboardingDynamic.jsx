@@ -224,17 +224,17 @@ export default function OnboardingDynamic() {
 
                 {currentQuestion.subtitle && (
                   <p style={{
-                    fontSize: '15px',
+                    fontSize: '14px',
                     color: '#888',
                     lineHeight: 1.6,
-                    maxWidth: '440px',
-                    margin: '0 auto 32px',
+                    maxWidth: '420px',
+                    margin: '0 auto 28px',
                   }}>
                     {currentQuestion.subtitle}
                   </p>
                 )}
 
-                {!currentQuestion.subtitle && <div style={{ height: '20px' }} />}
+                {!currentQuestion.subtitle && <div style={{ height: '16px' }} />}
 
                 {/* Text input */}
                 {currentQuestion.type === 'text' && (

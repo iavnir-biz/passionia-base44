@@ -7,10 +7,11 @@ import { CheckCircle2, Package, Rocket, FileText, Brain } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const items = [
-  { icon: CheckCircle2, color: 'text-blue-500', bg: 'bg-blue-50', title: 'Ton idée validée et ton positionnement' },
-  { icon: Package, color: 'text-pink-500', bg: 'bg-pink-50', title: '4 offres personnalisées, prêtes à vendre' },
-  { icon: FileText, color: 'text-amber-500', bg: 'bg-amber-50', title: 'Pages de vente, emails et messages' },
-  { icon: Rocket, color: 'text-green-500', bg: 'bg-green-50', title: 'Un plan d\'action sur 7 jours' },
+  { icon: CheckCircle2, color: 'text-blue-500', bg: 'bg-blue-50', title: 'Ton idée validée' },
+  { icon: Package, color: 'text-pink-500', bg: 'bg-pink-50', title: 'Tes 4 offres sur-mesure avec les prix' },
+  { icon: FileText, color: 'text-amber-500', bg: 'bg-amber-50', title: 'Les messages pour vendre' },
+  { icon: Rocket, color: 'text-green-500', bg: 'bg-green-50', title: 'La checklist de lancement' },
+  { icon: TrendingUp, color: 'text-purple-500', bg: 'bg-purple-50', title: '1 structure d\'ascension claire' },
 ];
 
 const statusTexts = [

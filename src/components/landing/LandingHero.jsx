@@ -133,11 +133,11 @@ export default function LandingHero({ onCTA }) {
         flexWrap: 'wrap'
       }}>
         <AnimatedTooltip items={[
-          { id: 1, name: "Sophie M.", designation: "Coach bien-être", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" },
-          { id: 2, name: "Thomas L.", designation: "Formateur fitness", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" },
-          { id: 3, name: "Marie P.", designation: "Photographe", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" },
-          { id: 4, name: "Lucas B.", designation: "Coach sportif", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" },
-          { id: 5, name: "Émilie V.", designation: "Designer", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face" },
+          { id: 1, name: "Sophie M.", designation: "Coach bien-être", image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/ec762acef_WhatsAppImage2026-03-05at190938.jpg" },
+          { id: 2, name: "Thomas L.", designation: "Formateur fitness", image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/1edef10d3_WhatsAppImage2026-03-05at1909383.jpg" },
+          { id: 3, name: "Marie P.", designation: "Photographe", image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/c5613076a_WhatsAppImage2026-03-05at1909381.jpg" },
+          { id: 4, name: "Lucas B.", designation: "Coach sportif", image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/4ccf19cfc_WhatsAppImage2026-03-05at1909384.jpg" },
+          { id: 5, name: "Émilie V.", designation: "Designer", image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/5f1c7bd56_Screenshotfrom20250415193811png_67fe9999ae1b7.png" },
         ]} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '8px' }}>
           <div style={{ display: 'flex', gap: '2px' }}>

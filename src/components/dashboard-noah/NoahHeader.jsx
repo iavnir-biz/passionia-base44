@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { Bell, LayoutGrid, Menu, ArrowRight } from 'lucide-react';
 
 export default function NoahHeader({ onMenuClick, onToggleSidebar }) {
+  const navigate = useNavigate();
   return (
     <header className="h-14 bg-white border-b border-[#e5e5e5] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40"
             style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
@@ -24,7 +27,7 @@ export default function NoahHeader({ onMenuClick, onToggleSidebar }) {
       <div className="flex items-center gap-2">
         <a
           href="#"
-          onClick={(e) => e.preventDefault()}
+          onClick={(e) => { e.preventDefault(); navigate(createPageUrl('SettingsNoah') + '?tab=affiliation'); }}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '6px',
             background: '#1a1a1a', color: '#fff', border: 'none',

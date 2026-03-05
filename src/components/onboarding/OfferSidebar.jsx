@@ -34,10 +34,7 @@ export default function OfferSidebar({ currentPage, currentStep: propStep }) {
            style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-        {/* Header */}
-        <div className="mb-8">
-          <p className="text-sm font-semibold text-[#1a1a1a]">Ton offre complète</p>
-        </div>
+
 
         {/* Steps */}
         <div className="flex-1 space-y-2">

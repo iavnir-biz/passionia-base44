@@ -161,10 +161,10 @@ export default function OnboardingDynamic() {
     }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-      {/* Progress bar — minimal top line */}
+      {/* Progress bar — gradient top line */}
       <div style={{ width: '100%', height: '3px', background: '#f0f0f0' }}>
         <motion.div
-          style={{ height: '100%', background: '#1a1a1a', borderRadius: '0 4px 4px 0' }}
+          style={{ height: '100%', background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)', borderRadius: '0 4px 4px 0' }}
           initial={{ width: '0%' }}
           animate={{ width: `${(questionNumber / 11) * 100}%` }}
           transition={{ duration: 0.5 }}

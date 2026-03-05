@@ -83,9 +83,27 @@ export default function OfferSuperieure() {
         <div style={{ position: 'absolute', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)', bottom: '10%', left: '5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
 
         <div className="max-w-3xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-[#1a1a1a] mb-2">Choisis ton Offre Supérieure</h2>
-            <p className="text-[#888] text-sm max-w-lg mx-auto">Une solution plus complète pour tes élèves motivés.</p>
+          {/* Title — Landing style */}
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <h1 style={{
+              fontSize: 'clamp(28px, 4.5vw, 44px)',
+              fontWeight: 400,
+              lineHeight: 1.15,
+              letterSpacing: '-0.03em',
+              color: '#1a1a1a',
+              marginBottom: '12px'
+            }}>
+              Choisis ton <span style={{
+                fontStyle: 'italic',
+                fontWeight: 500,
+                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>Offre Supérieure</span>
+            </h1>
+            <p style={{ fontSize: '16px', color: '#888', lineHeight: 1.6, maxWidth: '500px', margin: '0 auto' }}>
+              Une solution plus complète pour tes élèves motivés.
+            </p>
           </div>
 
           {offers.length === 0 ? (

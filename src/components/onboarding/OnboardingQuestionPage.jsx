@@ -145,8 +145,13 @@ export default function OnboardingQuestionPage({
         return;
       }
 
-      await base44.auth.updateMe({ [fieldName]: value });
-      const activeSessionId = localStorage.getItem('passionia_active_session_id') || user.sessionId;
+      try {
+        await base44.auth.updateMe({ [fieldName]: value });
+      } catch (updateMeError) {
+        console.warn('⚠️ updateMe failed (field may not exist on User):', updateMeError);
+      }
+      const currentUser = await base44.auth.me();
+      const activeSessionId = localStorage.getItem('passionia_active_session_id') || currentUser?.sessionId;
       if (activeSessionId && fieldName) {
         try {
           const sessions = await base44.entities.Session.filter({ id: activeSessionId });

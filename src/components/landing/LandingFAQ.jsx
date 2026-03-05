@@ -87,11 +87,16 @@ export default function LandingFAQ() {
   }, []);
 
   const faqs = [
-    { q: "J'ai besoin de compétences techniques ?", a: "Non. NOAH™ te guide pas à pas. Tu n'as qu'à répondre aux questions et copier-coller les contenus générés." },
-    { q: "Combien de temps pour voir des résultats ?", a: "La génération prend 5 minutes. Avec le plan d'action, tu peux faire ta première vente en 24h à 7 jours." },
-    { q: "Mon domaine est-il compatible ?", a: "Si tu as une expertise que d'autres veulent apprendre (cuisine, langues, fitness, business, créativité...), oui." },
-    { q: "C'est un abonnement ?", a: "Non. Paiement unique de 29€, accès à vie, mises à jour incluses." },
-    { q: "Et si ça ne marche pas ?", a: "Tu as 30 jours pour tester. Si tu n'es pas satisfait, tu es remboursé intégralement — sans justification." }
+    { q: "Est-ce que c'est vraiment pour moi ?", a: "Oui, si tu as un savoir-faire, une expertise ou un vécu qui peut aider quelqu'un à progresser. Pas besoin d'être \"expert international\". Il suffit d'avoir un coup d'avance sur quelqu'un. Si tu peux aider une personne, tu peux vendre." },
+    { q: "Est-ce que je dois déjà avoir un produit ?", a: "Non. Justement, NOAH™ t'aide à : • Trouver quoi vendre • Structurer tes 4 offres • Définir les prix • Comprendre la logique d'ascension. Tu n'as rien à préparer avant." },
+    { q: "Est-ce que je dois être à l'aise en vente ou en marketing ?", a: "Non. Tu n'as pas besoin : • De webinaire • D'appel de vente • De tunnel compliqué • De connaissances techniques avancées. NOAH™ te guide étape par étape." },
+    { q: "En quoi c'est différent d'une formation en ligne classique ?", a: "Les formations te donnent des concepts. Noah te donne des résultats. Pas de module à regarder pendant 40h. Pas de template à remplir. Tu entres ton idée, tu ressors avec une offre prête à vendre. C'est un générateur, pas un cours." },
+    { q: "Est-ce que c'est automatique ?", a: "NOAH™ génère la structure et les offres pour toi. Mais c'est toi qui passes à l'action. L'objectif n'est pas la magie. C'est la clarté + l'exécution." },
+    { q: "En combien de temps puis-je faire ma première vente ?", a: "Si tu passes à l'action immédiatement, tu peux : • Savoir quoi vendre en 15 minutes • Envoyer tes premiers messages le jour même • Déclencher une première vente en 24h. Tout dépend de ton implication." },
+    { q: "Est-ce que ça fonctionne dans toutes les niches ?", a: "Oui, tant que ton savoir-faire peut aider quelqu'un. Exemples : Coach sportif, Maman solo qui aide à gérer un budget, Prof de jiu-jitsu, Hypnothérapeute, Passionné de cuisine vegan, Entrepreneur débordé, Coach spirituel, Expert rénovation, Prof de chant, etc. Le principe reste le même : Une transformation = une offre." },
+    { q: "Et si je ne suis pas satisfait ?", a: "Tu bénéficies d'une garantie 30 jours. Si tu n'es pas satisfait, tu es remboursé. Simple." },
+    { q: "Est-ce que je dois investir en publicité ?", a: "Non. Mais tu pourras plus tard. Tu peux commencer sans pub. L'objectif est d'abord : • Structurer • Vendre • Valider. La pub vient ensuite si tu veux scaler." },
+    { q: "Est-ce que c'est une formation avec des dizaines d'heures de vidéos ?", a: "Non. C'est un système simple et direct. L'objectif est d'aller droit au résultat, pas de te faire regarder 40h de contenu." },
   ];
 
   return (

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { Brain, Sparkles, Zap, Check, Gift, Award, Crown } from 'lucide-react';
+import { Brain, Sparkles, Check, Gift, Award, Crown, RotateCw } from 'lucide-react';
 
 export default function OfferGenerationStart() {
   const navigate = useNavigate();
@@ -24,15 +24,13 @@ export default function OfferGenerationStart() {
   };
 
   const preparationSteps = [
-    { title: "Low Ticket", description: "Une petite offre pour attirer et convertir facilement tes premiers clients", icon: Gift },
-    { title: "Order Bump", description: "Un complément irrésistible qui booste ton panier moyen de 30-40%", icon: Sparkles },
+    { title: "Offre Principale", description: "Ton produit d'entrée pour attirer et convertir tes premiers clients", icon: Gift },
+    { title: "Offre Extra", description: "Un complément irrésistible qui booste ton panier moyen de 30-40%", icon: Sparkles },
     { title: "Offre Supérieure", description: "Pour les clients prêts à aller plus loin avec toi (×2-3 ton revenu)", icon: Award },
     { title: "Offre Premium", description: "Ton accompagnement VIP qui maximise ton revenu par client", icon: Crown }
   ];
 
-  useEffect(() => {
-    generateOffer();
-  }, []);
+  useEffect(() => { generateOffer(); }, []);
 
   useEffect(() => {
     const stepInterval = setInterval(() => {
@@ -154,30 +152,71 @@ export default function OfferGenerationStart() {
 
   if (error) {
     return (
-      <div className="fixed inset-0 bg-white flex items-center justify-center z-50"
-           style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-        <div className="text-center max-w-md px-6">
-          <div className="w-20 h-20 rounded-2xl bg-[#f8f8f8] mx-auto mb-6 flex items-center justify-center border border-[#e5e5e5]">
-            <span className="text-4xl">🔄</span>
+      <div style={{
+        minHeight: '100vh', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        background: '#ffffff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        padding: '40px 24px', position: 'relative', overflow: 'hidden',
+      }}>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <div className="ogs-neon ogs-neon-1" />
+        <div className="ogs-neon ogs-neon-2" />
+
+        <div style={{ maxWidth: '420px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <div style={{
+            width: '80px', height: '80px', borderRadius: '24px',
+            background: '#f8f8f8', border: '1px solid #e5e5e5',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 28px',
+          }}>
+            <RotateCw size={36} style={{ color: '#ccc' }} />
           </div>
-          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-3">Un petit souci temporaire</h2>
-          <p className="text-[#888] mb-6">{error.message}</p>
-          <button onClick={handleRetry}
-            style={{ background: 'linear-gradient(135deg, #f97316, #ec4899)', color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '100px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
+
+          <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#1a1a1a', marginBottom: '12px', letterSpacing: '-0.02em' }}>
+            Un petit souci temporaire
+          </h2>
+          <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6, marginBottom: '28px' }}>
+            {error.message}
+          </p>
+
+          <button
+            onClick={handleRetry}
+            style={{
+              background: '#1a1a1a', color: '#fff', border: 'none',
+              padding: '14px 32px', borderRadius: '100px',
+              fontSize: '15px', fontWeight: 600, cursor: 'pointer',
+              fontFamily: "'Inter', sans-serif",
+              transition: 'opacity 0.2s',
+            }}
+            onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseOut={e => e.currentTarget.style.opacity = '1'}
+          >
             Relancer la génération
           </button>
-          <p className="text-xs text-[#bbb] mt-4">Nos serveurs sont parfois très sollicités</p>
+          <p style={{ fontSize: '11px', color: '#bbb', marginTop: '16px' }}>
+            Nos serveurs sont parfois très sollicités
+          </p>
         </div>
+
+        <style>{`
+          .ogs-neon { position: absolute; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(60px); opacity: 0.5; }
+          .ogs-neon-1 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%); top: 5%; left: -8%; animation: ogsF1 7s ease-in-out infinite; }
+          .ogs-neon-2 { width: 220px; height: 220px; background: radial-gradient(circle, rgba(236,72,153,0.35) 0%, transparent 70%); bottom: 10%; right: -5%; animation: ogsF2 8s ease-in-out infinite; }
+          @keyframes ogsF1 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(18px,-12px) scale(1.06); } }
+          @keyframes ogsF2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-12px,16px) scale(1.05); } }
+        `}</style>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden"
-         style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+    <div style={{
+      minHeight: '100vh', display: 'flex', flexDirection: 'column',
+      background: '#ffffff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      {/* Progress bar gradient */}
+      {/* Progress bar */}
       <div style={{ width: '100%', height: '3px', background: '#f0f0f0' }}>
         <motion.div
           style={{ height: '100%', background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)', borderRadius: '0 4px 4px 0' }}
@@ -187,25 +226,53 @@ export default function OfferGenerationStart() {
         />
       </div>
 
-      <div className="min-h-screen flex flex-col items-center justify-start pt-16 pb-12 px-6 relative">
-        {/* Neon circles */}
-        <div style={{ position: 'absolute', width: '280px', height: '280px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%)', top: '5%', left: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', width: '220px', height: '220px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.10) 0%, transparent 70%)', bottom: '10%', right: '-3%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+      <div style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: '40px 24px', position: 'relative', overflow: 'hidden',
+      }}>
+        {/* Floating neon circles */}
+        <div className="ogs-neon ogs-neon-1" />
+        <div className="ogs-neon ogs-neon-2" />
+        <div className="ogs-neon ogs-neon-3" />
 
-        <div className="max-w-lg w-full relative z-10">
-          {/* Animated icon */}
+        <div style={{ width: '100%', maxWidth: '520px', position: 'relative', zIndex: 1 }}>
+
+          {/* Badge pill */}
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: '#f5f5f5', border: '1px solid #e8e8e8',
+              borderRadius: '100px', padding: '6px 16px',
+              fontSize: '13px', color: '#666',
+            }}>
+              <span style={{
+                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                color: '#fff', padding: '2px 10px', borderRadius: '100px',
+                fontSize: '11px', fontWeight: 600
+              }}>NOAH™</span>
+              Génération en cours
+            </div>
+          </div>
+
+          {/* Animated Brain Icon */}
           <motion.div
             animate={{ scale: [1, 1.06, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="relative mx-auto mb-8 w-24 h-24"
+            style={{ position: 'relative', width: '88px', height: '88px', margin: '0 auto 24px' }}
           >
-            <div className="w-24 h-24 rounded-2xl bg-[#1a1a1a] flex items-center justify-center shadow-xl">
+            <div style={{
+              width: '88px', height: '88px', borderRadius: '24px',
+              background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            }}>
               <motion.div animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
-                <Brain className="w-12 h-12 text-white" />
+                <Brain size={40} color="#fff" />
               </motion.div>
             </div>
-            {[...Array(2)].map((_, i) => (
-              <motion.div key={i} className="absolute inset-0 rounded-2xl border border-[#1a1a1a]"
+            {[0, 1].map(i => (
+              <motion.div key={i}
+                style={{ position: 'absolute', inset: 0, borderRadius: '24px', border: '1px solid #1a1a1a' }}
                 initial={{ scale: 1, opacity: 0.3 }}
                 animate={{ scale: [1, 1.5, 2], opacity: [0.3, 0.1, 0] }}
                 transition={{ duration: 2, repeat: Infinity, delay: i * 0.7, ease: "easeOut" }}
@@ -213,19 +280,32 @@ export default function OfferGenerationStart() {
             ))}
           </motion.div>
 
-          {/* Message + Timer */}
-          <div className="text-center mb-6">
-            <p className="text-xl font-semibold text-[#1a1a1a] mb-3">Noah construit ton offre…</p>
-            <div className="inline-flex items-center gap-2 bg-[#f8f8f8] px-4 py-2 rounded-full border border-[#e5e5e5]">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[#1a1a1a] font-mono font-semibold text-lg">{formatTime(elapsedTime)}</span>
+          {/* Title + Timer */}
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <h1 style={{
+              fontSize: 'clamp(20px, 3.5vw, 26px)', fontWeight: 600,
+              color: '#1a1a1a', letterSpacing: '-0.02em', marginBottom: '12px',
+            }}>
+              Noah construit ton offre…
+            </h1>
+
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: '#f8f8f8', border: '1px solid #e5e5e5',
+              borderRadius: '100px', padding: '8px 18px',
+            }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e', animation: 'ogsPulse 1.5s ease-in-out infinite' }} />
+              <span style={{ fontFamily: "'Inter', monospace", fontWeight: 600, fontSize: '16px', color: '#1a1a1a' }}>
+                {formatTime(elapsedTime)}
+              </span>
             </div>
-            <div className="flex items-center justify-center gap-2 mt-3">
-              {[0, 1, 2].map((i) => (
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginTop: '12px' }}>
+              {[0, 1, 2].map(i => (
                 <motion.div key={i}
                   animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
                   transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                  className="w-2 h-2 rounded-full bg-[#1a1a1a]"
+                  style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#1a1a1a' }}
                 />
               ))}
             </div>
@@ -237,25 +317,29 @@ export default function OfferGenerationStart() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2 }}
             style={{
-              background: 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(236,72,153,0.06))',
-              border: '1px solid rgba(249,115,22,0.2)',
-              borderRadius: '16px', padding: '16px 20px', marginBottom: '24px'
+              background: 'linear-gradient(135deg, rgba(249,115,22,0.06), rgba(236,72,153,0.04))',
+              border: '1px solid rgba(249,115,22,0.15)',
+              borderRadius: '20px', padding: '16px 20px', marginBottom: '28px',
             }}
           >
-            <div className="flex items-start gap-3">
-              <span className="text-xl flex-shrink-0">✨</span>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <span style={{ fontSize: '18px', flexShrink: 0 }}>✨</span>
               <div>
-                <p className="text-[#1a1a1a] text-sm font-semibold mb-1">🎯 Génération en cours...</p>
-                <p className="text-[#666] text-xs leading-relaxed mb-1">
-                  Pour des offres <span className="font-semibold">ultra-personnalisées</span>, la génération peut prendre jusqu'à <span className="font-semibold">5 minutes</span>.
+                <p style={{ fontSize: '13px', fontWeight: 600, color: '#1a1a1a', marginBottom: '4px' }}>
+                  Génération ultra-personnalisée
                 </p>
-                <p className="text-[#1a1a1a] font-semibold text-xs">⚠️ Ne ferme surtout pas cette page !</p>
+                <p style={{ fontSize: '12px', color: '#888', lineHeight: 1.5, marginBottom: '4px' }}>
+                  Pour des offres adaptées à ton profil, la génération peut prendre jusqu'à <span style={{ fontWeight: 600, color: '#666' }}>5 minutes</span>.
+                </p>
+                <p style={{ fontSize: '12px', fontWeight: 600, color: '#1a1a1a' }}>
+                  ⚠️ Ne ferme surtout pas cette page !
+                </p>
               </div>
             </div>
           </motion.div>
 
           {/* Steps */}
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {preparationSteps.map((step, index) => {
               const Icon = step.icon;
               const isCompleted = index < currentStep;
@@ -264,38 +348,68 @@ export default function OfferGenerationStart() {
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: index <= currentStep ? 1 : 0.4, x: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="relative rounded-xl p-4 transition-all duration-300"
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: index <= currentStep ? 1 : 0.35, x: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.08 }}
                   style={{
-                    background: isCompleted ? '#f0fdf4' : isInProgress ? '#f8f8f8' : '#fff',
-                    border: isCompleted ? '1px solid #bbf7d0' : isInProgress ? '2px solid #1a1a1a' : '1px solid #e5e5e5'
+                    position: 'relative', borderRadius: '16px', padding: '14px 16px',
+                    background: isCompleted ? '#fafafa' : isInProgress ? '#fff' : '#fff',
+                    border: isCompleted
+                      ? '1px solid #e0e0e0'
+                      : isInProgress
+                        ? '2px solid #1a1a1a'
+                        : '1px solid #eeeeee',
+                    transition: 'all 0.3s',
+                    overflow: 'hidden',
                   }}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-                         style={{ background: isCompleted ? '#22c55e' : '#1a1a1a' }}>
-                      {isCompleted ? <Check className="w-5 h-5 text-white" /> : <Icon className="w-5 h-5 text-white" />}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '40px', height: '40px', borderRadius: '12px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                      background: isCompleted
+                        ? 'linear-gradient(135deg, #f97316, #ec4899)'
+                        : '#1a1a1a',
+                    }}>
+                      {isCompleted
+                        ? <Check size={18} color="#fff" />
+                        : <Icon size={18} color="#fff" />
+                      }
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#1a1a1a] mb-0.5 text-sm flex items-center gap-2">
-                        {step.title}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', margin: 0 }}>
+                          {step.title}
+                        </h3>
                         {isInProgress && (
-                          <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.5, repeat: Infinity }} className="flex gap-0.5">
-                            <div className="w-1 h-1 rounded-full bg-[#1a1a1a]" />
-                            <div className="w-1 h-1 rounded-full bg-[#1a1a1a]" />
-                            <div className="w-1 h-1 rounded-full bg-[#1a1a1a]" />
+                          <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}
+                            style={{ display: 'flex', gap: '3px' }}>
+                            {[0, 1, 2].map(i => (
+                              <div key={i} style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#1a1a1a' }} />
+                            ))}
                           </motion.div>
                         )}
-                      </h3>
-                      <p className="text-xs text-[#888] leading-relaxed">{step.description}</p>
+                        {isCompleted && (
+                          <span style={{
+                            fontSize: '10px', fontWeight: 600, color: '#f97316',
+                            background: 'rgba(249,115,22,0.08)', padding: '2px 8px',
+                            borderRadius: '100px',
+                          }}>Prêt</span>
+                        )}
+                      </div>
+                      <p style={{ fontSize: '12px', color: '#999', margin: '2px 0 0', lineHeight: 1.4 }}>
+                        {step.description}
+                      </p>
                     </div>
                   </div>
+
                   {isInProgress && (
                     <motion.div
-                      className="absolute bottom-0 left-0 h-[2px] rounded-b-xl"
-                      style={{ background: 'linear-gradient(90deg, #f97316, #ec4899)' }}
+                      style={{
+                        position: 'absolute', bottom: 0, left: 0, height: '2px',
+                        background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)',
+                        borderRadius: '0 0 16px 16px',
+                      }}
                       initial={{ width: '0%' }}
                       animate={{ width: '100%' }}
                       transition={{ duration: 3, ease: 'linear' }}
@@ -307,6 +421,17 @@ export default function OfferGenerationStart() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        .ogs-neon { position: absolute; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(60px); opacity: 0.5; }
+        .ogs-neon-1 { width: min(280px, 55vw); height: min(280px, 55vw); background: radial-gradient(circle, rgba(249,115,22,0.5) 0%, transparent 70%); top: 8%; left: -8%; animation: ogsF1 7s ease-in-out infinite; }
+        .ogs-neon-2 { width: min(220px, 45vw); height: min(220px, 45vw); background: radial-gradient(circle, rgba(236,72,153,0.45) 0%, transparent 70%); bottom: 15%; right: -5%; animation: ogsF2 8s ease-in-out infinite; }
+        .ogs-neon-3 { width: min(200px, 42vw); height: min(200px, 42vw); background: radial-gradient(circle, rgba(167,139,250,0.45) 0%, transparent 70%); bottom: 5%; left: 10%; animation: ogsF3 9s ease-in-out infinite; }
+        @keyframes ogsF1 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(18px,-12px) scale(1.06); } }
+        @keyframes ogsF2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-12px,16px) scale(1.05); } }
+        @keyframes ogsF3 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(14px,10px) scale(1.08); } }
+        @keyframes ogsPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+      `}</style>
     </div>
   );
 }

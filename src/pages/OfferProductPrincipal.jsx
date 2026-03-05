@@ -36,8 +36,9 @@ export default function OfferProductPrincipal() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      if (currentUser.sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      if (resolvedSessionId) {
+        const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
         if (sessions.length > 0) {
           const userSession = sessions[0];
           setSession(userSession);

@@ -4,7 +4,6 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Brain, Sparkles, Zap, Check, Gift, Award, Crown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 export default function OfferGenerationStart() {
   const navigate = useNavigate();
@@ -25,10 +24,10 @@ export default function OfferGenerationStart() {
   };
 
   const preparationSteps = [
-    { title: "Low Ticket", description: "Une petite offre pour attirer et convertir tes premiers clients", icon: Gift, status: "in-progress" },
-    { title: "Order Bump", description: "Un complément irrésistible qui booste ton panier moyen", icon: Sparkles, status: "pending" },
-    { title: "Offre Supérieure", description: "Pour les clients prêts à aller plus loin (×2-3 ton revenu)", icon: Award, status: "pending" },
-    { title: "Offre Premium", description: "Ton accompagnement VIP qui maximise ton revenu", icon: Crown, status: "pending" }
+    { title: "Low Ticket", description: "Une petite offre pour attirer et convertir facilement tes premiers clients", icon: Gift },
+    { title: "Order Bump", description: "Un complément irrésistible qui booste ton panier moyen de 30-40%", icon: Sparkles },
+    { title: "Offre Supérieure", description: "Pour les clients prêts à aller plus loin avec toi (×2-3 ton revenu)", icon: Award },
+    { title: "Offre Premium", description: "Ton accompagnement VIP qui maximise ton revenu par client", icon: Crown }
   ];
 
   useEffect(() => {
@@ -47,7 +46,7 @@ export default function OfferGenerationStart() {
   const retryableCall = async (fn, { maxRetries = 3, baseDelay = 2000, label = 'call' } = {}) => {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try { return await fn(); } catch (err) {
-        const isRetryable = err.message?.includes('429') || err.message?.includes('overloaded') || err.message?.includes('529') || err.message?.includes('timeout') || err.message?.includes('network') || err.message?.includes('fetch');
+        const isRetryable = err.message?.includes('429') || err.message?.includes('Too Many') || err.message?.includes('overloaded') || err.message?.includes('529') || err.message?.includes('timeout') || err.message?.includes('network') || err.message?.includes('fetch');
         if (isRetryable && attempt < maxRetries) {
           const delay = baseDelay * Math.pow(2, attempt);
           setIsRetrying(true);
@@ -98,7 +97,8 @@ export default function OfferGenerationStart() {
 
       if (missingKeys.length > 0) {
         const redirectMap = { 'targetIncome': 'OnboardingQ16TargetIncome', 'perceivedObstacles': 'OnboardingQ23Obstacles', 'readinessScore': 'OnboardingQ25Readiness' };
-        navigate(createPageUrl(redirectMap[missingKeys[0]] || 'OnboardingQ16TargetIncome')); return;
+        navigate(createPageUrl(redirectMap[missingKeys[0]] || 'OnboardingQ16TargetIncome'));
+        return;
       }
 
       if (!user.firstName) { navigate(createPageUrl('OnboardingFirstName')); return; }
@@ -109,9 +109,10 @@ export default function OfferGenerationStart() {
         response = await retryableCall(() => base44.functions.invoke('generateFullStackOffer', { sessionId }), { label: 'generateFullStackOffer', maxRetries: 3, baseDelay: 3000 });
       } catch (genError) {
         setIsRetrying(false);
-        setError({ type: 'generation_error', message: 'La génération a pris trop de temps. Réessaye !' });
+        setError({ type: 'generation_error', message: 'La génération a pris trop de temps. Réessaye, ça devrait marcher !' });
         return;
       }
+
       setIsRetrying(false);
 
       if (response.data?.error) {
@@ -121,17 +122,21 @@ export default function OfferGenerationStart() {
           response = await base44.functions.invoke('generateFullStackOffer', { sessionId });
           setIsRetrying(false);
           if (response.data?.error || !response.data?.success) {
-            setError({ type: 'generation_error', message: 'La génération a rencontré un souci. Réessaye.' }); return;
+            setError({ type: 'generation_error', message: 'La génération a rencontré un souci. Réessaye dans quelques instants.' });
+            return;
           }
         } catch {
           setIsRetrying(false);
-          setError({ type: 'generation_error', message: 'La génération a rencontré un souci. Réessaye.' }); return;
+          setError({ type: 'generation_error', message: 'La génération a rencontré un souci. Réessaye dans quelques instants.' });
+          return;
         }
       }
 
       if (!response.data?.success) {
-        setError({ type: 'generation_error', message: 'La génération n\'a pas pu être confirmée.' }); return;
+        setError({ type: 'generation_error', message: 'La génération n\'a pas pu être confirmée. Réessaye.' });
+        return;
       }
+
       navigate(createPageUrl('OfferProductPrincipal'));
     } catch (error) {
       setIsRetrying(false);
@@ -140,7 +145,10 @@ export default function OfferGenerationStart() {
   };
 
   const handleRetry = () => {
-    setError(null); setIsRetrying(false); setElapsedTime(0); setCurrentStep(0);
+    setError(null);
+    setIsRetrying(false);
+    setElapsedTime(0);
+    setCurrentStep(0);
     generateOffer();
   };
 
@@ -149,13 +157,13 @@ export default function OfferGenerationStart() {
       <div className="fixed inset-0 bg-white flex items-center justify-center z-50"
            style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
         <div className="text-center max-w-md px-6">
-          <div className="w-20 h-20 rounded-2xl bg-[#f8f8f8] mx-auto mb-6 flex items-center justify-center">
+          <div className="w-20 h-20 rounded-2xl bg-[#f8f8f8] mx-auto mb-6 flex items-center justify-center border border-[#e5e5e5]">
             <span className="text-4xl">🔄</span>
           </div>
           <h2 className="text-2xl font-bold text-[#1a1a1a] mb-3">Un petit souci temporaire</h2>
           <p className="text-[#888] mb-6">{error.message}</p>
           <button onClick={handleRetry}
-            style={{ background: '#1a1a1a', color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '100px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
+            style={{ background: 'linear-gradient(135deg, #f97316, #ec4899)', color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '100px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
             Relancer la génération
           </button>
           <p className="text-xs text-[#bbb] mt-4">Nos serveurs sont parfois très sollicités</p>
@@ -169,13 +177,22 @@ export default function OfferGenerationStart() {
          style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      {/* Neon ambient */}
-      <div style={{ position: 'fixed', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%)', top: '5%', left: '-5%', filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0 }} />
-      <div style={{ position: 'fixed', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.10) 0%, transparent 70%)', bottom: '10%', right: '-3%', filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0 }} />
-      <div style={{ position: 'fixed', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(167,139,250,0.10) 0%, transparent 70%)', bottom: '5%', left: '15%', filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0 }} />
+      {/* Progress bar gradient */}
+      <div style={{ width: '100%', height: '3px', background: '#f0f0f0' }}>
+        <motion.div
+          style={{ height: '100%', background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)', borderRadius: '0 4px 4px 0' }}
+          initial={{ width: '0%' }}
+          animate={{ width: `${Math.min(95, 20 + currentStep * 20)}%` }}
+          transition={{ duration: 0.5 }}
+        />
+      </div>
 
-      <div className="min-h-screen flex flex-col items-center justify-start pt-20 lg:pt-8 pb-12 px-6 relative z-10">
-        <div className="max-w-xl w-full">
+      <div className="min-h-screen flex flex-col items-center justify-start pt-16 pb-12 px-6 relative">
+        {/* Neon circles */}
+        <div style={{ position: 'absolute', width: '280px', height: '280px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%)', top: '5%', left: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: '220px', height: '220px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.10) 0%, transparent 70%)', bottom: '10%', right: '-3%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+
+        <div className="max-w-lg w-full relative z-10">
           {/* Animated icon */}
           <motion.div
             animate={{ scale: [1, 1.06, 1] }}
@@ -191,45 +208,48 @@ export default function OfferGenerationStart() {
               <motion.div key={i} className="absolute inset-0 rounded-2xl border border-[#1a1a1a]"
                 initial={{ scale: 1, opacity: 0.3 }}
                 animate={{ scale: [1, 1.5, 2], opacity: [0.3, 0.1, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.7, ease: "easeOut" }} />
+                transition={{ duration: 2, repeat: Infinity, delay: i * 0.7, ease: "easeOut" }}
+              />
             ))}
           </motion.div>
 
-          {/* Message & Timer */}
+          {/* Message + Timer */}
           <div className="text-center mb-6">
             <p className="text-xl font-semibold text-[#1a1a1a] mb-3">Noah construit ton offre…</p>
-            <div className="inline-flex items-center gap-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-full px-4 py-2 mb-3">
+            <div className="inline-flex items-center gap-2 bg-[#f8f8f8] px-4 py-2 rounded-full border border-[#e5e5e5]">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-[#1a1a1a] font-mono font-semibold text-lg">{formatTime(elapsedTime)}</span>
             </div>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 mt-3">
               {[0, 1, 2].map((i) => (
                 <motion.div key={i}
                   animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
                   transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                  className="w-2 h-2 rounded-full bg-[#1a1a1a]" />
+                  className="w-2 h-2 rounded-full bg-[#1a1a1a]"
+                />
               ))}
             </div>
           </div>
 
           {/* Info banner */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2 }}
-            className="rounded-2xl p-5 mb-6 border border-[#e5e5e5] bg-[#f8f8f8]"
+            style={{
+              background: 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(236,72,153,0.06))',
+              border: '1px solid rgba(249,115,22,0.2)',
+              borderRadius: '16px', padding: '16px 20px', marginBottom: '24px'
+            }}
           >
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
-                   style={{ background: 'linear-gradient(135deg, #f97316, #ec4899)' }}>
-                <span className="text-base">✨</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-[#1a1a1a] font-bold text-sm mb-1">🎯 Génération en cours...</h3>
-                <p className="text-[#666] text-sm leading-relaxed mb-1">
+              <span className="text-xl flex-shrink-0">✨</span>
+              <div>
+                <p className="text-[#1a1a1a] text-sm font-semibold mb-1">🎯 Génération en cours...</p>
+                <p className="text-[#666] text-xs leading-relaxed mb-1">
                   Pour des offres <span className="font-semibold">ultra-personnalisées</span>, la génération peut prendre jusqu'à <span className="font-semibold">5 minutes</span>.
                 </p>
-                <p className="text-[#1a1a1a] font-semibold text-sm">⚠️ Ne ferme surtout pas cette page !</p>
+                <p className="text-[#1a1a1a] font-semibold text-xs">⚠️ Ne ferme surtout pas cette page !</p>
               </div>
             </div>
           </motion.div>
@@ -242,39 +262,40 @@ export default function OfferGenerationStart() {
               const isInProgress = index === currentStep;
 
               return (
-                <motion.div key={index}
+                <motion.div
+                  key={index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: index <= currentStep ? 1 : 0.4, x: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className={`relative rounded-xl p-4 transition-all duration-300 border ${
-                    isCompleted ? 'bg-[#f0faf4] border-[#c6f0d4]' :
-                    isInProgress ? 'bg-[#f8f8f8] border-[#1a1a1a]' :
-                    'bg-white border-[#e5e5e5]'
-                  }`}
+                  className="relative rounded-xl p-4 transition-all duration-300"
+                  style={{
+                    background: isCompleted ? '#f0fdf4' : isInProgress ? '#f8f8f8' : '#fff',
+                    border: isCompleted ? '1px solid #bbf7d0' : isInProgress ? '2px solid #1a1a1a' : '1px solid #e5e5e5'
+                  }}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
-                      isCompleted ? 'bg-[#1a1a1a]' : isInProgress ? 'bg-[#1a1a1a] animate-pulse' : 'bg-[#f0f0f0]'
-                    }`}>
-                      {isCompleted ? <Check className="w-5 h-5 text-white" /> : <Icon className={`w-5 h-5 ${isInProgress ? 'text-white' : 'text-[#ccc]'}`} />}
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                         style={{ background: isCompleted ? '#22c55e' : '#1a1a1a' }}>
+                      {isCompleted ? <Check className="w-5 h-5 text-white" /> : <Icon className="w-5 h-5 text-white" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#1a1a1a] mb-0.5 flex items-center gap-2 text-sm">
+                      <h3 className="font-semibold text-[#1a1a1a] mb-0.5 text-sm flex items-center gap-2">
                         {step.title}
                         {isInProgress && (
-                          <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }} className="flex gap-0.5">
-                            {[0,1,2].map(d => <div key={d} className="w-1 h-1 rounded-full bg-[#1a1a1a]" />)}
+                          <motion.div animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.5, repeat: Infinity }} className="flex gap-0.5">
+                            <div className="w-1 h-1 rounded-full bg-[#1a1a1a]" />
+                            <div className="w-1 h-1 rounded-full bg-[#1a1a1a]" />
+                            <div className="w-1 h-1 rounded-full bg-[#1a1a1a]" />
                           </motion.div>
                         )}
                       </h3>
                       <p className="text-xs text-[#888] leading-relaxed">{step.description}</p>
                     </div>
                   </div>
-
                   {isInProgress && (
                     <motion.div
                       className="absolute bottom-0 left-0 h-[2px] rounded-b-xl"
-                      style={{ background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)' }}
+                      style={{ background: 'linear-gradient(90deg, #f97316, #ec4899)' }}
                       initial={{ width: '0%' }}
                       animate={{ width: '100%' }}
                       transition={{ duration: 3, ease: 'linear' }}

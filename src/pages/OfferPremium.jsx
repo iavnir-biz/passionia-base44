@@ -12,9 +12,9 @@ const getProductIcon = (offer) => {
   const title = (offer?.title || '').toLowerCase();
   const description = (offer?.description || '').toLowerCase();
   const productType = (offer?.productType || '').toLowerCase();
-  if (title.includes('coaching') || title.includes('mentorat') || description.includes('coaching') || productType.includes('coaching')) return Users;
-  if (title.includes('vip') || title.includes('premium') || title.includes('exclusif')) return Crown;
-  if (title.includes('masterclass') || title.includes('élite')) return Award;
+  if (title.includes('coaching') || title.includes('mentorat') || description.includes('coaching') || description.includes('mentorat') || productType.includes('coaching')) return Users;
+  if (title.includes('vip') || title.includes('premium') || title.includes('exclusif') || description.includes('vip')) return Crown;
+  if (title.includes('masterclass') || title.includes('élite') || description.includes('masterclass')) return Award;
   return Star;
 };
 
@@ -34,17 +34,14 @@ export default function OfferPremium() {
     try {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
-      const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      if (resolvedSessionId) {
-        const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
+      if (currentUser.sessionId) {
+        const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
         if (sessions.length > 0) {
           const userSession = sessions[0];
           setSession(userSession);
           if (userSession.offer_generation?.offerChoices?.upsell3Choices) {
             const choices = userSession.offer_generation.offerChoices.upsell3Choices.map((choice, idx) => ({
-              ...choice, id: choice.id || `premium_${idx}`,
-              icon: getProductIcon(choice), badge: choice.productType || choice.badge || 'Premium',
-              result: choice.outcome
+              ...choice, id: choice.id || `premium_${idx}`, icon: getProductIcon(choice), badge: choice.productType || choice.badge || 'Premium', result: choice.outcome
             }));
             setOffers(choices);
           }
@@ -53,11 +50,8 @@ export default function OfferPremium() {
           }
         }
       }
-    } catch (error) {
-      console.error('Error loading user:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (error) { console.error('Error loading user:', error); }
+    finally { setIsLoading(false); }
   };
 
   const handleSelect = async (offer) => {
@@ -68,10 +62,7 @@ export default function OfferPremium() {
       console.log('✅ [OfferPremium] Offre complète:', result.data);
       setIsSaving(false);
       setShowTransition(true);
-    } catch (error) {
-      console.error('Error saving:', error);
-      setIsSaving(false);
-    }
+    } catch (error) { console.error('Error saving:', error); setIsSaving(false); }
   };
 
   if (isLoading) return null;
@@ -82,31 +73,30 @@ export default function OfferPremium() {
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <OfferSidebar currentStep={4} />
 
-      <div className="lg:ml-72 pt-24 lg:pt-12 pb-12">
-        <div className="max-w-3xl mx-auto px-4">
+      <div className="lg:ml-72 pt-24 lg:pt-12 pb-12 relative">
+        <div style={{ position: 'absolute', width: '220px', height: '220px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%)', top: '10%', right: '-3%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+
+        <div className="max-w-3xl mx-auto px-4 relative z-10">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-[#1a1a1a] mb-2">Choisis ton Offre Premium</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#1a1a1a] mb-2">Choisis ton Offre Premium</h2>
             <p className="text-[#888] text-sm max-w-lg mx-auto">Ton offre haut de gamme pour une transformation maximale.</p>
           </div>
 
           {offers.length === 0 ? (
             <div className="text-center py-12">
-              <Loader2 className="w-6 h-6 text-[#1a1a1a] animate-spin mx-auto mb-4" />
-              <p className="text-[#888]">Chargement des offres...</p>
+              <Loader2 className="w-8 h-8 text-[#1a1a1a] animate-spin mx-auto mb-4" />
+              <p className="text-[#888]">Chargement des offres générées...</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
-              {offers.map((offer) => (
-                <OfferCardNew key={offer.id} offer={offer} icon={offer.icon}
-                  isSelected={selectedOffer?.id === offer.id} onSelect={handleSelect} colorScheme="gold" />
-              ))}
+              {offers.map((offer) => <OfferCardNew key={offer.id} offer={offer} icon={offer.icon} isSelected={selectedOffer?.id === offer.id} onSelect={handleSelect} colorScheme="gold" />)}
             </div>
           )}
 
           {session && <UserIdeaBlock sessionId={session.id} offerKey="upsell3" existingIdeas={session.user_ideas} />}
 
           {isSaving && (
-            <div className="mt-6 flex items-center justify-center gap-2 text-[#888]">
+            <div className="mt-6 flex items-center justify-center gap-2 text-[#1a1a1a]">
               <Loader2 className="w-4 h-4 animate-spin" /><span className="text-sm">Enregistrement...</span>
             </div>
           )}

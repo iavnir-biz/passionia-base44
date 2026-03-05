@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { motion } from "framer-motion";
-import { Brain, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 export default function OnboardingFirstName() {
   const navigate = useNavigate();
@@ -23,16 +22,10 @@ export default function OnboardingFirstName() {
         return;
       }
       const user = await base44.auth.me();
-      // Pre-fill if we already have the firstName
-      if (user.firstName) {
-        setFirstName(user.firstName);
-      }
+      if (user.firstName) setFirstName(user.firstName);
       const stored = localStorage.getItem("onboarding_firstName");
-      if (stored && !user.firstName) {
-        setFirstName(stored);
-      }
+      if (stored && !user.firstName) setFirstName(stored);
     } catch (e) {
-      // Not logged in — redirect to login
       base44.auth.redirectToLogin(window.location.href);
       return;
     } finally {
@@ -50,7 +43,6 @@ export default function OnboardingFirstName() {
       navigate(createPageUrl("OnboardingDynamic"));
     } catch (e) {
       console.error("Error saving firstName:", e);
-      // Navigate anyway — the name is in localStorage
       navigate(createPageUrl("OnboardingDynamic"));
     }
   };
@@ -64,53 +56,82 @@ export default function OnboardingFirstName() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-        <Loader2 className="w-7 h-7 animate-spin text-[#61f7a2]" />
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#1a1a1a' }} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex flex-col items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#ffffff',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      padding: '40px 24px',
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-        {/* Noah Avatar */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex justify-center mb-8"
-        >
-          <div className="relative">
-            <div className="w-[72px] h-[72px] rounded-2xl bg-[#61f7a2] flex items-center justify-center shadow-lg shadow-[#61f7a2]/30">
-              <Brain size={36} className="text-white" />
-            </div>
-            <div className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-green-400 border-2 border-[#fafafa] animate-pulse" />
-          </div>
-        </motion.div>
+      <div style={{ width: '100%', maxWidth: '480px', textAlign: 'center' }}>
 
-        {/* Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-[26px] font-extrabold text-gray-900 tracking-tight leading-tight mb-2">
-            Avant de commencer...
-          </h1>
-          <p className="text-gray-500 text-[15px] leading-relaxed">
-            Comment tu t'appelles ? Je veux pouvoir m'adresser à toi directement.
-          </p>
-        </motion.div>
+        {/* Badge pill — same style as landing */}
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          background: '#f5f5f5',
+          border: '1px solid #e8e8e8',
+          borderRadius: '100px',
+          padding: '6px 16px',
+          fontSize: '13px',
+          color: '#666',
+          marginBottom: '32px'
+        }}>
+          <span style={{
+            background: '#1a1a1a',
+            color: '#fff',
+            padding: '2px 8px',
+            borderRadius: '100px',
+            fontSize: '11px',
+            fontWeight: 600
+          }}>ÉTAPE 1</span>
+          On fait connaissance
+        </div>
 
-        {/* Input */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="mb-6"
-        >
+        {/* Title — same mixed weight style as landing hero */}
+        <h1 style={{
+          fontSize: 'clamp(28px, 5vw, 44px)',
+          fontWeight: 400,
+          lineHeight: 1.15,
+          letterSpacing: '-0.03em',
+          color: '#1a1a1a',
+          marginBottom: '16px',
+        }}>
+          Comment tu t'<span style={{
+            fontStyle: 'italic',
+            fontWeight: 500,
+            background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>appelles</span> ?
+        </h1>
+
+        <p style={{
+          fontSize: '16px',
+          color: '#888',
+          lineHeight: 1.6,
+          maxWidth: '400px',
+          margin: '0 auto 40px',
+        }}>
+          NOAH™ personnalise tout ton parcours — tes offres, tes messages, ton plan d'action — avec ton prénom.
+        </p>
+
+        {/* Input — clean minimal style */}
+        <div style={{ marginBottom: '24px' }}>
           <input
             type="text"
             value={firstName}
@@ -119,41 +140,83 @@ export default function OnboardingFirstName() {
             placeholder="Ton prénom..."
             autoFocus
             maxLength={50}
-            className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl text-[17px] text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#61f7a2] focus:ring-4 focus:ring-[#61f7a2]/15 transition-all text-center font-medium"
+            style={{
+              width: '100%',
+              padding: '16px 20px',
+              fontSize: '18px',
+              fontWeight: 500,
+              fontFamily: "'Inter', sans-serif",
+              color: '#1a1a1a',
+              background: '#f8f8f8',
+              border: '1px solid #e5e5e5',
+              borderRadius: '100px',
+              textAlign: 'center',
+              outline: 'none',
+              transition: 'border-color 0.2s, box-shadow 0.2s',
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = '#1a1a1a';
+              e.target.style.boxShadow = '0 0 0 3px rgba(26,26,26,0.08)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = '#e5e5e5';
+              e.target.style.boxShadow = 'none';
+            }}
           />
-        </motion.div>
+        </div>
 
-        {/* CTA */}
-        <motion.button
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          onClick={handleContinue}
-          disabled={!firstName.trim() || loading}
-          className="w-full flex items-center justify-center gap-2.5 py-[18px] px-6 bg-gradient-to-b from-gray-900 to-black text-white rounded-2xl text-[17px] font-bold shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-[#61f7a2]/20 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-        >
-          {loading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <>
-              C'est parti
-              <ArrowRight className="w-5 h-5" />
-            </>
-          )}
-        </motion.button>
+        {/* CTA — same style as landing hero button */}
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          background: '#f8f8f8',
+          borderRadius: '100px',
+          padding: '6px',
+          border: '1px solid #e5e5e5',
+          width: '100%',
+          maxWidth: '360px',
+        }}>
+          <button
+            onClick={handleContinue}
+            disabled={!firstName.trim() || loading}
+            style={{
+              background: !firstName.trim() ? '#ccc' : '#1a1a1a',
+              color: '#fff',
+              border: 'none',
+              padding: '14px 28px',
+              borderRadius: '100px',
+              fontSize: '15px',
+              fontWeight: 600,
+              fontFamily: "'Inter', sans-serif",
+              cursor: !firstName.trim() ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'opacity 0.2s, background 0.2s',
+              width: '100%',
+            }}
+            onMouseOver={e => { if (firstName.trim()) e.currentTarget.style.opacity = '0.85'; }}
+            onMouseOut={e => e.currentTarget.style.opacity = '1'}
+          >
+            {loading ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <>
+                C'est parti <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        </div>
 
-        {/* Reassurance */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="flex items-center justify-center gap-2 mt-5"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-[#61f7a2]" />
-          <span className="text-xs text-gray-400 font-medium">
-            Ton prénom sera utilisé pour personnaliser tout ton parcours.
-          </span>
-        </motion.div>
+        {/* Subtle note */}
+        <p style={{
+          fontSize: '13px',
+          color: '#bbb',
+          marginTop: '24px',
+        }}>
+          Gratuit · 5 minutes · 100% personnalisé par l'IA
+        </p>
       </div>
     </div>
   );

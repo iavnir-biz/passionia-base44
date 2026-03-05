@@ -56,24 +56,23 @@ export default function OfferTransition({ onComplete, message = "Noah analyse to
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           className="relative mx-auto mb-8 w-24 h-24"
         >
-          <div className="w-24 h-24 rounded-2xl bg-[#1a1a1a] flex items-center justify-center shadow-xl">
+          <div className="w-24 h-24 flex items-center justify-center">
             <motion.div
               animate={{ scale: [1, 1.12, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
-              <CurrentIcon className="w-12 h-12 text-white" />
+              <svg width="0" height="0">
+                <defs>
+                  <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#f97316" />
+                    <stop offset="50%" stopColor="#ec4899" />
+                    <stop offset="100%" stopColor="#a78bfa" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <CurrentIcon style={{ width: '48px', height: '48px', stroke: 'url(#iconGradient)' }} />
             </motion.div>
           </div>
-
-          {[...Array(2)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute inset-0 rounded-2xl border border-[#1a1a1a]"
-              initial={{ scale: 1, opacity: 0.3 }}
-              animate={{ scale: [1, 1.5, 2], opacity: [0.3, 0.1, 0] }}
-              transition={{ duration: 2, repeat: Infinity, delay: i * 0.7, ease: "easeOut" }}
-            />
-          ))}
         </motion.div>
 
         {/* Message */}

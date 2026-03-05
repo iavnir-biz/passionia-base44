@@ -18,7 +18,6 @@ const searchablePages = [
   { name: 'Messages de vente', icon: MessageCircle, page: 'SalesMessages', keywords: 'messages dm vente prospection' },
   { name: 'Emails marketing', icon: Send, page: 'EmailsMarketing', keywords: 'emails marketing sequence' },
   { name: 'Page de vente', icon: FileText, page: 'SalesPage', keywords: 'page vente landing' },
-  { name: 'Ressources IA', icon: Sparkles, page: 'AIResources', keywords: 'ressources ia outils' },
   { name: 'Parametres', icon: Settings, page: 'Settings', keywords: 'parametres compte profil' },
 ];
 

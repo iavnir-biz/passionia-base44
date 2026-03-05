@@ -3,7 +3,6 @@
  * Simplified: removed 26 static onboarding question pages (Q1–Q26).
  * The dynamic onboarding (OnboardingFirstName) handles all questions via Claude API.
  */
-import AIResources from './pages/AIResources';
 import Activation from './pages/Activation';
 import AgentNoah from './pages/AgentNoah';
 import BonneNouvelle from './pages/BonneNouvelle';
@@ -22,11 +21,9 @@ import SalesMessages from './pages/SalesMessages';
 import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
-import UpsellCoaching from './pages/UpsellCoaching';
 import Welcome from './pages/Welcome';
 
 export const PAGES = {
-  "AIResources": AIResources,
   "Activation": Activation,
   "AgentNoah": AgentNoah,
   "BonneNouvelle": BonneNouvelle,
@@ -45,7 +42,6 @@ export const PAGES = {
   "SalesPage": SalesPage,
   "Settings": Settings,
   "SetupProfile": SetupProfile,
-  "UpsellCoaching": UpsellCoaching,
   "Welcome": Welcome,
 };
 

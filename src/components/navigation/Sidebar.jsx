@@ -79,7 +79,6 @@ const menuStructure = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Plan d\'action', icon: Target, page: 'PlanAction' },
   { name: 'Mon journal', icon: BookOpen, page: 'Journal' },
-  { name: 'Ressources IA', icon: Sparkles, page: 'AIResources' },
   { name: 'Discuter avec Noah', icon: MessageCircle, page: 'NovaChat', locked: true },
 ];
 

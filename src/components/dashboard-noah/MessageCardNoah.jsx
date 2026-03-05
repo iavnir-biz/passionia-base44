@@ -29,7 +29,7 @@ export default function MessageCardNoah({ msgType, message, isLoading, onGenerat
         <div style={{
           width: '40px', height: '40px', borderRadius: '12px', flexShrink: 0,
           background: isGenerated
-            ? 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)'
+            ? '#1a1a1a'
             : '#f5f5f5',
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>

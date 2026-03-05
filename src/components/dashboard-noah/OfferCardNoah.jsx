@@ -30,7 +30,7 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
         <div style={{
           width: '40px', height: '40px', borderRadius: '12px', flexShrink: 0,
           background: isEnriched
-            ? 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)'
+            ? '#1a1a1a'
             : '#f5f5f5',
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
@@ -95,7 +95,7 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
               disabled={isLoading}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '6px',
-                background: 'linear-gradient(135deg, #f97316, #ec4899)',
+                background: '#1a1a1a',
                 color: '#fff', border: 'none',
                 padding: '8px 16px', borderRadius: '100px', fontSize: '12px',
                 fontWeight: 600, cursor: 'pointer', opacity: isLoading ? 0.6 : 1
@@ -173,7 +173,7 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
                 </p>
                 {offer.benefits.slice(0, 3).map((b, i) => (
                   <p key={i} style={{ fontSize: '12px', color: '#555', marginBottom: '4px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                    <Zap style={{ width: '12px', height: '12px', color: '#f97316', flexShrink: 0, marginTop: '2px' }} />
+                    <Zap style={{ width: '12px', height: '12px', color: '#1a1a1a', flexShrink: 0, marginTop: '2px' }} />
                     {b}
                   </p>
                 ))}
@@ -191,7 +191,7 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
                 </p>
                 {offer.deliverables.slice(0, 4).map((d, i) => (
                   <p key={i} style={{ fontSize: '12px', color: '#555', marginBottom: '4px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                    <ArrowRight style={{ width: '10px', height: '10px', color: '#a78bfa', flexShrink: 0, marginTop: '3px' }} />
+                    <ArrowRight style={{ width: '10px', height: '10px', color: '#1a1a1a', flexShrink: 0, marginTop: '3px' }} />
                     {d}
                   </p>
                 ))}
@@ -205,7 +205,7 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
                 background: '#fafafa', border: '1px solid #f0f0f0'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                  <Target style={{ width: '12px', height: '12px', color: '#ec4899' }} />
+                  <Target style={{ width: '12px', height: '12px', color: '#1a1a1a' }} />
                   <p style={{ fontSize: '12px', fontWeight: 600, color: '#1a1a1a' }}>Idéal pour</p>
                 </div>
                 <p style={{ fontSize: '12px', color: '#555' }}>
@@ -221,7 +221,7 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
                 background: '#fafafa', border: '1px solid #f0f0f0'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Clock style={{ width: '12px', height: '12px', color: '#6366f1' }} />
+                  <Clock style={{ width: '12px', height: '12px', color: '#1a1a1a' }} />
                   <p style={{ fontSize: '12px', color: '#1a1a1a' }}>
                     <span style={{ fontWeight: 600 }}>Durée :</span> {offer.duration}
                   </p>

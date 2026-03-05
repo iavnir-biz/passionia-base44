@@ -225,8 +225,8 @@ export default function MonPlanNoah() {
                 style={{
                   height: '100%', borderRadius: '100px',
                   background: globalProgress >= 100
-                    ? 'linear-gradient(90deg, #22c55e, #16a34a)'
-                    : 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)'
+                   ? '#1a1a1a'
+                   : '#1a1a1a'
                 }}
               />
             </div>
@@ -266,7 +266,7 @@ export default function MonPlanNoah() {
               animate={{ opacity: 1, scale: 1 }}
               style={{
                 marginTop: '32px', borderRadius: '20px', padding: '32px',
-                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                background: '#1a1a1a',
                 textAlign: 'center', color: '#fff'
               }}
             >

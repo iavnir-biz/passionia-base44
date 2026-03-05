@@ -29,11 +29,11 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
             width: '48px', height: '48px', borderRadius: '50%', display: 'flex',
             alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             background: isCompleted
-              ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+              ? '#1a1a1a'
               : isActive
-                ? 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)'
+                ? '#1a1a1a'
                 : '#f0f0f0',
-            boxShadow: isActive ? '0 0 20px rgba(249,115,22,0.3)' : 'none',
+            boxShadow: isActive ? '0 0 20px rgba(0,0,0,0.15)' : 'none',
             border: isActive ? '3px solid #fff' : '2px solid #e5e5e5',
             cursor: isLocked ? 'default' : 'pointer'
           }}
@@ -59,7 +59,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
             style={{
               width: '2px', flex: 1, minHeight: '20px',
               background: isCompleted
-                ? 'linear-gradient(to bottom, #22c55e, #e5e5e5)'
+                ? 'linear-gradient(to bottom, #1a1a1a, #e5e5e5)'
                 : '#e5e5e5',
               transformOrigin: 'top', marginTop: '4px', marginBottom: '4px'
             }}
@@ -133,7 +133,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
             <motion.div
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.4 }}
-              style={{ height: '100%', background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)', borderRadius: '2px' }}
+              style={{ height: '100%', background: '#1a1a1a', borderRadius: '2px' }}
             />
           </div>
         )}
@@ -195,7 +195,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                           onClick={() => handleAction(item.action)}
                           style={{
                             display: 'inline-flex', alignItems: 'center', gap: '4px',
-                            fontSize: '11px', fontWeight: 600, color: '#f97316',
+                            fontSize: '11px', fontWeight: 600, color: '#1a1a1a',
                             background: 'none', border: 'none', cursor: 'pointer',
                             marginTop: '6px', padding: 0
                           }}

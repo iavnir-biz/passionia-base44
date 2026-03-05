@@ -9,9 +9,9 @@ export default function LandingTestimonials() {
   }, []);
 
   const testimonials = [
-    { name: "Marie L.", role: "Coach bien-être", text: "En 2 semaines, j'ai fait ma première vente à 297€. NOAH™ m'a donné la clarté qui me manquait depuis des mois." },
-    { name: "Thomas B.", role: "Expert Excel", text: "Je pensais que mon savoir était trop « basique » pour être vendu. NOAH™ m'a prouvé le contraire — 1 200€ le premier mois." },
-    { name: "Sophie M.", role: "Formatrice langue des signes", text: "Le plan d'action est incroyable. Chaque jour, je savais exactement quoi faire. Plus d'excuse pour procrastiner." }
+    { name: "Marie L.", role: "Coach bien-être", image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/ec762acef_WhatsAppImage2026-03-05at190938.jpg", text: "En 2 semaines, j'ai fait ma première vente à 297€. NOAH™ m'a donné la clarté qui me manquait depuis des mois." },
+    { name: "Thomas B.", role: "Expert Excel", image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/4ccf19cfc_WhatsAppImage2026-03-05at1909384.jpg", text: "Je pensais que mon savoir était trop « basique » pour être vendu. NOAH™ m'a prouvé le contraire — 1 200€ le premier mois." },
+    { name: "Sophie M.", role: "Formatrice langue des signes", image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/5f1c7bd56_Screenshotfrom20250415193811png_67fe9999ae1b7.png", text: "Le plan d'action est incroyable. Chaque jour, je savais exactement quoi faire. Plus d'excuse pour procrastiner." }
   ];
 
   return (
@@ -62,9 +62,12 @@ export default function LandingTestimonials() {
               <p style={{ fontSize: '15px', lineHeight: 1.6, color: '#555', marginBottom: '24px' }}>
                 "{t.text}"
               </p>
-              <div>
-                <p style={{ fontWeight: 600, fontSize: '14px', color: '#1a1a1a' }}>{t.name}</p>
-                <p style={{ fontSize: '13px', color: '#999' }}>{t.role}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <img src={t.image} alt={t.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e5e5' }} />
+                <div>
+                  <p style={{ fontWeight: 600, fontSize: '14px', color: '#1a1a1a' }}>{t.name}</p>
+                  <p style={{ fontSize: '13px', color: '#999' }}>{t.role}</p>
+                </div>
               </div>
             </div>
           ))}

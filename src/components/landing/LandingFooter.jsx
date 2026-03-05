@@ -169,7 +169,7 @@ export default function LandingFooter({ onCTA }) {
                 </svg>
               ))}
             </div>
-            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>+500 créateurs ont lancé leur business</span>
+            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>+500 créateurs ont lancé leur activité de formation en ligne</span>
           </div>
         </div>
       </section>

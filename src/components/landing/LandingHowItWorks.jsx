@@ -96,55 +96,109 @@ export default function LandingHowItWorks() {
               const isActive = progress > stepThreshold;
 
               return (
-                <div key={i} style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '28px',
-                  position: 'relative',
-                }}>
-                  {/* Dot */}
+                <div key={i}>
                   <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    background: isActive ? '#1a1a1a' : '#fff',
-                    border: `2px solid ${isActive ? '#1a1a1a' : '#d4d4d4'}`,
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    transition: 'all 0.4s ease',
-                    zIndex: 1,
+                    alignItems: 'flex-start',
+                    gap: '28px',
+                    position: 'relative',
                   }}>
-                    <span style={{
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      color: isActive ? '#fff' : '#bbb',
-                      transition: 'color 0.4s ease',
-                    }}>{s.num}</span>
+                    {/* Dot */}
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      background: isActive ? '#1a1a1a' : '#fff',
+                      border: `2px solid ${isActive ? '#1a1a1a' : '#d4d4d4'}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      transition: 'all 0.4s ease',
+                      zIndex: 1,
+                    }}>
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: isActive ? '#fff' : '#bbb',
+                        transition: 'color 0.4s ease',
+                      }}>{s.num}</span>
+                    </div>
+
+                    {/* Content */}
+                    <div style={{
+                      paddingTop: '4px',
+                      opacity: isActive ? 1 : 0.4,
+                      transform: isActive ? 'translateY(0)' : 'translateY(4px)',
+                      transition: 'all 0.5s ease',
+                    }}>
+                      <h3 style={{
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        marginBottom: '8px',
+                        letterSpacing: '-0.01em',
+                        color: '#1a1a1a',
+                      }}>{s.title}</h3>
+                      <p style={{
+                        fontSize: '15px',
+                        color: '#888',
+                        lineHeight: 1.6,
+                        margin: 0,
+                      }}>{s.desc}</p>
+                    </div>
                   </div>
 
-                  {/* Content */}
-                  <div style={{
-                    paddingTop: '4px',
-                    opacity: isActive ? 1 : 0.4,
-                    transform: isActive ? 'translateY(0)' : 'translateY(4px)',
-                    transition: 'all 0.5s ease',
-                  }}>
-                    <h3 style={{
-                      fontSize: '20px',
-                      fontWeight: 600,
-                      marginBottom: '8px',
-                      letterSpacing: '-0.01em',
-                      color: '#1a1a1a',
-                    }}>{s.title}</h3>
-                    <p style={{
-                      fontSize: '15px',
-                      color: '#888',
-                      lineHeight: 1.6,
-                      margin: 0,
-                    }}>{s.desc}</p>
-                  </div>
+                  {/* Screenshot after step 01 */}
+                  {i === 0 && (
+                    <div style={{
+                      marginTop: '32px',
+                      marginLeft: '60px',
+                      perspective: '1200px',
+                    }}>
+                      <div style={{
+                        background: '#1a1a1a',
+                        borderRadius: '16px',
+                        padding: '8px',
+                        boxShadow: '0 32px 80px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.08)',
+                        transform: 'rotateY(-8deg) rotateX(4deg)',
+                        transformOrigin: 'center center',
+                        maxWidth: '480px',
+                      }}>
+                        {/* Browser bar */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 12px',
+                        }}>
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f57' }} />
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#febc2e' }} />
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28c840' }} />
+                          <div style={{
+                            flex: 1,
+                            background: 'rgba(255,255,255,0.08)',
+                            borderRadius: '6px',
+                            padding: '4px 12px',
+                            fontSize: '10px',
+                            color: 'rgba(255,255,255,0.3)',
+                            marginLeft: '8px',
+                            textAlign: 'center',
+                          }}>
+                            noah.iavenir.com
+                          </div>
+                        </div>
+                        <img
+                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/4af84b246_Capturedecran2026-03-05a194036.png"
+                          alt="NOAH™ — Onboarding"
+                          style={{
+                            width: '100%',
+                            borderRadius: '10px',
+                            display: 'block',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

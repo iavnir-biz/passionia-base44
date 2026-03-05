@@ -24,7 +24,6 @@ export default function OfferProductPrincipal() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
-  const [sessionId, setSessionId] = useState(null);
   const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +37,6 @@ export default function OfferProductPrincipal() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      setSessionId(resolvedSessionId);
       if (resolvedSessionId) {
         const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
         if (sessions.length > 0) {
@@ -63,11 +61,11 @@ export default function OfferProductPrincipal() {
     setSelectedOffer(offer);
     setIsSaving(true);
     try {
-      const sid = sessionId || session?.id;
-      await base44.functions.invoke('saveFinalizedOffer', { sessionId: sid, key: 'mainProduct', offer });
-      setIsSaving(false);
-      setShowTransition(true);
-    } catch (error) { console.error('Error saving:', error); setIsSaving(false); }
+      const resolvedId = localStorage.getItem('passionia_active_session_id') || session?.id;
+      await base44.functions.invoke('saveFinalizedOffer', { sessionId: resolvedId, key: 'mainProduct', offer });
+    } catch (error) { console.error('Error saving:', error); }
+    setIsSaving(false);
+    setShowTransition(true);
   };
 
   if (isLoading) return null;

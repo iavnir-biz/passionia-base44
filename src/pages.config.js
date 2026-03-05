@@ -104,6 +104,7 @@ import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
 import DashboardNoah from './pages/DashboardNoah';
 import MesOffresNoah from './pages/MesOffresNoah';
+import MesMessagesNoah from './pages/MesMessagesNoah';
 
 
 export const PAGES = {
@@ -164,6 +165,7 @@ export const PAGES = {
     "Welcome": Welcome,
     "DashboardNoah": DashboardNoah,
     "MesOffresNoah": MesOffresNoah,
+    "MesMessagesNoah": MesMessagesNoah,
 }
 
 export const pagesConfig = {

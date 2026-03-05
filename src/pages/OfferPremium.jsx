@@ -6,7 +6,6 @@ import { Loader2, Star, Users, Crown, Award } from 'lucide-react';
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 import OfferTransition from '@/components/offer/OfferTransition';
 import OfferSidebar from '@/components/onboarding/OfferSidebar';
-import UserIdeaBlock from '@/components/offer/UserIdeaBlock';
 
 const getProductIcon = (offer) => {
   const title = (offer?.title || '').toLowerCase();
@@ -22,7 +21,6 @@ export default function OfferPremium() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
-  const [sessionId, setSessionId] = useState(null);
   const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +34,6 @@ export default function OfferPremium() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      setSessionId(resolvedSessionId);
       if (resolvedSessionId) {
         const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
         if (sessions.length > 0) {
@@ -61,12 +58,11 @@ export default function OfferPremium() {
     setSelectedOffer(offer);
     setIsSaving(true);
     try {
-      const sid = sessionId || session?.id;
-      const result = await base44.functions.invoke('saveFinalizedOffer', { sessionId: sid, key: 'upsell3', offer });
-      console.log('✅ [OfferPremium] Offre complète:', result.data);
-      setIsSaving(false);
-      setShowTransition(true);
-    } catch (error) { console.error('Error saving:', error); setIsSaving(false); }
+      const resolvedId = localStorage.getItem('passionia_active_session_id') || session?.id;
+      await base44.functions.invoke('saveFinalizedOffer', { sessionId: resolvedId, key: 'upsell3', offer });
+    } catch (error) { console.error('Error saving:', error); }
+    setIsSaving(false);
+    setShowTransition(true);
   };
 
   if (isLoading) return null;
@@ -78,7 +74,9 @@ export default function OfferPremium() {
       <OfferSidebar currentStep={4} />
 
       <div className="lg:ml-72 pt-24 lg:pt-12 pb-12 relative">
-        <div style={{ position: 'absolute', width: '220px', height: '220px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%)', top: '10%', right: '-3%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+        {/* Neon circles */}
+        <div style={{ position: 'absolute', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%)', top: '5%', right: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%)', bottom: '10%', left: '5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
 
         <div className="max-w-3xl mx-auto px-4 relative z-10">
           <div className="text-center mb-8">
@@ -96,8 +94,6 @@ export default function OfferPremium() {
               {offers.map((offer) => <OfferCardNew key={offer.id} offer={offer} icon={offer.icon} isSelected={selectedOffer?.id === offer.id} onSelect={handleSelect} colorScheme="gold" />)}
             </div>
           )}
-
-          {session && <UserIdeaBlock sessionId={session.id} offerKey="upsell3" existingIdeas={session.user_ideas} />}
 
           {isSaving && (
             <div className="mt-6 flex items-center justify-center gap-2 text-[#1a1a1a]">

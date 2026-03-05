@@ -8,7 +8,6 @@ import {
   ChevronDown, ChevronUp, TrendingUp, ArrowRight, BookOpen, Award, Crown, Gift, Target,
   Lightbulb, MessageSquare, Calendar, Package
 } from 'lucide-react';
-import GlowButton from '@/components/ui/GlowButton';
 import OfferTransition from '@/components/offer/OfferTransition';
 import OfferSidebar from '@/components/onboarding/OfferSidebar';
 

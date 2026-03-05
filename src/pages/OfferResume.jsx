@@ -53,7 +53,28 @@ export default function OfferResume() {
       const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
       if (!resolvedSessionId) return;
       const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
-      if (sessions?.length > 0) setSession(sessions[0]);
+      if (sessions?.length > 0) {
+        const s = sessions[0];
+        setSession(s);
+
+        // Auto-save potential_revenue and is_offer_complete if finalized_offer exists but values are missing
+        if (s.finalized_offer && Object.keys(s.finalized_offer).length > 0) {
+          const revenues = PRODUCT_CONFIG.map((p) => {
+            const data = s.finalized_offer[p.key];
+            const price = parsePrice(data?.price);
+            return price * p.multiplier;
+          });
+          const totalMonthly = revenues.reduce((sum, r) => sum + r, 0);
+
+          if (!s.is_offer_complete || !s.potential_revenue) {
+            await base44.entities.Session.update(s.id, {
+              is_offer_complete: true,
+              potential_revenue: totalMonthly
+            });
+            setSession({ ...s, is_offer_complete: true, potential_revenue: totalMonthly });
+          }
+        }
+      }
     } catch (error) { console.error('Error loading user:', error); }
     finally { setIsLoading(false); }
   };

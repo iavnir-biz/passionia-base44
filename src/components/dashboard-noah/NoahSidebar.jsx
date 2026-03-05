@@ -46,13 +46,11 @@ export default function NoahSidebar({ currentPage, user, isOpen, onClose }) {
         {/* Logo */}
         <div className="h-14 flex items-center px-5 border-b border-[#e5e5e5]">
           <div className="flex items-center gap-2.5">
-            <div style={{
-              width: '28px', height: '28px', borderRadius: '8px',
-              background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
-              <span style={{ fontSize: '14px', color: '#fff', fontWeight: 700 }}>N</span>
-            </div>
+            <img
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/519bb7a08_Sanstitre500x500px.png"
+              alt="iavnir"
+              style={{ width: '28px', height: '28px', borderRadius: '6px', objectFit: 'contain' }}
+            />
             <span style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
               iAvenir Lab
             </span>

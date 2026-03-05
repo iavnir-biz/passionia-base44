@@ -13,7 +13,7 @@ import NoahOnboardingSummary from '@/components/dashboard-noah/NoahOnboardingSum
 import NoahPlanAction from '@/components/dashboard-noah/NoahPlanAction';
 import NoahProducts from '@/components/dashboard-noah/NoahProducts';
 import NoahSalesMessages from '@/components/dashboard-noah/NoahSalesMessages';
-import NoahExploreCards from '@/components/dashboard-noah/NoahExploreCards';
+
 
 export default function DashboardNoah() {
   const navigate = useNavigate();
@@ -156,9 +156,6 @@ export default function DashboardNoah() {
 
           {/* Sales Messages */}
           <NoahSalesMessages session={session} />
-
-          {/* Explore */}
-          <NoahExploreCards />
 
         </main>
       </div>

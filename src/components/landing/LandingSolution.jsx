@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Zap, FileText, Mail, MessageSquare, Users, Clock } from 'lucide-react';
+import { Zap, FileText, BarChart3, MessageSquare, Users, Clock } from 'lucide-react';
 
 const marqueeItems = [
   { text: "1 offre d'entrée (7€–37€)", color: "#f97316" },
@@ -60,11 +60,11 @@ export default function LandingSolution() {
 
   const features = [
     { icon: <Zap size={22} />, title: "4 offres structurées", desc: "Offre principale, petit extra, offre supérieure, offre premium — avec les prix optimaux." },
-    { icon: <Clock size={22} />, title: "Plan d'action 7 jours", desc: "Étape par étape, une action par jour." },
-    { icon: <Users size={22} />, title: "Avatars clients", desc: "Profils détaillés de tes clients idéaux." },
-    { icon: <MessageSquare size={22} />, title: "Messages de vente", desc: "Scripts pour réseaux sociaux et conversations." },
+    { icon: <MessageSquare size={22} />, title: "Messages de vente", desc: "Messages complètement personnalisés par rapport à tes produits pour faire tes premières ventes." },
+    { icon: <Clock size={22} />, title: "Plan d'action 7 jours", desc: "Plan d'action étape par étape, une action par jour, 100% personnalisé à ton profil et à tes objectifs." },
+    { icon: <BarChart3 size={22} />, title: "Analyse de marché détaillée", desc: "Validation de ton idée et étude de marché complète." },
+    { icon: <Users size={22} />, title: "Avatars clients", desc: "Profils détaillés de tes clients idéaux, avec les stratégies pour savoir leur vendre." },
     { icon: <FileText size={22} />, title: "Pages de vente", desc: "Textes persuasifs générés, prêts à copier-coller." },
-    { icon: <Mail size={22} />, title: "Analyse de marché détaillée", desc: "Validation de ton idée et étude de marché complète." },
   ];
 
   return (

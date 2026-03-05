@@ -46,7 +46,7 @@ export default function OnboardingQ24IfNothingChanges() {
       const session = sessions[0];
       const onboardingFull = session.onboarding_full || {};
       onboardingFull.ifNothingChanges = option;
-      await base44.entities.Session.update(currentUser.sessionId, { onboarding_full: onboardingFull });
+      await base44.entities.Session.update(resolvedSessionId, { onboarding_full: onboardingFull });
       localStorage.setItem('onboarding_ifNothingChanges', option);
       navigate(createPageUrl('OnboardingQ25Readiness'));
     } catch (error) {

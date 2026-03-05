@@ -43,7 +43,7 @@ export default function NoahWelcomeBanner() {
             fontStyle: 'italic',
             background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-          }}>iavnirLab</span>
+          }}>le Lab</span>
         </h2>
         <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, maxWidth: '500px' }}>
           La méthode complète pour vendre tes premiers produits de formation en ligne et enfin vivre de ton savoir-faire.

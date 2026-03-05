@@ -63,12 +63,13 @@ export default function BonneNouvelle() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
 
-      if (!currentUser.sessionId) {
+      const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      if (!resolvedSessionId) {
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
       if (!sessions || sessions.length === 0) {
         navigate(createPageUrl('OnboardingFirstName'));
         return;

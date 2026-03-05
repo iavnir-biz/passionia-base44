@@ -191,9 +191,11 @@ export default function LandingHowItWorks() {
                         <img
                           src={i === 0
                             ? "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/b730b79e7_Capturedecran2026-03-05a194750.png"
-                            : "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/fe846192a_Capturedecran2026-03-05a195942.png"
+                            : i === 1
+                            ? "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/fe846192a_Capturedecran2026-03-05a195942.png"
+                            : "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/d70606f00_Capturedecran2026-03-05a213901.png"
                           }
-                          alt={i === 0 ? "NOAH™ — Onboarding" : "NOAH™ — Offres générées"}
+                          alt={i === 0 ? "NOAH™ — Onboarding" : i === 1 ? "NOAH™ — Offres générées" : "NOAH™ — Plan d'action"}
                           style={{
                             width: '100%',
                             borderRadius: '8px',

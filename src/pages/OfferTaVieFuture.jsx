@@ -105,7 +105,7 @@ export default function OfferTaVieFuture() {
   }
 
   if (showTransition) {
-    return <OfferTransition message="Noah prépare ton plan de route..." onComplete={() => navigate(createPageUrl('CTAPAYWALL'))} />;
+    return <OfferTransition message="Préparation de ton espace..." onComplete={() => navigate(createPageUrl('SetupProfile'))} />;
   }
 
   const finalizedOffer = session?.finalized_offer || {};
@@ -192,7 +192,7 @@ export default function OfferTaVieFuture() {
               onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
               onMouseOut={e => e.currentTarget.style.opacity = '1'}
             >
-              Voir le plan concret <ArrowRight size={16} />
+              Accéder à mon dashboard <ArrowRight size={16} />
             </button>
           </div>
 
@@ -367,7 +367,7 @@ export default function OfferTaVieFuture() {
               onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
               onMouseOut={e => e.currentTarget.style.opacity = '1'}
             >
-              Voir le plan concret <ArrowRight size={16} />
+              Accéder à mon dashboard <ArrowRight size={16} />
             </button>
           </motion.div>
 

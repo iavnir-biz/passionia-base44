@@ -88,7 +88,7 @@ export default function BonneNouvelle() {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        generateMarketAnalysis(currentUser.sessionId, currentSession);
+        generateMarketAnalysis(resolvedSessionId, currentSession);
       }
     } catch (error) {
       console.error('Error loading session:', error);

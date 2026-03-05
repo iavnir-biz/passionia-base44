@@ -30,7 +30,7 @@ export default function NoahProducts({ session }) {
           Mes produits
         </h3>
         <button
-          onClick={() => navigate(createPageUrl('MyOffers'))}
+          onClick={() => navigate(createPageUrl('MesOffresNoah'))}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '4px',
             fontSize: '12px', fontWeight: 500, color: '#888', background: 'none',
@@ -52,7 +52,7 @@ export default function NoahProducts({ session }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + idx * 0.06 }}
-              onClick={() => navigate(createPageUrl('MyOffers'))}
+              onClick={() => navigate(createPageUrl('MesOffresNoah'))}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px',
                 padding: '14px 16px', borderRadius: '14px',

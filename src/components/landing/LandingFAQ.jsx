@@ -106,15 +106,14 @@ export default function LandingFAQ() {
     }}>
       <div style={{ maxWidth: '700px', margin: '0 auto' }}>
         <h2 style={{
-          fontSize: 'clamp(32px, 5vw, 56px)',
+          fontSize: 'clamp(28px, 4vw, 44px)',
           fontWeight: 400,
-          lineHeight: 1.1,
-          letterSpacing: '-0.03em',
+          lineHeight: 1.2,
+          letterSpacing: '-0.02em',
           textAlign: 'center',
           marginBottom: '56px',
-          fontStyle: 'italic',
         }}>
-          Questions<br />fréquentes
+          Questions <span style={{ fontStyle: 'italic', fontWeight: 700 }}>fréquentes</span>
         </h2>
 
         {faqs.map((f, i) => (

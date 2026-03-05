@@ -175,8 +175,15 @@ export default function OnboardingDynamic() {
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         padding: '40px 24px',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        <div style={{ width: '100%', maxWidth: '520px', textAlign: 'center' }}>
+        {/* Floating neon circles — behind answers */}
+        <div className="od-neon od-neon-1" />
+        <div className="od-neon od-neon-2" />
+        <div className="od-neon od-neon-3" />
+
+        <div style={{ width: '100%', maxWidth: '520px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
 
           {/* Badge pill — gradient */}
           <div style={{

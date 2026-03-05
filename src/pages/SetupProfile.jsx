@@ -88,7 +88,7 @@ export default function SetupProfile() {
         profile_picture: formData.avatar_url
       });
 
-      navigate(createPageUrl('Dashboard'));
+      navigate(createPageUrl('DashboardNoah'));
     } catch (error) {
       console.error('Error saving profile:', error);
       toast.error('Erreur lors de la sauvegarde');

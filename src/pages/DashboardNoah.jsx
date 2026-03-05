@@ -114,7 +114,7 @@ export default function DashboardNoah() {
                 marginBottom: '24px', cursor: 'pointer', transition: 'all 0.2s'
               }}
               className="hover:shadow-sm hover:border-[#ccc]"
-              onClick={() => navigate(createPageUrl('PlanAction'))}
+              onClick={() => navigate(createPageUrl('MonPlanNoah'))}
             >
               <div style={{
                 width: '44px', height: '44px', borderRadius: '12px',

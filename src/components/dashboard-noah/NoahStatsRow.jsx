@@ -26,7 +26,8 @@ export default function NoahStatsRow({ session }) {
         </div>
         <p style={{
           fontSize: '28px', fontWeight: 700, letterSpacing: '-0.03em',
-          color: '#1a1a1a'
+          background: 'linear-gradient(135deg, #f97316, #ec4899)',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
         }}>
           {progressPercent}%
         </p>

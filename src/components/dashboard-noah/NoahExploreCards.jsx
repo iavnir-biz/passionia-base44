@@ -21,7 +21,7 @@ const CARDS = [
     cta: 'Accéder aux produits',
     page: 'MyOffers',
     icon: Package,
-    gradient: 'linear-gradient(135deg, #333 0%, #555 100%)',
+    gradient: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
   },
   {
     title: 'MESSAGES',
@@ -30,7 +30,7 @@ const CARDS = [
     cta: 'Générer les messages',
     page: 'SalesMessages',
     icon: MessageCircle,
-    gradient: 'linear-gradient(135deg, #444 0%, #666 100%)',
+    gradient: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)',
   },
   {
     title: 'COMMUNAUTÉ',
@@ -40,7 +40,7 @@ const CARDS = [
     page: null,
     href: 'https://www.skool.com/ia-pour-tous-6043/about?ref=8a2dca11af9048e6940087b263136daa',
     icon: Users,
-    gradient: 'linear-gradient(135deg, #555 0%, #777 100%)',
+    gradient: 'linear-gradient(135deg, #ec4899 0%, #f97316 100%)',
   },
 ];
 

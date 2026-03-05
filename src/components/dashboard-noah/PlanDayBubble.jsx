@@ -29,11 +29,11 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
             width: '48px', height: '48px', borderRadius: '50%', display: 'flex',
             alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             background: isCompleted
-              ? '#1a1a1a'
+              ? 'linear-gradient(135deg, #f97316, #ec4899)'
               : isActive
-                ? '#1a1a1a'
+                ? 'linear-gradient(135deg, #1a1a1a, #333)'
                 : '#f0f0f0',
-            boxShadow: isActive ? '0 0 20px rgba(0,0,0,0.15)' : 'none',
+            boxShadow: isActive ? '0 0 16px rgba(26,26,26,0.2)' : isCompleted ? '0 0 12px rgba(249,115,22,0.25)' : 'none',
             border: isActive ? '3px solid #fff' : '2px solid #e5e5e5',
             cursor: isLocked ? 'default' : 'pointer'
           }}
@@ -59,7 +59,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
             style={{
               width: '2px', flex: 1, minHeight: '20px',
               background: isCompleted
-                ? 'linear-gradient(to bottom, #1a1a1a, #e5e5e5)'
+                ? 'linear-gradient(to bottom, #f97316, #e5e5e5)'
                 : '#e5e5e5',
               transformOrigin: 'top', marginTop: '4px', marginBottom: '4px'
             }}
@@ -98,9 +98,9 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
               </span>
               <span style={{
                 fontSize: '10px', fontWeight: 600, padding: '2px 8px',
-                borderRadius: '100px', background: isCompleted ? '#1a1a1a' : '#f5f5f5',
+                borderRadius: '100px', background: isCompleted ? 'linear-gradient(135deg, #f97316, #ec4899)' : '#f5f5f5',
                 color: isCompleted ? '#fff' : '#888', border: '1px solid',
-                borderColor: isCompleted ? '#1a1a1a' : '#e5e5e5'
+                borderColor: isCompleted ? 'transparent' : '#e5e5e5'
               }}>
                 {isCompleted ? '✓ Terminé' : isActive ? 'En cours' : isLocked ? 'Verrouillé' : ''}
               </span>
@@ -133,7 +133,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
             <motion.div
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.4 }}
-              style={{ height: '100%', background: '#1a1a1a', borderRadius: '2px' }}
+              style={{ height: '100%', background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)', borderRadius: '2px' }}
             />
           </div>
         )}
@@ -166,8 +166,8 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                   <div key={idx} style={{
                     display: 'flex', alignItems: 'flex-start', gap: '12px',
                     padding: '10px 14px', borderRadius: '12px',
-                    background: item.checked ? '#f5f5f5' : '#fafafa',
-                    border: item.checked ? '1px solid #d4d4d4' : '1px solid #f0f0f0',
+                    background: item.checked ? 'linear-gradient(135deg, rgba(249,115,22,0.06), rgba(236,72,153,0.06))' : '#fafafa',
+                    border: item.checked ? '1px solid rgba(249,115,22,0.2)' : '1px solid #f0f0f0',
                     transition: 'all 0.2s'
                   }}>
                     <input
@@ -175,7 +175,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                       checked={item.checked}
                       onChange={() => onChecklistChange(idx)}
                       disabled={isCompleted || item.disabled}
-                      style={{ marginTop: '2px', width: '18px', height: '18px', accentColor: '#1a1a1a', cursor: 'pointer', flexShrink: 0 }}
+                      style={{ marginTop: '2px', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', accentColor: '#f97316', cursor: 'pointer', flexShrink: 0 }}
                     />
                     <div style={{ flex: 1 }}>
                       <p style={{
@@ -195,7 +195,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                           onClick={() => handleAction(item.action)}
                           style={{
                             display: 'inline-flex', alignItems: 'center', gap: '4px',
-                            fontSize: '11px', fontWeight: 600, color: '#1a1a1a',
+                            fontSize: '11px', fontWeight: 600, color: '#f97316',
                             background: 'none', border: 'none', cursor: 'pointer',
                             marginTop: '6px', padding: 0
                           }}
@@ -216,7 +216,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                     onClick={onComplete}
                     style={{
                       width: '100%', padding: '14px', borderRadius: '14px',
-                      background: '#1a1a1a', color: '#fff', border: 'none',
+                      background: 'linear-gradient(135deg, #1a1a1a, #333)', color: '#fff', border: 'none',
                       fontSize: '14px', fontWeight: 700, cursor: 'pointer',
                       marginTop: '8px'
                     }}
@@ -228,10 +228,10 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                 {/* Completion message */}
                 {isCompleted && day.completionMessage && (
                   <div style={{
-                    background: '#f5f5f5', borderRadius: '12px', padding: '12px 16px',
-                    border: '1px solid #d4d4d4'
+                    background: 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(167,139,250,0.08))', borderRadius: '12px', padding: '12px 16px',
+                    border: '1px solid rgba(249,115,22,0.2)'
                   }}>
-                    <p style={{ fontSize: '12px', color: '#1a1a1a', fontWeight: 600, margin: 0 }}>
+                    <p style={{ fontSize: '12px', color: '#f97316', fontWeight: 600, margin: 0 }}>
                       ✅ {day.completionMessage}
                     </p>
                   </div>

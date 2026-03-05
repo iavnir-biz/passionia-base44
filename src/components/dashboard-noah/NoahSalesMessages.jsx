@@ -38,7 +38,7 @@ export default function NoahSalesMessages({ session }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             width: '36px', height: '36px', borderRadius: '10px',
-            background: '#1a1a1a',
+            background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
             display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
             <MessageCircle style={{ width: '18px', height: '18px', color: '#fff' }} />

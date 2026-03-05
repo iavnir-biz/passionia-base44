@@ -206,10 +206,45 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
             )}
           </div>
 
+          {/* Actions */}
+          <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {(!offer || !isEnriched) && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onEnrich(); }}
+                disabled={isLoading}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: '#1a1a1a', color: '#fff', border: 'none',
+                  padding: '8px 16px', borderRadius: '100px', fontSize: '12px',
+                  fontWeight: 600, cursor: 'pointer', opacity: isLoading ? 0.6 : 1
+                }}
+              >
+                {isLoading ? (
+                  <><Loader2 style={{ width: '12px', height: '12px' }} className="animate-spin" /> {offer ? 'Enrichissement...' : 'Génération...'}</>
+                ) : (
+                  <><Sparkles style={{ width: '12px', height: '12px' }} /> {offer ? 'Enrichir avec l\'IA' : 'Détailler'}</>
+                )}
+              </button>
+            )}
+            {offer && isEnriched && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onCopy(); }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: '#f5f5f5', color: '#1a1a1a', border: '1px solid #e5e5e5',
+                  padding: '8px 16px', borderRadius: '100px', fontSize: '12px',
+                  fontWeight: 600, cursor: 'pointer'
+                }}
+              >
+                <Copy style={{ width: '12px', height: '12px' }} /> Copier
+              </button>
+            )}
+          </div>
+
           {/* Non enrichi */}
           {!isEnriched && (
             <div style={{
-              marginTop: '16px', padding: '14px 18px', borderRadius: '14px',
+              marginTop: '12px', padding: '14px 18px', borderRadius: '14px',
               background: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
               border: '1px solid #fde68a'
             }}>

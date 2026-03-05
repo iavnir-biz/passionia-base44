@@ -98,9 +98,9 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
               </span>
               <span style={{
                 fontSize: '10px', fontWeight: 600, padding: '2px 8px',
-                borderRadius: '100px', background: isCompleted ? '#dcfce7' : '#f5f5f5',
-                color: isCompleted ? '#16a34a' : '#888', border: '1px solid',
-                borderColor: isCompleted ? '#bbf7d0' : '#e5e5e5'
+                borderRadius: '100px', background: isCompleted ? '#1a1a1a' : '#f5f5f5',
+                color: isCompleted ? '#fff' : '#888', border: '1px solid',
+                borderColor: isCompleted ? '#1a1a1a' : '#e5e5e5'
               }}>
                 {isCompleted ? '✓ Terminé' : isActive ? 'En cours' : isLocked ? 'Verrouillé' : ''}
               </span>

@@ -3,38 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import {
-  Loader2,
-  TrendingUp,
-  ArrowRight,
-  ChevronDown,
-  ChevronUp,
-  Sparkles,
-  Globe,
-  Users,
-  Repeat,
-  Laptop,
-  BarChart3,
-  Package,
-  Sprout,
-  Map
-} from 'lucide-react';
-import GlowButton from '@/components/ui/GlowButton';
+import { Loader2, ArrowRight, Globe, TrendingUp, Package } from 'lucide-react';
 import OfferTransition from '@/components/offer/OfferTransition';
-import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
-import { cn } from "@/lib/utils";
-
-const mainSteps = [
-  { id: 1, label: "Tes offres", icon: Package, color: "from-orange-500 to-red-500" },
-  { id: 2, label: "Ton marché", icon: BarChart3, color: "from-green-500 to-emerald-500" },
-  { id: 3, label: "Ta vie future", icon: Sprout, color: "from-amber-500 to-yellow-500" },
-  { id: 4, label: "Ton plan d'action", icon: Map, color: "from-indigo-500 to-purple-500" },
-];
 
 function parsePrice(priceStr) {
   if (!priceStr) return 0;
-  const cleaned = priceStr.replace(/[^0-9]/g, '');
-  return parseInt(cleaned, 10) || 0;
+  return parseInt(priceStr.replace(/[^0-9]/g, ''), 10) || 0;
 }
 
 function ProgressBarItem({ label, value, icon: Icon, explanation, delay = 0 }) {
@@ -43,26 +17,30 @@ function ProgressBarItem({ label, value, icon: Icon, explanation, delay = 0 }) {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay }}
-      className="space-y-2"
+      style={{ marginBottom: '20px' }}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#61f7a2]/10 flex items-center justify-center">
-            <Icon className="w-4 h-4 text-[#61f7a2]" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icon style={{ width: '16px', height: '16px', color: '#1a1a1a' }} />
           </div>
-          <span className="text-sm font-medium text-gray-700">{label}</span>
+          <span style={{ fontSize: '14px', fontWeight: 500, color: '#1a1a1a' }}>{label}</span>
         </div>
-        <span className="text-sm font-bold text-[#61f7a2]">{value}%</span>
+        <span style={{
+          fontSize: '14px', fontWeight: 700,
+          background: 'linear-gradient(135deg, #f97316, #ec4899)',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+        }}>{value}%</span>
       </div>
       {explanation && (
-        <p className="text-xs text-gray-600 ml-11 leading-relaxed">{explanation}</p>
+        <p style={{ fontSize: '12px', color: '#888', marginLeft: '42px', marginBottom: '8px', lineHeight: 1.5 }}>{explanation}</p>
       )}
-      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div style={{ height: '6px', background: '#f0f0f0', borderRadius: '100px', overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
           transition={{ delay: delay + 0.2, duration: 0.8, ease: "easeOut" }}
-          className="h-full bg-gradient-to-r from-[#61f7a2] to-[#4de88f] rounded-full shadow-sm"
+          style={{ height: '100%', borderRadius: '100px', background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)' }}
         />
       </div>
     </motion.div>
@@ -74,14 +52,11 @@ export default function BonneNouvelle() {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showDetail, setShowDetail] = useState(false);
   const [marketAnalysis, setMarketAnalysis] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
 
-  useEffect(() => {
-    loadSession();
-  }, []);
+  useEffect(() => { loadSession(); }, []);
 
   const loadSession = async () => {
     try {
@@ -89,14 +64,12 @@ export default function BonneNouvelle() {
       setUser(currentUser);
 
       if (!currentUser.sessionId) {
-        console.error('❌ [BONNENOUVELLE] Pas de sessionId');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
       const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
       if (!sessions || sessions.length === 0) {
-        console.error('❌ [BONNENOUVELLE] Session introuvable');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
@@ -104,25 +77,15 @@ export default function BonneNouvelle() {
       const currentSession = sessions[0];
       setSession(currentSession);
 
-      console.log('[BONNENOUVELLE][SESSION]', {
-        hasMarket: !!currentSession.market_validation,
-        hasScores: !!currentSession.market_validation_scores,
-        hasFinalized: !!currentSession.finalized_offer,
-        hasMyOffers: !!currentSession.my_generated_offers
-      });
-
-      // Si cache existe, utiliser immédiatement
       if (currentSession.market_validation) {
         setMarketAnalysis({
           validationText: currentSession.market_validation,
           marketScores: currentSession.market_validation_scores || {},
-          scoreExplanations: currentSession.market_validation_score_explanations || {},
           sources: currentSession.market_validation_sources || {},
           summary: currentSession.onboarding_summary || {}
         });
         setIsLoading(false);
       } else {
-        // Sinon générer
         setIsLoading(false);
         generateMarketAnalysis(currentUser.sessionId, currentSession);
       }
@@ -134,20 +97,15 @@ export default function BonneNouvelle() {
 
   const generateMarketAnalysis = async (sessionId, currentSession) => {
     if (!sessionId) return;
-
     setIsGenerating(true);
     try {
       const summary = currentSession?.onboarding_summary || {};
-
-      const { data } = await base44.functions.invoke('generateMarketValidation', {
-        sessionId
-      });
+      const { data } = await base44.functions.invoke('generateMarketValidation', { sessionId });
 
       if (data.success) {
         setMarketAnalysis({
           validationText: data.marketValidation,
           marketScores: data.marketScores || {},
-          scoreExplanations: data.scoreExplanations || {},
           sources: data.sources || {},
           summary
         });
@@ -155,20 +113,9 @@ export default function BonneNouvelle() {
     } catch (error) {
       console.error('Error generating analysis:', error);
       const summary = currentSession?.onboarding_summary || {};
-      const who = summary.who_to_teach || 'ta compétence';
-
       setMarketAnalysis({
-        validationText: `${user?.firstName || ''}, les personnes que tu veux aider font face à un blocage réel. Ce problème les empêche de progresser efficacement.\n\nCe que tu proposes répond directement à ce blocage : un résultat rapide dès le départ, puis une transformation durable. Cette progression claire crée une valeur perçue forte.\n\nTon objectif de revenus est cohérent avec les formats que tu as choisis et le niveau de transformation que tu apportes. Le ratio effort/revenus est favorable.`,
-        marketScores: {
-          marketSize: 68,
-          demandIntensity: 74,
-          revenueRecurrence: 70
-        },
-        scoreExplanations: {
-          marketSize: "Score modéré car audience ciblée spécifique.",
-          demandIntensity: "Score élevé car besoin identifié et douleur concrète.",
-          revenueRecurrence: "Score élevé car potentiel de récurrence."
-        },
+        validationText: `${user?.firstName || ''}, les personnes que tu veux aider font face à un blocage réel. Ce problème les empêche de progresser efficacement.\n\nCe que tu proposes répond directement à ce blocage : un résultat rapide dès le départ, puis une transformation durable. Cette progression claire crée une valeur perçue forte.\n\nTon objectif de revenus est cohérent avec les formats que tu as choisis et le niveau de transformation que tu apportes.`,
+        marketScores: { marketSize: 68, demandIntensity: 74, revenueRecurrence: 70 },
         summary
       });
     } finally {
@@ -176,211 +123,184 @@ export default function BonneNouvelle() {
     }
   };
 
-  const handleContinue = () => {
-    setShowTransition(true);
-  };
-
-  const handleTransitionComplete = () => {
-    navigate(createPageUrl('OfferTaVieFuture'));
-  };
+  const handleContinue = () => setShowTransition(true);
 
   if (isLoading || isGenerating) {
     return <OfferTransition message={isGenerating ? "Noah analyse le marché..." : "Chargement..."} />;
   }
 
   if (showTransition) {
-    return <OfferTransition message="Noah prépare ta vision future..." onComplete={handleTransitionComplete} />;
+    return <OfferTransition message="Noah prépare ta vision future..." onComplete={() => navigate(createPageUrl('OfferTaVieFuture'))} />;
   }
-
-  // 🔥 REVENUE depuis Session
-  const finalized = session?.finalized_offer || null;
-  const myOffers = session?.my_generated_offers || null;
-
-  const defaultRevenues = [
-    { key: 'low', label: 'Produit Principal', price: 97, multiplier: 30 },
-    { key: 'bump', label: 'Order Bump', price: 27, multiplier: 15 },
-    { key: 'mid', label: 'Upsell', price: 297, multiplier: 9 },
-    { key: 'high', label: 'Premium', price: 3000, multiplier: 1 }
-  ];
-
-  let revenues = [];
-  let revenueSource = 'defaults';
-
-  if (myOffers?.low || myOffers?.bump || myOffers?.mid || myOffers?.high) {
-    revenueSource = 'my_generated_offers';
-    revenues = [
-      { key: 'low', label: 'Produit Principal', data: myOffers.low, multiplier: 30 },
-      { key: 'bump', label: 'Order Bump', data: myOffers.bump, multiplier: 15 },
-      { key: 'mid', label: 'Upsell', data: myOffers.mid, multiplier: 9 },
-      { key: 'high', label: 'Premium', data: myOffers.high, multiplier: 1 }
-    ].map((p, idx) => {
-      const price = parsePrice(p.data?.price);
-      return {
-        ...p,
-        price: price > 0 ? price : defaultRevenues[idx].price,
-        total: (price > 0 ? price : defaultRevenues[idx].price) * p.multiplier
-      };
-    });
-  } else if (finalized?.mainProduct || finalized?.upsell1 || finalized?.upsell2 || finalized?.upsell3) {
-    revenueSource = 'finalized_offer';
-    revenues = [
-      { key: 'main', label: 'Produit Principal', data: finalized.mainProduct, multiplier: 30 },
-      { key: 'upsell1', label: 'Order Bump', data: finalized.orderBump, multiplier: 15 },
-      { key: 'upsell2', label: 'Upsell', data: finalized.upsell1, multiplier: 9 },
-      { key: 'upsell3', label: 'Premium', data: finalized.upsell3, multiplier: 1 }
-    ].map((p, idx) => {
-      const price = parsePrice(p.data?.price);
-      return {
-        ...p,
-        price: price > 0 ? price : defaultRevenues[idx].price,
-        total: (price > 0 ? price : defaultRevenues[idx].price) * p.multiplier
-      };
-    });
-  } else {
-    revenues = defaultRevenues.map(p => ({ ...p, total: p.price * p.multiplier }));
-  }
-
-  const totalMonthly = revenues.reduce((sum, r) => sum + r.total, 0);
 
   const scores = marketAnalysis?.marketScores || {};
-  const completedSteps = [1, 2, 3, 4];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
-      <OnboardingSidebar currentPage="BonneNouvelle" completedSteps={completedSteps} progressInStep={0} />
+    <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-32 lg:pt-0 overflow-x-hidden relative">
-        <div className="py-12">
-          <div className="max-w-3xl mx-auto px-4">
-            {/* Title */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-10"
+      <div className="relative">
+        {/* Neon circles */}
+        <div style={{ position: 'absolute', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)', top: '5%', right: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%)', bottom: '10%', left: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%)', top: '40%', left: '50%', transform: 'translateX(-50%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+
+        <div className="max-w-3xl mx-auto px-4 relative z-10" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+
+          {/* Hero Title — Landing style */}
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: '#f5f5f5', border: '1px solid #e8e8e8', borderRadius: '100px',
+              padding: '6px 16px', fontSize: '13px', color: '#666', marginBottom: '32px'
+            }}>
+              <span style={{ fontSize: '16px' }}>🎉</span>
+              Analyse de marché terminée
+            </div>
+
+            <h1 style={{
+              fontSize: 'clamp(32px, 5vw, 52px)',
+              fontWeight: 400,
+              lineHeight: 1.15,
+              letterSpacing: '-0.03em',
+              color: '#1a1a1a',
+              marginBottom: '16px'
+            }}>
+              Ton marché est <span style={{
+                fontStyle: 'italic',
+                fontWeight: 500,
+                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>réel et viable</span>
+            </h1>
+
+            <p style={{ fontSize: '17px', color: '#888', lineHeight: 1.6, maxWidth: '550px', margin: '0 auto 40px' }}>
+              Noah a analysé ton expertise et ton audience. Voici ce que ça donne.
+            </p>
+
+            {/* Top CTA */}
+            <button
+              onClick={handleContinue}
+              style={{
+                background: '#1a1a1a', color: '#fff', border: 'none',
+                padding: '14px 32px', borderRadius: '100px', fontSize: '15px',
+                fontWeight: 600, cursor: 'pointer', display: 'inline-flex',
+                alignItems: 'center', gap: '8px', transition: 'opacity 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseOut={e => e.currentTarget.style.opacity = '1'}
             >
-              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">
-                🎉 Bonne nouvelle
-              </h1>
-              <p className="text-lg md:text-xl text-gray-600 mb-8">
-                Ton marché est réel et viable
-              </p>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
-                className="flex justify-center"
-              >
-                <GlowButton onClick={handleContinue} size="lg" className="w-full md:w-auto px-12">
-                  Voir ma vie future
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </GlowButton>
-              </motion.div>
-            </motion.div>
-
-            {/* Bandeau info Dashboard */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl flex items-start gap-3"
-            >
-              <div className="bg-amber-400 rounded-full p-1.5 flex-shrink-0 mt-0.5">
-                <BarChart3 className="w-4 h-4 text-white" />
-              </div>
-              <p className="text-sm text-amber-900 leading-relaxed">
-                Toute <span className="font-semibold">l'analyse de marché complète</span>, avec tes acheteurs idéaux, les réseaux où les trouver, et bien plus d'analyses détaillées, se trouve maintenant dans <span className="font-semibold">ton dashboard</span> disponible à la fin ! 📊
-              </p>
-            </motion.div>
-
-            {/* 🔥 BLOC 1 : Validation Text - UTILISE LA FUNCTION */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8 mb-8"
-            >
-              {isGenerating ? (
-                <div className="flex items-center justify-center gap-3 py-12">
-                  <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                  <span className="text-gray-600">Noah analyse le marché...</span>
-                </div>
-              ) : (
-                <div className="space-y-5 text-gray-700 leading-relaxed text-base whitespace-pre-line">
-                  {marketAnalysis?.validationText || 'Analyse en cours...'}
-                </div>
-              )}
-            </motion.div>
-
-            {/* 🔥 BLOC 2 : Preuves - SUPPRIMÉ (déjà dans validationText) */}
-
-            {/* 🔥 BLOC 3 : Market Potential Indicators */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8 mb-8"
-            >
-              <h2 className="text-xl font-bold text-gray-900 mb-6">
-                📊 Ton potentiel sur ce marché
-              </h2>
-
-              {isGenerating ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <ProgressBarItem
-                    label="Potentiel du marché"
-                    value={scores.marketSize || 75}
-                    explanation="Taille et accessibilité de l'audience pour ton offre."
-                    icon={Globe}
-                    delay={0}
-                  />
-                  <ProgressBarItem
-                    label="Évolution récente"
-                    value={scores.demandIntensity || 78}
-                    explanation="Croissance de l'intérêt sur les 12 derniers mois."
-                    icon={TrendingUp}
-                    delay={0.1}
-                  />
-                  <ProgressBarItem
-                    label="Potentiel de monétisation"
-                    value={scores.revenueRecurrence || 80}
-                    explanation="Capacité à générer des revenus stables avec les bons formats."
-                    icon={Package}
-                    delay={0.2}
-                  />
-                </div>
-              )}
-            </motion.div>
-
-            {/* Conclusion */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-gradient-to-r from-[#61f7a2]/10 to-[#4de88f]/10 rounded-2xl border border-[#61f7a2]/20 p-6 mb-8 text-center"
-            >
-              <p className="text-gray-700 text-lg font-medium">
-                👉 Tu n'essaies pas de créer un marché. Tu arrives sur un marché qui existe déjà.
-              </p>
-            </motion.div>
-
-            {/* Bottom CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="flex justify-center"
-            >
-              <GlowButton onClick={handleContinue} size="lg" className="px-12">
-                Voir ma vie future
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </GlowButton>
-            </motion.div>
+              Voir ma vie future <ArrowRight size={16} />
+            </button>
           </div>
+
+          {/* Validation Text Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            style={{
+              background: '#fff', border: '1px solid #e5e5e5', borderRadius: '20px',
+              padding: '32px', marginBottom: '24px'
+            }}
+          >
+            <div style={{ color: '#444', fontSize: '15px', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
+              {marketAnalysis?.validationText || 'Analyse en cours...'}
+            </div>
+          </motion.div>
+
+          {/* Market Potential Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: '#fff', border: '1px solid #e5e5e5', borderRadius: '20px',
+              padding: '32px', marginBottom: '24px'
+            }}
+          >
+            <h2 style={{
+              fontSize: 'clamp(20px, 3vw, 28px)',
+              fontWeight: 400,
+              lineHeight: 1.2,
+              letterSpacing: '-0.02em',
+              color: '#1a1a1a',
+              marginBottom: '28px'
+            }}>
+              Ton <span style={{
+                fontStyle: 'italic',
+                fontWeight: 500,
+                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>potentiel</span> sur ce marché
+            </h2>
+
+            <ProgressBarItem
+              label="Potentiel du marché"
+              value={scores.marketSize || 75}
+              explanation="Taille et accessibilité de l'audience pour ton offre."
+              icon={Globe}
+              delay={0}
+            />
+            <ProgressBarItem
+              label="Évolution récente"
+              value={scores.demandIntensity || 78}
+              explanation="Croissance de l'intérêt sur les 12 derniers mois."
+              icon={TrendingUp}
+              delay={0.1}
+            />
+            <ProgressBarItem
+              label="Potentiel de monétisation"
+              value={scores.revenueRecurrence || 80}
+              explanation="Capacité à générer des revenus stables avec les bons formats."
+              icon={Package}
+              delay={0.2}
+            />
+          </motion.div>
+
+          {/* Conclusion quote */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{
+              background: '#1a1a1a', borderRadius: '20px', padding: '32px',
+              textAlign: 'center', marginBottom: '40px'
+            }}
+          >
+            <p style={{
+              fontSize: '17px', fontWeight: 500, lineHeight: 1.6,
+              background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>
+              Tu n'essaies pas de créer un marché. Tu arrives sur un marché qui existe déjà.
+            </p>
+          </motion.div>
+
+          {/* Bottom CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            style={{ textAlign: 'center' }}
+          >
+            <button
+              onClick={handleContinue}
+              style={{
+                background: '#1a1a1a', color: '#fff', border: 'none',
+                padding: '16px 36px', borderRadius: '100px', fontSize: '15px',
+                fontWeight: 600, cursor: 'pointer', display: 'inline-flex',
+                alignItems: 'center', gap: '8px', transition: 'opacity 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseOut={e => e.currentTarget.style.opacity = '1'}
+            >
+              Voir ma vie future <ArrowRight size={16} />
+            </button>
+          </motion.div>
+
         </div>
       </div>
     </div>

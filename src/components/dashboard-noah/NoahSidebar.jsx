@@ -51,9 +51,7 @@ export default function NoahSidebar({ currentPage, user, isOpen, onClose }) {
               alt="iavnir"
               style={{ width: '28px', height: '28px', borderRadius: '6px', objectFit: 'contain' }}
             />
-            <span style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em' }}>
-              iAvenir Lab
-            </span>
+
           </div>
           <button onClick={onClose} className="ml-auto p-1.5 rounded-lg hover:bg-[#f5f5f5] lg:hidden">
             <ChevronDown className="w-4 h-4 text-[#888] rotate-90" />

@@ -2,185 +2,143 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { Brain, ArrowRight, Loader2 } from "lucide-react";
 
 export default function OnboardingFirstName() {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("payment") === "success") {
-      setPaymentSuccess(true);
+    async function init() {
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth) {
+          base44.auth.redirectToLogin(createPageUrl("OnboardingFirstName"));
+          return;
+        }
+
+        // Check if user already has a profile with first_name
+        const profiles = await base44.entities.UserProfile.list();
+        if (profiles.length > 0 && profiles[0].first_name) {
+          // Already has a name, go to dynamic onboarding
+          navigate(createPageUrl("OnboardingDynamic"), { replace: true });
+          return;
+        }
+      } catch (e) {
+        console.error("Init error:", e);
+      }
+      setLoading(false);
     }
-  }, []);
+    init();
+  }, [navigate]);
 
-  const handleContinue = async () => {
-    if (!firstName.trim() || loading) return;
-    setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!firstName.trim() || saving) return;
 
-    const user = await base44.auth.me();
-
-    const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
-    if (profiles.length > 0) {
-      await base44.entities.UserProfile.update(profiles[0].id, { first_name: firstName.trim() });
-    } else {
-      await base44.entities.UserProfile.create({ first_name: firstName.trim() });
+    setSaving(true);
+    try {
+      const profiles = await base44.entities.UserProfile.list();
+      if (profiles.length > 0) {
+        await base44.entities.UserProfile.update(profiles[0].id, { first_name: firstName.trim() });
+      } else {
+        await base44.entities.UserProfile.create({ first_name: firstName.trim() });
+      }
+      navigate(createPageUrl("OnboardingDynamic"));
+    } catch (err) {
+      console.error("Save error:", err);
+      setSaving(false);
     }
-
-    navigate(createPageUrl("OnboardingDynamic"));
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#ffffff",
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "40px 24px",
-    }}>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <div className="min-h-screen bg-[#fafafa] flex flex-col items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md">
 
-      <div style={{ maxWidth: "480px", width: "100%", textAlign: "center" }}>
-
-        {/* Badge */}
-        <div style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "8px",
-          background: "#f5f5f5",
-          border: "1px solid #e8e8e8",
-          borderRadius: "100px",
-          padding: "6px 16px",
-          fontSize: "13px",
-          color: "#666",
-          marginBottom: "32px",
-        }}>
-          <span style={{
-            background: "#1a1a1a",
-            color: "#fff",
-            padding: "2px 8px",
-            borderRadius: "100px",
-            fontSize: "11px",
-            fontWeight: 600,
-          }}>NOAH™</span>
-          {paymentSuccess ? "Paiement confirmé ✓" : "Ton associé IA"}
-        </div>
-
-        {/* Success message */}
-        {paymentSuccess && (
-          <div style={{
-            background: "#f0fdf4",
-            border: "1px solid #bbf7d0",
-            borderRadius: "16px",
-            padding: "16px 20px",
-            marginBottom: "28px",
-            fontSize: "14px",
-            color: "#166534",
-            lineHeight: 1.6,
-          }}>
-            🎉 Merci pour ton achat ! Commençons par faire connaissance.
+        {/* Noah Avatar */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-center mb-8"
+        >
+          <div className="relative">
+            <div className="w-[72px] h-[72px] rounded-2xl bg-[#61f7a2] flex items-center justify-center shadow-lg shadow-[#61f7a2]/30">
+              <Brain size={36} className="text-white" />
+            </div>
+            <div className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-green-400 border-2 border-[#fafafa] animate-pulse" />
           </div>
-        )}
+        </motion.div>
 
         {/* Title */}
-        <h1 style={{
-          fontSize: "clamp(28px, 5vw, 42px)",
-          fontWeight: 400,
-          lineHeight: 1.15,
-          letterSpacing: "-0.03em",
-          color: "#1a1a1a",
-          marginBottom: "12px",
-        }}>
-          Comment tu{" "}
-          <span style={{
-            fontStyle: "italic",
-            fontWeight: 500,
-            background: "linear-gradient(135deg, #f97316, #ec4899, #a78bfa)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}>t'appelles</span> ?
-        </h1>
-
-        {/* Subtitle */}
-        <p style={{
-          fontSize: "16px",
-          color: "#888",
-          lineHeight: 1.6,
-          marginBottom: "40px",
-        }}>
-          Pour que je puisse te parler directement.
-        </p>
-
-        {/* Input */}
-        <input
-          type="text"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleContinue()}
-          placeholder="Ton prénom"
-          autoFocus
-          style={{
-            width: "100%",
-            padding: "18px 24px",
-            fontSize: "18px",
-            fontWeight: 500,
-            fontFamily: "inherit",
-            border: "2px solid #e5e5e5",
-            borderRadius: "16px",
-            outline: "none",
-            textAlign: "center",
-            color: "#1a1a1a",
-            transition: "border-color 0.2s",
-            boxSizing: "border-box",
-            background: "#fafafa",
-          }}
-          onFocus={(e) => e.target.style.borderColor = "#1a1a1a"}
-          onBlur={(e) => e.target.style.borderColor = "#e5e5e5"}
-        />
-
-        {/* CTA */}
-        <button
-          onClick={handleContinue}
-          disabled={!firstName.trim() || loading}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-            width: "100%",
-            marginTop: "20px",
-            padding: "16px 32px",
-            background: firstName.trim() ? "#1a1a1a" : "#d4d4d4",
-            color: "#fff",
-            border: "none",
-            borderRadius: "100px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: firstName.trim() ? "pointer" : "not-allowed",
-            fontFamily: "inherit",
-            transition: "all 0.2s",
-          }}
-          onMouseOver={e => { if (firstName.trim()) e.currentTarget.style.opacity = "0.85"; }}
-          onMouseOut={e => e.currentTarget.style.opacity = "1"}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="text-center mb-10"
         >
-          {loading ? "Un instant..." : <>Continuer <ArrowRight size={16} /></>}
-        </button>
+          <h1 className="text-[26px] font-extrabold text-gray-900 tracking-tight leading-tight mb-3">
+            Avant de commencer...
+          </h1>
+          <p className="text-gray-500 text-[15px] leading-relaxed">
+            Comment tu t'appelles ? Je veux pouvoir m'adresser à toi directement. 😊
+          </p>
+        </motion.div>
 
-        {/* Reassurance */}
-        <p style={{
-          fontSize: "13px",
-          color: "#bbb",
-          marginTop: "24px",
-        }}>
-          5 minutes · 100% personnalisé · Tes données restent privées
-        </p>
+        {/* Form */}
+        <motion.form
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          onSubmit={handleSubmit}
+          className="space-y-5"
+        >
+          <div>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Ton prénom"
+              autoFocus
+              className="w-full px-5 py-4 bg-white border border-gray-200 rounded-2xl text-[17px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#61f7a2]/50 focus:border-[#61f7a2] transition-all"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={!firstName.trim() || saving}
+            className="w-full flex items-center justify-center gap-2.5 py-[18px] px-6 bg-gradient-to-b from-gray-900 to-black text-white rounded-2xl text-[17px] font-bold shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-[#61f7a2]/20 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-lg"
+          >
+            {saving ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <>
+                Continuer
+                <ArrowRight className="w-5 h-5" />
+              </>
+            )}
+          </button>
+        </motion.form>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-center text-xs text-gray-400 mt-6"
+        >
+          Ton prénom est utilisé uniquement pour personnaliser ton expérience.
+        </motion.p>
       </div>
     </div>
   );

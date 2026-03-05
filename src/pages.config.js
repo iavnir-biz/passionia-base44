@@ -49,30 +49,19 @@
  */
 import AIResources from './pages/AIResources';
 import Activation from './pages/Activation';
-import AdCopies from './pages/AdCopies';
 import AgentNoah from './pages/AgentNoah';
 import AvatarClients from './pages/AvatarClients';
 import BonneNouvelle from './pages/BonneNouvelle';
 import Booking from './pages/Booking';
-import CTAPAYWALL from './pages/CTAPAYWALL';
-import ChooseYourPath from './pages/ChooseYourPath';
-import ChooseYourPathNew from './pages/ChooseYourPathNew';
 import DailyActions from './pages/DailyActions';
 import Documents from './pages/Documents';
-import DoneForYouElite from './pages/DoneForYouElite';
-import DownsellSession from './pages/DownsellSession';
 import EmailsMarketing from './pages/EmailsMarketing';
-import EtComment from './pages/EtComment';
 import GenerationProgress from './pages/GenerationProgress';
-import Home from './pages/Home';
 import Journal from './pages/Journal';
-import LandingNoah from './pages/LandingNoah';
 import LandingNoah2 from './pages/LandingNoah2';
 import MarketAnalysis from './pages/MarketAnalysis';
-import MonetiserSavoir from './pages/MonetiserSavoir';
 import MyOffers from './pages/MyOffers';
 import NoahGeneration from './pages/NoahGeneration';
-import NovaChat from './pages/NovaChat';
 import NovaGeneration from './pages/NovaGeneration';
 import OfferGenerationStart from './pages/OfferGenerationStart';
 import OfferPetitExtra from './pages/OfferPetitExtra';
@@ -81,7 +70,6 @@ import OfferProductPrincipal from './pages/OfferProductPrincipal';
 import OfferResume from './pages/OfferResume';
 import OfferSuperieure from './pages/OfferSuperieure';
 import OfferTaVieFuture from './pages/OfferTaVieFuture';
-import Onboarding from './pages/Onboarding';
 import OnboardingDynamic from './pages/OnboardingDynamic';
 import OnboardingQ10TypicalMistake from './pages/OnboardingQ10TypicalMistake';
 import OnboardingQ11ExtraDetail from './pages/OnboardingQ11ExtraDetail';
@@ -104,18 +92,13 @@ import OnboardingQ26DeliveryPreferences from './pages/OnboardingQ26DeliveryPrefe
 import OnboardingTransition from './pages/OnboardingTransition';
 import PlanAction from './pages/PlanAction';
 import PlanStepDetail from './pages/PlanStepDetail';
-import ProtocoleQuickwin from './pages/ProtocoleQuickwin';
 import Register from './pages/Register';
 import Results from './pages/Results';
 import SalesMessages from './pages/SalesMessages';
 import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
-import SkoolAbonnement from './pages/SkoolAbonnement';
-import SkoolComparaison from './pages/SkoolComparaison';
 import SocialMedia from './pages/SocialMedia';
-import UpsellCoaching from './pages/UpsellCoaching';
-import WelcomeOpening from './pages/WelcomeOpening';
 import OnboardingFirstName from './pages/OnboardingFirstName';
 import Welcome from './pages/Welcome';
 import Dashboard from './pages/Dashboard';
@@ -124,30 +107,19 @@ import Dashboard from './pages/Dashboard';
 export const PAGES = {
     "AIResources": AIResources,
     "Activation": Activation,
-    "AdCopies": AdCopies,
     "AgentNoah": AgentNoah,
     "AvatarClients": AvatarClients,
     "BonneNouvelle": BonneNouvelle,
     "Booking": Booking,
-    "CTAPAYWALL": CTAPAYWALL,
-    "ChooseYourPath": ChooseYourPath,
-    "ChooseYourPathNew": ChooseYourPathNew,
     "DailyActions": DailyActions,
     "Documents": Documents,
-    "DoneForYouElite": DoneForYouElite,
-    "DownsellSession": DownsellSession,
     "EmailsMarketing": EmailsMarketing,
-    "EtComment": EtComment,
     "GenerationProgress": GenerationProgress,
-    "Home": Home,
     "Journal": Journal,
-    "LandingNoah": LandingNoah,
     "LandingNoah2": LandingNoah2,
     "MarketAnalysis": MarketAnalysis,
-    "MonetiserSavoir": MonetiserSavoir,
     "MyOffers": MyOffers,
     "NoahGeneration": NoahGeneration,
-    "NovaChat": NovaChat,
     "NovaGeneration": NovaGeneration,
     "OfferGenerationStart": OfferGenerationStart,
     "OfferPetitExtra": OfferPetitExtra,
@@ -156,7 +128,6 @@ export const PAGES = {
     "OfferResume": OfferResume,
     "OfferSuperieure": OfferSuperieure,
     "OfferTaVieFuture": OfferTaVieFuture,
-    "Onboarding": Onboarding,
     "OnboardingDynamic": OnboardingDynamic,
     "OnboardingQ10TypicalMistake": OnboardingQ10TypicalMistake,
     "OnboardingQ11ExtraDetail": OnboardingQ11ExtraDetail,
@@ -179,18 +150,13 @@ export const PAGES = {
     "OnboardingTransition": OnboardingTransition,
     "PlanAction": PlanAction,
     "PlanStepDetail": PlanStepDetail,
-    "ProtocoleQuickwin": ProtocoleQuickwin,
     "Register": Register,
     "Results": Results,
     "SalesMessages": SalesMessages,
     "SalesPage": SalesPage,
     "Settings": Settings,
     "SetupProfile": SetupProfile,
-    "SkoolAbonnement": SkoolAbonnement,
-    "SkoolComparaison": SkoolComparaison,
     "SocialMedia": SocialMedia,
-    "UpsellCoaching": UpsellCoaching,
-    "WelcomeOpening": WelcomeOpening,
     "OnboardingFirstName": OnboardingFirstName,
     "Welcome": Welcome,
     "Dashboard": Dashboard,

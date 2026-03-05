@@ -1,11 +1,27 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Loader2, Copy, ChevronDown, ChevronUp, ArrowRight, Clock, Target, Zap } from 'lucide-react';
+import { Sparkles, Loader2, Copy, ChevronDown, ChevronUp, ArrowRight, Clock, Target, Zap, Monitor, Users, Crown, Gift } from 'lucide-react';
+
+const TAG_STYLES = {
+  low: { background: 'linear-gradient(135deg, #f97316, #ef4444)', color: '#fff' },
+  bump: { background: 'linear-gradient(135deg, #ec4899, #a855f7)', color: '#fff' },
+  mid: { background: 'linear-gradient(135deg, #ef4444, #ec4899)', color: '#fff' },
+  high: { background: 'linear-gradient(135deg, #1a1a1a, #444)', color: '#fff' },
+};
+
+const OFFER_ICONS = {
+  low: Monitor,
+  bump: Gift,
+  mid: Users,
+  high: Crown,
+};
 
 export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, onCopy, index }) {
   const [expanded, setExpanded] = useState(false);
 
   const isEnriched = offer?.before || offer?.after || offer?.benefits?.length > 0;
+  const IconComponent = OFFER_ICONS[offerType.id] || Monitor;
+  const tagStyle = TAG_STYLES[offerType.id] || TAG_STYLES.low;
 
   return (
     <motion.div
@@ -13,7 +29,7 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.08 + index * 0.06 }}
       style={{
-        background: '#fff', border: '1px solid #e5e5e5', borderRadius: '20px',
+        background: '#fff', border: '1px solid #e5e5e5', borderRadius: '16px',
         overflow: 'hidden', transition: 'all 0.2s'
       }}
       className="hover:shadow-sm hover:border-[#ccc]"
@@ -26,107 +42,54 @@ export default function OfferCardNoah({ offerType, offer, isLoading, onEnrich, o
         }}
         onClick={() => offer && setExpanded(!expanded)}
       >
-        {/* Number badge */}
+        {/* Icon */}
         <div style={{
-          width: '40px', height: '40px', borderRadius: '12px', flexShrink: 0,
-          background: isEnriched
-            ? 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)'
-            : '#f5f5f5',
+          width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0,
+          background: '#f5f5f5',
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
-          <span style={{
-            fontSize: '15px', fontWeight: 700,
-            color: isEnriched ? '#fff' : '#888'
-          }}>
-            {index + 1}
-          </span>
+          <IconComponent style={{ width: '20px', height: '20px', color: '#666' }} />
         </div>
 
         {/* Info */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-            <p style={{ fontSize: '15px', fontWeight: 600, color: '#1a1a1a' }}>
-              {offer?.title || offerType.label}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px', flexWrap: 'wrap' }}>
+            <p style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a1a', margin: 0 }}>
+              {offerType.label}
             </p>
             <span style={{
-              fontSize: '10px', fontWeight: 600, padding: '2px 8px',
-              borderRadius: '100px', background: '#f5f5f5', color: '#888',
-              border: '1px solid #e5e5e5', whiteSpace: 'nowrap'
+              fontSize: '10px', fontWeight: 700, padding: '3px 10px',
+              borderRadius: '100px', whiteSpace: 'nowrap', letterSpacing: '0.02em',
+              ...tagStyle
             }}>
               {offerType.tag}
             </span>
           </div>
-          {offer?.subtitle && (
-            <p style={{ fontSize: '12px', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {offer.subtitle}
-            </p>
-          )}
+          <p style={{
+            fontSize: '13px', color: '#888', overflow: 'hidden',
+            textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0
+          }}>
+            {offer?.title || offer?.subtitle || '—'}
+          </p>
         </div>
 
         {/* Price */}
-        {offer?.price && (
-          <span style={{ fontSize: '16px', fontWeight: 700, color: '#1a1a1a', flexShrink: 0 }}>
-            {offer.price}
-          </span>
+        <span style={{
+          fontSize: 'clamp(20px, 3vw, 26px)', fontWeight: 800, color: '#1a1a1a',
+          flexShrink: 0, letterSpacing: '-0.02em'
+        }}>
+          {offer?.price || '—'}
+        </span>
+
+        {/* Expand arrow */}
+        {offer && (
+          <div style={{ flexShrink: 0 }}>
+            {expanded
+              ? <ChevronUp style={{ width: '18px', height: '18px', color: '#bbb' }} />
+              : <ChevronDown style={{ width: '18px', height: '18px', color: '#bbb' }} />
+            }
+          </div>
         )}
-
-        {/* Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-          {!offer ? (
-            <button
-              onClick={(e) => { e.stopPropagation(); onEnrich(); }}
-              disabled={isLoading}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                background: '#1a1a1a', color: '#fff', border: 'none',
-                padding: '8px 16px', borderRadius: '100px', fontSize: '12px',
-                fontWeight: 600, cursor: 'pointer', opacity: isLoading ? 0.6 : 1
-              }}
-            >
-              {isLoading ? (
-                <><Loader2 style={{ width: '12px', height: '12px' }} className="animate-spin" /> Génération...</>
-              ) : (
-                <><Sparkles style={{ width: '12px', height: '12px' }} /> Détailler</>
-              )}
-            </button>
-          ) : !isEnriched ? (
-            <button
-              onClick={(e) => { e.stopPropagation(); onEnrich(); }}
-              disabled={isLoading}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                background: '#1a1a1a',
-                color: '#fff', border: 'none',
-                padding: '8px 16px', borderRadius: '100px', fontSize: '12px',
-                fontWeight: 600, cursor: 'pointer', opacity: isLoading ? 0.6 : 1
-              }}
-            >
-              {isLoading ? (
-                <><Loader2 style={{ width: '12px', height: '12px' }} className="animate-spin" /> Enrichissement...</>
-              ) : (
-                <><Sparkles style={{ width: '12px', height: '12px' }} /> Enrichir avec l'IA</>
-              )}
-            </button>
-          ) : (
-            <button
-              onClick={(e) => { e.stopPropagation(); onCopy(); }}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                background: '#f5f5f5', color: '#1a1a1a', border: '1px solid #e5e5e5',
-                padding: '8px 16px', borderRadius: '100px', fontSize: '12px',
-                fontWeight: 600, cursor: 'pointer'
-              }}
-            >
-              <Copy style={{ width: '12px', height: '12px' }} /> Copier
-            </button>
-          )}
-
-          {offer && (
-            expanded
-              ? <ChevronUp style={{ width: '16px', height: '16px', color: '#888' }} />
-              : <ChevronDown style={{ width: '16px', height: '16px', color: '#888' }} />
-          )}
-        </div>
       </div>
 
       {/* Expanded details */}

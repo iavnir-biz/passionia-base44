@@ -2,67 +2,53 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { motion } from 'framer-motion';
-import { CheckCircle2, Package, Rocket, FileText } from 'lucide-react';
-import { NoahBrainIcon } from '@/components/NoahBrainIcon';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, Package, Rocket, FileText, Brain } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const items = [
-  { icon: CheckCircle2, title: 'Ton idee validee et ton positionnement' },
-  { icon: Package, title: '4 offres personnalisees, pretes a vendre' },
-  { icon: FileText, title: 'Pages de vente, emails et messages' },
-  { icon: Rocket, title: 'Un plan d\'action sur 7 jours' },
+  { icon: CheckCircle2, color: 'text-blue-500', bg: 'bg-blue-50', title: 'Ton idée validée et ton positionnement' },
+  { icon: Package, color: 'text-pink-500', bg: 'bg-pink-50', title: '4 offres personnalisées, prêtes à vendre' },
+  { icon: FileText, color: 'text-amber-500', bg: 'bg-amber-50', title: 'Pages de vente, emails et messages' },
+  { icon: Rocket, color: 'text-green-500', bg: 'bg-green-50', title: 'Un plan d\'action sur 7 jours' },
 ];
 
 const statusTexts = [
   'Analyse de ton positionnement…',
   'Structuration de tes offres…',
   'Estimation de ton potentiel…',
-  'Preparation du plan d\'action…'
+  'Préparation du plan d\'action…'
 ];
 
 function fireConfetti() {
-  // Burst 1 — center explosion
   confetti({
-    particleCount: 80,
-    spread: 70,
+    particleCount: 80, spread: 70,
     origin: { x: 0.5, y: 0.5 },
-    colors: ['#61f7a2', '#4de88f', '#2dd4bf', '#fbbf24', '#f472b6'],
+    colors: ['#f97316', '#ec4899', '#a78bfa', '#fbbf24', '#61f7a2'],
     ticks: 120,
   });
-
-  // Burst 2 — left side
   setTimeout(() => {
     confetti({
-      particleCount: 50,
-      angle: 60,
-      spread: 55,
+      particleCount: 50, angle: 60, spread: 55,
       origin: { x: 0, y: 0.6 },
-      colors: ['#61f7a2', '#4de88f', '#fbbf24'],
+      colors: ['#f97316', '#ec4899', '#fbbf24'],
       ticks: 100,
     });
   }, 400);
-
-  // Burst 3 — right side
   setTimeout(() => {
     confetti({
-      particleCount: 50,
-      angle: 120,
-      spread: 55,
+      particleCount: 50, angle: 120, spread: 55,
       origin: { x: 1, y: 0.6 },
-      colors: ['#61f7a2', '#2dd4bf', '#f472b6'],
+      colors: ['#a78bfa', '#ec4899', '#f97316'],
       ticks: 100,
     });
   }, 700);
-
-  // Burst 4 — top rain
   setTimeout(() => {
     confetti({
-      particleCount: 40,
-      spread: 160,
+      particleCount: 40, spread: 160,
       origin: { x: 0.5, y: 0 },
       gravity: 1.2,
-      colors: ['#61f7a2', '#fbbf24', '#4de88f'],
+      colors: ['#f97316', '#fbbf24', '#a78bfa'],
       ticks: 140,
     });
   }, 1100);
@@ -76,27 +62,19 @@ export default function OnboardingTransition() {
   const [progress, setProgress] = useState(75);
   const [statusIndex, setStatusIndex] = useState(0);
 
-  // Load user + session data, enrich user, then reveal
-  useEffect(() => {
-    loadAndPrepare();
-  }, []);
+  useEffect(() => { loadAndPrepare(); }, []);
 
-  // Multi-burst confetti when ready
   useEffect(() => {
-    if (ready) {
-      fireConfetti();
-    }
+    if (ready) fireConfetti();
   }, [ready]);
 
-  // Items appear one by one (fast: 300ms each)
   useEffect(() => {
     if (ready && visibleItems < items.length) {
-      const timer = setTimeout(() => setVisibleItems(v => v + 1), 300);
+      const timer = setTimeout(() => setVisibleItems(v => v + 1), 350);
       return () => clearTimeout(timer);
     }
   }, [ready, visibleItems]);
 
-  // Progress bar animation
   useEffect(() => {
     if (!ready) return;
     const timer = setInterval(() => {
@@ -105,7 +83,6 @@ export default function OnboardingTransition() {
     return () => clearInterval(timer);
   }, [ready]);
 
-  // Rotating status text
   useEffect(() => {
     if (!ready) return;
     const timer = setInterval(() => {
@@ -114,7 +91,6 @@ export default function OnboardingTransition() {
     return () => clearInterval(timer);
   }, [ready]);
 
-  // Auto-redirect after 7s once ready
   useEffect(() => {
     if (!ready) return;
     const timer = setTimeout(() => {
@@ -148,7 +124,6 @@ export default function OnboardingTransition() {
         return;
       }
 
-      // Enrich user with onboarding data
       const fullData = session.onboarding_full || {};
       await base44.auth.updateMe({
         firstName: name,
@@ -170,93 +145,233 @@ export default function OnboardingTransition() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#ffffff',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      position: 'relative',
+      overflow: 'hidden',
+      padding: '40px 24px',
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-        {/* Noah avatar */}
+      {/* Floating neon circles */}
+      <div className="ot-neon ot-neon-1" />
+      <div className="ot-neon ot-neon-2" />
+      <div className="ot-neon ot-neon-3" />
+
+      <div style={{ width: '100%', maxWidth: '460px', position: 'relative', zIndex: 1 }}>
+
+        {/* Noah Avatar */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex justify-center mb-6"
+          transition={{ duration: 0.6, type: 'spring', stiffness: 200 }}
+          style={{ display: 'flex', justifyContent: 'center', marginBottom: '28px' }}
         >
-          <NoahBrainIcon size={72} isThinking={true} isFloating={true} />
+          <div style={{ position: 'relative' }}>
+            <motion.div
+              animate={ready ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                width: '72px', height: '72px',
+                borderRadius: '20px',
+                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 8px 32px rgba(249,115,22,0.25)',
+              }}
+            >
+              <Brain size={36} color="#fff" />
+            </motion.div>
+            <motion.div
+              animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              style={{
+                position: 'absolute', bottom: '2px', right: '2px',
+                width: '14px', height: '14px',
+                borderRadius: '50%',
+                background: '#3dd67a',
+                border: '2.5px solid #fff',
+              }}
+            />
+          </div>
         </motion.div>
 
         {/* Message */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={ready ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4 }}
-          className="text-center mb-8"
+          initial={{ opacity: 0, y: 16 }}
+          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0.5, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ textAlign: 'center', marginBottom: '32px' }}
         >
-          <h1 className="text-xl font-bold text-gray-900 mb-2">
-            {ready ? `Bravo ${firstName}, c'est prometteur.` : 'Analyse en cours…'}
+          <h1 style={{
+            fontSize: 'clamp(22px, 4vw, 28px)',
+            fontWeight: 800,
+            letterSpacing: '-0.03em',
+            color: '#1a1a1a',
+            lineHeight: 1.2,
+            marginBottom: '8px',
+          }}>
+            {ready ? (
+              <>Bravo{firstName ? ` ${firstName}` : ''}, c'est prometteur.</>
+            ) : (
+              'Analyse en cours…'
+            )}
           </h1>
-          <p className="text-sm text-gray-500">
-            {ready ? 'Voici ce que Noah va construire pour toi :' : 'Noah etudie tes reponses…'}
+          <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>
+            {ready ? 'Voici ce que Noah va construire pour toi :' : 'Noah étudie tes réponses…'}
           </p>
         </motion.div>
 
         {/* Progress bar */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={ready ? { opacity: 1 } : {}}
-          transition={{ delay: 0.2 }}
-          className="mb-6"
+          initial={{ opacity: 0, y: 8 }}
+          animate={ready ? { opacity: 1, y: 0 } : { opacity: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+          style={{ marginBottom: '28px' }}
         >
-          <div className="flex items-center justify-between mb-1.5">
-            <motion.span
-              key={statusIndex}
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-xs text-gray-500"
-            >
-              {statusTexts[statusIndex]}
-            </motion.span>
-            <span className="text-xs font-bold text-[#61f7a2]">{progress}%</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={statusIndex}
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ duration: 0.25 }}
+                style={{ fontSize: '12px', color: '#999' }}
+              >
+                {statusTexts[statusIndex]}
+              </motion.span>
+            </AnimatePresence>
+            <span style={{
+              fontSize: '12px', fontWeight: 700,
+              background: 'linear-gradient(135deg, #f97316, #ec4899)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              {progress}%
+            </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+          <div style={{
+            width: '100%', height: '6px',
+            background: '#f0f0f0', borderRadius: '100px',
+            overflow: 'hidden',
+          }}>
             <motion.div
-              className="h-full bg-gradient-to-r from-[#61f7a2] to-[#2dd4bf] rounded-full"
               initial={{ width: '75%' }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3, ease: 'linear' }}
+              style={{
+                height: '100%',
+                background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)',
+                borderRadius: '100px',
+              }}
             />
           </div>
         </motion.div>
 
         {/* Items */}
-        <div className="space-y-2.5">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {items.map((item, i) => {
             const Icon = item.icon;
             return (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: -16 }}
-                animate={i < visibleItems ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.35 }}
-                className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 shadow-sm"
+                initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                animate={i < visibleItems ? { opacity: 1, x: 0, scale: 1 } : {}}
+                transition={{ duration: 0.4, type: 'spring', stiffness: 300, damping: 25 }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '14px',
+                  padding: '16px 18px',
+                  background: '#fff',
+                  borderRadius: '16px',
+                  border: '1px solid #f0f0f0',
+                  transition: 'border-color 0.2s, box-shadow 0.2s',
+                }}
+                whileHover={{ borderColor: '#e0e0e0', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}
               >
-                <div className="flex-shrink-0 w-9 h-9 bg-[#61f7a2]/15 rounded-lg flex items-center justify-center">
-                  <Icon className="w-[18px] h-[18px] text-[#3dd67a]" />
+                <div className={`flex-shrink-0 w-11 h-11 rounded-xl ${item.bg} flex items-center justify-center`}>
+                  <Icon className={`w-5 h-5 ${item.color}`} />
                 </div>
-                <span className="text-sm font-medium text-gray-800">{item.title}</span>
+                <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', letterSpacing: '-0.01em' }}>
+                  {item.title}
+                </span>
+                {i < visibleItems && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, type: 'spring' }}
+                    style={{ marginLeft: 'auto' }}
+                  >
+                    <CheckCircle2 size={16} style={{ color: '#3dd67a' }} />
+                  </motion.div>
+                )}
               </motion.div>
             );
           })}
         </div>
 
-        {/* Subtle reassurance */}
+        {/* Reassurance */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={ready ? { opacity: 1 } : {}}
-          transition={{ delay: 2 }}
-          className="text-center text-xs text-gray-400 mt-8"
+          transition={{ delay: 2.5, duration: 0.6 }}
+          style={{
+            textAlign: 'center',
+            fontSize: '12px',
+            color: '#bbb',
+            marginTop: '32px',
+          }}
         >
-          Encore quelques questions pour affiner le resultat.
+          Encore quelques questions pour affiner le résultat.
         </motion.p>
       </div>
+
+      <style>{`
+        .ot-neon {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(60px);
+          opacity: 0.45;
+        }
+        .ot-neon-1 {
+          width: min(300px, 60vw); height: min(300px, 60vw);
+          background: radial-gradient(circle, rgba(249,115,22,0.5) 0%, transparent 70%);
+          top: 5%; right: -10%;
+          animation: otFloat1 7s ease-in-out infinite;
+        }
+        .ot-neon-2 {
+          width: min(240px, 50vw); height: min(240px, 50vw);
+          background: radial-gradient(circle, rgba(236,72,153,0.45) 0%, transparent 70%);
+          bottom: 10%; left: -8%;
+          animation: otFloat2 8s ease-in-out infinite;
+        }
+        .ot-neon-3 {
+          width: min(200px, 42vw); height: min(200px, 42vw);
+          background: radial-gradient(circle, rgba(167,139,250,0.45) 0%, transparent 70%);
+          top: 40%; left: 50%;
+          transform: translateX(-50%);
+          animation: otFloat3 9s ease-in-out infinite;
+        }
+        @keyframes otFloat1 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-16px, 14px) scale(1.06); }
+        }
+        @keyframes otFloat2 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(14px, -10px) scale(1.05); }
+        }
+        @keyframes otFloat3 {
+          0%, 100% { transform: translateX(-50%) scale(1); }
+          50% { transform: translateX(-50%) translate(10px, 12px) scale(1.08); }
+        }
+      `}</style>
     </div>
   );
 }

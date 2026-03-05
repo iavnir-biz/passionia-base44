@@ -82,13 +82,11 @@ export default function LandingVideo() {
         zIndex: 1,
         borderRadius: '20px',
         overflow: 'hidden',
-        border: '1px solid #e8e8e8',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04)',
-        background: '#000',
+        background: 'transparent',
         aspectRatio: '16 / 9',
       }}>
         <iframe
-          src="https://player.vimeo.com/video/1170810950?badge=0&autopause=0&player_id=0&app_id=58479"
+          src="https://player.vimeo.com/video/1170810950?autoplay=1&muted=1&loop=1&badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&controls=0&background=1"
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
           allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
           allowFullScreen

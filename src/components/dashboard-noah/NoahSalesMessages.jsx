@@ -89,8 +89,7 @@ export default function NoahSalesMessages({ session }) {
             Génère tes messages de vente pour ton produit principal.
           </p>
           <button
-            onClick={handleGenerate}
-            disabled={generating}
+            onClick={() => navigate(createPageUrl('MesMessagesNoah'))}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               background: '#1a1a1a', color: '#fff', border: 'none',

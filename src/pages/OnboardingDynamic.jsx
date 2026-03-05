@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, Brain, Send } from 'lucide-react';
-import { NoahBrainIcon } from '@/components/NoahBrainIcon';
+import { ArrowRight, Loader2 } from 'lucide-react';
 
 export default function OnboardingDynamic() {
   const navigate = useNavigate();
@@ -35,16 +34,13 @@ export default function OnboardingDynamic() {
       const name = user.firstName || localStorage.getItem('onboarding_firstName') || '';
       setFirstName(name);
 
-      // Get or create session
       let activeSessionId = localStorage.getItem('passionia_active_session_id');
-      
+
       if (!activeSessionId) {
-        // Check existing sessions
         const sessions = await base44.entities.Session.list('-created_date', 1);
         if (sessions.length > 0 && !sessions[0].is_onboarding_done) {
           activeSessionId = sessions[0].id;
         } else {
-          // Create new session
           const res = await base44.functions.invoke('createNewSession', {});
           if (res.data.success) {
             activeSessionId = res.data.session.id;
@@ -58,14 +54,12 @@ export default function OnboardingDynamic() {
 
       setSessionId(activeSessionId);
 
-      // Check session state
       const sessions = await base44.entities.Session.filter({ id: activeSessionId });
       if (sessions.length > 0 && sessions[0].is_onboarding_done) {
         navigate(createPageUrl('OnboardingTransition'), { replace: true });
         return;
       }
 
-      // Fetch first/next question
       const res = await base44.functions.invoke('onboardingNextQuestion', {
         sessionId: activeSessionId,
         firstName: name
@@ -116,7 +110,6 @@ export default function OnboardingDynamic() {
         return;
       }
 
-      // Reset inputs
       setAnswer('');
       setSelectedOption('');
       setCurrentQuestion(res.data.nextQuestion);
@@ -125,7 +118,6 @@ export default function OnboardingDynamic() {
         setSliderValue(res.data.nextQuestion.min || 0);
       }
 
-      // Focus textarea
       setTimeout(() => textareaRef.current?.focus(), 300);
     } catch (err) {
       console.error('Submit error:', err);
@@ -141,41 +133,70 @@ export default function OnboardingDynamic() {
     }
   };
 
+  const isDisabled = sending ||
+    (currentQuestion?.type === 'text' && !answer.trim()) ||
+    (currentQuestion?.type === 'single_choice' && !selectedOption);
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#61f7a2] mx-auto mb-3" />
-          <p className="text-sm text-gray-500">Noah prépare tes questions...</p>
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#fff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#1a1a1a', margin: '0 auto 12px' }} />
+          <p style={{ fontSize: '14px', color: '#999' }}>Noah prépare tes questions...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex flex-col">
-      {/* Progress bar */}
-      <div className="w-full bg-gray-100 h-1.5">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      background: '#ffffff',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    }}>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+      {/* Progress bar — minimal top line */}
+      <div style={{ width: '100%', height: '3px', background: '#f0f0f0' }}>
         <motion.div
-          className="h-full bg-gradient-to-r from-[#61f7a2] to-[#2dd4bf] rounded-r-full"
+          style={{ height: '100%', background: '#1a1a1a', borderRadius: '0 4px 4px 0' }}
           initial={{ width: '0%' }}
           animate={{ width: `${(questionNumber / 11) * 100}%` }}
           transition={{ duration: 0.5 }}
         />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-        <div className="w-full max-w-lg">
+      <div style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: '40px 24px',
+      }}>
+        <div style={{ width: '100%', maxWidth: '520px', textAlign: 'center' }}>
 
-          {/* Noah avatar + question counter */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-[#61f7a2] flex items-center justify-center shadow-sm shadow-[#61f7a2]/30">
-              <Brain size={20} className="text-white" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-[#2dd4bf]">Noah</p>
-              <p className="text-xs text-gray-400">Question {questionNumber}/11</p>
-            </div>
+          {/* Badge pill */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: '#f5f5f5',
+            border: '1px solid #e8e8e8',
+            borderRadius: '100px',
+            padding: '6px 16px',
+            fontSize: '13px',
+            color: '#666',
+            marginBottom: '32px'
+          }}>
+            <span style={{
+              background: '#1a1a1a', color: '#fff',
+              padding: '2px 8px', borderRadius: '100px',
+              fontSize: '11px', fontWeight: 600
+            }}>NOAH™</span>
+            Question {questionNumber}/11
           </div>
 
           {/* Question */}
@@ -188,52 +209,92 @@ export default function OnboardingDynamic() {
                 exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.4 }}
               >
-                <h2 className="text-[22px] font-bold text-gray-900 leading-tight mb-2">
+                {/* Title */}
+                <h1 style={{
+                  fontSize: 'clamp(24px, 4.5vw, 36px)',
+                  fontWeight: 400,
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.03em',
+                  color: '#1a1a1a',
+                  marginBottom: '12px',
+                }}>
                   {currentQuestion.title}
-                </h2>
+                </h1>
+
                 {currentQuestion.subtitle && (
-                  <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+                  <p style={{
+                    fontSize: '15px',
+                    color: '#888',
+                    lineHeight: 1.6,
+                    maxWidth: '440px',
+                    margin: '0 auto 32px',
+                  }}>
                     {currentQuestion.subtitle}
                   </p>
                 )}
 
+                {!currentQuestion.subtitle && <div style={{ height: '20px' }} />}
+
                 {/* Text input */}
                 {currentQuestion.type === 'text' && (
-                  <div className="mt-4">
-                    <textarea
-                      ref={textareaRef}
-                      value={answer}
-                      onChange={(e) => setAnswer(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder="Ta réponse..."
-                      autoFocus
-                      rows={3}
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#61f7a2]/50 focus:border-[#61f7a2] transition-all resize-none"
-                    />
-                  </div>
+                  <textarea
+                    ref={textareaRef}
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ta réponse..."
+                    autoFocus
+                    rows={3}
+                    style={{
+                      width: '100%',
+                      padding: '16px 20px',
+                      fontSize: '16px',
+                      fontFamily: "'Inter', sans-serif",
+                      fontWeight: 400,
+                      color: '#1a1a1a',
+                      background: '#f8f8f8',
+                      border: '1px solid #e5e5e5',
+                      borderRadius: '20px',
+                      textAlign: 'left',
+                      outline: 'none',
+                      resize: 'none',
+                      transition: 'border-color 0.2s, box-shadow 0.2s',
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#1a1a1a';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(26,26,26,0.08)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#e5e5e5';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
                 )}
 
                 {/* Single choice */}
                 {currentQuestion.type === 'single_choice' && currentQuestion.options && (
-                  <div className="mt-4 space-y-2.5">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left' }}>
                     {currentQuestion.options.map((option, idx) => (
                       <motion.button
                         key={idx}
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.08 }}
-                        onClick={() => {
-                          setSelectedOption(option);
-                          // Auto-submit on choice
-                          setTimeout(() => {
-                            setSelectedOption(option);
-                          }, 100);
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.06 }}
+                        onClick={() => setSelectedOption(option)}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '14px 20px',
+                          borderRadius: '100px',
+                          border: selectedOption === option ? '2px solid #1a1a1a' : '1px solid #e5e5e5',
+                          background: selectedOption === option ? '#f5f5f5' : '#fff',
+                          fontSize: '15px',
+                          fontWeight: selectedOption === option ? 600 : 400,
+                          fontFamily: "'Inter', sans-serif",
+                          color: '#1a1a1a',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
                         }}
-                        className={`w-full text-left px-4 py-3.5 rounded-2xl border transition-all text-[15px] font-medium ${
-                          selectedOption === option
-                            ? 'bg-[#61f7a2]/10 border-[#61f7a2] text-gray-900'
-                            : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
-                        }`}
                       >
                         {option}
                       </motion.button>
@@ -243,10 +304,15 @@ export default function OnboardingDynamic() {
 
                 {/* Slider */}
                 {currentQuestion.type === 'slider' && (
-                  <div className="mt-6 space-y-4">
-                    <div className="text-center">
-                      <span className="text-4xl font-bold text-[#61f7a2]">{sliderValue}</span>
-                      <span className="text-lg text-gray-400 ml-1">/ {currentQuestion.max || 15}</span>
+                  <div style={{ marginTop: '8px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                      <span style={{
+                        fontSize: '52px', fontWeight: 700,
+                        letterSpacing: '-0.03em', color: '#1a1a1a'
+                      }}>{sliderValue}</span>
+                      <span style={{ fontSize: '18px', color: '#bbb', marginLeft: '4px' }}>
+                        / {currentQuestion.max || 15}
+                      </span>
                     </div>
                     <input
                       type="range"
@@ -255,33 +321,60 @@ export default function OnboardingDynamic() {
                       step={currentQuestion.step || 1}
                       value={sliderValue}
                       onChange={(e) => setSliderValue(Number(e.target.value))}
-                      className="w-full accent-[#61f7a2]"
+                      style={{ width: '100%', accentColor: '#1a1a1a' }}
                     />
-                    <div className="flex justify-between text-xs text-gray-400">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#bbb', marginTop: '8px' }}>
                       <span>{currentQuestion.min || 0} an</span>
                       <span>{currentQuestion.max || 15} ans</span>
                     </div>
                   </div>
                 )}
 
-                {/* Submit button */}
-                <motion.button
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  onClick={handleSubmit}
-                  disabled={sending || (currentQuestion.type === 'text' && !answer.trim()) || (currentQuestion.type === 'single_choice' && !selectedOption)}
-                  className="w-full mt-6 flex items-center justify-center gap-2.5 py-[16px] px-6 bg-gradient-to-b from-gray-900 to-black text-white rounded-2xl text-[16px] font-bold shadow-lg shadow-black/15 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                >
-                  {sending ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      Continuer
-                      <ArrowRight className="w-5 h-5" />
-                    </>
-                  )}
-                </motion.button>
+                {/* CTA Button */}
+                <div style={{ marginTop: '32px' }}>
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    background: '#f8f8f8',
+                    borderRadius: '100px',
+                    padding: '6px',
+                    border: '1px solid #e5e5e5',
+                    width: '100%',
+                    maxWidth: '360px',
+                  }}>
+                    <button
+                      onClick={handleSubmit}
+                      disabled={isDisabled}
+                      style={{
+                        background: isDisabled ? '#ccc' : '#1a1a1a',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '14px 28px',
+                        borderRadius: '100px',
+                        fontSize: '15px',
+                        fontWeight: 600,
+                        fontFamily: "'Inter', sans-serif",
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'opacity 0.2s, background 0.2s',
+                        width: '100%',
+                      }}
+                      onMouseOver={e => { if (!isDisabled) e.currentTarget.style.opacity = '0.85'; }}
+                      onMouseOut={e => e.currentTarget.style.opacity = '1'}
+                    >
+                      {sending ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <>
+                          Continuer <ArrowRight size={16} />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

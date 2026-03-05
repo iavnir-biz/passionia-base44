@@ -95,14 +95,9 @@ export default function NoahSalesMessages({ session }) {
               background: '#1a1a1a', color: '#fff', border: 'none',
               padding: '12px 24px', borderRadius: '100px', fontSize: '13px',
               fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.2s',
-              opacity: generating ? 0.6 : 1
             }}
           >
-            {generating ? (
-              <><Loader2 style={{ width: '14px', height: '14px' }} className="animate-spin" /> Génération...</>
-            ) : (
-              <><Sparkles style={{ width: '14px', height: '14px' }} /> Générer avec Noah</>
-            )}
+            <Sparkles style={{ width: '14px', height: '14px' }} /> Générer avec Noah
           </button>
         </div>
       )}

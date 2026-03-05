@@ -122,8 +122,9 @@ export default function NoahSidebar({ currentPage, user, isOpen, onClose }) {
               <p className="text-sm font-semibold text-[#1a1a1a] truncate">{displayName}</p>
               <div style={{
                 display: 'inline-flex', fontSize: '10px', fontWeight: 600,
-                padding: '1px 8px', borderRadius: '100px', background: '#f5f5f5',
-                border: '1px solid #e5e5e5', color: '#888'
+                padding: '2px 10px', borderRadius: '100px',
+                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                color: '#fff', letterSpacing: '0.02em'
               }}>
                 Starter
               </div>

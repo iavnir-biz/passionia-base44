@@ -145,8 +145,7 @@ export default function DashboardNoah() {
           {/* Stats */}
           <NoahStatsRow session={session} />
 
-          {/* Onboarding Summary */}
-          <NoahOnboardingSummary session={session} />
+          {/* Onboarding Summary removed */}
 
           {/* Products */}
           <NoahProducts session={session} />

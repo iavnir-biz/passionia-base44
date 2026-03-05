@@ -64,6 +64,7 @@ import LandingNoah2 from './pages/LandingNoah2';
 import MarketAnalysis from './pages/MarketAnalysis';
 import MesMessagesNoah from './pages/MesMessagesNoah';
 import MesOffresNoah from './pages/MesOffresNoah';
+import MonPlanNoah from './pages/MonPlanNoah';
 import MyOffers from './pages/MyOffers';
 import NoahGeneration from './pages/NoahGeneration';
 import NovaGeneration from './pages/NovaGeneration';
@@ -102,11 +103,10 @@ import Results from './pages/Results';
 import SalesMessages from './pages/SalesMessages';
 import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
+import SettingsNoah from './pages/SettingsNoah';
 import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
-import MonPlanNoah from './pages/MonPlanNoah';
-import SettingsNoah from './pages/SettingsNoah';
 
 
 export const PAGES = {
@@ -127,6 +127,7 @@ export const PAGES = {
     "MarketAnalysis": MarketAnalysis,
     "MesMessagesNoah": MesMessagesNoah,
     "MesOffresNoah": MesOffresNoah,
+    "MonPlanNoah": MonPlanNoah,
     "MyOffers": MyOffers,
     "NoahGeneration": NoahGeneration,
     "NovaGeneration": NovaGeneration,
@@ -165,11 +166,10 @@ export const PAGES = {
     "SalesMessages": SalesMessages,
     "SalesPage": SalesPage,
     "Settings": Settings,
+    "SettingsNoah": SettingsNoah,
     "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
-    "MonPlanNoah": MonPlanNoah,
-    "SettingsNoah": SettingsNoah,
 }
 
 export const pagesConfig = {

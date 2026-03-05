@@ -16,8 +16,8 @@ export default function OfferCardNew({
       text: 'text-[#1a1a1a]',
       glow: 'shadow-lg shadow-black/10',
       badge: 'bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 text-white',
-      iconBg: 'bg-gradient-to-br from-blue-100 to-blue-50',
-      iconText: 'text-blue-600',
+      iconBg: 'bg-[#f5f5f5]',
+      iconText: 'text-[#1a1a1a]',
       priceBg: 'text-[#1a1a1a]',
       resultBg: 'bg-[#f8f8f8] border-[#e5e5e5]',
       checkBg: 'bg-[#1a1a1a]'
@@ -27,8 +27,8 @@ export default function OfferCardNew({
       text: 'text-[#1a1a1a]',
       glow: 'shadow-lg shadow-black/10',
       badge: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white',
-      iconBg: 'bg-gradient-to-br from-green-100 to-green-50',
-      iconText: 'text-green-600',
+      iconBg: 'bg-[#f5f5f5]',
+      iconText: 'text-[#1a1a1a]',
       priceBg: 'text-[#1a1a1a]',
       resultBg: 'bg-[#f8f8f8] border-[#e5e5e5]',
       checkBg: 'bg-[#1a1a1a]'
@@ -38,8 +38,8 @@ export default function OfferCardNew({
       text: 'text-[#1a1a1a]',
       glow: 'shadow-lg shadow-black/10',
       badge: 'bg-gradient-to-r from-purple-500 to-violet-500 text-white',
-      iconBg: 'bg-gradient-to-br from-purple-100 to-purple-50',
-      iconText: 'text-purple-600',
+      iconBg: 'bg-[#f5f5f5]',
+      iconText: 'text-[#1a1a1a]',
       priceBg: 'text-[#1a1a1a]',
       resultBg: 'bg-[#f8f8f8] border-[#e5e5e5]',
       checkBg: 'bg-[#1a1a1a]'
@@ -49,8 +49,8 @@ export default function OfferCardNew({
       text: 'text-[#1a1a1a]',
       glow: 'shadow-lg shadow-black/10',
       badge: 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white',
-      iconBg: 'bg-gradient-to-br from-amber-100 to-amber-50',
-      iconText: 'text-amber-600',
+      iconBg: 'bg-[#f5f5f5]',
+      iconText: 'text-[#1a1a1a]',
       priceBg: 'text-[#1a1a1a]',
       resultBg: 'bg-[#f8f8f8] border-[#e5e5e5]',
       checkBg: 'bg-[#1a1a1a]'
@@ -96,7 +96,7 @@ export default function OfferCardNew({
           <div className="flex items-center gap-2">
             {Icon && (
               <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", scheme.iconBg)}>
-                <Icon className={cn("w-5 h-5", scheme.iconText)} />
+                <Icon className={cn("w-5 h-5", scheme.iconText)} strokeWidth={1.5} />
               </div>
             )}
             <span className={cn("px-3 py-1 text-[11px] font-semibold rounded-full", scheme.badge)}>

@@ -175,7 +175,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                       checked={item.checked}
                       onChange={() => onChecklistChange(idx)}
                       disabled={isCompleted || item.disabled}
-                      style={{ marginTop: '2px', width: '18px', height: '18px', minWidth: '18px', minHeight: '18px', accentColor: '#f97316', cursor: 'pointer', flexShrink: 0 }}
+                      style={{ marginTop: '2px', width: '20px', height: '20px', minWidth: '20px', minHeight: '20px', accentColor: '#f97316', cursor: 'pointer', flexShrink: 0 }}
                     />
                     <div style={{ flex: 1 }}>
                       <p style={{

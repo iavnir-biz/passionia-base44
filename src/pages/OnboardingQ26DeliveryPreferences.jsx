@@ -54,25 +54,28 @@ export default function OnboardingQ26DeliveryPreferences() {
         const summary = { ...session.onboarding_summary };
         summary.format_preferences = value;
         
-        await base44.entities.Session.update(currentUser.sessionId, {
+        await base44.entities.Session.update(resolvedSessionId, {
           onboarding_full: onboardingFull,
           onboarding_summary: summary,
           is_onboarding_done: true
         });
         
         console.log('✅ [Q26] Session updated (merge only):', {
-          sessionId: currentUser.sessionId,
+          sessionId: resolvedSessionId,
           deliveryPreferences: value,
           fullKeys: Object.keys(onboardingFull)
         });
         
-        // Update User aussi
-        await base44.auth.updateMe({ 
-          deliveryPreferences: value,
-          onboarding_completed: true
-        });
+        // Update User onboarding_completed
+        try {
+          await base44.auth.updateMe({ onboarding_completed: true });
+        } catch (e) {
+          console.warn('⚠️ [Q26] updateMe failed:', e);
+        }
         
-        console.log('✅ [Q26] User updated with deliveryPreferences');
+        // Save deliveryPreferences in localStorage
+        localStorage.setItem('onboarding_deliveryPreferences', JSON.stringify(value));
+        console.log('✅ [Q26] Done');
       }}
       prevPage="OnboardingQ25Readiness"
       progress={100}

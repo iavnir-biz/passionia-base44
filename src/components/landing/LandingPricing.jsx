@@ -10,12 +10,13 @@ export default function LandingPricing({ onCTA }) {
   }, []);
 
   const included = [
-    "Validation de ton idée",
-    "Analyse de ton marché",
-    "Tes 4 offres sur-mesure structurées avec les prix :\n1 offre d'entrée (7€–37€)\n1 offre en extra (7€–27€)\n1 offre intermédiaire (97€–297€)\n1 offre premium (1 000€–3 000€)",
+    "Tes 4 offres sur-mesure structurées avec les prix :\nOffre principale, petit extra, offre supérieure, offre premium avec les prix optimaux",
     "Messages personnalisés pour vendre",
-    "Checklist de lancement + Plan d'action sur 7 jours",
-    "Une structure d'ascension claire",
+    "Ton plan d'action sur 7 jours étape par étape",
+    "Analyse de marché + validation de ton idée",
+    "3 avatars clients détaillés",
+    "Ta page de vente rédigée",
+    "Structure d'ascension claire",
     "Accès à vie + mises à jour",
   ];
 

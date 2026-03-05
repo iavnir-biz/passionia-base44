@@ -10,7 +10,7 @@ export default function LandingProblem() {
 
   const problems = [
     "Tu ne sais pas quel prix fixer",
-    "Tu n'as pas de page de vente",
+    "Tu ne sais pas à qui vendre",
     "Tu ne sais pas par où commencer",
     "Tu as peur de ne pas être légitime",
     "Tu manques de temps pour tout créer",

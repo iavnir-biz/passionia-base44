@@ -86,7 +86,7 @@ export default function LandingFooter({ onCTA }) {
             maxWidth: '520px',
             margin: '0 auto 44px',
           }}>
-            Rejoins +500 créateurs qui ont lancé leur business grâce à NOAH™.
+            Rejoins +500 créateurs qui ont lancé leur activité de formation en ligne grâce à NOAH™.
             Offres, pages de vente, emails — tout est généré pour toi.
           </p>
 

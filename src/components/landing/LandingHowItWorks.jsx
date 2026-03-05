@@ -60,7 +60,7 @@ export default function LandingHowItWorks() {
           letterSpacing: '-0.02em',
           marginBottom: '64px'
         }}>
-          3 étapes. <span style={{ fontStyle: 'italic' }}>5 minutes.</span> Tout est prêt.
+          3 étapes. <span style={{ fontStyle: 'italic' }}>5 minutes.</span><br />Tout est prêt.
         </h2>
 
         {/* Timeline */}

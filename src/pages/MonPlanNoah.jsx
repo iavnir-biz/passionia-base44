@@ -133,21 +133,26 @@ export default function MonPlanNoah() {
   };
 
   const handleChecklistChange = async (day, itemIndex) => {
-    if (!session?.id) return;
     const currentList = getDayChecklist(day);
-    const newChecklist = currentList.map((item, idx) => idx === itemIndex ? { ...item, checked: !item.checked } : item);
+    const newChecklist = currentList.map((item, idx) => {
+      const { action, details, autoChecked, ...cleanItem } = item;
+      return idx === itemIndex ? { ...cleanItem, checked: !item.checked } : { ...cleanItem };
+    });
     const newProgress = { ...dayProgress, [day]: { ...(dayProgress[day] || {}), checklist: newChecklist, updatedAt: new Date().toISOString() } };
     setDayProgress(newProgress);
-    await base44.entities.Session.update(session.id, { plan_progress: newProgress });
+    if (session?.id) {
+      await base44.entities.Session.update(session.id, { plan_progress: newProgress });
+    }
   };
 
   const handleDayComplete = async (day) => {
-    if (!session?.id) return;
     confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
     const newProgress = { ...dayProgress, [day]: { ...(dayProgress[day] || {}), completed: true, completedAt: new Date().toISOString() } };
     setDayProgress(newProgress);
     setCurrentDay(Math.min(day + 1, 7));
-    await base44.entities.Session.update(session.id, { plan_progress: newProgress });
+    if (session?.id) {
+      await base44.entities.Session.update(session.id, { plan_progress: newProgress });
+    }
   };
 
   const totalTasks = [1,2,3,4,5,6,7].reduce((acc, d) => acc + getDayChecklist(d).length, 0);

@@ -31,9 +31,9 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
             background: isCompleted
               ? 'linear-gradient(135deg, #f97316, #ec4899)'
               : isActive
-                ? 'linear-gradient(135deg, #1a1a1a, #333)'
+                ? 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)'
                 : '#f0f0f0',
-            boxShadow: isActive ? '0 0 16px rgba(26,26,26,0.2)' : isCompleted ? '0 0 12px rgba(249,115,22,0.25)' : 'none',
+            boxShadow: isActive ? '0 0 16px rgba(249,115,22,0.3)' : isCompleted ? '0 0 12px rgba(249,115,22,0.25)' : 'none',
             border: isActive ? '3px solid #fff' : '2px solid #e5e5e5',
             cursor: isLocked ? 'default' : 'pointer'
           }}

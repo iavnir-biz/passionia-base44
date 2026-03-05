@@ -5,7 +5,8 @@ import { base44 } from '@/api/base44Client';
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, MessageCircle, LogOut, User,
-  Users, ChevronDown, ExternalLink, Headphones
+  Users, ChevronDown, ExternalLink, Headphones,
+  Package, Target
 } from 'lucide-react';
 
 export default function NoahSidebar({ currentPage, user, isOpen, onClose }) {
@@ -28,6 +29,9 @@ export default function NoahSidebar({ currentPage, user, isOpen, onClose }) {
 
   const navItems = [
     { label: 'Overview', page: 'DashboardNoah', icon: LayoutDashboard },
+    { label: 'Mes offres', page: 'MyOffers', icon: Package },
+    { label: 'Mes messages de vente', page: 'SalesMessages', icon: MessageCircle },
+    { label: 'Mon plan d\'action', page: 'PlanAction', icon: Target },
   ];
 
   return (

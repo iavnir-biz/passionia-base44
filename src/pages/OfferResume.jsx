@@ -50,8 +50,9 @@ export default function OfferResume() {
   const loadUser = async () => {
     try {
       const currentUser = await base44.auth.me();
-      if (!currentUser.sessionId) return;
-      const sessions = await base44.entities.Session.filter({ id: currentUser.sessionId });
+      const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      if (!resolvedSessionId) return;
+      const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
       if (sessions?.length > 0) setSession(sessions[0]);
     } catch (error) { console.error('Error loading user:', error); }
     finally { setIsLoading(false); }

@@ -178,7 +178,7 @@ export default function OnboardingDynamic() {
       }}>
         <div style={{ width: '100%', maxWidth: '520px', textAlign: 'center' }}>
 
-          {/* Badge pill */}
+          {/* Badge pill — gradient */}
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -189,11 +189,12 @@ export default function OnboardingDynamic() {
             padding: '6px 16px',
             fontSize: '13px',
             color: '#666',
-            marginBottom: '32px'
+            marginBottom: '28px'
           }}>
             <span style={{
-              background: '#1a1a1a', color: '#fff',
-              padding: '2px 8px', borderRadius: '100px',
+              background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+              color: '#fff',
+              padding: '2px 10px', borderRadius: '100px',
               fontSize: '11px', fontWeight: 600
             }}>NOAH™</span>
             Question {questionNumber}/11

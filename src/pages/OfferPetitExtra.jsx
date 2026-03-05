@@ -23,6 +23,7 @@ export default function OfferPetitExtra() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
   const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +37,7 @@ export default function OfferPetitExtra() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      setSessionId(resolvedSessionId);
       if (resolvedSessionId) {
         const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
         if (sessions.length > 0) {
@@ -60,7 +62,8 @@ export default function OfferPetitExtra() {
     setSelectedOffer(offer);
     setIsSaving(true);
     try {
-      await base44.functions.invoke('saveFinalizedOffer', { sessionId: session.id, key: 'orderBump', offer });
+      const sid = sessionId || session?.id;
+      await base44.functions.invoke('saveFinalizedOffer', { sessionId: sid, key: 'orderBump', offer });
       setIsSaving(false);
       setShowTransition(true);
     } catch (error) { console.error('Error saving:', error); setIsSaving(false); }

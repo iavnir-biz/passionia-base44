@@ -22,6 +22,7 @@ export default function OfferPremium() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
   const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +36,7 @@ export default function OfferPremium() {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       const resolvedSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      setSessionId(resolvedSessionId);
       if (resolvedSessionId) {
         const sessions = await base44.entities.Session.filter({ id: resolvedSessionId });
         if (sessions.length > 0) {
@@ -59,7 +61,8 @@ export default function OfferPremium() {
     setSelectedOffer(offer);
     setIsSaving(true);
     try {
-      const result = await base44.functions.invoke('saveFinalizedOffer', { sessionId: session.id, key: 'upsell3', offer });
+      const sid = sessionId || session?.id;
+      const result = await base44.functions.invoke('saveFinalizedOffer', { sessionId: sid, key: 'upsell3', offer });
       console.log('✅ [OfferPremium] Offre complète:', result.data);
       setIsSaving(false);
       setShowTransition(true);

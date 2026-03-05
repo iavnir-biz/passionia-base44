@@ -212,12 +212,12 @@ export default function OnboardingDynamic() {
               >
                 {/* Title */}
                 <h1 style={{
-                  fontSize: 'clamp(24px, 4.5vw, 36px)',
-                  fontWeight: 400,
-                  lineHeight: 1.2,
-                  letterSpacing: '-0.03em',
+                  fontSize: 'clamp(20px, 3.5vw, 28px)',
+                  fontWeight: 500,
+                  lineHeight: 1.3,
+                  letterSpacing: '-0.02em',
                   color: '#1a1a1a',
-                  marginBottom: '12px',
+                  marginBottom: '10px',
                 }}>
                   {currentQuestion.title}
                 </h1>

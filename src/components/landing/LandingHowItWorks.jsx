@@ -185,11 +185,11 @@ export default function LandingHowItWorks() {
                             marginLeft: '6px',
                             textAlign: 'center',
                           }}>
-                            noah.iavenir.com
+                            app.iavenir.fr
                           </div>
                         </div>
                         <img
-                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/4af84b246_Capturedecran2026-03-05a194036.png"
+                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/b730b79e7_Capturedecran2026-03-05a194750.png"
                           alt="NOAH™ — Onboarding"
                           style={{
                             width: '100%',

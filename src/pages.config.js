@@ -55,12 +55,15 @@ import BonneNouvelle from './pages/BonneNouvelle';
 import Booking from './pages/Booking';
 import DailyActions from './pages/DailyActions';
 import Dashboard from './pages/Dashboard';
+import DashboardNoah from './pages/DashboardNoah';
 import Documents from './pages/Documents';
 import EmailsMarketing from './pages/EmailsMarketing';
 import GenerationProgress from './pages/GenerationProgress';
 import Journal from './pages/Journal';
 import LandingNoah2 from './pages/LandingNoah2';
 import MarketAnalysis from './pages/MarketAnalysis';
+import MesMessagesNoah from './pages/MesMessagesNoah';
+import MesOffresNoah from './pages/MesOffresNoah';
 import MyOffers from './pages/MyOffers';
 import NoahGeneration from './pages/NoahGeneration';
 import NovaGeneration from './pages/NovaGeneration';
@@ -102,9 +105,7 @@ import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
-import DashboardNoah from './pages/DashboardNoah';
-import MesOffresNoah from './pages/MesOffresNoah';
-import MesMessagesNoah from './pages/MesMessagesNoah';
+import MonPlanNoah from './pages/MonPlanNoah';
 
 
 export const PAGES = {
@@ -116,12 +117,15 @@ export const PAGES = {
     "Booking": Booking,
     "DailyActions": DailyActions,
     "Dashboard": Dashboard,
+    "DashboardNoah": DashboardNoah,
     "Documents": Documents,
     "EmailsMarketing": EmailsMarketing,
     "GenerationProgress": GenerationProgress,
     "Journal": Journal,
     "LandingNoah2": LandingNoah2,
     "MarketAnalysis": MarketAnalysis,
+    "MesMessagesNoah": MesMessagesNoah,
+    "MesOffresNoah": MesOffresNoah,
     "MyOffers": MyOffers,
     "NoahGeneration": NoahGeneration,
     "NovaGeneration": NovaGeneration,
@@ -163,9 +167,7 @@ export const PAGES = {
     "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
-    "DashboardNoah": DashboardNoah,
-    "MesOffresNoah": MesOffresNoah,
-    "MesMessagesNoah": MesMessagesNoah,
+    "MonPlanNoah": MonPlanNoah,
 }
 
 export const pagesConfig = {

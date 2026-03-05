@@ -50,7 +50,7 @@ export default function NoahSalesMessages({ session }) {
 
         {hasMessages && (
           <button
-            onClick={() => navigate(createPageUrl('SalesMessages'))}
+            onClick={() => navigate(createPageUrl('MesMessagesNoah'))}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '4px',
               fontSize: '12px', fontWeight: 500, color: '#888', background: 'none',
@@ -67,7 +67,7 @@ export default function NoahSalesMessages({ session }) {
           {messages.slice(0, 3).map((msg, idx) => (
             <div
               key={idx}
-              onClick={() => navigate(createPageUrl('SalesMessages'))}
+              onClick={() => navigate(createPageUrl('MesMessagesNoah'))}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px',
                 padding: '12px 16px', borderRadius: '12px', border: '1px solid #f0f0f0',

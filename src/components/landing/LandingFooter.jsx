@@ -176,13 +176,19 @@ export default function LandingFooter({ onCTA }) {
 
       {/* Footer */}
       <footer style={{
-        padding: '24px',
+        padding: '24px 24px 32px',
         textAlign: 'center',
         background: '#111111',
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}>
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.2)' }}>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.2)', marginBottom: '4px' }}>
           © 2026 NOAH™ — Tous droits réservés
+        </p>
+        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.15)', marginBottom: '16px' }}>
+          Copyright by iAvenir
+        </p>
+        <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.12)', maxWidth: '600px', margin: '0 auto', lineHeight: 1.5 }}>
+          Ce site n'est pas affilié à Facebook™, Instagram™ ou Meta Platforms, Inc. Facebook™ et Instagram™ sont des marques déposées de Meta Platforms, Inc. Les résultats peuvent varier selon les individus et dépendent de nombreux facteurs. Ce site ne garantit aucun résultat spécifique.
         </p>
       </footer>
     </>

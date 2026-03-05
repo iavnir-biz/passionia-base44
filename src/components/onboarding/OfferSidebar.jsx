@@ -36,14 +36,7 @@ export default function OfferSidebar({ currentPage, currentStep: propStep }) {
 
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-1">
-            <span style={{
-              background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              fontSize: '18px', fontWeight: 800
-            }}>NOAH™</span>
-          </div>
-          <p className="text-sm text-[#888]">Construis ton offre complète</p>
+          <p className="text-sm font-semibold text-[#1a1a1a]">Ton offre complète</p>
         </div>
 
         {/* Steps */}

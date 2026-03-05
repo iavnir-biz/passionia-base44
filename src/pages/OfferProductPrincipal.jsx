@@ -6,7 +6,7 @@ import { Loader2, Video, FileText, Headphones, CheckSquare, BookOpen, Graduation
 import OfferCardNew from '@/components/onboarding/OfferCardNew';
 import OfferTransition from '@/components/offer/OfferTransition';
 import OfferSidebar from '@/components/onboarding/OfferSidebar';
-import UserIdeaBlock from '@/components/offer/UserIdeaBlock';
+
 
 const getProductIcon = (offer) => {
   const title = (offer?.title || '').toLowerCase();
@@ -80,16 +80,6 @@ export default function OfferProductPrincipal() {
         <div style={{ position: 'absolute', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%)', bottom: '10%', left: '5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
 
         <div className="max-w-3xl mx-auto px-4 relative z-10">
-          {/* Info banner */}
-          <div className="mb-6 p-4 rounded-2xl flex items-start gap-3" style={{ background: 'linear-gradient(135deg, rgba(249,115,22,0.06), rgba(236,72,153,0.04))', border: '1px solid rgba(249,115,22,0.15)' }}>
-            <div className="rounded-full p-1.5 flex-shrink-0 mt-0.5" style={{ background: 'linear-gradient(135deg, #f97316, #ec4899)' }}>
-              <Lightbulb className="w-4 h-4 text-white" />
-            </div>
-            <p className="text-sm text-[#666] leading-relaxed">
-              Je t'ai préparé <span className="font-semibold text-[#1a1a1a]">2 options prêtes à vendre</span>. Tu pourras modifier ou régénérer à tout moment.
-            </p>
-          </div>
-
           {/* Title */}
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-[#1a1a1a] mb-2">Choisis ton Produit Principal</h2>
@@ -108,8 +98,6 @@ export default function OfferProductPrincipal() {
               )}
             </div>
           )}
-
-          {session && <UserIdeaBlock sessionId={session.id} offerKey="mainProduct" existingIdeas={session.user_ideas} />}
 
           {isSaving && (
             <div className="mt-6 flex items-center justify-center gap-2 text-[#1a1a1a]">

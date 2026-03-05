@@ -58,7 +58,6 @@ import CTAPAYWALL from './pages/CTAPAYWALL';
 import ChooseYourPath from './pages/ChooseYourPath';
 import ChooseYourPathNew from './pages/ChooseYourPathNew';
 import DailyActions from './pages/DailyActions';
-import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
 import DoneForYouElite from './pages/DoneForYouElite';
 import DownsellSession from './pages/DownsellSession';
@@ -84,7 +83,6 @@ import OfferSuperieure from './pages/OfferSuperieure';
 import OfferTaVieFuture from './pages/OfferTaVieFuture';
 import Onboarding from './pages/Onboarding';
 import OnboardingDynamic from './pages/OnboardingDynamic';
-import OnboardingFirstName from './pages/OnboardingFirstName';
 import OnboardingQ10TypicalMistake from './pages/OnboardingQ10TypicalMistake';
 import OnboardingQ11ExtraDetail from './pages/OnboardingQ11ExtraDetail';
 import OnboardingQ12AgeRange from './pages/OnboardingQ12AgeRange';
@@ -117,8 +115,10 @@ import SkoolAbonnement from './pages/SkoolAbonnement';
 import SkoolComparaison from './pages/SkoolComparaison';
 import SocialMedia from './pages/SocialMedia';
 import UpsellCoaching from './pages/UpsellCoaching';
-import Welcome from './pages/Welcome';
 import WelcomeOpening from './pages/WelcomeOpening';
+import OnboardingFirstName from './pages/OnboardingFirstName';
+import Welcome from './pages/Welcome';
+import Dashboard from './pages/Dashboard';
 
 
 export const PAGES = {
@@ -133,7 +133,6 @@ export const PAGES = {
     "ChooseYourPath": ChooseYourPath,
     "ChooseYourPathNew": ChooseYourPathNew,
     "DailyActions": DailyActions,
-    "Dashboard": Dashboard,
     "Documents": Documents,
     "DoneForYouElite": DoneForYouElite,
     "DownsellSession": DownsellSession,
@@ -159,7 +158,6 @@ export const PAGES = {
     "OfferTaVieFuture": OfferTaVieFuture,
     "Onboarding": Onboarding,
     "OnboardingDynamic": OnboardingDynamic,
-    "OnboardingFirstName": OnboardingFirstName,
     "OnboardingQ10TypicalMistake": OnboardingQ10TypicalMistake,
     "OnboardingQ11ExtraDetail": OnboardingQ11ExtraDetail,
     "OnboardingQ12AgeRange": OnboardingQ12AgeRange,
@@ -192,8 +190,10 @@ export const PAGES = {
     "SkoolComparaison": SkoolComparaison,
     "SocialMedia": SocialMedia,
     "UpsellCoaching": UpsellCoaching,
-    "Welcome": Welcome,
     "WelcomeOpening": WelcomeOpening,
+    "OnboardingFirstName": OnboardingFirstName,
+    "Welcome": Welcome,
+    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {

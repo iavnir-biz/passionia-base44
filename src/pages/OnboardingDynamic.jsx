@@ -7,7 +7,7 @@ import { createPageUrl } from '@/utils';
 export default function OnboardingDynamic() {
   const navigate = useNavigate();
   useEffect(() => {
-    navigate(createPageUrl('OnboardingFirstName'), { replace: true });
+    navigate(createPageUrl('Onboarding'), { replace: true });
   }, [navigate]);
   return null;
 }

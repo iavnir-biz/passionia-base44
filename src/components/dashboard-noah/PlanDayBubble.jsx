@@ -75,7 +75,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
         style={{
           flex: 1, marginBottom: '16px', borderRadius: '16px',
           border: isActive ? '1px solid #1a1a1a' : '1px solid #e5e5e5',
-          background: isCompleted ? '#fafffe' : '#fff',
+          background: isCompleted ? '#fafafa' : '#fff',
           opacity: isLocked ? 0.45 : 1, overflow: 'hidden'
         }}
       >
@@ -166,8 +166,8 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                   <div key={idx} style={{
                     display: 'flex', alignItems: 'flex-start', gap: '12px',
                     padding: '10px 14px', borderRadius: '12px',
-                    background: item.checked ? '#f0fdf4' : '#fafafa',
-                    border: item.checked ? '1px solid #bbf7d0' : '1px solid #f0f0f0',
+                    background: item.checked ? '#f5f5f5' : '#fafafa',
+                    border: item.checked ? '1px solid #d4d4d4' : '1px solid #f0f0f0',
                     transition: 'all 0.2s'
                   }}>
                     <input
@@ -175,7 +175,7 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                       checked={item.checked}
                       onChange={() => onChecklistChange(idx)}
                       disabled={isCompleted || item.disabled}
-                      style={{ marginTop: '2px', width: '18px', height: '18px', accentColor: '#22c55e', cursor: 'pointer', flexShrink: 0 }}
+                      style={{ marginTop: '2px', width: '18px', height: '18px', accentColor: '#1a1a1a', cursor: 'pointer', flexShrink: 0 }}
                     />
                     <div style={{ flex: 1 }}>
                       <p style={{
@@ -228,10 +228,10 @@ export default function PlanDayBubble({ day, checklist, isActive, isCompleted, i
                 {/* Completion message */}
                 {isCompleted && day.completionMessage && (
                   <div style={{
-                    background: '#f0fdf4', borderRadius: '12px', padding: '12px 16px',
-                    border: '1px solid #bbf7d0'
+                    background: '#f5f5f5', borderRadius: '12px', padding: '12px 16px',
+                    border: '1px solid #d4d4d4'
                   }}>
-                    <p style={{ fontSize: '12px', color: '#16a34a', fontWeight: 600, margin: 0 }}>
+                    <p style={{ fontSize: '12px', color: '#1a1a1a', fontWeight: 600, margin: 0 }}>
                       ✅ {day.completionMessage}
                     </p>
                   </div>

@@ -214,7 +214,7 @@ export default function MonPlanNoah() {
               <span style={{ fontSize: '13px', fontWeight: 600, color: '#1a1a1a' }}>
                 Progression globale
               </span>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: globalProgress >= 100 ? '#16a34a' : '#1a1a1a' }}>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
                 {globalProgress}%
               </span>
             </div>

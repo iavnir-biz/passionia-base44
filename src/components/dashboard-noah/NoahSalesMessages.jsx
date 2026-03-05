@@ -38,7 +38,7 @@ export default function NoahSalesMessages({ session }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             width: '36px', height: '36px', borderRadius: '10px',
-            background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+            background: '#1a1a1a',
             display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
             <MessageCircle style={{ width: '18px', height: '18px', color: '#fff' }} />
@@ -75,7 +75,7 @@ export default function NoahSalesMessages({ session }) {
               }}
               className="hover:border-[#ccc] hover:bg-[#fafafa]"
             >
-              <CheckCircle style={{ width: '14px', height: '14px', color: '#22c55e', flexShrink: 0 }} />
+              <CheckCircle style={{ width: '14px', height: '14px', color: '#1a1a1a', flexShrink: 0 }} />
               <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a1a1a', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {msg.title || msg.name || `Message ${idx + 1}`}
               </p>

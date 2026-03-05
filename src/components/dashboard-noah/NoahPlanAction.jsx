@@ -80,10 +80,10 @@ export default function NoahPlanAction({ session }) {
               <div style={{
                 width: '28px', height: '28px', borderRadius: '8px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                background: isCompleted ? '#f0fdf4' : isCurrent ? '#1a1a1a' : '#f5f5f5'
+                background: isCompleted ? '#1a1a1a' : isCurrent ? '#1a1a1a' : '#f5f5f5'
               }}>
                 {isCompleted ? (
-                  <CheckCircle style={{ width: '14px', height: '14px', color: '#22c55e' }} />
+                  <CheckCircle style={{ width: '14px', height: '14px', color: '#fff' }} />
                 ) : isLocked ? (
                   <Lock style={{ width: '12px', height: '12px', color: '#ccc' }} />
                 ) : (

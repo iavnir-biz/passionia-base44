@@ -76,7 +76,7 @@ export default function LandingVideo() {
         Vois NOAH™ en action
       </p>
 
-      {/* Video frame — Amplemarket style */}
+      {/* Video frame — Vimeo embed */}
       <div style={{
         position: 'relative',
         zIndex: 1,
@@ -84,77 +84,16 @@ export default function LandingVideo() {
         overflow: 'hidden',
         border: '1px solid #e8e8e8',
         boxShadow: '0 24px 80px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04)',
-        background: '#f5f5f5',
+        background: '#000',
         aspectRatio: '16 / 9',
-        cursor: 'pointer',
       }}>
-        {/* Gradient placeholder background */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 50%, #ebebeb 100%)',
-        }} />
-
-        {/* Subtle grid pattern */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'radial-gradient(circle, #d0d0d0 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-          opacity: 0.5,
-        }} />
-
-        {/* Center play button */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '16px',
-        }}>
-          <div style={{
-            width: '72px',
-            height: '72px',
-            borderRadius: '50%',
-            background: '#1a1a1a',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-            transition: 'transform 0.2s, box-shadow 0.2s',
-          }}
-            onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.28)'; }}
-            onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.2)'; }}
-          >
-            <Play size={28} color="#fff" fill="#fff" style={{ marginLeft: '4px' }} />
-          </div>
-          <span style={{
-            fontSize: '14px',
-            color: '#888',
-            fontWeight: 500,
-          }}>
-            Démo produit · 2 min
-          </span>
-        </div>
-
-        {/* Top-left label */}
-        <div style={{
-          position: 'absolute',
-          top: '16px',
-          left: '16px',
-          background: 'rgba(255,255,255,0.9)',
-          border: '1px solid rgba(0,0,0,0.06)',
-          borderRadius: '100px',
-          padding: '4px 12px',
-          fontSize: '12px',
-          fontWeight: 600,
-          color: '#1a1a1a',
-          backdropFilter: 'blur(8px)',
-        }}>
-          NOAH™
-        </div>
+        <iframe
+          src="https://player.vimeo.com/video/1170810950?badge=0&autopause=0&player_id=0&app_id=58479"
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+          allowFullScreen
+          title="NOAH™ Démo"
+        />
       </div>
     </section>
   );

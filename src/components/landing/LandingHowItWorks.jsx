@@ -60,7 +60,7 @@ export default function LandingHowItWorks() {
           letterSpacing: '-0.02em',
           marginBottom: '64px'
         }}>
-          3 étapes. <span style={{ fontStyle: 'italic' }}>5 minutes.</span><br />Tout est prêt.
+          3 étapes. <span style={{ fontStyle: 'italic', fontWeight: 700 }}>5 minutes.</span><br />Tout est prêt.
         </h2>
 
         {/* Timeline */}
@@ -148,8 +148,8 @@ export default function LandingHowItWorks() {
                     </div>
                   </div>
 
-                  {/* Screenshot after step 01 */}
-                  {i === 0 && (
+                  {/* Screenshot after step 01 or 02 */}
+                  {(i === 0 || i === 1) && (
                     <div style={{
                       marginTop: '32px',
                       marginLeft: '60px',
@@ -189,8 +189,11 @@ export default function LandingHowItWorks() {
                           </div>
                         </div>
                         <img
-                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/b730b79e7_Capturedecran2026-03-05a194750.png"
-                          alt="NOAH™ — Onboarding"
+                          src={i === 0
+                            ? "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/b730b79e7_Capturedecran2026-03-05a194750.png"
+                            : "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/fe846192a_Capturedecran2026-03-05a195942.png"
+                          }
+                          alt={i === 0 ? "NOAH™ — Onboarding" : "NOAH™ — Offres générées"}
                           style={{
                             width: '100%',
                             borderRadius: '8px',

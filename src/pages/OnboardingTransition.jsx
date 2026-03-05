@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Package, Rocket, FileText, Brain } from 'lucide-react';
+import { CheckCircle2, Package, Rocket, FileText, Brain, TrendingUp } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const items = [

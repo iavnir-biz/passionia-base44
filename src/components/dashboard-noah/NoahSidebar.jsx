@@ -31,7 +31,7 @@ export default function NoahSidebar({ currentPage, user, isOpen, onClose }) {
     { label: 'Overview', page: 'DashboardNoah', icon: LayoutDashboard },
     { label: 'Mes offres', page: 'MesOffresNoah', icon: Package },
     { label: 'Mes messages de vente', page: 'MesMessagesNoah', icon: MessageCircle },
-    { label: 'Mon plan d\'action', page: 'PlanAction', icon: Target },
+    { label: 'Mon plan d\'action', page: 'MonPlanNoah', icon: Target },
   ];
 
   return (

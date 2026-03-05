@@ -42,15 +42,15 @@ export default function NoahPlanAction({ session }) {
           Plan d'action <span style={{ color: '#888', fontWeight: 400 }}>· 7 jours</span>
         </h3>
         <button
-          onClick={() => navigate(createPageUrl('PlanAction'))}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '4px',
-            fontSize: '12px', fontWeight: 500, color: '#888', background: 'none',
-            border: 'none', cursor: 'pointer', padding: 0
-          }}
-        >
-          Voir tout <ArrowRight size={12} />
-        </button>
+          onClick={() => navigate(createPageUrl('MonPlanNoah'))}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              fontSize: '12px', fontWeight: 500, color: '#888', background: 'none',
+              border: 'none', cursor: 'pointer', padding: 0
+            }}
+          >
+            Voir tout <ArrowRight size={12} />
+          </button>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -65,7 +65,7 @@ export default function NoahPlanAction({ session }) {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.25 + step.day * 0.05 }}
-              onClick={() => !isLocked && navigate(createPageUrl('PlanAction'))}
+              onClick={() => !isLocked && navigate(createPageUrl('MonPlanNoah'))}
               style={{
                 display: 'flex', alignItems: 'center', gap: '14px',
                 padding: '12px 16px', borderRadius: '14px',

@@ -52,7 +52,7 @@ export default function OnboardingQ17TargetDelay() {
       const session = sessions[0];
       const onboardingFull = session.onboarding_full || {};
       onboardingFull.targetIncomeDelay = delay.toString();
-      await base44.entities.Session.update(currentUser.sessionId, { onboarding_full: onboardingFull });
+      await base44.entities.Session.update(resolvedSessionId, { onboarding_full: onboardingFull });
       localStorage.setItem('onboarding_targetIncomeDelay', delay);
       navigate(createPageUrl('OnboardingQ18LifeChange'));
     } catch (error) {
@@ -78,7 +78,7 @@ export default function OnboardingQ17TargetDelay() {
       const onboardingFull = session.onboarding_full || {};
       onboardingFull.targetIncome = newIncome.toString();
       onboardingFull.targetIncomeDelay = value.toString();
-      await base44.entities.Session.update(currentUser.sessionId, { onboarding_full: onboardingFull });
+      await base44.entities.Session.update(resolvedSessionId, { onboarding_full: onboardingFull });
       localStorage.setItem('onboarding_targetIncome', newIncome);
       localStorage.setItem('onboarding_targetIncomeDelay', value);
       navigate(createPageUrl('OnboardingQ18LifeChange'));

@@ -72,7 +72,6 @@ import OfferResume from './pages/OfferResume';
 import OfferSuperieure from './pages/OfferSuperieure';
 import OfferTaVieFuture from './pages/OfferTaVieFuture';
 import OnboardingDynamic from './pages/OnboardingDynamic';
-import OnboardingFirstName from './pages/OnboardingFirstName';
 import OnboardingQ10TypicalMistake from './pages/OnboardingQ10TypicalMistake';
 import OnboardingQ11ExtraDetail from './pages/OnboardingQ11ExtraDetail';
 import OnboardingQ12AgeRange from './pages/OnboardingQ12AgeRange';
@@ -102,6 +101,7 @@ import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
+import OnboardingFirstName from './pages/OnboardingFirstName';
 
 
 export const PAGES = {
@@ -130,7 +130,6 @@ export const PAGES = {
     "OfferSuperieure": OfferSuperieure,
     "OfferTaVieFuture": OfferTaVieFuture,
     "OnboardingDynamic": OnboardingDynamic,
-    "OnboardingFirstName": OnboardingFirstName,
     "OnboardingQ10TypicalMistake": OnboardingQ10TypicalMistake,
     "OnboardingQ11ExtraDetail": OnboardingQ11ExtraDetail,
     "OnboardingQ12AgeRange": OnboardingQ12AgeRange,
@@ -160,6 +159,7 @@ export const PAGES = {
     "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
+    "OnboardingFirstName": OnboardingFirstName,
 }
 
 export const pagesConfig = {

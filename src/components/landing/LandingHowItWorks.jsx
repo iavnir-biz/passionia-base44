@@ -149,7 +149,7 @@ export default function LandingHowItWorks() {
                   </div>
 
                   {/* Screenshot after step 01 or 02 */}
-                  {(i === 0 || i === 1) && (
+                  {(i === 0 || i === 1 || i === 2) && (
                     <div style={{
                       marginTop: '32px',
                       marginLeft: '60px',

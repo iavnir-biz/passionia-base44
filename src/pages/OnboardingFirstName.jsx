@@ -23,7 +23,6 @@ export default function OnboardingFirstName() {
 
     const user = await base44.auth.me();
 
-    // Save first name to user profile
     const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
     if (profiles.length > 0) {
       await base44.entities.UserProfile.update(profiles[0].id, { first_name: firstName.trim() });
@@ -31,7 +30,7 @@ export default function OnboardingFirstName() {
       await base44.entities.UserProfile.create({ first_name: firstName.trim() });
     }
 
-    navigate(createPageUrl("Onboarding"));
+    navigate(createPageUrl("OnboardingDynamic"));
   };
 
   return (

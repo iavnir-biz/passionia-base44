@@ -193,7 +193,7 @@ export default function LandingHowItWorks() {
                           alt="NOAH™ — Onboarding"
                           style={{
                             width: '100%',
-                            borderRadius: '10px',
+                            borderRadius: '8px',
                             display: 'block',
                           }}
                         />

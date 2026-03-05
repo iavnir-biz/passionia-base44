@@ -60,7 +60,10 @@ export default function OfferSuperieure() {
     setIsSaving(true);
     try {
       const resolvedId = localStorage.getItem('passionia_active_session_id') || session?.id;
-      await base44.functions.invoke('saveFinalizedOffer', { sessionId: resolvedId, key: 'upsell1', offer });
+      const currentSession = session || {};
+      const updatedOffer = { ...(currentSession.finalized_offer || {}), upsell1: offer };
+      await base44.entities.Session.update(resolvedId, { finalized_offer: updatedOffer });
+      setSession({ ...currentSession, finalized_offer: updatedOffer });
     } catch (error) { console.error('Error saving:', error); }
     setIsSaving(false);
     setShowTransition(true);

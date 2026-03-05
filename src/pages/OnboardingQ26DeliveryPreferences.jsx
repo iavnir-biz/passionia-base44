@@ -8,7 +8,7 @@ export default function OnboardingQ26DeliveryPreferences() {
       questionId="deliveryPreferences"
       title="Comment préfères-tu créer et délivrer tes produits ?"
       subtitle="Plusieurs choix sont possibles. Coche toutes les options qui te conviennent."
-      isLastQuestion={true}
+      isLastQuestion={false}
       inputType="checkbox"
       options={[
         "Enregistrer des vidéos (partage d'écran, sans montrer ma tête)",

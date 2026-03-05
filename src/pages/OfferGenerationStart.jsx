@@ -212,225 +212,196 @@ export default function OfferGenerationStart() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
       background: '#ffffff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      position: 'relative', overflow: 'hidden', padding: '40px 24px',
     }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      {/* Progress bar */}
-      <div style={{ width: '100%', height: '3px', background: '#f0f0f0' }}>
+      {/* Floating neon circles — subtle */}
+      <div className="ogs-neon ogs-neon-1" />
+      <div className="ogs-neon ogs-neon-2" />
+      <div className="ogs-neon ogs-neon-3" />
+
+      <div style={{ width: '100%', maxWidth: '460px', position: 'relative', zIndex: 1 }}>
+
+        {/* Avatar icon */}
         <motion.div
-          style={{ height: '100%', background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)', borderRadius: '0 4px 4px 0' }}
-          initial={{ width: '0%' }}
-          animate={{ width: `${Math.min(95, 20 + currentStep * 20)}%` }}
-          transition={{ duration: 0.5 }}
-        />
-      </div>
-
-      <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        padding: '40px 24px', position: 'relative', overflow: 'hidden',
-      }}>
-        {/* Floating neon circles */}
-        <div className="ogs-neon ogs-neon-1" />
-        <div className="ogs-neon ogs-neon-2" />
-        <div className="ogs-neon ogs-neon-3" />
-
-        <div style={{ width: '100%', maxWidth: '520px', position: 'relative', zIndex: 1 }}>
-
-          {/* Badge pill */}
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              background: '#f5f5f5', border: '1px solid #e8e8e8',
-              borderRadius: '100px', padding: '6px 16px',
-              fontSize: '13px', color: '#666',
-            }}>
-              <span style={{
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, type: 'spring', stiffness: 200 }}
+          style={{ display: 'flex', justifyContent: 'center', marginBottom: '28px' }}
+        >
+          <div style={{ position: 'relative' }}>
+            <motion.div
+              animate={{ scale: [1, 1.04, 1] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                width: '72px', height: '72px', borderRadius: '20px',
                 background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
-                color: '#fff', padding: '2px 10px', borderRadius: '100px',
-                fontSize: '11px', fontWeight: 600
-              }}>NOAH™</span>
-              Génération en cours
-            </div>
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 8px 32px rgba(249,115,22,0.2)',
+              }}
+            >
+              <Brain size={36} color="#fff" strokeWidth={1.5} />
+            </motion.div>
+            <motion.div
+              animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              style={{
+                position: 'absolute', bottom: '2px', right: '2px',
+                width: '14px', height: '14px', borderRadius: '50%',
+                background: '#3dd67a', border: '2.5px solid #fff',
+              }}
+            />
           </div>
+        </motion.div>
 
-          {/* Animated Brain Icon */}
-          <motion.div
-            animate={{ scale: [1, 1.06, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            style={{ position: 'relative', width: '88px', height: '88px', margin: '0 auto 24px' }}
-          >
-            <div style={{
-              width: '88px', height: '88px', borderRadius: '24px',
-              background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        {/* Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ textAlign: 'center', marginBottom: '8px' }}
+        >
+          <h1 style={{
+            fontSize: 'clamp(22px, 4vw, 28px)', fontWeight: 800,
+            letterSpacing: '-0.03em', color: '#1a1a1a', lineHeight: 1.2, marginBottom: '8px',
+          }}>
+            Construction de ton offre…
+          </h1>
+          <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>
+            Cela peut prendre jusqu'à 5 minutes. Ne ferme pas cette page.
+          </p>
+        </motion.div>
+
+        {/* Progress bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          style={{ marginTop: '24px', marginBottom: '28px' }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '12px', color: '#999' }}>
+              {formatTime(elapsedTime)}
+            </span>
+            <span style={{
+              fontSize: '12px', fontWeight: 700,
+              background: 'linear-gradient(135deg, #f97316, #ec4899)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             }}>
-              <motion.div animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
-                <Brain size={40} color="#fff" />
-              </motion.div>
-            </div>
-            {[0, 1].map(i => (
-              <motion.div key={i}
-                style={{ position: 'absolute', inset: 0, borderRadius: '24px', border: '1px solid #1a1a1a' }}
-                initial={{ scale: 1, opacity: 0.3 }}
-                animate={{ scale: [1, 1.5, 2], opacity: [0.3, 0.1, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.7, ease: "easeOut" }}
-              />
-            ))}
-          </motion.div>
-
-          {/* Title + Timer */}
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <h1 style={{
-              fontSize: 'clamp(20px, 3.5vw, 26px)', fontWeight: 600,
-              color: '#1a1a1a', letterSpacing: '-0.02em', marginBottom: '12px',
-            }}>
-              Noah construit ton offre…
-            </h1>
-
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              background: '#f8f8f8', border: '1px solid #e5e5e5',
-              borderRadius: '100px', padding: '8px 18px',
-            }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e', animation: 'ogsPulse 1.5s ease-in-out infinite' }} />
-              <span style={{ fontFamily: "'Inter', monospace", fontWeight: 600, fontSize: '16px', color: '#1a1a1a' }}>
-                {formatTime(elapsedTime)}
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginTop: '12px' }}>
-              {[0, 1, 2].map(i => (
-                <motion.div key={i}
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
-                  transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                  style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#1a1a1a' }}
-                />
-              ))}
-            </div>
+              {Math.min(95, 20 + currentStep * 20)}%
+            </span>
           </div>
+          <div style={{
+            width: '100%', height: '4px', background: '#f0f0f0',
+            borderRadius: '100px', overflow: 'hidden',
+          }}>
+            <motion.div
+              initial={{ width: '0%' }}
+              animate={{ width: `${Math.min(95, 20 + currentStep * 20)}%` }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              style={{
+                height: '100%', borderRadius: '100px',
+                background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)',
+              }}
+            />
+          </div>
+        </motion.div>
 
-          {/* Info banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2 }}
-            style={{
-              background: 'linear-gradient(135deg, rgba(249,115,22,0.06), rgba(236,72,153,0.04))',
-              border: '1px solid rgba(249,115,22,0.15)',
-              borderRadius: '20px', padding: '16px 20px', marginBottom: '28px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-              <span style={{ fontSize: '18px', flexShrink: 0 }}>✨</span>
-              <div>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: '#1a1a1a', marginBottom: '4px' }}>
-                  Génération ultra-personnalisée
-                </p>
-                <p style={{ fontSize: '12px', color: '#888', lineHeight: 1.5, marginBottom: '4px' }}>
-                  Pour des offres adaptées à ton profil, la génération peut prendre jusqu'à <span style={{ fontWeight: 600, color: '#666' }}>5 minutes</span>.
-                </p>
-                <p style={{ fontSize: '12px', fontWeight: 600, color: '#1a1a1a' }}>
-                  ⚠️ Ne ferme surtout pas cette page !
-                </p>
-              </div>
-            </div>
-          </motion.div>
+        {/* Steps */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {preparationSteps.map((step, index) => {
+            const Icon = step.icon;
+            const isCompleted = index < currentStep;
+            const isInProgress = index === currentStep;
 
-          {/* Steps */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {preparationSteps.map((step, index) => {
-              const Icon = step.icon;
-              const isCompleted = index < currentStep;
-              const isInProgress = index === currentStep;
-
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: index <= currentStep ? 1 : 0.35, x: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.08 }}
-                  style={{
-                    position: 'relative', borderRadius: '16px', padding: '14px 16px',
-                    background: isCompleted ? '#fafafa' : isInProgress ? '#fff' : '#fff',
-                    border: isCompleted
-                      ? '1px solid #e0e0e0'
-                      : isInProgress
-                        ? '2px solid #1a1a1a'
-                        : '1px solid #eeeeee',
-                    transition: 'all 0.3s',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{
-                      width: '40px', height: '40px', borderRadius: '12px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                      background: isCompleted
-                        ? 'linear-gradient(135deg, #f97316, #ec4899)'
-                        : '#1a1a1a',
-                    }}>
-                      {isCompleted
-                        ? <Check size={18} color="#fff" />
-                        : <Icon size={18} color="#fff" />
-                      }
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', margin: 0 }}>
-                          {step.title}
-                        </h3>
-                        {isInProgress && (
-                          <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}
-                            style={{ display: 'flex', gap: '3px' }}>
-                            {[0, 1, 2].map(i => (
-                              <div key={i} style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#1a1a1a' }} />
-                            ))}
-                          </motion.div>
-                        )}
-                        {isCompleted && (
-                          <span style={{
-                            fontSize: '10px', fontWeight: 600, color: '#f97316',
-                            background: 'rgba(249,115,22,0.08)', padding: '2px 8px',
-                            borderRadius: '100px',
-                          }}>Prêt</span>
-                        )}
-                      </div>
-                      <p style={{ fontSize: '12px', color: '#999', margin: '2px 0 0', lineHeight: 1.4 }}>
-                        {step.description}
-                      </p>
-                    </div>
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                animate={{ opacity: index <= currentStep ? 1 : 0.35, x: 0, scale: 1 }}
+                transition={{ duration: 0.4, delay: index * 0.08, type: 'spring', stiffness: 300, damping: 25 }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '14px',
+                  padding: '16px 18px', background: '#fff',
+                  borderRadius: '16px',
+                  border: isInProgress ? '1px solid #e0e0e0' : '1px solid #f0f0f0',
+                  transition: 'border-color 0.3s, box-shadow 0.3s',
+                  boxShadow: isInProgress ? '0 4px 16px rgba(0,0,0,0.04)' : 'none',
+                  position: 'relative', overflow: 'hidden',
+                }}
+              >
+                <div style={{
+                  flexShrink: 0, width: '44px', height: '44px', borderRadius: '14px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: isCompleted ? '#f0fdf4' : '#f5f5f5',
+                }}>
+                  {isCompleted
+                    ? <Check size={20} color="#3dd67a" strokeWidth={2} />
+                    : <Icon size={20} color="#1a1a1a" strokeWidth={1.5} />
+                  }
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', letterSpacing: '-0.01em' }}>
+                      {step.title}
+                    </span>
+                    {isInProgress && (
+                      <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}
+                        style={{ display: 'flex', gap: '3px' }}>
+                        {[0, 1, 2].map(i => (
+                          <div key={i} style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#999' }} />
+                        ))}
+                      </motion.div>
+                    )}
                   </div>
+                  <p style={{ fontSize: '12px', color: '#999', margin: '2px 0 0', lineHeight: 1.4 }}>
+                    {step.description}
+                  </p>
+                </div>
+                {isCompleted && (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }} style={{ marginLeft: 'auto' }}>
+                    <Check size={16} color="#3dd67a" strokeWidth={2} />
+                  </motion.div>
+                )}
 
-                  {isInProgress && (
-                    <motion.div
-                      style={{
-                        position: 'absolute', bottom: 0, left: 0, height: '2px',
-                        background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)',
-                        borderRadius: '0 0 16px 16px',
-                      }}
-                      initial={{ width: '0%' }}
-                      animate={{ width: '100%' }}
-                      transition={{ duration: 3, ease: 'linear' }}
-                    />
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
+                {isInProgress && (
+                  <motion.div
+                    style={{
+                      position: 'absolute', bottom: 0, left: 0, height: '2px',
+                      background: 'linear-gradient(90deg, #f97316, #ec4899, #a78bfa)',
+                    }}
+                    initial={{ width: '0%' }}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: 3, ease: 'linear' }}
+                  />
+                )}
+              </motion.div>
+            );
+          })}
         </div>
+
+        {/* Reassurance */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3, duration: 0.6 }}
+          style={{ textAlign: 'center', fontSize: '12px', color: '#bbb', marginTop: '32px' }}
+        >
+          Nos serveurs sont parfois très sollicités — merci de patienter.
+        </motion.p>
       </div>
 
       <style>{`
-        .ogs-neon { position: absolute; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(60px); opacity: 0.5; }
-        .ogs-neon-1 { width: min(280px, 55vw); height: min(280px, 55vw); background: radial-gradient(circle, rgba(249,115,22,0.5) 0%, transparent 70%); top: 8%; left: -8%; animation: ogsF1 7s ease-in-out infinite; }
-        .ogs-neon-2 { width: min(220px, 45vw); height: min(220px, 45vw); background: radial-gradient(circle, rgba(236,72,153,0.45) 0%, transparent 70%); bottom: 15%; right: -5%; animation: ogsF2 8s ease-in-out infinite; }
-        .ogs-neon-3 { width: min(200px, 42vw); height: min(200px, 42vw); background: radial-gradient(circle, rgba(167,139,250,0.45) 0%, transparent 70%); bottom: 5%; left: 10%; animation: ogsF3 9s ease-in-out infinite; }
-        @keyframes ogsF1 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(18px,-12px) scale(1.06); } }
-        @keyframes ogsF2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-12px,16px) scale(1.05); } }
-        @keyframes ogsF3 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(14px,10px) scale(1.08); } }
-        @keyframes ogsPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
+        .ogs-neon { position: absolute; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(60px); opacity: 0.35; }
+        .ogs-neon-1 { width: min(300px, 60vw); height: min(300px, 60vw); background: radial-gradient(circle, rgba(249,115,22,0.4) 0%, transparent 70%); top: 5%; right: -10%; animation: ogsF1 7s ease-in-out infinite; }
+        .ogs-neon-2 { width: min(240px, 50vw); height: min(240px, 50vw); background: radial-gradient(circle, rgba(236,72,153,0.35) 0%, transparent 70%); bottom: 10%; left: -8%; animation: ogsF2 8s ease-in-out infinite; }
+        .ogs-neon-3 { width: min(200px, 42vw); height: min(200px, 42vw); background: radial-gradient(circle, rgba(167,139,250,0.35) 0%, transparent 70%); top: 40%; left: 50%; transform: translateX(-50%); animation: ogsF3 9s ease-in-out infinite; }
+        @keyframes ogsF1 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-16px,14px) scale(1.06); } }
+        @keyframes ogsF2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(14px,-10px) scale(1.05); } }
+        @keyframes ogsF3 { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) translate(10px,12px) scale(1.08); } }
       `}</style>
     </div>
   );

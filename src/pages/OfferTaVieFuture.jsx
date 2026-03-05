@@ -3,55 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import {
-  Loader2,
-  TrendingUp,
-  ArrowRight,
-  ChevronDown,
-  ChevronUp,
-  Sparkles,
-  Target,
-  CheckCircle,
-  Package,
-  BarChart3,
-  Sprout,
-  Map
-} from 'lucide-react';
-import GlowButton from '@/components/ui/GlowButton';
+import { Loader2, ArrowRight, Sparkles, Target, CheckCircle } from 'lucide-react';
 import OfferTransition from '@/components/offer/OfferTransition';
-import OnboardingSidebar from '@/components/onboarding/OnboardingSidebar';
-import { cn } from "@/lib/utils";
-
-const mainSteps = [
-  { id: 1, label: "Tes offres", icon: Package, color: "from-orange-500 to-red-500" },
-  { id: 2, label: "Ton marché", icon: BarChart3, color: "from-green-500 to-emerald-500" },
-  { id: 3, label: "Ta vie future", icon: Sprout, color: "from-amber-500 to-yellow-500" },
-  { id: 4, label: "Ton plan d'action", icon: Map, color: "from-indigo-500 to-purple-500" },
-];
 
 function parsePrice(priceStr) {
   if (!priceStr) return 0;
-  const cleaned = priceStr.replace(/[^0-9]/g, '');
-  return parseInt(cleaned, 10) || 0;
+  return parseInt(priceStr.replace(/[^0-9]/g, ''), 10) || 0;
 }
 
 export default function OfferTaVieFuture() {
   const navigate = useNavigate();
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showDetail, setShowDetail] = useState(false);
   const [futureVision, setFutureVision] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
 
-  useEffect(() => {
-    loadSession();
-  }, []);
+  useEffect(() => { loadSession(); }, []);
 
   useEffect(() => {
-    if (session && !futureVision) {
-      generateFutureVision();
-    }
+    if (session && !futureVision) generateFutureVision();
   }, [session, futureVision]);
 
   const loadSession = async () => {
@@ -60,40 +31,27 @@ export default function OfferTaVieFuture() {
       const realSessionId = currentUser.sessionId;
 
       if (!realSessionId) {
-        console.error('❌ No sessionId');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
       const sessions = await base44.entities.Session.filter({ id: realSessionId });
       if (!sessions || sessions.length === 0) {
-        console.error('❌ Session not found');
         navigate(createPageUrl('OnboardingFirstName'));
         return;
       }
 
       const loadedSession = sessions[0];
 
-      // 🔥 P0-1: Vérifier potential_revenue
       if (!loadedSession.potential_revenue || loadedSession.potential_revenue === 0) {
-        console.warn('⚠️ potential_revenue = 0, redirect OfferResume');
         navigate(createPageUrl('OfferResume'));
         return;
       }
 
-      // 🔥 P0-1: Vérifier finalized_offer
       if (!loadedSession.finalized_offer || !loadedSession.is_offer_complete) {
-        console.warn('⚠️ Offre incomplète, redirect OfferResume');
         navigate(createPageUrl('OfferResume'));
         return;
       }
-
-      console.log('✅ Session chargée:', {
-        sessionId: loadedSession.id,
-        potential_revenue: loadedSession.potential_revenue,
-        is_offer_complete: loadedSession.is_offer_complete,
-        has_future_vision: !!loadedSession.future_vision
-      });
 
       setSession(loadedSession);
     } catch (error) {
@@ -105,17 +63,11 @@ export default function OfferTaVieFuture() {
 
   const generateFutureVision = async () => {
     if (!session?.id) return;
-
     setIsGenerating(true);
     try {
-      const { data } = await base44.functions.invoke('generateFutureVision', {
-        sessionId: session.id
-      });
-
+      const { data } = await base44.functions.invoke('generateFutureVision', { sessionId: session.id });
       if (data.success) {
-        setFutureVision({
-          narrativeText: data.narrativeText
-        });
+        setFutureVision({ narrativeText: data.narrativeText });
       }
     } catch (error) {
       console.error('Error generating vision:', error);
@@ -128,23 +80,16 @@ export default function OfferTaVieFuture() {
     }
   };
 
-  const handleContinue = () => {
-    setShowTransition(true);
-  };
-
-  const handleTransitionComplete = () => {
-    navigate(createPageUrl('CTAPAYWALL'));
-  };
+  const handleContinue = () => setShowTransition(true);
 
   if (isLoading || isGenerating) {
     return <OfferTransition message={isGenerating ? "Noah écrit ta vision future..." : "Chargement..."} />;
   }
 
   if (showTransition) {
-    return <OfferTransition message="Noah prépare ton plan de route..." onComplete={handleTransitionComplete} />;
+    return <OfferTransition message="Noah prépare ton plan de route..." onComplete={() => navigate(createPageUrl('CTAPAYWALL'))} />;
   }
 
-  // 🔥 P0-1: Source of truth = session.finalized_offer
   const finalizedOffer = session?.finalized_offer || {};
   const potentialRevenue = session?.potential_revenue || 0;
 
@@ -161,206 +106,255 @@ export default function OfferTaVieFuture() {
     total: parsePrice(p.data?.price) * p.multiplier
   }));
 
-  // 🔥 P0-5: Clé correcte targetIncome
   const revenueGoal = parseInt(session?.onboarding_full?.targetIncome) || 500;
-
-  // Calculate the multiplier to reach the goal from potential_revenue
   const multiplier = potentialRevenue > 0 ? revenueGoal / potentialRevenue : 1;
 
-  // Apply the multiplier to each product's sales count to maintain proportions
   const salesNeeded = revenues.map(r => {
     if (r.price === 0) return { ...r, salesNeeded: 0, projectedRevenue: 0 };
-
-    // Scale up the current multiplier by the goal ratio
     const targetSales = Math.ceil(r.multiplier * multiplier);
     const projectedRevenue = targetSales * r.price;
-
-    return {
-      ...r,
-      salesNeeded: targetSales,
-      projectedRevenue
-    };
+    return { ...r, salesNeeded: targetSales, projectedRevenue };
   });
 
-  // Calculate total projected revenue to verify
   const totalProjected = salesNeeded.reduce((sum, item) => sum + item.projectedRevenue, 0);
 
-  const completedSteps = [1, 2, 3, 4, 5]; // Jusqu'à Ton marché complété
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white flex">
-      <OnboardingSidebar currentPage="OfferTaVieFuture" completedSteps={completedSteps} progressInStep={0} />
+    <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      {/* Content */}
-      <div className="flex-1 w-full flex flex-col lg:ml-80 pt-32 lg:pt-0 overflow-x-hidden relative">
-        <div className="py-6 md:py-12">
-          <div className="max-w-3xl mx-auto px-4">
-            {/* Title */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-8"
+      <div className="relative">
+        {/* Neon circles */}
+        <div style={{ position: 'absolute', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 70%)', top: '5%', right: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%)', bottom: '10%', left: '-5%', filter: 'blur(60px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%)', top: '40%', left: '50%', transform: 'translateX(-50%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+
+        <div className="max-w-3xl mx-auto px-4 relative z-10" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+
+          {/* Hero Title */}
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: '#f5f5f5', border: '1px solid #e8e8e8', borderRadius: '100px',
+              padding: '6px 16px', fontSize: '13px', color: '#666', marginBottom: '32px'
+            }}>
+              <span style={{ fontSize: '16px' }}>✨</span>
+              Vision personnalisée
+            </div>
+
+            <h1 style={{
+              fontSize: 'clamp(32px, 5vw, 52px)',
+              fontWeight: 400,
+              lineHeight: 1.15,
+              letterSpacing: '-0.03em',
+              color: '#1a1a1a',
+              marginBottom: '16px'
+            }}>
+              Voici ce que ta <span style={{
+                fontStyle: 'italic',
+                fontWeight: 500,
+                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>vie future</span> te réserve
+            </h1>
+
+            <p style={{ fontSize: '17px', color: '#888', lineHeight: 1.6, maxWidth: '550px', margin: '0 auto 40px' }}>
+              Une projection inspirante basée sur ton parcours et tes offres.
+            </p>
+
+            {/* Top CTA */}
+            <button
+              onClick={handleContinue}
+              style={{
+                background: '#1a1a1a', color: '#fff', border: 'none',
+                padding: '14px 32px', borderRadius: '100px', fontSize: '15px',
+                fontWeight: 600, cursor: 'pointer', display: 'inline-flex',
+                alignItems: 'center', gap: '8px', transition: 'opacity 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseOut={e => e.currentTarget.style.opacity = '1'}
             >
-              <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3">
-                ✨ Voici ce que ta vie future te réserve…
-              </h1>
-            </motion.div>
+              Voir le plan concret <ArrowRight size={16} />
+            </button>
+          </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex justify-center mb-8"
-            >
-              <GlowButton onClick={handleContinue} size="lg" className="w-full md:w-auto px-6 md:px-10 text-sm md:text-base">
-                Voir le Plan de mise en place CONCRÈTE
-                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
-              </GlowButton>
-            </motion.div>
-
-            {/* Bandeau info Dashboard */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl flex items-start gap-3"
-            >
-              <div className="bg-amber-400 rounded-full p-1.5 flex-shrink-0 mt-0.5">
-                <Map className="w-4 h-4 text-white" />
-              </div>
-              <p className="text-sm text-amber-900 leading-relaxed">
-                Pour donner vie à cette projection de ta vie future, un <span className="font-semibold">plan d'action sur-mesure sur 30 jours</span>, personnalisé à ton profil et à tes offres, a été créé dans <span className="font-semibold">ton dashboard final</span>.
-              </p>
-            </motion.div>
-
-            {/* Narrative Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-3xl border border-gray-200 shadow-sm p-5 md:p-8 mb-6"
-            >
-              <div className="flex items-start gap-4 mb-6">
-                <motion.div
-                  className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#61f7a2] to-[#4de88f] flex items-center justify-center flex-shrink-0 shadow-lg"
-                  animate={{ rotate: [0, 5, -5, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Sparkles className="w-6 h-6 text-white" />
-                </motion.div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-1">
-                    Ta vision personnalisée
-                  </h2>
-                  <p className="text-gray-600 text-sm">
-                    Une projection inspirante basée sur ton parcours
-                  </p>
-                </div>
-              </div>
-
-              {isGenerating ? (
-                <div className="flex items-center gap-3 py-8">
-                  <Loader2 className="w-5 h-5 text-[#61f7a2] animate-spin" />
-                  <span className="text-gray-600">Génération de ta vision en cours...</span>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  {futureVision?.narrativeText.split('\n\n').map((paragraph, idx) => (
-                    <motion.p
-                      key={idx}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="text-gray-700 leading-relaxed text-base"
-                    >
-                      {paragraph}
-                    </motion.p>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-
-            {/* Roadmap to Goal */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="bg-gradient-to-br from-yellow-50 to-white rounded-3xl border-2 border-yellow-300/50 p-5 md:p-8 mb-8 shadow-lg"
-            >
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-                <Target className="w-5 h-5 md:w-6 md:h-6 text-white" />
+          {/* Narrative Vision Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            style={{
+              background: '#fff', border: '1px solid #e5e5e5', borderRadius: '20px',
+              padding: '32px', marginBottom: '24px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '12px',
+                background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+              }}>
+                <Sparkles style={{ width: '20px', height: '20px', color: '#fff' }} />
               </div>
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 leading-tight">
-                  Ton Plan de Route pour Atteindre ton Objectif
+                <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1a1a1a', margin: 0 }}>
+                  Ta vision personnalisée
                 </h2>
-                <p className="text-gray-600 text-[11px] md:text-sm mt-0.5">
-                  Scénario indicatif pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
-                  {totalProjected > 0 && (
-                    <span className="block mt-1 text-emerald-600 font-semibold">
-                      → Projection totale : {totalProjected.toLocaleString('fr-FR')}€/mois
+                <p style={{ fontSize: '13px', color: '#888', margin: 0 }}>
+                  Basée sur ton profil et tes choix
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {futureVision?.narrativeText.split('\n\n').map((paragraph, idx) => (
+                <motion.p
+                  key={idx}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  style={{ color: '#444', fontSize: '15px', lineHeight: 1.8, margin: 0 }}
+                >
+                  {paragraph}
+                </motion.p>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Roadmap Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: '#fff', border: '1px solid #e5e5e5', borderRadius: '20px',
+              padding: '32px', marginBottom: '24px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '12px',
+                background: '#f5f5f5',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+              }}>
+                <Target style={{ width: '20px', height: '20px', color: '#1a1a1a' }} />
+              </div>
+              <h2 style={{
+                fontSize: 'clamp(18px, 3vw, 24px)',
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+                color: '#1a1a1a',
+                margin: 0
+              }}>
+                Ton <span style={{
+                  fontStyle: 'italic',
+                  fontWeight: 500,
+                  background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}>plan de route</span>
+              </h2>
+            </div>
+            <p style={{ fontSize: '13px', color: '#888', marginBottom: '24px', marginLeft: '52px' }}>
+              Scénario indicatif pour atteindre {revenueGoal.toLocaleString('fr-FR')}€/mois
+              {totalProjected > 0 && (
+                <span style={{ display: 'block', marginTop: '4px', fontWeight: 600, background: 'linear-gradient(135deg, #f97316, #ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  → Projection totale : {totalProjected.toLocaleString('fr-FR')}€/mois
+                </span>
+              )}
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {salesNeeded.map((item, idx) => (
+                <motion.div
+                  key={item.key}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + idx * 0.1 }}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '14px 18px', background: '#f8f8f8', borderRadius: '14px',
+                    border: '1px solid #e5e5e5'
+                  }}
+                >
+                  <div>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', display: 'block' }}>{item.label}</span>
+                    <span style={{ fontSize: '12px', color: '#888' }}>{item.price}€ par vente</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                    <CheckCircle style={{ width: '18px', height: '18px', color: '#f97316' }} />
+                    <span style={{
+                      fontWeight: 700, fontSize: '16px',
+                      background: 'linear-gradient(135deg, #f97316, #ec4899)',
+                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                    }}>
+                      {item.salesNeeded} ventes
                     </span>
-                  )}
-                </p>
-              </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
 
-              <div className="space-y-3">
-                {salesNeeded.map((item, idx) => (
-                  <motion.div
-                    key={item.key}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6 + idx * 0.1 }}
-                    className="flex items-center justify-between py-3 md:py-4 px-4 md:px-5 bg-white rounded-2xl border border-gray-200 shadow-sm"
-                  >
-                    <div>
-                      <span className="text-gray-900 text-sm font-semibold truncate block max-w-[150px] md:max-w-none">{item.label}</span>
-                      <p className="text-gray-500 text-[10px] md:text-xs">{item.price} € par vente</p>
-                    </div>
-                    <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-                      <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-yellow-500" />
-                      <span className="text-yellow-600 font-bold text-base md:text-lg">
-                        {item.salesNeeded} ventes
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
-                className="mt-6 p-5 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border border-yellow-200"
-              >
-                <p className="text-gray-700 text-sm text-center leading-relaxed">
-                  💡 <strong className="text-gray-900">Astuce :</strong> Commence par te concentrer sur ton Produit Principal pour valider le marché, puis ajoute progressivement les autres offres. Ces volumes sont indicatifs et s'ajustent avec ton expérience.
-                </p>
-              </motion.div>
-            </motion.div>
-
+            {/* Tip */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="flex justify-center"
+              transition={{ delay: 0.7 }}
+              style={{
+                marginTop: '20px', padding: '16px 20px',
+                background: '#f8f8f8', borderRadius: '14px', border: '1px solid #e5e5e5',
+                textAlign: 'center'
+              }}
             >
-              <GlowButton onClick={handleContinue} size="lg" className="w-full md:w-auto px-6 md:px-12 text-sm md:text-base">
-                Voir le Plan de mise en place CONCRÈTE
-                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
-              </GlowButton>
+              <p style={{ fontSize: '13px', color: '#666', lineHeight: 1.6, margin: 0 }}>
+                💡 <strong style={{ color: '#1a1a1a' }}>Astuce :</strong> Commence par ton Produit Principal pour valider le marché, puis ajoute progressivement les autres offres.
+              </p>
             </motion.div>
-          </div>
+          </motion.div>
+
+          {/* Conclusion quote */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{
+              background: '#1a1a1a', borderRadius: '20px', padding: '32px',
+              textAlign: 'center', marginBottom: '40px'
+            }}
+          >
+            <p style={{
+              fontSize: '17px', fontWeight: 500, lineHeight: 1.6, margin: 0,
+              background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>
+              Cette vie t'attend. Il te suffit maintenant de passer à l'action, étape par étape.
+            </p>
+          </motion.div>
+
+          {/* Bottom CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            style={{ textAlign: 'center' }}
+          >
+            <button
+              onClick={handleContinue}
+              style={{
+                background: '#1a1a1a', color: '#fff', border: 'none',
+                padding: '16px 36px', borderRadius: '100px', fontSize: '15px',
+                fontWeight: 600, cursor: 'pointer', display: 'inline-flex',
+                alignItems: 'center', gap: '8px', transition: 'opacity 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseOut={e => e.currentTarget.style.opacity = '1'}
+            >
+              Voir le plan concret <ArrowRight size={16} />
+            </button>
+          </motion.div>
+
         </div>
       </div>
-
-      {/* Transition Animation */}
-      {showTransition && (
-        <OfferTransition
-          message="Noah prépare ton plan de route..."
-          onComplete={handleTransitionComplete}
-        />
-      )}
     </div>
   );
 }

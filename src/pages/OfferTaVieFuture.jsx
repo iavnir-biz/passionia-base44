@@ -25,10 +25,17 @@ export default function OfferTaVieFuture() {
     if (session && !futureVision) generateFutureVision();
   }, [session, futureVision]);
 
+  const PRODUCT_CONFIG = [
+    { key: 'mainProduct', multiplier: 30 },
+    { key: 'orderBump', multiplier: 15 },
+    { key: 'upsell1', multiplier: 9 },
+    { key: 'upsell3', multiplier: 1 }
+  ];
+
   const loadSession = async () => {
     try {
       const currentUser = await base44.auth.me();
-      const realSessionId = currentUser.sessionId;
+      const realSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
 
       if (!realSessionId) {
         navigate(createPageUrl('OnboardingFirstName'));
@@ -43,14 +50,25 @@ export default function OfferTaVieFuture() {
 
       const loadedSession = sessions[0];
 
-      if (!loadedSession.potential_revenue || loadedSession.potential_revenue === 0) {
+      // If no finalized offer at all, go back
+      if (!loadedSession.finalized_offer || Object.keys(loadedSession.finalized_offer).length === 0) {
         navigate(createPageUrl('OfferResume'));
         return;
       }
 
-      if (!loadedSession.finalized_offer || !loadedSession.is_offer_complete) {
-        navigate(createPageUrl('OfferResume'));
-        return;
+      // Auto-fix missing potential_revenue / is_offer_complete
+      if (!loadedSession.potential_revenue || !loadedSession.is_offer_complete) {
+        const totalMonthly = PRODUCT_CONFIG.reduce((sum, p) => {
+          const price = parsePrice(loadedSession.finalized_offer[p.key]?.price);
+          return sum + price * p.multiplier;
+        }, 0);
+
+        await base44.entities.Session.update(loadedSession.id, {
+          potential_revenue: totalMonthly,
+          is_offer_complete: true
+        });
+        loadedSession.potential_revenue = totalMonthly;
+        loadedSession.is_offer_complete = true;
       }
 
       setSession(loadedSession);

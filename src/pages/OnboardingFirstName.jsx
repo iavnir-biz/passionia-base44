@@ -1,63 +1,71 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
-import { Brain, ArrowRight, Loader2 } from "lucide-react";
+import { Brain, ArrowRight, Loader2, Sparkles } from "lucide-react";
 
 export default function OnboardingFirstName() {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    async function init() {
-      try {
-        const isAuth = await base44.auth.isAuthenticated();
-        if (!isAuth) {
-          base44.auth.redirectToLogin(createPageUrl("OnboardingFirstName"));
-          return;
-        }
+    checkExisting();
+  }, []);
 
-        // Check if user already has a profile with first_name
-        const profiles = await base44.entities.UserProfile.list();
-        if (profiles.length > 0 && profiles[0].first_name) {
-          // Already has a name, go to dynamic onboarding
-          navigate(createPageUrl("OnboardingDynamic"), { replace: true });
-          return;
-        }
-      } catch (e) {
-        console.error("Init error:", e);
-      }
-      setLoading(false);
-    }
-    init();
-  }, [navigate]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!firstName.trim() || saving) return;
-
-    setSaving(true);
+  const checkExisting = async () => {
     try {
-      const profiles = await base44.entities.UserProfile.list();
-      if (profiles.length > 0) {
-        await base44.entities.UserProfile.update(profiles[0].id, { first_name: firstName.trim() });
-      } else {
-        await base44.entities.UserProfile.create({ first_name: firstName.trim() });
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        base44.auth.redirectToLogin(window.location.href);
+        return;
       }
-      navigate(createPageUrl("OnboardingDynamic"));
-    } catch (err) {
-      console.error("Save error:", err);
-      setSaving(false);
+      const user = await base44.auth.me();
+      // Pre-fill if we already have the firstName
+      if (user.firstName) {
+        setFirstName(user.firstName);
+      }
+      const stored = localStorage.getItem("onboarding_firstName");
+      if (stored && !user.firstName) {
+        setFirstName(stored);
+      }
+    } catch (e) {
+      // Not logged in — redirect to login
+      base44.auth.redirectToLogin(window.location.href);
+      return;
+    } finally {
+      setInitialLoading(false);
     }
   };
 
-  if (loading) {
+  const handleContinue = async () => {
+    if (!firstName.trim() || loading) return;
+    setLoading(true);
+    try {
+      const cleanName = firstName.trim().slice(0, 50);
+      localStorage.setItem("onboarding_firstName", cleanName);
+      await base44.auth.updateMe({ firstName: cleanName });
+      navigate(createPageUrl("OnboardingDynamic"));
+    } catch (e) {
+      console.error("Error saving firstName:", e);
+      // Navigate anyway — the name is in localStorage
+      navigate(createPageUrl("OnboardingDynamic"));
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleContinue();
+    }
+  };
+
+  if (initialLoading) {
     return (
       <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        <Loader2 className="w-7 h-7 animate-spin text-[#61f7a2]" />
       </div>
     );
   }
@@ -86,59 +94,66 @@ export default function OnboardingFirstName() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="text-center mb-10"
+          className="text-center mb-8"
         >
-          <h1 className="text-[26px] font-extrabold text-gray-900 tracking-tight leading-tight mb-3">
+          <h1 className="text-[26px] font-extrabold text-gray-900 tracking-tight leading-tight mb-2">
             Avant de commencer...
           </h1>
           <p className="text-gray-500 text-[15px] leading-relaxed">
-            Comment tu t'appelles ? Je veux pouvoir m'adresser à toi directement. 😊
+            Comment tu t'appelles ? Je veux pouvoir m'adresser à toi directement.
           </p>
         </motion.div>
 
-        {/* Form */}
-        <motion.form
+        {/* Input */}
+        <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          onSubmit={handleSubmit}
-          className="space-y-5"
+          transition={{ delay: 0.25 }}
+          className="mb-6"
         >
-          <div>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              placeholder="Ton prénom"
-              autoFocus
-              className="w-full px-5 py-4 bg-white border border-gray-200 rounded-2xl text-[17px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#61f7a2]/50 focus:border-[#61f7a2] transition-all"
-            />
-          </div>
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ton prénom..."
+            autoFocus
+            maxLength={50}
+            className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl text-[17px] text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#61f7a2] focus:ring-4 focus:ring-[#61f7a2]/15 transition-all text-center font-medium"
+          />
+        </motion.div>
 
-          <button
-            type="submit"
-            disabled={!firstName.trim() || saving}
-            className="w-full flex items-center justify-center gap-2.5 py-[18px] px-6 bg-gradient-to-b from-gray-900 to-black text-white rounded-2xl text-[17px] font-bold shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-[#61f7a2]/20 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-lg"
-          >
-            {saving ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <>
-                Continuer
-                <ArrowRight className="w-5 h-5" />
-              </>
-            )}
-          </button>
-        </motion.form>
+        {/* CTA */}
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          onClick={handleContinue}
+          disabled={!firstName.trim() || loading}
+          className="w-full flex items-center justify-center gap-2.5 py-[18px] px-6 bg-gradient-to-b from-gray-900 to-black text-white rounded-2xl text-[17px] font-bold shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-[#61f7a2]/20 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+        >
+          {loading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <>
+              C'est parti
+              <ArrowRight className="w-5 h-5" />
+            </>
+          )}
+        </motion.button>
 
-        <motion.p
+        {/* Reassurance */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-center text-xs text-gray-400 mt-6"
+          className="flex items-center justify-center gap-2 mt-5"
         >
-          Ton prénom est utilisé uniquement pour personnaliser ton expérience.
-        </motion.p>
+          <Sparkles className="w-3.5 h-3.5 text-[#61f7a2]" />
+          <span className="text-xs text-gray-400 font-medium">
+            Ton prénom sera utilisé pour personnaliser tout ton parcours.
+          </span>
+        </motion.div>
       </div>
     </div>
   );

@@ -54,6 +54,7 @@ import AvatarClients from './pages/AvatarClients';
 import BonneNouvelle from './pages/BonneNouvelle';
 import Booking from './pages/Booking';
 import DailyActions from './pages/DailyActions';
+import Dashboard from './pages/Dashboard';
 import Documents from './pages/Documents';
 import EmailsMarketing from './pages/EmailsMarketing';
 import GenerationProgress from './pages/GenerationProgress';
@@ -71,6 +72,7 @@ import OfferResume from './pages/OfferResume';
 import OfferSuperieure from './pages/OfferSuperieure';
 import OfferTaVieFuture from './pages/OfferTaVieFuture';
 import OnboardingDynamic from './pages/OnboardingDynamic';
+import OnboardingFirstName from './pages/OnboardingFirstName';
 import OnboardingQ10TypicalMistake from './pages/OnboardingQ10TypicalMistake';
 import OnboardingQ11ExtraDetail from './pages/OnboardingQ11ExtraDetail';
 import OnboardingQ12AgeRange from './pages/OnboardingQ12AgeRange';
@@ -99,9 +101,7 @@ import SalesPage from './pages/SalesPage';
 import Settings from './pages/Settings';
 import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
-import OnboardingFirstName from './pages/OnboardingFirstName';
 import Welcome from './pages/Welcome';
-import Dashboard from './pages/Dashboard';
 
 
 export const PAGES = {
@@ -112,6 +112,7 @@ export const PAGES = {
     "BonneNouvelle": BonneNouvelle,
     "Booking": Booking,
     "DailyActions": DailyActions,
+    "Dashboard": Dashboard,
     "Documents": Documents,
     "EmailsMarketing": EmailsMarketing,
     "GenerationProgress": GenerationProgress,
@@ -129,6 +130,7 @@ export const PAGES = {
     "OfferSuperieure": OfferSuperieure,
     "OfferTaVieFuture": OfferTaVieFuture,
     "OnboardingDynamic": OnboardingDynamic,
+    "OnboardingFirstName": OnboardingFirstName,
     "OnboardingQ10TypicalMistake": OnboardingQ10TypicalMistake,
     "OnboardingQ11ExtraDetail": OnboardingQ11ExtraDetail,
     "OnboardingQ12AgeRange": OnboardingQ12AgeRange,
@@ -157,9 +159,7 @@ export const PAGES = {
     "Settings": Settings,
     "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
-    "OnboardingFirstName": OnboardingFirstName,
     "Welcome": Welcome,
-    "Dashboard": Dashboard,
 }
 
 export const pagesConfig = {

@@ -34,6 +34,11 @@ Deno.serve(async (req) => {
       console.log('No authenticated user, proceeding as guest');
     }
 
+    const body = await req.json().catch(() => ({}));
+    const withBump = body.withBump || false;
+    const unitAmount = withBump ? 4600 : 2900;
+    const productName = withBump ? 'Noah by Iavnir + Plan d\'action 7 jours' : 'Noah by Iavnir';
+
     const sessionConfig = {
       payment_method_types: ['card'],
       line_items: [
@@ -41,9 +46,9 @@ Deno.serve(async (req) => {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: 'Noah by Iavnir',
+              name: productName,
             },
-            unit_amount: 50,
+            unit_amount: unitAmount,
           },
           quantity: 1,
         }

@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
           price_data: {
             currency: 'eur',
             product_data: {
+              name: 'Noah by Iavnir',
             },
             unit_amount: 2900,
           },

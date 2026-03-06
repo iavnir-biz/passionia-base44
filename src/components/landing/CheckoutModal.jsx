@@ -189,7 +189,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                   <p style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a1a', margin: 0 }}>
-                    Passion IA — {totalPrice}€
+                    Noah by Iavnir — {totalPrice}€
                   </p>
                   {withBump && (
                     <p style={{ fontSize: '12px', color: '#61aa7a', marginTop: '4px' }}>

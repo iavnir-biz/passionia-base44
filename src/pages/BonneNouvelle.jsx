@@ -173,6 +173,11 @@ export default function BonneNouvelle() {
                 background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                display: 'inline-block',
+                paddingRight: '0.3em',
+                marginRight: '-0.3em',
+                paddingBottom: '0.1em',
+                marginBottom: '-0.1em',
               }}>réel et viable</span>
             </h1>
 
@@ -235,6 +240,11 @@ export default function BonneNouvelle() {
                 background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                display: 'inline-block',
+                paddingRight: '0.3em',
+                marginRight: '-0.3em',
+                paddingBottom: '0.1em',
+                marginBottom: '-0.1em',
               }}>potentiel</span> sur ce marché
             </h2>
 

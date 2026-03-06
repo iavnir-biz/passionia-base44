@@ -137,12 +137,12 @@ html, body {
 .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
 
 /* Fix gradient text clipping on descenders and italic right-side slant */
-span[style*="WebkitBackgroundClip"],
-span[style*="-webkit-background-clip"] {
-  padding-bottom: 0.15em;
-  margin-bottom: -0.15em;
-  padding-right: 0.15em;
-  margin-right: -0.15em;
+span[style*="-webkit-background-clip"],
+span[style*="-webkit-text-fill-color"] {
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+  padding-right: 0.3em;
+  margin-right: -0.3em;
   display: inline-block;
 }
 

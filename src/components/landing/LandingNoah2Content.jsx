@@ -3,7 +3,7 @@ import LandingHero from './LandingHero';
 import LandingProblem from './LandingProblem';
 import LandingSolution from './LandingSolution';
 import LandingHowItWorks from './LandingHowItWorks';
-import LandingCalculator from './LandingCalculator';
+import LandingScaleSection from './LandingScaleSection';
 import LandingPricing from './LandingPricing';
 import LandingFAQ from './LandingFAQ';
 import LandingTestimonialsScroll from './LandingTestimonialsScroll';
@@ -53,7 +53,7 @@ export default function LandingNoah2Content() {
       <LandingProblem />
       <LandingSolution />
       <LandingHowItWorks />
-      <LandingCalculator />
+      <LandingScaleSection />
       <LandingPricing onCTA={handleCTA} />
       <LandingFAQ />
       <LandingTestimonialsScroll />

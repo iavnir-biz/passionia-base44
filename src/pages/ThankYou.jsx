@@ -185,6 +185,15 @@ export default function ThankYou() {
             perspective: '1000px',
           }}
         >
+          <p style={{
+            fontSize: '14px',
+            color: '#555',
+            fontWeight: 400,
+            marginBottom: '16px',
+            lineHeight: 1.6,
+          }}>
+            ⚠️ Attention : sur la page suivante, vous devrez créer un nouveau compte en cliquant sur <strong>Sign up</strong>.
+          </p>
           <div style={{
             background: '#f8f9fb',
             borderRadius: '16px',

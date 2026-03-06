@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
             product_data: {
               name: 'Noah by Iavnir',
             },
-            unit_amount: 2900,
+            unit_amount: 20,
           },
           quantity: 1,
         }

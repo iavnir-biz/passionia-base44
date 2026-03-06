@@ -7,6 +7,8 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
   const [submitted, setSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   // Reset state when sidebar closes
   useEffect(() => {
@@ -42,11 +44,31 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      setSubmitted(true);
+    if (!validate()) return;
+
+    setLoading(true);
+    setSubmitError(null);
+
+    const webhookUrl = import.meta.env.VITE_GHL_WEBHOOK_URL;
+
+    if (webhookUrl) {
+      try {
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, phone: whatsapp }),
+        });
+      } catch {
+        setSubmitError('Une erreur est survenue. Veuillez réessayer.');
+        setLoading(false);
+        return;
+      }
     }
+
+    setLoading(false);
+    setSubmitted(true);
   };
 
   const handleCopy = () => {
@@ -202,8 +224,15 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
                   )}
                 </div>
 
+                {submitError && (
+                  <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '12px', textAlign: 'center' }}>
+                    {submitError}
+                  </p>
+                )}
+
                 <button
                   type="submit"
+                  disabled={loading}
                   style={{
                     width: '100%',
                     background: '#1a1a1a',
@@ -213,14 +242,15 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
                     padding: '16px',
                     fontSize: '15px',
                     fontWeight: 600,
-                    cursor: 'pointer',
+                    cursor: loading ? 'not-allowed' : 'pointer',
                     letterSpacing: '-0.01em',
                     transition: 'opacity 0.2s',
+                    opacity: loading ? 0.6 : 1,
                   }}
-                  onMouseOver={e => e.target.style.opacity = '0.85'}
-                  onMouseOut={e => e.target.style.opacity = '1'}
+                  onMouseOver={e => { if (!loading) e.target.style.opacity = '0.85'; }}
+                  onMouseOut={e => { if (!loading) e.target.style.opacity = '1'; }}
                 >
-                  Obtenir mon code -20€
+                  {loading ? 'Envoi en cours...' : 'Obtenir mon code -20€'}
                 </button>
               </form>
             </>

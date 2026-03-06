@@ -33,7 +33,7 @@ export default function LandingAnnouncementBar({ onScrollToCTA }) {
   return (
     <>
       <div style={{
-        background: '#1a1a1a',
+        background: '#111111',
         color: '#fff',
         textAlign: 'center',
         padding: '10px 16px',
@@ -45,25 +45,27 @@ export default function LandingAnnouncementBar({ onScrollToCTA }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '10px',
+        gap: '12px',
         flexWrap: 'wrap'
       }}>
         {/* Promo text */}
-        <span className="announce-text" style={{ opacity: 0.95 }}>
-          🔥 <strong>-20€ immédiat</strong> — Offre valable jusqu'à minuit
+        <span className="announce-text" style={{ opacity: 0.9, fontSize: '13px' }}>
+          🔥 <strong style={{ color: '#fff' }}>-20€ immédiat</strong>
+          <span style={{ color: 'rgba(255,255,255,0.55)', marginLeft: '6px' }}>— Offre valable jusqu'à minuit</span>
         </span>
 
         {/* Timer */}
         <div style={{
-          display: 'inline-flex', gap: '4px', alignItems: 'center',
-          background: 'rgba(255,255,255,0.1)', borderRadius: '8px',
-          padding: '3px 10px', fontSize: '13px', fontWeight: 700,
-          fontVariantNumeric: 'tabular-nums', letterSpacing: '0.5px'
+          display: 'inline-flex', gap: '3px', alignItems: 'center',
+          background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '8px',
+          padding: '4px 12px', fontSize: '13px', fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums', letterSpacing: '0.5px', color: '#fff',
         }}>
           <span>{pad(timeLeft.hours)}</span>
-          <span style={{ opacity: 0.5 }}>:</span>
+          <span style={{ opacity: 0.35 }}>:</span>
           <span>{pad(timeLeft.minutes)}</span>
-          <span style={{ opacity: 0.5 }}>:</span>
+          <span style={{ opacity: 0.35 }}>:</span>
           <span>{pad(timeLeft.seconds)}</span>
         </div>
 
@@ -72,16 +74,17 @@ export default function LandingAnnouncementBar({ onScrollToCTA }) {
           onClick={() => setSidebarOpen(true)}
           className="announce-cta"
           style={{
-            background: '#61f7a2',
+            background: '#fff',
             border: 'none',
-            color: '#1a1a1a', padding: '5px 16px', borderRadius: '100px',
-            fontSize: '12px', fontWeight: 700, cursor: 'pointer',
-            transition: 'all 0.2s', whiteSpace: 'nowrap', letterSpacing: '0.3px'
+            color: '#111', padding: '6px 18px', borderRadius: '100px',
+            fontSize: '11px', fontWeight: 700, cursor: 'pointer',
+            transition: 'all 0.2s', whiteSpace: 'nowrap', letterSpacing: '0.3px',
+            textTransform: 'uppercase',
           }}
-          onMouseOver={e => e.target.style.background = '#4de08e'}
-          onMouseOut={e => e.target.style.background = '#61f7a2'}
+          onMouseOver={e => e.target.style.opacity = '0.85'}
+          onMouseOut={e => e.target.style.opacity = '1'}
         >
-          RECUPERER ma réduction
+          Récupérer ma réduction
         </button>
 
         <style>{`

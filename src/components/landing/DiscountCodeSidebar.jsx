@@ -95,32 +95,37 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '20px 24px',
+          padding: '24px',
           borderBottom: '1px solid #f0f0f0',
-          background: '#1a1a1a',
+          background: '#fff',
         }}>
           <div>
-            <div style={{ color: '#61f7a2', fontSize: '12px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
+            <div style={{
+              fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '6px',
+              background: 'linear-gradient(135deg, #f97316, #ec4899)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>
               Offre exclusive
             </div>
-            <div style={{ color: '#fff', fontSize: '18px', fontWeight: 700 }}>
+            <div style={{ color: '#1a1a1a', fontSize: '20px', fontWeight: 700, letterSpacing: '-0.02em' }}>
               -20€ immédiats sur votre commande
             </div>
           </div>
           <button
             onClick={onClose}
             style={{
-              background: 'rgba(255,255,255,0.1)',
+              background: '#f5f5f5',
               border: 'none',
-              borderRadius: '8px',
-              padding: '8px',
+              borderRadius: '50%',
+              width: '32px', height: '32px',
               cursor: 'pointer',
-              color: '#fff',
+              color: '#999',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -128,18 +133,18 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
         <div style={{ padding: '32px 24px', flex: 1 }}>
           {!submitted ? (
             <>
-              <p style={{ color: '#555', fontSize: '15px', lineHeight: 1.6, marginBottom: '28px' }}>
+              <p style={{ color: '#888', fontSize: '14px', lineHeight: 1.6, marginBottom: '28px' }}>
                 Renseignez votre email et votre numéro WhatsApp pour recevoir votre code de réduction personnel.
               </p>
 
               <form onSubmit={handleSubmit} noValidate>
                 {/* Email */}
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: '#1a1a1a', marginBottom: '8px' }}>
-                    RENSEIGNER votre email
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: '#999', marginBottom: '8px' }}>
+                    Renseigner votre email
                   </label>
                   <div style={{ position: 'relative' }}>
-                    <Mail size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#999' }} />
+                    <Mail size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#ccc' }} />
                     <input
                       type="email"
                       value={email}
@@ -147,16 +152,17 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
                       placeholder="votre@email.com"
                       style={{
                         width: '100%',
-                        padding: '12px 14px 12px 40px',
-                        borderRadius: '10px',
-                        border: `1.5px solid ${errors.email ? '#ef4444' : '#e5e7eb'}`,
+                        padding: '14px 14px 14px 42px',
+                        borderRadius: '12px',
+                        border: `1.5px solid ${errors.email ? '#ef4444' : '#eee'}`,
                         fontSize: '15px',
                         outline: 'none',
                         boxSizing: 'border-box',
                         transition: 'border-color 0.2s',
+                        background: '#fafafa',
                       }}
                       onFocus={e => e.target.style.borderColor = '#1a1a1a'}
-                      onBlur={e => e.target.style.borderColor = errors.email ? '#ef4444' : '#e5e7eb'}
+                      onBlur={e => e.target.style.borderColor = errors.email ? '#ef4444' : '#eee'}
                     />
                   </div>
                   {errors.email && (
@@ -166,11 +172,11 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
 
                 {/* WhatsApp */}
                 <div style={{ marginBottom: '28px' }}>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', color: '#1a1a1a', marginBottom: '8px' }}>
-                    RENSEIGNER votre numéro WhatsApp
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: '#999', marginBottom: '8px' }}>
+                    Renseigner votre numéro WhatsApp
                   </label>
                   <div style={{ position: 'relative' }}>
-                    <MessageCircle size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#999' }} />
+                    <MessageCircle size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#ccc' }} />
                     <input
                       type="tel"
                       value={whatsapp}
@@ -178,16 +184,17 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
                       placeholder="+33 6 12 34 56 78"
                       style={{
                         width: '100%',
-                        padding: '12px 14px 12px 40px',
-                        borderRadius: '10px',
-                        border: `1.5px solid ${errors.whatsapp ? '#ef4444' : '#e5e7eb'}`,
+                        padding: '14px 14px 14px 42px',
+                        borderRadius: '12px',
+                        border: `1.5px solid ${errors.whatsapp ? '#ef4444' : '#eee'}`,
                         fontSize: '15px',
                         outline: 'none',
                         boxSizing: 'border-box',
                         transition: 'border-color 0.2s',
+                        background: '#fafafa',
                       }}
                       onFocus={e => e.target.style.borderColor = '#1a1a1a'}
-                      onBlur={e => e.target.style.borderColor = errors.whatsapp ? '#ef4444' : '#e5e7eb'}
+                      onBlur={e => e.target.style.borderColor = errors.whatsapp ? '#ef4444' : '#eee'}
                     />
                   </div>
                   {errors.whatsapp && (
@@ -202,18 +209,18 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
                     background: '#1a1a1a',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: '12px',
-                    padding: '15px',
+                    borderRadius: '100px',
+                    padding: '16px',
                     fontSize: '15px',
-                    fontWeight: 700,
+                    fontWeight: 600,
                     cursor: 'pointer',
-                    letterSpacing: '0.3px',
-                    transition: 'background 0.2s',
+                    letterSpacing: '-0.01em',
+                    transition: 'opacity 0.2s',
                   }}
-                  onMouseOver={e => e.target.style.background = '#333'}
-                  onMouseOut={e => e.target.style.background = '#1a1a1a'}
+                  onMouseOver={e => e.target.style.opacity = '0.85'}
+                  onMouseOut={e => e.target.style.opacity = '1'}
                 >
-                  OBTENIR MON CODE -20€
+                  Obtenir mon code -20€
                 </button>
               </form>
             </>
@@ -221,37 +228,40 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
             /* Step 2: Show the code */
             <div style={{ textAlign: 'center' }}>
               <div style={{
-                width: '64px',
-                height: '64px',
-                background: 'rgba(97,247,162,0.15)',
+                width: '56px',
+                height: '56px',
+                background: '#f5f5f5',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto 20px',
               }}>
-                <Check size={28} color="#22c55e" strokeWidth={2.5} />
+                <Check size={24} color="#1a1a1a" strokeWidth={2.5} />
               </div>
 
-              <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#1a1a1a', marginBottom: '8px' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.02em', marginBottom: '8px' }}>
                 Votre code est prêt !
               </h2>
-              <p style={{ color: '#666', fontSize: '14px', lineHeight: 1.6, marginBottom: '32px' }}>
+              <p style={{ color: '#888', fontSize: '14px', lineHeight: 1.6, marginBottom: '32px' }}>
                 Copiez ce code et collez-le au moment du paiement pour bénéficier de -20€ immédiats.
               </p>
 
               {/* Code display */}
               <div style={{
-                background: '#f8f8f8',
-                border: '2px dashed #22c55e',
-                borderRadius: '16px',
-                padding: '24px',
+                background: '#fafafa',
+                border: '1px solid #eee',
+                borderRadius: '20px',
+                padding: '28px',
                 marginBottom: '16px',
               }}>
-                <div style={{ fontSize: '12px', color: '#999', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '10px' }}>
+                <div style={{
+                  fontSize: '11px', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '12px',
+                  color: '#999',
+                }}>
                   Code promo
                 </div>
-                <div style={{ fontSize: '32px', fontWeight: 800, color: '#1a1a1a', letterSpacing: '3px', marginBottom: '16px' }}>
+                <div style={{ fontSize: '36px', fontWeight: 800, color: '#1a1a1a', letterSpacing: '4px', marginBottom: '20px' }}>
                   noah20
                 </div>
                 <button
@@ -260,23 +270,25 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    background: copied ? '#22c55e' : '#1a1a1a',
+                    background: copied ? '#1a1a1a' : '#1a1a1a',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: '10px',
-                    padding: '10px 20px',
+                    borderRadius: '100px',
+                    padding: '12px 24px',
                     fontSize: '14px',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    transition: 'all 0.2s',
+                    transition: 'opacity 0.2s',
                   }}
+                  onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+                  onMouseOut={e => e.currentTarget.style.opacity = '1'}
                 >
                   {copied ? <Check size={15} /> : <Copy size={15} />}
                   {copied ? 'Code copié !' : 'Copier le code'}
                 </button>
               </div>
 
-              <p style={{ color: '#999', fontSize: '12px' }}>
+              <p style={{ color: '#bbb', fontSize: '12px' }}>
                 Offre valable jusqu'à minuit — ne pas partager
               </p>
             </div>

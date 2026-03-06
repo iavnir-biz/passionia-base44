@@ -51,6 +51,11 @@ export default function LandingHero({ onCTA }) {
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
+          display: 'inline-block',
+          paddingRight: '0.3em',
+          marginRight: '-0.3em',
+          paddingBottom: '0.1em',
+          marginBottom: '-0.1em',
         }}>4 offres</span> et fais ta première vente en <strong>24h</strong>
       </h1>
 

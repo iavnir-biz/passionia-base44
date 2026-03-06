@@ -117,6 +117,11 @@ export default function OnboardingFirstName() {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
+            display: 'inline-block',
+            paddingRight: '0.3em',
+            marginRight: '-0.3em',
+            paddingBottom: '0.1em',
+            marginBottom: '-0.1em',
           }}>appelles</span> ?
         </h1>
 

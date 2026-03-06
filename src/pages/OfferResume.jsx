@@ -163,6 +163,11 @@ export default function OfferResume() {
                 background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                display: 'inline-block',
+                paddingRight: '0.3em',
+                marginRight: '-0.3em',
+                paddingBottom: '0.1em',
+                marginBottom: '-0.1em',
               }}>offre complète</span>
             </h1>
             <p style={{ fontSize: '16px', color: '#888', lineHeight: 1.6, maxWidth: '500px', margin: '0 auto' }}>

@@ -173,6 +173,11 @@ export default function OfferTaVieFuture() {
                 background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                display: 'inline-block',
+                paddingRight: '0.3em',
+                marginRight: '-0.3em',
+                paddingBottom: '0.1em',
+                marginBottom: '-0.1em',
               }}>vie future</span> te réserve
             </h1>
 
@@ -270,6 +275,11 @@ export default function OfferTaVieFuture() {
                   background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
+                  display: 'inline-block',
+                  paddingRight: '0.3em',
+                  marginRight: '-0.3em',
+                  paddingBottom: '0.1em',
+                  marginBottom: '-0.1em',
                 }}>plan de route</span>
               </h2>
             </div>

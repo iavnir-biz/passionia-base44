@@ -105,48 +105,21 @@ const tiers = [
     frequency: '1 vente tous les 2 jours',
     monthly: '≈ 405€ / mois',
     description: 'Petit produit accessible · Première marche',
-    priceColor: '#16a34a',
-    bg: 'linear-gradient(145deg, #f0fdf4, #dcfce7)',
-    border: '#bbf7d0',
-    monthlyColor: '#16a34a',
-    descBg: '#f0fdf4',
-    descBorder: '#bbf7d0',
-    accent: '#16a34a',
-    tag: 'STARTER',
-    tagBg: '#dcfce7',
-    tagColor: '#15803d',
+    tag: 'OFFRE PRINCIPALE',
   },
   {
     priceRange: '97€ – 287€',
     frequency: '2 ventes / mois',
     monthly: '≈ 400€ – 600€ / mois',
     description: 'Pour ceux qui veulent aller plus loin',
-    priceColor: '#1d4ed8',
-    bg: 'linear-gradient(145deg, #eff6ff, #dbeafe)',
-    border: '#bfdbfe',
-    monthlyColor: '#1d4ed8',
-    descBg: '#eff6ff',
-    descBorder: '#bfdbfe',
-    accent: '#1d4ed8',
-    tag: 'INTERMÉDIAIRE',
-    tagBg: '#dbeafe',
-    tagColor: '#1e40af',
+    tag: 'OFFRE INTERMÉDIAIRE',
   },
   {
     priceRange: '1000€ – 2000€',
     frequency: '1 à 2 ventes / mois',
     monthly: '1000€ à 4000€ / mois',
     description: 'Accompagnement plus profond',
-    priceColor: '#dc2626',
-    bg: 'linear-gradient(145deg, #fff1f2, #ffe4e6)',
-    border: '#fecdd3',
-    monthlyColor: '#dc2626',
-    descBg: '#fff1f2',
-    descBorder: '#fecdd3',
-    accent: '#dc2626',
-    tag: 'PREMIUM',
-    tagBg: '#ffe4e6',
-    tagColor: '#be123c',
+    tag: 'OFFRE PREMIUM',
   },
 ];
 
@@ -169,8 +142,8 @@ function TierCard({ tier, delay }) {
     <div ref={ref} className="scale-tier" style={{
       flex: '1 1 200px',
       minWidth: '200px',
-      background: tier.bg,
-      border: `1.5px solid ${tier.border}`,
+      background: '#1a1a1a',
+      border: '1.5px solid #333',
       borderRadius: '20px',
       padding: '24px 20px',
       display: 'flex',
@@ -180,24 +153,28 @@ function TierCard({ tier, delay }) {
       {/* Tag */}
       <span style={{
         display: 'inline-flex', alignSelf: 'flex-start',
-        background: tier.tagBg, color: tier.tagColor,
+        background: 'rgba(255,255,255,0.1)', color: '#fff',
         fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em',
         borderRadius: '100px', padding: '3px 10px',
-        border: `1px solid ${tier.border}`,
+        border: '1px solid rgba(255,255,255,0.15)',
       }}>{tier.tag}</span>
 
       {/* Price range */}
       <div style={{
         fontSize: 'clamp(20px, 2.5vw, 26px)',
         fontWeight: 800,
-        color: tier.priceColor,
+        background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
         letterSpacing: '-0.02em',
         lineHeight: 1.1,
+        display: 'inline-block',
       }}>{tier.priceRange}</div>
 
       {/* Frequency */}
       <div style={{
-        fontSize: '14px', fontWeight: 600, color: '#1a1a1a',
+        fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)',
         lineHeight: 1.4,
       }}>{tier.frequency}</div>
 
@@ -205,21 +182,21 @@ function TierCard({ tier, delay }) {
       <div style={{
         fontSize: 'clamp(15px, 1.8vw, 18px)',
         fontWeight: 700,
-        color: tier.monthlyColor,
+        color: '#fff',
         lineHeight: 1.3,
       }}>{tier.monthly}</div>
 
       {/* Divider */}
-      <div style={{ height: '1px', background: tier.border }} />
+      <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)' }} />
 
       {/* Description */}
       <div style={{
-        background: tier.descBg,
-        border: `1px solid ${tier.descBorder}`,
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.1)',
         borderRadius: '10px',
         padding: '10px 12px',
         fontSize: '12px',
-        color: '#444',
+        color: 'rgba(255,255,255,0.5)',
         fontWeight: 500,
         lineHeight: 1.5,
         textAlign: 'center',
@@ -330,8 +307,14 @@ export default function LandingScaleSection() {
             letterSpacing: '-0.01em',
           }}>
             Des petites ventes.{' '}
-            <span style={{ color: '#1d4ed8' }}>Des moyennes ventes.</span>{' '}
-            <span style={{ color: '#dc2626' }}>Des premium.</span>
+            <span style={{ color: '#1a1a1a' }}>Des moyennes ventes.</span>{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              display: 'inline',
+            }}>Des premium.</span>
           </p>
 
           {/* Stripe-style scrolling feed */}

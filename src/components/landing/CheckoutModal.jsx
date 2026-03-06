@@ -82,6 +82,11 @@ export default function CheckoutModal({ isOpen, onClose }) {
         {!showCheckout ? (
           /* ── Step 1: Offer selection ── */
           <div style={{ padding: '32px 28px 28px' }}>
+            {/* Logo */}
+            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+              <img src={LOGO_URL} alt="iavnirLab" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+            </div>
+
             {/* Badge */}
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <span style={{

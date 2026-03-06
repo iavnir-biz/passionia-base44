@@ -1,32 +1,26 @@
 import React from 'react';
 
-const IMG1 = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/1edef10d3_WhatsAppImage2026-03-05at1909383.jpg";
-const IMG2 = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/4ccf19cfc_WhatsAppImage2026-03-05at1909384.jpg";
-const IMG3 = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/ec762acef_WhatsAppImage2026-03-05at190938.jpg";
-const IMG4 = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/5f1c7bd56_Screenshotfrom20250415193811png_67fe9999ae1b7.png";
-const IMG5 = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/c5613076a_WhatsAppImage2026-03-05at1909381.jpg";
-
 const testimonials = [
   // Column 1
   [
-    { name: "Sophie M.", role: "Coach bien-être", image: IMG3, text: "En 3 jours, Noah m'a créé 4 offres complètes avec les prix, les pages de vente et les emails. J'aurais mis des semaines à faire ça seule." },
-    { name: "Julien R.", role: "Formateur fitness", image: IMG1, text: "Je ne savais pas comment structurer mes offres. Noah m'a tout généré : du low-ticket au premium. J'ai lancé ma première vente en 5 jours." },
-    { name: "Camille D.", role: "Prof de langues", image: IMG5, text: "L'analyse de marché m'a donné confiance. Les chiffres étaient là, la demande existait. Il me manquait juste le plan — Noah l'a fait." },
-    { name: "Nadia K.", role: "Experte nutrition", image: IMG4, text: "Le plan d'action jour par jour m'a débloquée. Plus besoin de réfléchir à quoi faire, tout est là." },
+    { name: "Sophie M.", role: "Coach bien-être", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces", text: "En 3 jours, Noah m'a créé 4 offres complètes avec les prix, les pages de vente et les emails. J'aurais mis des semaines à faire ça seule." },
+    { name: "Julien R.", role: "Formateur fitness", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces", text: "Je ne savais pas comment structurer mes offres. Noah m'a tout généré : du low-ticket au premium. J'ai lancé ma première vente en 5 jours." },
+    { name: "Camille D.", role: "Prof de langues", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces", text: "L'analyse de marché m'a donné confiance. Les chiffres étaient là, la demande existait. Il me manquait juste le plan — Noah l'a fait." },
+    { name: "Nadia K.", role: "Experte nutrition", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces", text: "Le plan d'action jour par jour m'a débloquée. Plus besoin de réfléchir à quoi faire, tout est là." },
   ],
   // Column 2
   [
-    { name: "Thomas L.", role: "Développeur web", image: IMG2, text: "Je pensais que vendre des formations c'était compliqué. Noah m'a prouvé le contraire. En 10 minutes j'avais mon offre et mon pricing." },
-    { name: "Marie P.", role: "Photographe", image: IMG5, text: "Les messages de vente générés sont incroyables. J'ai juste copié-collé sur Instagram et j'ai eu mes premières demandes le jour même." },
-    { name: "Lucas B.", role: "Coach sportif", image: IMG1, text: "La page de vente était prête en quelques minutes. Professionnelle, convaincante. Mes clients ont adoré." },
-    { name: "Émilie V.", role: "Designer graphique", image: IMG4, text: "Noah comprend vraiment ton expertise et crée des offres qui correspondent à ta valeur. Pas du générique, du sur-mesure." },
+    { name: "Thomas L.", role: "Développeur web", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces", text: "Je pensais que vendre des formations c'était compliqué. Noah m'a prouvé le contraire. En 10 minutes j'avais mon offre et mon pricing." },
+    { name: "Marie P.", role: "Photographe", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces", text: "Les messages de vente générés sont incroyables. J'ai juste copié-collé sur Instagram et j'ai eu mes premières demandes le jour même." },
+    { name: "Lucas B.", role: "Coach sportif", image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=faces", text: "La page de vente était prête en quelques minutes. Professionnelle, convaincante. Mes clients ont adoré." },
+    { name: "Émilie V.", role: "Designer graphique", image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop&crop=faces", text: "Noah comprend vraiment ton expertise et crée des offres qui correspondent à ta valeur. Pas du générique, du sur-mesure." },
   ],
   // Column 3
   [
-    { name: "Antoine F.", role: "Musicien", image: IMG2, text: "J'avais peur de fixer mes prix. Noah m'a montré que mon savoir valait bien plus que ce que je pensais. Résultat : 2 400€/mois projetés." },
-    { name: "Sarah G.", role: "Prof de yoga", image: IMG3, text: "La séquence de 5 emails marketing est brillante. Chaque email donne envie d'acheter sans être pushy. C'est exactement ce qu'il me fallait." },
-    { name: "Kevin H.", role: "Expert SEO", image: IMG1, text: "Le storytelling de 'Ta vie future' m'a mis les larmes aux yeux. Ça m'a remotivé à fond. Et le plan concret derrière, c'est du béton." },
-    { name: "Clara M.", role: "Consultante RH", image: IMG5, text: "Tout est personnalisé à ma niche. Les avatars clients, les douleurs identifiées, les solutions proposées. On dirait qu'un expert a passé des heures dessus." },
+    { name: "Antoine F.", role: "Musicien", image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=faces", text: "J'avais peur de fixer mes prix. Noah m'a montré que mon savoir valait bien plus que ce que je pensais. Résultat : 2 400€/mois projetés." },
+    { name: "Sarah G.", role: "Prof de yoga", image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&h=100&fit=crop&crop=faces", text: "La séquence de 5 emails marketing est brillante. Chaque email donne envie d'acheter sans être pushy. C'est exactement ce qu'il me fallait." },
+    { name: "Kevin H.", role: "Expert SEO", image: "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=100&h=100&fit=crop&crop=faces", text: "Le storytelling de 'Ta vie future' m'a mis les larmes aux yeux. Ça m'a remotivé à fond. Et le plan concret derrière, c'est du béton." },
+    { name: "Clara M.", role: "Consultante RH", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=faces", text: "Tout est personnalisé à ma niche. Les avatars clients, les douleurs identifiées, les solutions proposées. On dirait qu'un expert a passé des heures dessus." },
   ],
 ];
 

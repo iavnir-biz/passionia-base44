@@ -6,11 +6,13 @@ import { X, Check, Shield, ChevronRight, Plus } from 'lucide-react';
 
 const stripePromise = loadStripe('pk_live_51QfPN7P7FZHXEZ2M2JkBxFZlslfFqOF4ePCzfaMwthUBTxLV9Ow1OqEYJffAeTXw2bwhiOnaqz6C67e8i66N3iFz00uFjFrfXu');
 
+const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/9089019f0_Sanstitre500x500px1.png";
+
 const included = [
-  "4 offres sur-mesure structurées par IA",
+  "4 offres sur-mesure structurées par notre IA",
   "Messages de vente prêts à l'emploi",
-  "Page de vente complète (formule PSSO)",
-  "Validation marché par IA",
+  "Validation de l'idée + Analyse de marché détaillée",
+  "Checklist de lancement",
   "Accès à vie + mises à jour",
 ];
 

@@ -190,97 +190,63 @@ Deno.serve(async (req) => {
           },
           body: JSON.stringify({
             email: user.email,
-            redirectTo: `${APP_URL}/WelcomeOpening`
-          })
-        });
+            redirectTo: `${APP_URL}/ThankYou`
+            })
+            });
 
-        const magicLinkData = await magicLinkResponse.json();
-        const magicLink = magicLinkData.magicLink;
+            const magicLinkData = await magicLinkResponse.json();
+            const magicLink = magicLinkData.magicLink;
 
-        await base44.integrations.Core.SendEmail({
-          to: user.email,
-          from_name: 'Passion IA',
-          subject: '🎉 Paiement confirmé - Ton accès est activé',
-          body: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
-              <!-- Header -->
-              <div style="text-align: center; margin-bottom: 30px;">
-                <div style="display: inline-block; width: 80px; height: 80px; background: linear-gradient(135deg, #61f7a2, #4de88f); border-radius: 16px; line-height: 80px;">
-                  <span style="font-size: 40px; color: white; font-weight: bold;">P</span>
-                </div>
-                <h2 style="margin-top: 15px; color: #1a1a2e; font-size: 18px;">Passion IA</h2>
-              </div>
-              
-              <!-- Titre Principal -->
-              <h1 style="color: #1a1a2e; font-size: 28px; margin-bottom: 20px; text-align: center;">
-                🎉 Bravo ${user.full_name || user.firstName || user.email.split('@')[0]} !
-              </h1>
-              
-              <!-- Message Principal -->
-              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
-                Ton paiement a bien été confirmé et ton accès est maintenant <strong>activé</strong>.
-              </p>
-              
-              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                Tu es déjà connecté sur ton navigateur ? Parfait ! 🚀<br>
-                Tu as fermé la page ? Pas de souci, utilise le bouton ci-dessous pour te connecter à tout moment.
-              </p>
-              
-              <!-- Bouton CTA -->
-              <div style="text-align: center; margin: 35px 0;">
-                <a href="${magicLink}" style="display: inline-block; background: linear-gradient(135deg, #61f7a2, #4de88f); color: #1a1a2e; padding: 18px 45px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 20px rgba(97, 247, 162, 0.4); transition: all 0.3s;">
-                  Accéder à mon espace
-                </a>
-              </div>
-              
-              <!-- Ce qui t'attend -->
-              <div style="background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border-left: 4px solid #61f7a2; padding: 20px; margin: 30px 0; border-radius: 8px;">
-                <p style="color: #1a1a2e; margin: 0 0 12px 0; font-size: 16px; font-weight: bold;">
-                  📦 Ce qui t'attend dans ton espace :
-                </p>
-                <ul style="color: #2d3748; margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.8;">
-                  <li><strong>Analyse de marché complète</strong> - SWOT, concurrence, stratégie</li>
-                  <li><strong>3 Avatars clients détaillés</strong> - Profils prêts à utiliser</li>
-                  <li><strong>4 Offres sur-mesure</strong> - Avec prix et positionnement</li>
-                  <li><strong>Messages de vente</strong> - 8 messages pour DM/emails</li>
-                  <li><strong>5 Emails marketing</strong> - Séquence complète prête à envoyer</li>
-                  <li><strong>Plan d'action personnalisé</strong> - Étapes concrètes pour lancer</li>
-                </ul>
-              </div>
-              
-              <!-- Note importante -->
-              <div style="background: #fff9e6; border-left: 4px solid #fbbf24; padding: 16px; margin: 25px 0; border-radius: 8px;">
-                <p style="color: #92400e; margin: 0; font-size: 14px; line-height: 1.6;">
-                  💡 <strong>Bon à savoir :</strong> Noah va générer tous tes documents personnalisés dès ta première connexion. Ça prend environ 1-2 minutes. Tu verras la magie opérer en temps réel !
-                </p>
-              </div>
-              
-              <!-- Connexion future -->
-              <div style="background: #f7fafc; padding: 20px; margin: 25px 0; border-radius: 8px; border: 1px solid #e2e8f0;">
-                <p style="color: #2d3748; margin: 0 0 10px 0; font-size: 15px; font-weight: bold;">
-                  🔐 Pour te reconnecter plus tard :
-                </p>
-                <p style="color: #4a5568; margin: 0; font-size: 14px; line-height: 1.6;">
-                  Conserve cet email et utilise le bouton ci-dessus pour accéder à ton espace à tout moment. Le lien reste valide et tu peux te connecter sans mot de passe.
-                </p>
-              </div>
-              
-              <!-- Footer -->
-              <p style="color: #718096; font-size: 14px; margin-top: 35px; text-align: center;">
-                À tout de suite dans ton espace ! 🚀<br>
-                <strong>L'équipe Passion IA</strong>
-              </p>
-              
-              <!-- Lien de secours -->
-              <div style="border-top: 1px solid #e2e8f0; margin-top: 30px; padding-top: 20px; text-align: center;">
-                <p style="color: #a0aec0; font-size: 12px; line-height: 1.6;">
-                  Si le bouton ne fonctionne pas, copie ce lien dans ton navigateur :<br>
-                  <span style="color: #4299e1; word-break: break-all;">${magicLink}</span>
-                </p>
-              </div>
+            await base44.integrations.Core.SendEmail({
+            to: user.email,
+            from_name: 'Noah by Iavnir',
+            subject: '🎉 Paiement confirmé - Ton accès est activé',
+            body: `
+            <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 24px; background: #ffffff;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/9089019f0_Sanstitre500x500px1.png" alt="Noah" style="width: 48px; height: 48px; object-fit: contain;" />
             </div>
-          `
-          });
+
+            <h1 style="color: #1a1a1a; font-size: 28px; font-weight: 800; margin-bottom: 12px; text-align: center; letter-spacing: -0.02em;">
+              Bravo ${user.full_name || user.firstName || user.email.split('@')[0]} 🎉
+            </h1>
+
+            <p style="color: #888; font-size: 16px; line-height: 1.6; margin-bottom: 32px; text-align: center;">
+              Ton paiement est confirmé et ton accès est <strong style="color: #1a1a1a;">activé</strong>. Noah est prêt à créer ton business sur-mesure.
+            </p>
+
+            <div style="text-align: center; margin: 32px 0;">
+              <a href="${magicLink}" style="display: inline-block; background: #1a1a1a; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 100px; font-weight: 600; font-size: 16px;">
+                Accéder à mon espace →
+              </a>
+            </div>
+
+            <div style="background: #fafafa; border: 1px solid #f0f0f0; padding: 24px; margin: 32px 0; border-radius: 16px;">
+              <p style="color: #1a1a1a; margin: 0 0 16px 0; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                📦 Ce qui t'attend
+              </p>
+              <ul style="color: #555; margin: 0; padding-left: 20px; font-size: 14px; line-height: 2;">
+                <li>Analyse de marché complète</li>
+                <li>4 Offres sur-mesure avec prix</li>
+                <li>Messages de vente prêts à l'emploi</li>
+                <li>Séquence d'emails marketing</li>
+                <li>Plan d'action personnalisé</li>
+              </ul>
+            </div>
+
+            <p style="color: #ccc; font-size: 13px; margin-top: 40px; text-align: center; line-height: 1.6;">
+              À tout de suite ! — L'équipe Noah by Iavnir
+            </p>
+
+            <div style="border-top: 1px solid #f0f0f0; margin-top: 24px; padding-top: 16px; text-align: center;">
+              <p style="color: #ccc; font-size: 11px;">
+                Si le bouton ne fonctionne pas :<br>
+                <span style="color: #999; word-break: break-all;">${magicLink}</span>
+              </p>
+            </div>
+            </div>
+            `
+            });
 
         console.log(`✅ Existing user ${userId} marked as purchased + email sent`);
       } else if (customerEmail) {
@@ -311,68 +277,58 @@ Deno.serve(async (req) => {
             },
             body: JSON.stringify({
               email: customerEmail,
-              redirectTo: `${APP_URL}/WelcomeOpening`
+              redirectTo: `${APP_URL}/ThankYou`
             })
           });
 
           const magicLinkData = await magicLinkResponse.json();
           const magicLink = magicLinkData.magicLink;
 
-          // Envoyer le même email
           await base44.integrations.Core.SendEmail({
             to: customerEmail,
-            from_name: 'Passion IA',
+            from_name: 'Noah by Iavnir',
             subject: '🎉 Paiement confirmé - Ton accès est activé',
             body: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                  <div style="display: inline-block; width: 80px; height: 80px; background: linear-gradient(135deg, #61f7a2, #4de88f); border-radius: 16px; line-height: 80px;">
-                    <span style="font-size: 40px; color: white; font-weight: bold;">P</span>
-                  </div>
-                  <h2 style="margin-top: 15px; color: #1a1a2e; font-size: 18px;">Passion IA</h2>
+              <div style="font-family: 'Inter', Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 24px; background: #ffffff;">
+                <div style="text-align: center; margin-bottom: 32px;">
+                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/9089019f0_Sanstitre500x500px1.png" alt="Noah" style="width: 48px; height: 48px; object-fit: contain;" />
                 </div>
                 
-                <h1 style="color: #1a1a2e; font-size: 28px; margin-bottom: 20px; text-align: center;">
-                  🎉 Bravo ${firstName} !
+                <h1 style="color: #1a1a1a; font-size: 28px; font-weight: 800; margin-bottom: 12px; text-align: center; letter-spacing: -0.02em;">
+                  Bravo ${firstName} 🎉
                 </h1>
                 
-                <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
-                  Ton paiement a bien été confirmé et ton accès est maintenant <strong>activé</strong>.
+                <p style="color: #888; font-size: 16px; line-height: 1.6; margin-bottom: 32px; text-align: center;">
+                  Ton paiement est confirmé et ton accès est <strong style="color: #1a1a1a;">activé</strong>. Noah est prêt à créer ton business sur-mesure.
                 </p>
                 
-                <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                  Utilise le bouton ci-dessous pour accéder à ton espace et commencer à générer tes documents personnalisés.
-                </p>
-                
-                <div style="text-align: center; margin: 35px 0;">
-                  <a href="${magicLink}" style="display: inline-block; background: linear-gradient(135deg, #61f7a2, #4de88f); color: #1a1a2e; padding: 18px 45px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 20px rgba(97, 247, 162, 0.4);">
-                    Accéder à mon espace
+                <div style="text-align: center; margin: 32px 0;">
+                  <a href="${magicLink}" style="display: inline-block; background: #1a1a1a; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 100px; font-weight: 600; font-size: 16px;">
+                    Accéder à mon espace →
                   </a>
                 </div>
                 
-                <div style="background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border-left: 4px solid #61f7a2; padding: 20px; margin: 30px 0; border-radius: 8px;">
-                  <p style="color: #1a1a2e; margin: 0 0 12px 0; font-size: 16px; font-weight: bold;">
-                    📦 Ce qui t'attend :
+                <div style="background: #fafafa; border: 1px solid #f0f0f0; padding: 24px; margin: 32px 0; border-radius: 16px;">
+                  <p style="color: #1a1a1a; margin: 0 0 16px 0; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                    📦 Ce qui t'attend
                   </p>
-                  <ul style="color: #2d3748; margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.8;">
+                  <ul style="color: #555; margin: 0; padding-left: 20px; font-size: 14px; line-height: 2;">
                     <li>Analyse de marché complète</li>
-                    <li>3 Avatars clients détaillés</li>
                     <li>4 Offres sur-mesure avec prix</li>
-                    <li>Messages de vente prêts</li>
-                    <li>5 Emails marketing</li>
+                    <li>Messages de vente prêts à l'emploi</li>
+                    <li>Séquence d'emails marketing</li>
                     <li>Plan d'action personnalisé</li>
                   </ul>
                 </div>
                 
-                <p style="color: #718096; font-size: 14px; margin-top: 35px; text-align: center;">
-                  À tout de suite ! 🚀<br>
-                  <strong>L'équipe Passion IA</strong>
+                <p style="color: #ccc; font-size: 13px; margin-top: 40px; text-align: center; line-height: 1.6;">
+                  À tout de suite ! — L'équipe Noah by Iavnir
                 </p>
                 
-                <div style="border-top: 1px solid #e2e8f0; margin-top: 30px; padding-top: 20px; text-align: center;">
-                  <p style="color: #a0aec0; font-size: 12px;">
-                    Lien de connexion :<br>
-                    <span style="color: #4299e1; word-break: break-all;">${magicLink}</span>
+                <div style="border-top: 1px solid #f0f0f0; margin-top: 24px; padding-top: 16px; text-align: center;">
+                  <p style="color: #ccc; font-size: 11px;">
+                    Si le bouton ne fonctionne pas :<br>
+                    <span style="color: #999; word-break: break-all;">${magicLink}</span>
                   </p>
                 </div>
               </div>

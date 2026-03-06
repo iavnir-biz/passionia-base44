@@ -107,6 +107,7 @@ import SettingsNoah from './pages/SettingsNoah';
 import SetupProfile from './pages/SetupProfile';
 import SocialMedia from './pages/SocialMedia';
 import Welcome from './pages/Welcome';
+import ThankYou from './pages/ThankYou';
 
 
 export const PAGES = {
@@ -170,6 +171,7 @@ export const PAGES = {
     "SetupProfile": SetupProfile,
     "SocialMedia": SocialMedia,
     "Welcome": Welcome,
+    "ThankYou": ThankYou,
 }
 
 export const pagesConfig = {

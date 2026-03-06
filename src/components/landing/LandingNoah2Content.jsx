@@ -72,8 +72,8 @@ export default function LandingNoah2Content() {
           transform: translateY(0);
         }
         @media (max-width: 480px) {
-          .announcement-text {
-            font-size: 12px !important;
+          .announce-text {
+            font-size: 11px !important;
           }
         }
       `}</style>

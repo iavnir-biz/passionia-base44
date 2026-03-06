@@ -41,8 +41,6 @@ Deno.serve(async (req) => {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: 'Pack Clé en Main PassionIA®',
-              description: "Tout ce dont tu as besoin pour créer et vendre ton premier produit.",
             },
             unit_amount: 2900,
           },

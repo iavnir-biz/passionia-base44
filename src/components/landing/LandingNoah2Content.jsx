@@ -46,44 +46,7 @@ export default function LandingNoah2Content() {
       </noscript>
 
       {/* Top announcement bar */}
-      <div className="announcement-bar" style={{
-        background: '#1a1a1a',
-        color: '#fff',
-        textAlign: 'center',
-        padding: '10px 20px',
-        fontSize: '14px',
-        fontWeight: 500,
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '12px',
-        flexWrap: 'wrap'
-      }}>
-        <span style={{ opacity: 0.9 }}>🚀</span>
-        <span className="announcement-text">Offre de lancement — 29€ paiement unique · Accès immédiat</span>
-        <button
-          onClick={scrollToCTA}
-          style={{
-            background: 'rgba(255,255,255,0.15)',
-            border: '1px solid rgba(255,255,255,0.25)',
-            color: '#fff',
-            padding: '4px 14px',
-            borderRadius: '100px',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            whiteSpace: 'nowrap'
-          }}
-          onMouseOver={e => e.target.style.background = 'rgba(255,255,255,0.25)'}
-          onMouseOut={e => e.target.style.background = 'rgba(255,255,255,0.15)'}
-        >
-          Voir l'offre →
-        </button>
-      </div>
+      <LandingAnnouncementBar onScrollToCTA={scrollToCTA} />
 
       <LandingHero onCTA={handleCTA} />
       <LandingVideo />

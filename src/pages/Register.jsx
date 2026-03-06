@@ -31,6 +31,28 @@ export default function Register() {
   const redirectAfterAuth = async () => {
     try {
       const user = await base44.auth.me();
+
+      // Vérifier le paiement Stripe via session_id dans l'URL
+      // Stripe ajoute automatiquement ?session_id=cs_xxx à la return_url
+      const urlParams = new URLSearchParams(window.location.search);
+      const stripeSessionId = urlParams.get('session_id');
+
+      if (stripeSessionId && !user.has_purchased) {
+        try {
+          const result = await base44.functions.invoke('verifyStripeSession', { sessionId: stripeSessionId });
+          if (result?.data?.verified) {
+            await base44.auth.updateMe({
+              has_purchased: true,
+              purchased_at: new Date().toISOString(),
+            });
+          }
+        } catch (verifyError) {
+          console.warn('[Register] verifyStripeSession error:', verifyError);
+          // On continue quand même — le webhook Supabase peut aussi avoir déjà marqué has_purchased
+        }
+      }
+
+      // Redirection post-auth normale
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       const hasProfile = profiles.length > 0 && profiles[0].first_name;
       if (!hasProfile) { navigate(createPageUrl('SetupProfile')); return; }

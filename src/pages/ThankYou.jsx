@@ -10,7 +10,6 @@ const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/pub
 export default function ThankYou() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [countdown, setCountdown] = useState(8);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -21,20 +20,6 @@ export default function ThankYou() {
     };
     loadUser();
   }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          navigate(createPageUrl('OnboardingFirstName'));
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [navigate]);
 
   const firstName = user?.full_name?.split(' ')[0] || user?.firstName || '';
 
@@ -58,15 +43,6 @@ export default function ThankYou() {
           textAlign: 'center',
         }}
       >
-        {/* Logo */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-        >
-          <img src={LOGO_URL} alt="Noah" style={{ width: '48px', height: '48px', margin: '0 auto 32px', objectFit: 'contain' }} />
-        </motion.div>
-
         {/* Check circle */}
         <motion.div
           initial={{ scale: 0 }}
@@ -164,15 +140,7 @@ export default function ThankYou() {
           <ArrowRight size={18} />
         </motion.button>
 
-        {/* Auto redirect */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.3 }}
-          style={{ fontSize: '12px', color: '#ccc', marginTop: '16px' }}
-        >
-          Redirection automatique dans {countdown}s...
-        </motion.p>
+
       </motion.div>
     </div>
   );

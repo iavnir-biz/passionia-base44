@@ -175,6 +175,58 @@ export default function ThankYou() {
           ))}
         </motion.div>
 
+        {/* Screenshot preview */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          style={{
+            marginBottom: '32px',
+            perspective: '1000px',
+          }}
+        >
+          <div style={{
+            background: '#f8f9fb',
+            borderRadius: '16px',
+            padding: '8px',
+            border: '1px solid #e8e8e8',
+            boxShadow: '0 12px 40px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)',
+            transform: 'rotateY(-2deg) rotateX(1deg)',
+          }}>
+            {/* Browser bar */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 12px',
+              borderBottom: '1px solid #eee',
+              marginBottom: '4px',
+            }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f57' }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ffbd2e' }} />
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28c840' }} />
+              <div style={{
+                flex: 1, marginLeft: '8px',
+                background: '#f0f0f0', borderRadius: '6px',
+                height: '20px',
+              }} />
+            </div>
+            <img
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/8c66eeef4_iavnir1000x1000px.png"
+              alt="Étape suivante"
+              style={{
+                width: '100%',
+                borderRadius: '10px',
+                display: 'block',
+              }}
+            />
+          </div>
+
+          <p style={{ fontSize: '12px', color: '#bbb', marginTop: '12px', fontStyle: 'italic' }}>
+            Ton espace Noah t'attend après inscription 👆
+          </p>
+        </motion.div>
+
         {/* CTA */}
         <motion.button
           initial={{ opacity: 0 }}

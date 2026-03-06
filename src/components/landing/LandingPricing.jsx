@@ -101,7 +101,7 @@ export default function LandingPricing({ onCTA }) {
         </div>
 
         <div style={{ marginBottom: '8px' }}>
-          <span style={{ textDecoration: 'line-through', color: '#bbb', fontSize: '20px' }}>47€</span>
+          <span style={{ textDecoration: 'line-through', color: '#bbb', fontSize: '20px' }}>97€</span>
         </div>
         <div style={{ marginBottom: '8px' }}>
           <span style={{ fontSize: '56px', fontWeight: 700, letterSpacing: '-0.03em' }}>29€</span>

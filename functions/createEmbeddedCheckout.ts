@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
       ],
       mode: 'payment',
       ui_mode: 'embedded',
+      allow_promotion_codes: true,
       return_url: `${origin}/OnboardingFirstName?payment=success`,
       metadata: user ? {
         user_id: user.id,

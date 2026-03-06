@@ -65,7 +65,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
           borderRadius: '24px 24px 0 0',
-          background: 'linear-gradient(135deg, #61f7a2, #2dd4bf, #6366f1)',
+          background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
         }} />
 
         {/* Close */}
@@ -118,7 +118,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
               </p>
               {included.map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '5px 0' }}>
-                  <Check size={14} color="#61f7a2" strokeWidth={3} style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <Check size={14} color="#f97316" strokeWidth={3} style={{ flexShrink: 0, marginTop: '2px' }} />
                   <span style={{ fontSize: '13px', color: '#444', lineHeight: 1.5 }}>{item}</span>
                 </div>
               ))}
@@ -128,9 +128,9 @@ export default function CheckoutModal({ isOpen, onClose }) {
             <button
               onClick={() => setWithBump(!withBump)}
               style={{
-                width: '100%', border: `2px solid ${withBump ? '#61f7a2' : '#e5e5e5'}`,
+                width: '100%', border: `2px solid ${withBump ? '#f97316' : '#e5e5e5'}`,
                 borderRadius: '14px', padding: '16px',
-                background: withBump ? '#f0fdf6' : '#fff',
+                background: withBump ? '#fff7ed' : '#fff',
                 cursor: 'pointer', textAlign: 'left',
                 transition: 'all 0.2s', marginBottom: '20px',
                 display: 'flex', alignItems: 'flex-start', gap: '12px',
@@ -139,8 +139,8 @@ export default function CheckoutModal({ isOpen, onClose }) {
               {/* Checkbox */}
               <div style={{
                 width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
-                background: withBump ? '#61f7a2' : '#fff',
-                border: `2px solid ${withBump ? '#61f7a2' : '#ccc'}`,
+                background: withBump ? '#f97316' : '#fff',
+                border: `2px solid ${withBump ? '#f97316' : '#ccc'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.2s',
               }}>
@@ -192,7 +192,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
                     Noah by Iavnir — {totalPrice}€
                   </p>
                   {withBump && (
-                    <p style={{ fontSize: '12px', color: '#61aa7a', marginTop: '4px' }}>
+                    <p style={{ fontSize: '12px', color: '#f97316', marginTop: '4px' }}>
                       ✓ Plan d'action 7 jours inclus
                     </p>
                   )}

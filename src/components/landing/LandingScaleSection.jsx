@@ -241,7 +241,7 @@ export default function LandingScaleSection() {
             marginBottom: '12px',
             lineHeight: 1.15,
           }}>
-            Une échelle simple.{' '}
+            Pourquoi ce système est{' '}
             <span style={{
               fontStyle: 'italic',
               background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
@@ -251,7 +251,7 @@ export default function LandingScaleSection() {
               display: 'inline-block',
               paddingRight: '0.2em',
               marginRight: '-0.2em',
-            }}>3 niveaux.</span>
+            }}>si puissant.</span>
           </h2>
           <p style={{ fontSize: '15px', color: '#666', lineHeight: 1.6, maxWidth: '480px', margin: '0 auto' }}>
             Tu n'as pas besoin de 1000 clients.<br />

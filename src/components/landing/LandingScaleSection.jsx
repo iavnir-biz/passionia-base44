@@ -234,16 +234,17 @@ export default function LandingScaleSection() {
         {/* Header */}
         <div ref={titleRef} className="landing-fade" style={{ textAlign: 'center', marginBottom: '40px' }}>
           <h2 style={{
-            fontSize: 'clamp(26px, 4vw, 42px)',
-            fontWeight: 800,
-            letterSpacing: '-0.03em',
+            fontSize: 'clamp(22px, 3vw, 32px)',
+            fontWeight: 400,
+            letterSpacing: '-0.02em',
             color: '#1a1a1a',
             marginBottom: '12px',
-            lineHeight: 1.15,
+            lineHeight: 1.2,
           }}>
-            Pourquoi ce système est{' '}
+            Pourquoi <span style={{ fontWeight: 700 }}>ce système</span> est{' '}
             <span style={{
               fontStyle: 'italic',
+              fontWeight: 400,
               background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',

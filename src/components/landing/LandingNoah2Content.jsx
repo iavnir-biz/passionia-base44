@@ -10,6 +10,7 @@ import LandingTestimonialsScroll from './LandingTestimonialsScroll';
 import LandingFooter from './LandingFooter';
 import LandingVideo from './LandingVideo';
 import CheckoutModal from './CheckoutModal';
+import LandingAnnouncementBar from './LandingAnnouncementBar';
 
 export default function LandingNoah2Content() {
   const [showCheckout, setShowCheckout] = useState(false);

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Copy, Check, Mail, MessageCircle } from 'lucide-react';
+import { X, Copy, Check, Mail, MessageCircle, User } from 'lucide-react';
 
 export default function DiscountCodeSidebar({ isOpen, onClose }) {
+  const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -12,6 +13,7 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
   useEffect(() => {
     if (!isOpen) {
       setTimeout(() => {
+        setFirstName('');
         setEmail('');
         setWhatsapp('');
         setSubmitted(false);
@@ -32,6 +34,9 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
 
   const validate = () => {
     const newErrors = {};
+    if (!firstName || firstName.trim().length < 2) {
+      newErrors.firstName = 'Prénom requis';
+    }
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'Adresse email invalide';
     }
@@ -42,11 +47,32 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      setSubmitted(true);
+    if (!validate()) return;
+
+    // Send lead to GHL webhook
+    const webhookUrl = import.meta.env.VITE_GHL_WEBHOOK_URL;
+    if (webhookUrl) {
+      try {
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: firstName.trim(),
+            email: email.trim(),
+            phone: whatsapp.trim(),
+            source: 'landing_discount_sidebar',
+            tags: ['discount-20', 'landing-page'],
+          }),
+        });
+      } catch (err) {
+        // Don't block UX if webhook fails
+        console.error('GHL webhook error:', err);
+      }
     }
+
+    setSubmitted(true);
   };
 
   const handleCopy = () => {
@@ -138,6 +164,38 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
               </p>
 
               <form onSubmit={handleSubmit} noValidate>
+                {/* Prénom */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: '#999', marginBottom: '8px' }}>
+                    Votre prénom
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <User size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#ccc' }} />
+                    <input
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => { setFirstName(e.target.value); setErrors(p => ({ ...p, firstName: null })); }}
+                      placeholder="Votre prénom"
+                      style={{
+                        width: '100%',
+                        padding: '14px 14px 14px 42px',
+                        borderRadius: '12px',
+                        border: `1.5px solid ${errors.firstName ? '#ef4444' : '#eee'}`,
+                        fontSize: '15px',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        transition: 'border-color 0.2s',
+                        background: '#fafafa',
+                      }}
+                      onFocus={e => e.target.style.borderColor = '#1a1a1a'}
+                      onBlur={e => e.target.style.borderColor = errors.firstName ? '#ef4444' : '#eee'}
+                    />
+                  </div>
+                  {errors.firstName && (
+                    <p style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{errors.firstName}</p>
+                  )}
+                </div>
+
                 {/* Email */}
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', color: '#999', marginBottom: '8px' }}>

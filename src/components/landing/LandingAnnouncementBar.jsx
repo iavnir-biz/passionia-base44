@@ -55,7 +55,7 @@ export default function LandingAnnouncementBar({ onScrollToCTA }) {
         </span>
 
         {/* Timer */}
-        <div style={{
+        <div className="announce-timer" style={{
           display: 'inline-flex', gap: '3px', alignItems: 'center',
           background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '8px',
@@ -90,7 +90,7 @@ export default function LandingAnnouncementBar({ onScrollToCTA }) {
         <style>{`
           @media (max-width: 480px) {
             .announce-text { font-size: 11px !important; }
-            .announce-cta { display: none !important; }
+            .announce-timer { display: none !important; }
           }
         `}</style>
       </div>

@@ -66,7 +66,7 @@ export default function LandingHero({ onCTA }) {
         maxWidth: '600px',
         margin: '0 auto 40px'
       }}>
-        Si ton savoir, ton talent, ou ton expertise peut aider quelqu'un à progresser, utilise Noah AI pour créer 4 offres claires, prêtes à vendre de façon simple et prédictive. Inclus : Les messages prêts à envoyer pour déclencher tes premières ventes.
+        En quelques minutes, notre IA analyse ton expertise, ton profil et tes objectifs, et génère des offres complètes, prêtes à vendre.
       </p>
 
       {/* CTA bar — responsive */}

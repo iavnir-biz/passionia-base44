@@ -161,7 +161,11 @@ export default function CheckoutModal({ isOpen, onClose }) {
                 <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
                   💎 Ajouter : Page de vente personnalisée + 5 emails marketing
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', marginLeft: '12px', flexShrink: 0 }}>+37€</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '12px', flexShrink: 0 }}>
+                  <span style={{ fontSize: '11px', color: '#bbb', textDecoration: 'line-through', lineHeight: 1 }}>57€</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', lineHeight: 1.2 }}>+37€</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#fff', background: 'linear-gradient(135deg, #a78bfa, #ec4899)', borderRadius: '100px', padding: '1px 6px', marginTop: '2px', letterSpacing: '0.3px' }}>-20€</span>
+                </div>
               </div>
               <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
                 1 page de vente pour ton produit principal + 5 emails marketing rédigés et 100% personnalisés. Prêts à copier-coller.

@@ -37,16 +37,15 @@ export default function LandingHero({ onCTA }) {
 
       {/* Title — mixed weight like Amplemarket */}
       <h1 style={{
-        fontSize: 'clamp(36px, 5.5vw, 60px)',
+        fontSize: 'clamp(28px, 4.5vw, 52px)',
         fontWeight: 400,
-        lineHeight: 1.15,
+        lineHeight: 1.2,
         letterSpacing: '-0.03em',
         color: '#1a1a1a',
         marginBottom: '24px'
       }}>
         <span style={{
-          fontStyle: 'italic',
-          fontWeight: 500,
+          fontWeight: 600,
           background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
@@ -56,17 +55,17 @@ export default function LandingHero({ onCTA }) {
           marginRight: '-0.3em',
           paddingBottom: '0.1em',
           marginBottom: '-0.1em',
-        }}>Noah AI</span> génère tes 4 offres et t'aide à faire ta première vente en moins de <strong>24h</strong> pour viser +4000€/mois
+        }}>Noah AI</span> génère tes 4 offres et t'aide à faire ta première vente <strong>en moins de 24h</strong> pour viser <strong>+4000€/mois</strong>
       </h1>
 
       <p style={{
-        fontSize: '18px',
+        fontSize: '17px',
         color: '#888',
         lineHeight: 1.6,
-        maxWidth: '600px',
+        maxWidth: '580px',
         margin: '0 auto 40px'
       }}>
-        En quelques minutes, notre IA analyse ton expertise, ton profil et tes objectifs, et génère des offres complètes, prêtes à vendre.
+        Si ton savoir, ton talent, ou ton expertise peut aider quelqu'un à progresser, utilise Noah AI pour créer 4 offres claires, prêtes à vendre de façon simple et prédictive. Inclus : Les messages prêts à envoyer pour déclencher tes premières ventes.
       </p>
 
       {/* CTA bar — responsive */}

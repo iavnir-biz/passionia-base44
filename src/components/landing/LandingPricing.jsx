@@ -15,7 +15,6 @@ export default function LandingPricing({ onCTA }) {
     "Ton plan d'action sur 7 jours étape par étape",
     "Analyse de marché + validation de ton idée",
     "3 avatars clients détaillés",
-    "Ta page de vente rédigée",
     "Structure d'ascension claire",
     "Accès à vie + mises à jour",
   ];

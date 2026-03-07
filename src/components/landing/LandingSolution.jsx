@@ -64,7 +64,7 @@ export default function LandingSolution() {
     { icon: <Clock size={22} />, title: "Plan d'action 7 jours", desc: "Plan d'action étape par étape, une action par jour, 100% personnalisé à ton profil et à tes objectifs." },
     { icon: <BarChart3 size={22} />, title: "Analyse de marché détaillée", desc: "Validation de ton idée et étude de marché complète." },
     { icon: <Users size={22} />, title: "Avatars clients", desc: "Profils détaillés de tes clients idéaux, avec les stratégies pour savoir leur vendre." },
-    { icon: <FileText size={22} />, title: "Pages de vente", desc: "Textes persuasifs générés, prêts à copier-coller." },
+    { icon: <FileText size={22} />, title: "Dashboard gamifié", desc: "Suis ta progression, débloque des étapes et reste motivé jusqu'à ta première vente." },
   ];
 
   return (

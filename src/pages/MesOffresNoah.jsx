@@ -3,19 +3,16 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Loader2, Copy, Sparkles, ArrowRight } from 'lucide-react';
+import { useSessionLoader } from '@/components/hooks/useSessionLoader';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import OfferCardNoah from '@/components/dashboard-noah/OfferCardNoah';
 
 export default function MesOffresNoah() {
-  const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, session, loading } = useSessionLoader();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loadingOffers, setLoadingOffers] = useState({});
   const [generatedOffers, setGeneratedOffers] = useState(null);
-
-  useEffect(() => { loadData(); }, []);
 
   const normalizeOffer = (offer) => {
     if (!offer) return null;
@@ -41,48 +38,32 @@ export default function MesOffresNoah() {
     };
   };
 
-  const loadData = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      const sessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      if (!sessionId) { setLoading(false); return; }
-
-      const sessions = await base44.entities.Session.filter({ id: sessionId });
-      if (sessions.length > 0) {
-        const s = sessions[0];
-        setSession(s);
-
-        let baseOffers = {};
-        if (s.finalized_offer) {
-          baseOffers = {
-            low: normalizeOffer(s.finalized_offer.mainProduct),
-            bump: normalizeOffer(s.finalized_offer.orderBump),
-            mid: normalizeOffer(s.finalized_offer.upsell1),
-            high: normalizeOffer(s.finalized_offer.upsell3)
-          };
-        }
-        if (s.detailed_offers) {
-          const d = {
-            low: normalizeOffer(s.detailed_offers.mainProduct),
-            bump: normalizeOffer(s.detailed_offers.orderBump),
-            mid: normalizeOffer(s.detailed_offers.upsell),
-            high: normalizeOffer(s.detailed_offers.premium)
-          };
-          baseOffers = { ...baseOffers, ...d };
-        }
-        if (s.my_generated_offers) {
-          baseOffers = { ...baseOffers, ...s.my_generated_offers };
-        }
-        setGeneratedOffers(baseOffers);
-      }
-    } catch (error) {
-      console.error('[MesOffresNoah] Error:', error);
-    } finally {
-      setLoading(false);
+  // Build offers from session data
+  useEffect(() => {
+    if (!session) return;
+    let baseOffers = {};
+    if (session.finalized_offer) {
+      baseOffers = {
+        low: normalizeOffer(session.finalized_offer.mainProduct),
+        bump: normalizeOffer(session.finalized_offer.orderBump),
+        mid: normalizeOffer(session.finalized_offer.upsell1),
+        high: normalizeOffer(session.finalized_offer.upsell3)
+      };
     }
-  };
+    if (session.detailed_offers) {
+      const d = {
+        low: normalizeOffer(session.detailed_offers.mainProduct),
+        bump: normalizeOffer(session.detailed_offers.orderBump),
+        mid: normalizeOffer(session.detailed_offers.upsell),
+        high: normalizeOffer(session.detailed_offers.premium)
+      };
+      baseOffers = { ...baseOffers, ...d };
+    }
+    if (session.my_generated_offers) {
+      baseOffers = { ...baseOffers, ...session.my_generated_offers };
+    }
+    setGeneratedOffers(baseOffers);
+  }, [session]);
 
   const handleEnrich = async (offerType) => {
     if (!session?.id) return;
@@ -97,7 +78,6 @@ export default function MesOffresNoah() {
       const updated = { ...generatedOffers, [offerType]: enrichedOffer };
       setGeneratedOffers(updated);
       await base44.entities.Session.update(session.id, { my_generated_offers: updated });
-      await loadData();
       toast.success('Offre enrichie avec succès !');
     } catch (error) {
       toast.error(`Erreur: ${error.message || 'Erreur lors de l\'enrichissement'}`);

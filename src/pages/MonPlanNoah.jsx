@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { useSessionLoader } from '@/components/hooks/useSessionLoader';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import PlanDayBubble from '@/components/dashboard-noah/PlanDayBubble';
@@ -11,43 +12,22 @@ import confetti from 'canvas-confetti';
 
 export default function MonPlanNoah() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, session, loading } = useSessionLoader();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dayProgress, setDayProgress] = useState({});
   const [currentDay, setCurrentDay] = useState(1);
 
-  useEffect(() => { loadData(); }, []);
-
-  const loadData = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      const sessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      if (!sessionId) { setLoading(false); return; }
-
-      const sessions = await base44.entities.Session.filter({ id: sessionId });
-      if (sessions.length > 0) {
-        const s = sessions[0];
-        setSession(s);
-
-        let saved = s.plan_progress || {};
-        if (typeof saved === 'string') {
-          try { saved = JSON.parse(saved); } catch { saved = {}; }
-        }
-        setDayProgress(saved);
-
-        const completedDays = Object.keys(saved).filter(k => saved[k]?.completed).length;
-        setCurrentDay(Math.min(completedDays + 1, 7));
-      }
-    } catch (error) {
-      console.error('[MonPlanNoah] Error:', error);
-    } finally {
-      setLoading(false);
+  // Sync plan progress from session
+  useEffect(() => {
+    if (!session) return;
+    let saved = session.plan_progress || {};
+    if (typeof saved === 'string') {
+      try { saved = JSON.parse(saved); } catch { saved = {}; }
     }
-  };
+    setDayProgress(saved);
+    const completedDays = Object.keys(saved).filter(k => saved[k]?.completed).length;
+    setCurrentDay(Math.min(completedDays + 1, 7));
+  }, [session]);
 
   const getDayChecklist = (day) => {
     const mainProduct = session?.finalized_offer?.mainProduct;

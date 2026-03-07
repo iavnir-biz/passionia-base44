@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Loader2, User, Shield, Bell, CreditCard, Share2, LogOut } from 'lucide-react';
+import { useSessionLoader } from '@/components/hooks/useSessionLoader';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import SettingsProfileTab from '@/components/settings/SettingsProfileTab';
@@ -19,10 +20,7 @@ const TABS = [
 ];
 
 export default function SettingsNoah() {
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, session, profile, loading, reload: loadData } = useSessionLoader();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('profil');
 
@@ -34,28 +32,6 @@ export default function SettingsNoah() {
       setActiveTab(tab);
     }
   }, []);
-
-  useEffect(() => { loadData(); }, []);
-
-  const loadData = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
-      if (profiles.length > 0) setProfile(profiles[0]);
-
-      const sessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      if (sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: sessionId });
-        if (sessions.length > 0) setSession(sessions[0]);
-      }
-    } catch (e) {
-      console.error('[SettingsNoah] Error:', e);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

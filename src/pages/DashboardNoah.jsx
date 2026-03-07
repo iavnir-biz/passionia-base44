@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Loader2, ArrowRight } from 'lucide-react';
 
+import { useSessionLoader } from '@/components/hooks/useSessionLoader';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import NoahWelcomeBanner from '@/components/dashboard-noah/NoahWelcomeBanner';
 import NoahStatsRow from '@/components/dashboard-noah/NoahStatsRow';
-import NoahOnboardingSummary from '@/components/dashboard-noah/NoahOnboardingSummary';
 import NoahPlanAction from '@/components/dashboard-noah/NoahPlanAction';
 import NoahProducts from '@/components/dashboard-noah/NoahProducts';
 import NoahSalesMessages from '@/components/dashboard-noah/NoahSalesMessages';
@@ -17,48 +16,8 @@ import NoahSalesMessages from '@/components/dashboard-noah/NoahSalesMessages';
 
 export default function DashboardNoah() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, session, profile, loading } = useSessionLoader();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => { loadData(); }, []);
-
-  const loadData = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
-      if (profiles.length > 0) setProfile(profiles[0]);
-
-      // 1. Try localStorage first (fast path)
-      let foundSession = null;
-      const localSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      if (localSessionId) {
-        const localSessions = await base44.entities.Session.filter({ id: localSessionId });
-        if (localSessions.length > 0) foundSession = localSessions[0];
-      }
-
-      // 2. Fallback: query ALL sessions by user email (handles new device / cleared cache)
-      if (!foundSession) {
-        const allSessions = await base44.entities.Session.filter({ created_by: currentUser.email }, '-created_date', 10);
-        if (allSessions.length > 0) {
-          foundSession = allSessions[0]; // most recent session
-          // Re-sync localStorage for future visits
-          localStorage.setItem('passionia_active_session_id', foundSession.id);
-          console.log('[DashboardNoah] Restored session from DB:', foundSession.id);
-        }
-      }
-
-      if (foundSession) setSession(foundSession);
-    } catch (error) {
-      console.error('[DashboardNoah] Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

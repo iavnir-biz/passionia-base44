@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { useSessionLoader } from '@/components/hooks/useSessionLoader';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import MessageCardNoah from '@/components/dashboard-noah/MessageCardNoah';
@@ -39,37 +40,17 @@ const MESSAGE_TYPES = [
 ];
 
 export default function MesMessagesNoah() {
-  const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, session, loading } = useSessionLoader();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loadingMsgs, setLoadingMsgs] = useState({});
   const [generatedMessages, setGeneratedMessages] = useState({});
 
-  useEffect(() => { loadData(); }, []);
-
-  const loadData = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-
-      const sessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      if (!sessionId) { setLoading(false); return; }
-
-      const sessions = await base44.entities.Session.filter({ id: sessionId });
-      if (sessions.length > 0) {
-        const s = sessions[0];
-        setSession(s);
-        if (s.generated_sales_messages && Object.keys(s.generated_sales_messages).length > 0) {
-          setGeneratedMessages(s.generated_sales_messages);
-        }
-      }
-    } catch (error) {
-      console.error('[MesMessagesNoah] Error:', error);
-    } finally {
-      setLoading(false);
+  // Sync messages from session
+  useEffect(() => {
+    if (session?.generated_sales_messages && Object.keys(session.generated_sales_messages).length > 0) {
+      setGeneratedMessages(session.generated_sales_messages);
     }
-  };
+  }, [session]);
 
   const handleGenerate = async (messageType) => {
     if (!session?.id) return;
@@ -82,7 +63,6 @@ export default function MesMessagesNoah() {
       const updated = { ...generatedMessages, [messageType]: response.data };
       setGeneratedMessages(updated);
       await base44.entities.Session.update(session.id, { generated_sales_messages: updated });
-      await loadData();
       toast.success('Message généré !');
     } catch (error) {
       console.error('[MesMessagesNoah] Error generating:', error);

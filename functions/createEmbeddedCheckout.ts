@@ -36,8 +36,15 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const withBump = body.withBump || false;
-    const unitAmount = withBump ? 4600 : 2900;
-    const productName = withBump ? 'Noah by Iavnir + Plan d\'action 7 jours' : 'Noah by Iavnir';
+    const withBump2 = body.withBump2 || false;
+    const unitAmount = 2900 + (withBump ? 1700 : 0) + (withBump2 ? 3700 : 0);
+    const extras = [
+      withBump ? "Plan d'action 7 jours" : null,
+      withBump2 ? 'Pack Premium (page de vente + 5 emails)' : null,
+    ].filter(Boolean);
+    const productName = extras.length > 0
+      ? `Noah by Iavnir + ${extras.join(' + ')}`
+      : 'Noah by Iavnir';
 
     const sessionConfig = {
       payment_method_types: ['card'],
@@ -60,7 +67,12 @@ Deno.serve(async (req) => {
       metadata: user ? {
         user_id: user.id,
         user_email: user.email,
-      } : {}
+        has_order_bump: String(withBump),
+        has_premium_bump: String(withBump2),
+      } : {
+        has_order_bump: String(withBump),
+        has_premium_bump: String(withBump2),
+      }
     };
 
     if (customerId) {

@@ -33,11 +33,26 @@ export default function DashboardNoah() {
       const profiles = await base44.entities.UserProfile.filter({ created_by: currentUser.email });
       if (profiles.length > 0) setProfile(profiles[0]);
 
-      const sessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
-      if (sessionId) {
-        const sessions = await base44.entities.Session.filter({ id: sessionId });
-        if (sessions.length > 0) setSession(sessions[0]);
+      // 1. Try localStorage first (fast path)
+      let foundSession = null;
+      const localSessionId = localStorage.getItem('passionia_active_session_id') || currentUser.sessionId;
+      if (localSessionId) {
+        const localSessions = await base44.entities.Session.filter({ id: localSessionId });
+        if (localSessions.length > 0) foundSession = localSessions[0];
       }
+
+      // 2. Fallback: query ALL sessions by user email (handles new device / cleared cache)
+      if (!foundSession) {
+        const allSessions = await base44.entities.Session.filter({ created_by: currentUser.email }, '-created_date', 10);
+        if (allSessions.length > 0) {
+          foundSession = allSessions[0]; // most recent session
+          // Re-sync localStorage for future visits
+          localStorage.setItem('passionia_active_session_id', foundSession.id);
+          console.log('[DashboardNoah] Restored session from DB:', foundSession.id);
+        }
+      }
+
+      if (foundSession) setSession(foundSession);
     } catch (error) {
       console.error('[DashboardNoah] Error:', error);
     } finally {

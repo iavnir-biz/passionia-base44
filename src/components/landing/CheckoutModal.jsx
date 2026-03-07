@@ -9,19 +9,17 @@ const stripePromise = loadStripe('pk_live_51QfPN7P7FZHXEZ2M2JkBxFZlslfFqOF4ePCzf
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/9089019f0_Sanstitre500x500px1.png";
 
 export default function CheckoutModal({ isOpen, onClose }) {
-  const [withBump, setWithBump] = useState(false);
-  const [withBump2, setWithBump2] = useState(false);
+  const [withBundle, setWithBundle] = useState(false);
 
-  const totalPrice = 29 + (withBump ? 17 : 0) + (withBump2 ? 37 : 0);
+  const totalPrice = 29 + (withBundle ? 47 : 0);
 
   const fetchClientSecret = useCallback(async () => {
-    const response = await base44.functions.invoke('createEmbeddedCheckout', { withBump, withBump2 });
+    const response = await base44.functions.invoke('createEmbeddedCheckout', { withBundle });
     return response.data.clientSecret;
-  }, [withBump, withBump2]);
+  }, [withBundle]);
 
   const handleClose = () => {
-    setWithBump(false);
-    setWithBump2(false);
+    setWithBundle(false);
     onClose();
   };
 
@@ -94,47 +92,13 @@ export default function CheckoutModal({ isOpen, onClose }) {
             <p style={{ fontSize: '12px', color: '#aaa', marginTop: '4px' }}>Sans engagement · Accès immédiat</p>
           </div>
 
-          {/* Order bump 1 */}
+          {/* Order bump — Pack Complet */}
           <button
-            onClick={() => setWithBump(!withBump)}
+            onClick={() => setWithBundle(!withBundle)}
             style={{
-              width: '100%', border: `2px solid ${withBump ? '#f97316' : '#e5e5e5'}`,
+              width: '100%', border: `2px solid ${withBundle ? '#a78bfa' : '#e5e5e5'}`,
               borderRadius: '14px', padding: '16px',
-              background: withBump ? '#fff7ed' : '#fff',
-              cursor: 'pointer', textAlign: 'left',
-              transition: 'all 0.2s', marginBottom: '10px',
-              display: 'flex', alignItems: 'flex-start', gap: '12px',
-            }}
-          >
-            <div style={{
-              width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
-              background: withBump ? '#f97316' : '#fff',
-              border: `2px solid ${withBump ? '#f97316' : '#ccc'}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.2s',
-            }}>
-              {withBump && <Check size={12} color="#fff" strokeWidth={3} />}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
-                  ⚡ Ajouter : Plan d'action 7 jours détaillé
-                </span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a', marginLeft: '12px', flexShrink: 0 }}>+17€</span>
-              </div>
-              <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
-                Checklist jour par jour avec les actions concrètes pour réaliser ta première vente en 7 jours.
-              </p>
-            </div>
-          </button>
-
-          {/* Order bump 2 — Pack Premium */}
-          <button
-            onClick={() => setWithBump2(!withBump2)}
-            style={{
-              width: '100%', border: `2px solid ${withBump2 ? '#a78bfa' : '#e5e5e5'}`,
-              borderRadius: '14px', padding: '16px',
-              background: withBump2 ? '#f5f3ff' : '#fff',
+              background: withBundle ? '#f5f3ff' : '#fff',
               cursor: 'pointer', textAlign: 'left',
               transition: 'all 0.2s', marginBottom: '24px',
               display: 'flex', alignItems: 'flex-start', gap: '12px',
@@ -152,28 +116,29 @@ export default function CheckoutModal({ isOpen, onClose }) {
             </div>
             <div style={{
               width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
-              background: withBump2 ? '#a78bfa' : '#fff',
-              border: `2px solid ${withBump2 ? '#a78bfa' : '#ccc'}`,
+              background: withBundle ? '#a78bfa' : '#fff',
+              border: `2px solid ${withBundle ? '#a78bfa' : '#ccc'}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.2s',
             }}>
-              {withBump2 && <Check size={12} color="#fff" strokeWidth={3} />}
+              {withBundle && <Check size={12} color="#fff" strokeWidth={3} />}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
-                  💎 Ajouter : Pack Premium — Page de vente + 5 emails
+                  💎 Ajouter : Pack Complet — Plan d'action + Page de vente + 5 emails
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', marginLeft: '12px', flexShrink: 0 }}>+37€</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', marginLeft: '12px', flexShrink: 0 }}>+47€</span>
               </div>
               <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
-                1 page de vente pour ton produit principal + 5 emails marketing rédigés et 100% personnalisés. Prêts à copier-coller.
+                Plan d'action 7 jours + 1 page de vente + 5 emails marketing 100% personnalisés. Prêts à copier-coller.{' '}
+                <span style={{ color: '#a78bfa', fontWeight: 600 }}>Économisez 7€ vs séparément.</span>
               </p>
             </div>
           </button>
 
           {/* Stripe checkout */}
-          <EmbeddedCheckoutProvider key={String(withBump)} stripe={stripePromise} options={{ fetchClientSecret }}>
+          <EmbeddedCheckoutProvider key={String(withBundle)} stripe={stripePromise} options={{ fetchClientSecret }}>
             <EmbeddedCheckout />
           </EmbeddedCheckoutProvider>
 

@@ -35,15 +35,10 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const withBump = body.withBump || false;
-    const withBump2 = body.withBump2 || false;
-    const unitAmount = 2900 + (withBump ? 1700 : 0) + (withBump2 ? 3700 : 0);
-    const extras = [
-      withBump ? "Plan d'action 7 jours" : null,
-      withBump2 ? 'Pack Premium (page de vente + 5 emails)' : null,
-    ].filter(Boolean);
-    const productName = extras.length > 0
-      ? `Noah by Iavnir + ${extras.join(' + ')}`
+    const withBundle = body.withBundle || false;
+    const unitAmount = 2900 + (withBundle ? 4700 : 0);
+    const productName = withBundle
+      ? "Noah by Iavnir + Pack Complet (Plan d'action + Page de vente + 5 emails)"
       : 'Noah by Iavnir';
 
     const sessionConfig = {
@@ -67,11 +62,9 @@ Deno.serve(async (req) => {
       metadata: user ? {
         user_id: user.id,
         user_email: user.email,
-        has_order_bump: String(withBump),
-        has_premium_bump: String(withBump2),
+        has_bundle_bump: String(withBundle),
       } : {
-        has_order_bump: String(withBump),
-        has_premium_bump: String(withBump2),
+        has_bundle_bump: String(withBundle),
       }
     };
 

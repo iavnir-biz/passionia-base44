@@ -14,6 +14,8 @@ export default function CheckoutModal({ isOpen, onClose }) {
   const [withBump, setWithBump] = useState(false);
   const [withBump2, setWithBump2] = useState(false);
   const [timeLeft, setTimeLeft] = useState(COUNTDOWN_SECONDS);
+  // null = selection step, object = checkout step (frozen bump values)
+  const [checkoutConfig, setCheckoutConfig] = useState(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -32,14 +34,27 @@ export default function CheckoutModal({ isOpen, onClose }) {
 
   const totalPrice = 29 + (withBump ? 17 : 0) + (withBump2 ? 37 : 0);
 
+  // Only called once when user clicks "Proceed to payment"
   const fetchClientSecret = useCallback(async () => {
-    const response = await base44.functions.invoke('createEmbeddedCheckout', { withBump, withBump2 });
+    const response = await base44.functions.invoke('createEmbeddedCheckout', {
+      withBump: checkoutConfig?.withBump ?? false,
+      withBump2: checkoutConfig?.withBump2 ?? false,
+    });
     return response.data.clientSecret;
-  }, [withBump, withBump2]);
+  }, [checkoutConfig]);
+
+  const handleProceedToCheckout = () => {
+    setCheckoutConfig({ withBump, withBump2 });
+  };
+
+  const handleBackToSelection = () => {
+    setCheckoutConfig(null);
+  };
 
   const handleClose = () => {
     setWithBump(false);
     setWithBump2(false);
+    setCheckoutConfig(null);
     onClose();
   };
 
@@ -106,103 +121,140 @@ export default function CheckoutModal({ isOpen, onClose }) {
             </span>
           </div>
 
-          {/* Price */}
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <div>
-              <span style={{ fontSize: '52px', fontWeight: 800, letterSpacing: '-0.03em', color: '#1a1a1a' }}>
-                {totalPrice}€
-              </span>
-              <span style={{ fontSize: '14px', color: '#888', marginLeft: '8px' }}>paiement unique</span>
-            </div>
-            <p style={{ fontSize: '12px', color: '#aaa', marginTop: '4px' }}>Sans engagement · Accès immédiat</p>
-          </div>
+          {checkoutConfig ? (
+            /* ── STEP 2: Stripe embedded checkout ── */
+            <>
+              {/* Back link */}
+              <button onClick={handleBackToSelection} style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: '12px', color: '#888', marginBottom: '16px',
+                display: 'flex', alignItems: 'center', gap: '4px', padding: 0,
+              }}>
+                ← Modifier ma sélection
+              </button>
 
-          {/* Order bump 1 */}
-          <button
-            onClick={() => setWithBump(!withBump)}
-            style={{
-              width: '100%', border: `2px solid ${withBump ? '#f97316' : '#e5e5e5'}`,
-              borderRadius: '14px', padding: '16px',
-              background: withBump ? '#fff7ed' : '#fff',
-              cursor: 'pointer', textAlign: 'left',
-              transition: 'all 0.2s', marginBottom: '10px',
-              display: 'flex', alignItems: 'flex-start', gap: '12px',
-            }}
-          >
-            <div style={{
-              width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
-              background: withBump ? '#f97316' : '#fff',
-              border: `2px solid ${withBump ? '#f97316' : '#ccc'}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.2s',
-            }}>
-              {withBump && <Check size={12} color="#fff" strokeWidth={3} />}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
-                  ⚡ Ajouter : Plan d'action 7 jours détaillé
+              {/* Summary */}
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <span style={{ fontSize: '36px', fontWeight: 800, color: '#1a1a1a' }}>
+                  {29 + (checkoutConfig.withBump ? 17 : 0) + (checkoutConfig.withBump2 ? 37 : 0)}€
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a', marginLeft: '12px', flexShrink: 0 }}>+17€</span>
+                <span style={{ fontSize: '13px', color: '#888', marginLeft: '8px' }}>paiement unique</span>
               </div>
-              <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
-                Checklist jour par jour avec les actions concrètes pour réaliser ta première vente en 7 jours.
-              </p>
-            </div>
-          </button>
 
-          {/* Order bump 2 — Pack Premium */}
-          <button
-            onClick={() => setWithBump2(!withBump2)}
-            style={{
-              width: '100%', border: `2px solid ${withBump2 ? '#a78bfa' : '#e5e5e5'}`,
-              borderRadius: '14px', padding: '16px',
-              background: withBump2 ? '#f5f3ff' : '#fff',
-              cursor: 'pointer', textAlign: 'left',
-              transition: 'all 0.2s', marginBottom: '24px',
-              display: 'flex', alignItems: 'flex-start', gap: '12px',
-              position: 'relative',
-            }}
-          >
-            {/* Badge RECOMMANDÉ */}
-            <div style={{
-              position: 'absolute', top: '-10px', left: '16px',
-              background: 'linear-gradient(135deg, #a78bfa, #ec4899)',
-              color: '#fff', fontSize: '9px', fontWeight: 800,
-              letterSpacing: '0.8px', padding: '3px 10px', borderRadius: '100px',
-            }}>
-              LE PLUS CHOISI
-            </div>
-            <div style={{
-              width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
-              background: withBump2 ? '#a78bfa' : '#fff',
-              border: `2px solid ${withBump2 ? '#a78bfa' : '#ccc'}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'all 0.2s',
-            }}>
-              {withBump2 && <Check size={12} color="#fff" strokeWidth={3} />}
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
-                  💎 Ajouter : Page de vente personnalisée + 5 emails marketing
-                </span>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '12px', flexShrink: 0 }}>
-                  <span style={{ fontSize: '11px', color: '#bbb', textDecoration: 'line-through', lineHeight: 1 }}>57€</span>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', lineHeight: 1.2 }}>+37€</span>
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#fff', background: 'linear-gradient(135deg, #a78bfa, #ec4899)', borderRadius: '100px', padding: '1px 6px', marginTop: '2px', letterSpacing: '0.3px' }}>-20€</span>
+              <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
+                <EmbeddedCheckout />
+              </EmbeddedCheckoutProvider>
+            </>
+          ) : (
+            /* ── STEP 1: Bump selection ── */
+            <>
+              {/* Price */}
+              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <div>
+                  <span style={{ fontSize: '52px', fontWeight: 800, letterSpacing: '-0.03em', color: '#1a1a1a' }}>
+                    {totalPrice}€
+                  </span>
+                  <span style={{ fontSize: '14px', color: '#888', marginLeft: '8px' }}>paiement unique</span>
                 </div>
+                <p style={{ fontSize: '12px', color: '#aaa', marginTop: '4px' }}>Sans engagement · Accès immédiat</p>
               </div>
-              <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
-                1 page de vente pour ton produit principal + 5 emails marketing rédigés et 100% personnalisés. Prêts à copier-coller.
-              </p>
-            </div>
-          </button>
 
-          {/* Stripe checkout */}
-          <EmbeddedCheckoutProvider key={`${withBump}-${withBump2}`} stripe={stripePromise} options={{ fetchClientSecret }}>
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
+              {/* Order bump 1 */}
+              <button
+                onClick={() => setWithBump(!withBump)}
+                style={{
+                  width: '100%', border: `2px solid ${withBump ? '#f97316' : '#e5e5e5'}`,
+                  borderRadius: '14px', padding: '16px',
+                  background: withBump ? '#fff7ed' : '#fff',
+                  cursor: 'pointer', textAlign: 'left',
+                  transition: 'all 0.2s', marginBottom: '10px',
+                  display: 'flex', alignItems: 'flex-start', gap: '12px',
+                }}
+              >
+                <div style={{
+                  width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
+                  background: withBump ? '#f97316' : '#fff',
+                  border: `2px solid ${withBump ? '#f97316' : '#ccc'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.2s',
+                }}>
+                  {withBump && <Check size={12} color="#fff" strokeWidth={3} />}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
+                      ⚡ Ajouter : Plan d'action 7 jours détaillé
+                    </span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a', marginLeft: '12px', flexShrink: 0 }}>+17€</span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
+                    Checklist jour par jour avec les actions concrètes pour réaliser ta première vente en 7 jours.
+                  </p>
+                </div>
+              </button>
+
+              {/* Order bump 2 — Pack Premium */}
+              <button
+                onClick={() => setWithBump2(!withBump2)}
+                style={{
+                  width: '100%', border: `2px solid ${withBump2 ? '#a78bfa' : '#e5e5e5'}`,
+                  borderRadius: '14px', padding: '16px',
+                  background: withBump2 ? '#f5f3ff' : '#fff',
+                  cursor: 'pointer', textAlign: 'left',
+                  transition: 'all 0.2s', marginBottom: '24px',
+                  display: 'flex', alignItems: 'flex-start', gap: '12px',
+                  position: 'relative',
+                }}
+              >
+                <div style={{
+                  position: 'absolute', top: '-10px', left: '16px',
+                  background: 'linear-gradient(135deg, #a78bfa, #ec4899)',
+                  color: '#fff', fontSize: '9px', fontWeight: 800,
+                  letterSpacing: '0.8px', padding: '3px 10px', borderRadius: '100px',
+                }}>
+                  LE PLUS CHOISI
+                </div>
+                <div style={{
+                  width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
+                  background: withBump2 ? '#a78bfa' : '#fff',
+                  border: `2px solid ${withBump2 ? '#a78bfa' : '#ccc'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.2s',
+                }}>
+                  {withBump2 && <Check size={12} color="#fff" strokeWidth={3} />}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
+                      💎 Ajouter : Page de vente personnalisée + 5 emails marketing
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '12px', flexShrink: 0 }}>
+                      <span style={{ fontSize: '11px', color: '#bbb', textDecoration: 'line-through', lineHeight: 1 }}>57€</span>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', lineHeight: 1.2 }}>+37€</span>
+                      <span style={{ fontSize: '9px', fontWeight: 800, color: '#fff', background: 'linear-gradient(135deg, #a78bfa, #ec4899)', borderRadius: '100px', padding: '1px 6px', marginTop: '2px', letterSpacing: '0.3px' }}>-20€</span>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
+                    1 page de vente pour ton produit principal + 5 emails marketing rédigés et 100% personnalisés. Prêts à copier-coller.
+                  </p>
+                </div>
+              </button>
+
+              {/* CTA */}
+              <button
+                onClick={handleProceedToCheckout}
+                style={{
+                  width: '100%', padding: '16px',
+                  background: 'linear-gradient(135deg, #1a1a1a, #333)',
+                  color: '#fff', border: 'none', borderRadius: '14px',
+                  fontSize: '15px', fontWeight: 700, cursor: 'pointer',
+                  letterSpacing: '0.2px', marginBottom: '12px',
+                }}
+              >
+                Payer {totalPrice}€ →
+              </button>
+            </>
+          )}
 
           {/* Trust */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '16px' }}>

@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
       mode: 'payment',
       ui_mode: 'embedded',
       allow_promotion_codes: true,
-      return_url: `${origin}/ThankYou`,
+      return_url: `${origin}/ThankYou?session_id={CHECKOUT_SESSION_ID}`,
       metadata: user ? {
         user_id: user.id,
         user_email: user.email,

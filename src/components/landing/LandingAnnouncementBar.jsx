@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Zap } from 'lucide-react';
 import DiscountCodeSidebar from './DiscountCodeSidebar';
 
 export default function LandingAnnouncementBar({ onScrollToCTA }) {
@@ -50,7 +51,8 @@ export default function LandingAnnouncementBar({ onScrollToCTA }) {
       }}>
         {/* Promo text */}
         <span className="announce-text" style={{ opacity: 0.9, fontSize: '13px' }}>
-          🔥 <strong style={{ color: '#fff' }}>-20€ immédiat</strong>
+          <Zap size={14} style={{ display: 'inline-block', verticalAlign: 'middle', fill: '#fff', color: '#fff', marginRight: '4px' }} />
+          <strong style={{ color: '#fff' }}>-20€ immédiat</strong>
           <span style={{ color: 'rgba(255,255,255,0.55)', marginLeft: '6px' }}>— Offre valable jusqu'à minuit</span>
         </span>
 

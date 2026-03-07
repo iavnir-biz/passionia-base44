@@ -55,7 +55,7 @@ export default function LandingHero({ onCTA }) {
           marginRight: '-0.3em',
           paddingBottom: '0.1em',
           marginBottom: '-0.1em',
-        }}>Noah AI</span> génère tes 4 offres et t'aide à faire ta première vente <strong>en moins de 24h</strong> pour viser <strong>+4000€/mois</strong>
+        }}>Noah AI</span> génère tes 4 offres et t'aide à faire ta 1ère vente <strong>en moins de 24h</strong> pour viser <strong>+4000€/mois</strong>
       </h1>
 
       <p style={{
@@ -65,7 +65,7 @@ export default function LandingHero({ onCTA }) {
         maxWidth: '580px',
         margin: '0 auto 40px'
       }}>
-        Si ton savoir, ton talent, ou ton expertise peut aider quelqu'un à progresser, utilise Noah AI pour créer 4 offres claires, prêtes à vendre de façon simple et prédictive. Inclus : Les messages prêts à envoyer pour déclencher tes premières ventes.
+        Si ton savoir, ton talent, ou ton expertise peut aider quelqu'un à progresser, utilise Noah AI pour créer 4 offres claires, prêtes à vendre de façon simple et prédictive.
       </p>
 
       {/* CTA bar — responsive */}

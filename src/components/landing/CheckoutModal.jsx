@@ -148,7 +148,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
               color: '#fff', fontSize: '9px', fontWeight: 800,
               letterSpacing: '0.8px', padding: '3px 10px', borderRadius: '100px',
             }}>
-              RECOMMANDÉ
+              LE PLUS CHOISI
             </div>
             <div style={{
               width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
@@ -162,7 +162,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
-                  💎 Ajouter : Pack Premium — Page de vente + 5 emails
+                  💎 Ajouter : Page de vente personnalisée + 5 emails marketing
                 </span>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', marginLeft: '12px', flexShrink: 0 }}>+37€</span>
               </div>

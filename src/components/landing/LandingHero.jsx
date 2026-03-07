@@ -66,7 +66,7 @@ export default function LandingHero({ onCTA }) {
         margin: '0 auto 40px'
       }}>
         Si ton savoir, ton talent, ou ton expertise peut aider quelqu'un à progresser, utilise Noah AI pour créer 4 offres claires, prêtes à vendre de façon simple et prédictive.
-      </p>
+      </p>{/* updated */}
 
       {/* CTA bar — responsive */}
       <div className="hero-cta-bar" style={{

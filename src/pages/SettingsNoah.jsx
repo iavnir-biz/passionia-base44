@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Loader2, User, Shield, Bell, CreditCard, Share2, LogOut } from 'lucide-react';
-import { useSessionLoader } from '@/components/hooks/useSessionLoader';
+import { useActiveSession } from '@/components/hooks/useActiveSession';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import SettingsProfileTab from '@/components/settings/SettingsProfileTab';
@@ -20,7 +20,9 @@ const TABS = [
 ];
 
 export default function SettingsNoah() {
-  const { user, session, profile, loading, reload: loadData } = useSessionLoader();
+  const { user, session, loading: sessionLoading, reload: reloadSession } = useActiveSession();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('profil');
 
@@ -33,7 +35,26 @@ export default function SettingsNoah() {
     }
   }, []);
 
-  if (loading) {
+  // Load profile when user is ready
+  useEffect(() => {
+    if (!sessionLoading && user) {
+      base44.entities.UserProfile.filter({ created_by: user.email })
+        .then(profiles => { if (profiles.length > 0) setProfile(profiles[0]); })
+        .finally(() => setLoading(false));
+    } else if (!sessionLoading) {
+      setLoading(false);
+    }
+  }, [sessionLoading, user]);
+
+  const loadData = async () => {
+    await reloadSession();
+    if (user) {
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      if (profiles.length > 0) setProfile(profiles[0]);
+    }
+  };
+
+  if (loading || sessionLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-[#1a1a1a] animate-spin" />

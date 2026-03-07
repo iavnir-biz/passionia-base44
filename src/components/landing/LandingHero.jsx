@@ -10,7 +10,7 @@ export default function LandingHero() {
   }, []);
 
   return (
-    <section ref={ref} className="landing-fade" style={{
+    <section ref={ref} className="landing-fade landing-hero-section" style={{
       textAlign: 'center',
       padding: '80px 24px 40px',
       maxWidth: '820px',

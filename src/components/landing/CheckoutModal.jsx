@@ -82,9 +82,6 @@ export default function CheckoutModal({ isOpen, onClose }) {
 
           {/* Price */}
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <div style={{ marginBottom: '4px' }}>
-              <span style={{ textDecoration: 'line-through', color: '#bbb', fontSize: '16px' }}>97€</span>
-            </div>
             <div>
               <span style={{ fontSize: '52px', fontWeight: 800, letterSpacing: '-0.03em', color: '#1a1a1a' }}>
                 {totalPrice}€

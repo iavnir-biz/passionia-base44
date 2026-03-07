@@ -151,6 +151,17 @@ export default function LandingNoah2Content() {
           .announce-text {
             font-size: 11px !important;
           }
+          .landing-hero-section {
+            padding-top: 32px !important;
+            padding-bottom: 24px !important;
+          }
+          .landing-hero-section h1 {
+            font-size: clamp(22px, 7vw, 36px) !important;
+            margin-bottom: 16px !important;
+          }
+          .landing-hero-section p {
+            font-size: 15px !important;
+          }
         }
         @media (max-width: 600px) {
           .hero-cta-bar {

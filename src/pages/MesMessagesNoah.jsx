@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { useSessionLoader } from '@/components/hooks/useSessionLoader';
+import { useActiveSession } from '@/components/hooks/useActiveSession';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import MessageCardNoah from '@/components/dashboard-noah/MessageCardNoah';
@@ -40,12 +40,12 @@ const MESSAGE_TYPES = [
 ];
 
 export default function MesMessagesNoah() {
-  const { user, session, loading } = useSessionLoader();
+  const { user, session, loading, reload: reloadSession } = useActiveSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loadingMsgs, setLoadingMsgs] = useState({});
   const [generatedMessages, setGeneratedMessages] = useState({});
 
-  // Sync messages from session
+  // Load messages from session when it loads
   useEffect(() => {
     if (session?.generated_sales_messages && Object.keys(session.generated_sales_messages).length > 0) {
       setGeneratedMessages(session.generated_sales_messages);
@@ -63,6 +63,7 @@ export default function MesMessagesNoah() {
       const updated = { ...generatedMessages, [messageType]: response.data };
       setGeneratedMessages(updated);
       await base44.entities.Session.update(session.id, { generated_sales_messages: updated });
+      await reloadSession();
       toast.success('Message généré !');
     } catch (error) {
       console.error('[MesMessagesNoah] Error generating:', error);

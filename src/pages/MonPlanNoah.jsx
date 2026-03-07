@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { useSessionLoader } from '@/components/hooks/useSessionLoader';
+import { useActiveSession } from '@/components/hooks/useActiveSession';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import PlanDayBubble from '@/components/dashboard-noah/PlanDayBubble';
@@ -12,12 +12,12 @@ import confetti from 'canvas-confetti';
 
 export default function MonPlanNoah() {
   const navigate = useNavigate();
-  const { user, session, loading } = useSessionLoader();
+  const { user, session, loading } = useActiveSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dayProgress, setDayProgress] = useState({});
   const [currentDay, setCurrentDay] = useState(1);
 
-  // Sync plan progress from session
+  // Load plan progress from session when it loads
   useEffect(() => {
     if (!session) return;
     let saved = session.plan_progress || {};

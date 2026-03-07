@@ -3,13 +3,13 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Loader2, Copy, Sparkles, ArrowRight } from 'lucide-react';
-import { useSessionLoader } from '@/components/hooks/useSessionLoader';
+import { useActiveSession } from '@/components/hooks/useActiveSession';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import OfferCardNoah from '@/components/dashboard-noah/OfferCardNoah';
 
 export default function MesOffresNoah() {
-  const { user, session, loading } = useSessionLoader();
+  const { user, session, loading, reload: reloadSession } = useActiveSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loadingOffers, setLoadingOffers] = useState({});
   const [generatedOffers, setGeneratedOffers] = useState(null);
@@ -38,7 +38,7 @@ export default function MesOffresNoah() {
     };
   };
 
-  // Build offers from session data
+  // Build offers from session when it loads
   useEffect(() => {
     if (!session) return;
     let baseOffers = {};
@@ -78,6 +78,7 @@ export default function MesOffresNoah() {
       const updated = { ...generatedOffers, [offerType]: enrichedOffer };
       setGeneratedOffers(updated);
       await base44.entities.Session.update(session.id, { my_generated_offers: updated });
+      await reloadSession();
       toast.success('Offre enrichie avec succès !');
     } catch (error) {
       toast.error(`Erreur: ${error.message || 'Erreur lors de l\'enrichissement'}`);

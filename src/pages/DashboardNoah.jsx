@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Loader2, ArrowRight } from 'lucide-react';
+import { useActiveSession } from '@/components/hooks/useActiveSession';
 
-import { useSessionLoader } from '@/components/hooks/useSessionLoader';
 import NoahSidebar from '@/components/dashboard-noah/NoahSidebar';
 import NoahHeader from '@/components/dashboard-noah/NoahHeader';
 import NoahWelcomeBanner from '@/components/dashboard-noah/NoahWelcomeBanner';
 import NoahStatsRow from '@/components/dashboard-noah/NoahStatsRow';
+import NoahOnboardingSummary from '@/components/dashboard-noah/NoahOnboardingSummary';
 import NoahPlanAction from '@/components/dashboard-noah/NoahPlanAction';
 import NoahProducts from '@/components/dashboard-noah/NoahProducts';
 import NoahSalesMessages from '@/components/dashboard-noah/NoahSalesMessages';
@@ -16,10 +18,22 @@ import NoahSalesMessages from '@/components/dashboard-noah/NoahSalesMessages';
 
 export default function DashboardNoah() {
   const navigate = useNavigate();
-  const { user, session, profile, loading } = useSessionLoader();
+  const { user, session, loading: sessionLoading } = useActiveSession();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    if (!sessionLoading && user) {
+      base44.entities.UserProfile.filter({ created_by: user.email })
+        .then(profiles => { if (profiles.length > 0) setProfile(profiles[0]); })
+        .finally(() => setLoading(false));
+    } else if (!sessionLoading) {
+      setLoading(false);
+    }
+  }, [sessionLoading, user]);
+
+  if (loading || sessionLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-[#1a1a1a] animate-spin" />

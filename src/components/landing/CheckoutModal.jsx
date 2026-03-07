@@ -10,16 +10,18 @@ const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/pub
 
 export default function CheckoutModal({ isOpen, onClose }) {
   const [withBump, setWithBump] = useState(false);
+  const [withBump2, setWithBump2] = useState(false);
 
-  const totalPrice = withBump ? 46 : 29;
+  const totalPrice = 29 + (withBump ? 17 : 0) + (withBump2 ? 37 : 0);
 
   const fetchClientSecret = useCallback(async () => {
-    const response = await base44.functions.invoke('createEmbeddedCheckout', { withBump });
+    const response = await base44.functions.invoke('createEmbeddedCheckout', { withBump, withBump2 });
     return response.data.clientSecret;
-  }, [withBump]);
+  }, [withBump, withBump2]);
 
   const handleClose = () => {
     setWithBump(false);
+    setWithBump2(false);
     onClose();
   };
 
@@ -92,7 +94,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
             <p style={{ fontSize: '12px', color: '#aaa', marginTop: '4px' }}>Sans engagement · Accès immédiat</p>
           </div>
 
-          {/* Order bump */}
+          {/* Order bump 1 */}
           <button
             onClick={() => setWithBump(!withBump)}
             style={{
@@ -100,7 +102,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
               borderRadius: '14px', padding: '16px',
               background: withBump ? '#fff7ed' : '#fff',
               cursor: 'pointer', textAlign: 'left',
-              transition: 'all 0.2s', marginBottom: '24px',
+              transition: 'all 0.2s', marginBottom: '10px',
               display: 'flex', alignItems: 'flex-start', gap: '12px',
             }}
           >
@@ -122,6 +124,50 @@ export default function CheckoutModal({ isOpen, onClose }) {
               </div>
               <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
                 Checklist jour par jour avec les actions concrètes pour réaliser ta première vente en 7 jours.
+              </p>
+            </div>
+          </button>
+
+          {/* Order bump 2 — Pack Premium */}
+          <button
+            onClick={() => setWithBump2(!withBump2)}
+            style={{
+              width: '100%', border: `2px solid ${withBump2 ? '#a78bfa' : '#e5e5e5'}`,
+              borderRadius: '14px', padding: '16px',
+              background: withBump2 ? '#f5f3ff' : '#fff',
+              cursor: 'pointer', textAlign: 'left',
+              transition: 'all 0.2s', marginBottom: '24px',
+              display: 'flex', alignItems: 'flex-start', gap: '12px',
+              position: 'relative',
+            }}
+          >
+            {/* Badge RECOMMANDÉ */}
+            <div style={{
+              position: 'absolute', top: '-10px', left: '16px',
+              background: 'linear-gradient(135deg, #a78bfa, #ec4899)',
+              color: '#fff', fontSize: '9px', fontWeight: 800,
+              letterSpacing: '0.8px', padding: '3px 10px', borderRadius: '100px',
+            }}>
+              RECOMMANDÉ
+            </div>
+            <div style={{
+              width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0, marginTop: '2px',
+              background: withBump2 ? '#a78bfa' : '#fff',
+              border: `2px solid ${withBump2 ? '#a78bfa' : '#ccc'}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all 0.2s',
+            }}>
+              {withBump2 && <Check size={12} color="#fff" strokeWidth={3} />}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a1a' }}>
+                  💎 Ajouter : Pack Premium — Page de vente + 5 emails
+                </span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', marginLeft: '12px', flexShrink: 0 }}>+37€</span>
+              </div>
+              <p style={{ fontSize: '12px', color: '#777', lineHeight: 1.5, margin: 0 }}>
+                1 page de vente pour ton produit principal + 5 emails marketing rédigés et 100% personnalisés. Prêts à copier-coller.
               </p>
             </div>
           </button>

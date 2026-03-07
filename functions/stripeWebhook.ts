@@ -40,6 +40,7 @@ Deno.serve(async (req) => {
       const customerEmail = session.customer_details?.email || session.metadata?.user_email;
       const userId = session.metadata?.user_id;
       const hasOrderBump = session.metadata?.has_order_bump === 'true';
+      const hasPremiumBump = session.metadata?.has_premium_bump === 'true';
       const paymentType = session.metadata?.type;
 
       console.log('Session metadata:', { userId, customerEmail, hasOrderBump, paymentType });
@@ -175,10 +176,11 @@ Deno.serve(async (req) => {
         await base44.entities.User.update(userId, {
           has_purchased: true,
           has_order_bump: hasOrderBump,
+          has_premium_bump: hasPremiumBump,
           purchased_at: new Date().toISOString()
         });
 
-        console.log('Main pack purchased:', { userId, hasOrderBump });
+        console.log('Main pack purchased:', { userId, hasOrderBump, hasPremiumBump });
 
         // 📧 Envoyer l'email de bienvenue avec magic link
         const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';
@@ -261,11 +263,12 @@ Deno.serve(async (req) => {
             firstName: firstName,
             has_purchased: true,
             has_order_bump: hasOrderBump,
+            has_premium_bump: hasPremiumBump,
             stripe_customer_id: session.customer,
             purchased_at: new Date().toISOString()
           });
 
-          console.log('New user created:', { email: customerEmail, hasOrderBump });
+          console.log('New user created:', { email: customerEmail, hasOrderBump, hasPremiumBump });
 
           // Générer un lien de connexion magique
           const APP_URL = Deno.env.get('APP_URL') || 'https://6930250f9337193d59c1dcf5.base44.app';

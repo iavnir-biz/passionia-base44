@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
@@ -8,9 +8,27 @@ const stripePromise = loadStripe('pk_live_51QfPN7P7FZHXEZ2M2JkBxFZlslfFqOF4ePCzf
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6930250f9337193d59c1dcf5/9089019f0_Sanstitre500x500px1.png";
 
+const COUNTDOWN_SECONDS = 15 * 60; // 15 minutes
+
 export default function CheckoutModal({ isOpen, onClose }) {
   const [withBump, setWithBump] = useState(false);
   const [withBump2, setWithBump2] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(COUNTDOWN_SECONDS);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setTimeLeft(COUNTDOWN_SECONDS);
+    const interval = setInterval(() => {
+      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isOpen]);
+
+  const formatTime = (s) => {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  };
 
   const totalPrice = 29 + (withBump ? 17 : 0) + (withBump2 ? 37 : 0);
 
@@ -73,11 +91,19 @@ export default function CheckoutModal({ isOpen, onClose }) {
           {/* Badge */}
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <span style={{
-              display: 'inline-block',
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
               background: '#1a1a1a', color: '#fff',
-              borderRadius: '100px', padding: '5px 14px',
+              borderRadius: '100px', padding: '6px 16px',
               fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px',
-            }}>OFFRE DE LANCEMENT</span>
+            }}>
+              OFFRE EXCLUSIVE
+              <span style={{
+                background: '#f97316', color: '#fff',
+                borderRadius: '100px', padding: '2px 8px',
+                fontSize: '11px', fontWeight: 800, letterSpacing: '0.3px',
+                fontVariantNumeric: 'tabular-nums',
+              }}>{formatTime(timeLeft)}</span>
+            </span>
           </div>
 
           {/* Price */}
@@ -174,7 +200,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
           </button>
 
           {/* Stripe checkout */}
-          <EmbeddedCheckoutProvider key={String(withBump)} stripe={stripePromise} options={{ fetchClientSecret }}>
+          <EmbeddedCheckoutProvider key={`${withBump}-${withBump2}`} stripe={stripePromise} options={{ fetchClientSecret }}>
             <EmbeddedCheckout />
           </EmbeddedCheckoutProvider>
 

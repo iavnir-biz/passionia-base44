@@ -44,7 +44,7 @@ export default function LandingHero({ onCTA }) {
         color: '#1a1a1a',
         marginBottom: '24px'
       }}>
-        Génère tes <span style={{
+        <span style={{
           fontStyle: 'italic',
           fontWeight: 500,
           background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
@@ -56,7 +56,7 @@ export default function LandingHero({ onCTA }) {
           marginRight: '-0.3em',
           paddingBottom: '0.1em',
           marginBottom: '-0.1em',
-        }}>4 offres</span> et fais ta première vente en <strong>24h</strong>
+        }}>Noah AI</span> génère tes 4 offres et t'aide à faire ta première vente en moins de <strong>24h</strong> pour viser +4000€/mois
       </h1>
 
       <p style={{
@@ -66,7 +66,7 @@ export default function LandingHero({ onCTA }) {
         maxWidth: '600px',
         margin: '0 auto 40px'
       }}>
-        NOAH™ analyse ton expertise, structure tes offres, rédige tes contenus de vente et te guide pas à pas — pour viser +4 000€/mois.
+        Si ton savoir, ton talent, ou ton expertise peut aider quelqu'un à progresser, utilise Noah AI pour créer 4 offres claires, prêtes à vendre de façon simple et prédictive. Inclus : Les messages prêts à envoyer pour déclencher tes premières ventes.
       </p>
 
       {/* CTA bar — responsive */}

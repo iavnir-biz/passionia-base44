@@ -92,7 +92,7 @@ export default function LandingFooter({ onCTA }) {
             margin: '0 auto 44px',
           }}>
             Rejoins +500 créateurs qui ont lancé leur activité de formation en ligne grâce à NOAH™.
-            Offres, pages de vente, emails — tout est généré pour toi.
+            Offres, prix, messages de vente — tout est généré pour toi.
           </p>
 
           {/* CTA bar — responsive */}

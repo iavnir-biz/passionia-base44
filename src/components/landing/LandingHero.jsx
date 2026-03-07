@@ -31,8 +31,8 @@ export default function LandingHero({ onCTA }) {
         color: '#666',
         marginBottom: '32px'
       }}>
-        <span style={{ background: '#1a1a1a', color: '#fff', padding: '2px 8px', borderRadius: '100px', fontSize: '11px', fontWeight: 600 }}>NEW</span>
-        Transforme ton savoir-faire en revenus avec l'IA →
+        <span style={{ background: '#1a1a1a', color: '#fff', padding: '2px 8px', borderRadius: '100px', fontSize: '11px', fontWeight: 600 }}>Offre limitée</span>
+        Pour ceux qui veulent monétiser leur savoir en ligne →
       </div>
 
       {/* Title — mixed weight like Amplemarket */}

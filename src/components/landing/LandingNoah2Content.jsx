@@ -56,11 +56,8 @@ export default function LandingNoah2Content() {
       {/* Video — right below subtitle */}
       <LandingVideo />
 
-      {/* Animated Stripe payment feed */}
-      <LandingStripePanel />
-
       {/* CTA section */}
-      <div style={{ textAlign: 'center', padding: '0 24px 64px', maxWidth: '820px', margin: '0 auto' }}>
+      <div style={{ textAlign: 'center', padding: '0 24px 40px', maxWidth: '820px', margin: '0 auto' }}>
         <div className="hero-cta-bar" style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -126,6 +123,9 @@ export default function LandingNoah2Content() {
           </div>
         </div>
       </div>
+
+      {/* Animated Stripe payment feed — below social proof */}
+      <LandingStripePanel />
 
       <LandingProblem />
       <LandingSolution />

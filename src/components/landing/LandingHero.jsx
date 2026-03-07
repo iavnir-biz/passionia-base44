@@ -30,7 +30,7 @@ export default function LandingHero() {
         marginBottom: '32px'
       }}>
         <span style={{
-          background: 'linear-gradient(135deg, #f97316, #ec4899, #a78bfa)',
+          background: '#1a1a1a',
           color: '#fff',
           padding: '2px 8px',
           borderRadius: '100px',

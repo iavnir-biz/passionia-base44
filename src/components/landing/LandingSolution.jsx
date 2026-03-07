@@ -132,7 +132,7 @@ export default function LandingSolution() {
         </h2>
 
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '17px', maxWidth: '550px', margin: '0 auto 56px', lineHeight: 1.6 }}>
-          En quelques minutes, notre IA analyse ton expertise et génère un business complet, prêt à vendre.
+          En quelques minutes, notre IA analyse ton expertise, ton profil et tes objectifs, et génère des offres complètes, prêtes à vendre.
         </p>
 
         <div style={{

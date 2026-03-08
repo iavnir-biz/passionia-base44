@@ -51,25 +51,23 @@ export default function DiscountCodeSidebar({ isOpen, onClose }) {
     e.preventDefault();
     if (!validate()) return;
 
-    // Send lead to GHL webhook
-    const webhookUrl = import.meta.env.VITE_GHL_WEBHOOK_URL;
-    if (webhookUrl) {
-      try {
-        await fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            firstName: firstName.trim(),
-            email: email.trim(),
-            phone: whatsapp.trim(),
-            source: 'landing_discount_sidebar',
-            tags: ['discount-20', 'landing-page'],
-          }),
-        });
-      } catch (err) {
-        // Don't block UX if webhook fails
-        console.error('GHL webhook error:', err);
-      }
+    // Send lead to GHL webhook to trigger WhatsApp sequence
+    const GHL_WEBHOOK_URL = 'https://services.leadconnectorhq.com/hooks/sUvbFvWRWrKRnomVk7xQ/webhook-trigger/724bf933-b25e-48a9-a55c-8f85459adfea';
+    try {
+      await fetch(GHL_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          email: email.trim(),
+          phone: whatsapp.trim(),
+          source: 'landing_discount_sidebar',
+          tags: ['discount-20', 'landing-page'],
+        }),
+      });
+    } catch (err) {
+      // Don't block UX if webhook fails
+      console.error('GHL webhook error:', err);
     }
 
     setSubmitted(true);

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { AnimatedTooltip } from '@/components/ui/animated-tooltip';
 import LandingHero from './LandingHero';
@@ -11,18 +12,18 @@ import LandingTestimonialsScroll from './LandingTestimonialsScroll';
 import LandingFooter from './LandingFooter';
 import LandingVideo from './LandingVideo';
 import LandingStripePanel from './LandingStripePanel';
-import CheckoutModal from './CheckoutModal';
 import LandingAnnouncementBar from './LandingAnnouncementBar';
+import { createPageUrl } from '@/utils';
 
 export default function LandingNoah2Content() {
-  const [showCheckout, setShowCheckout] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToCTA = () => {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleCTA = () => {
-    setShowCheckout(true);
+    navigate(createPageUrl('Panier'));
   };
 
   return (
@@ -134,8 +135,6 @@ export default function LandingNoah2Content() {
       <LandingFAQ />
       <LandingTestimonialsScroll />
       <LandingFooter onCTA={handleCTA} />
-
-      <CheckoutModal isOpen={showCheckout} onClose={() => setShowCheckout(false)} />
 
       <style>{`
         .landing-fade {

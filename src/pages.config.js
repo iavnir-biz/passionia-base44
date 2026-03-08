@@ -66,6 +66,7 @@ import MesMessagesNoah from './pages/MesMessagesNoah';
 import MesOffresNoah from './pages/MesOffresNoah';
 import MonPlanNoah from './pages/MonPlanNoah';
 import MyOffers from './pages/MyOffers';
+import Panier from './pages/Panier';
 import NoahGeneration from './pages/NoahGeneration';
 import NovaGeneration from './pages/NovaGeneration';
 import OfferGenerationStart from './pages/OfferGenerationStart';
@@ -131,6 +132,7 @@ export const PAGES = {
     "MesOffresNoah": MesOffresNoah,
     "MonPlanNoah": MonPlanNoah,
     "MyOffers": MyOffers,
+    "Panier": Panier,
     "NoahGeneration": NoahGeneration,
     "NovaGeneration": NovaGeneration,
     "OfferGenerationStart": OfferGenerationStart,

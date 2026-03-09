@@ -115,16 +115,81 @@ Pour chaque idée, génère :
 Tu dois générer 8 offres au total (2 options pour chaque niveau) :
 
 1. **PRODUIT PRINCIPAL (Low Ticket)** - 2 options
-2. **ORDER BUMP** - 2 options
+2. **ORDER BUMP (LE COMPLÉMENT LOGIQUE)** - 2 options
 3. **UPSELL (Mid Ticket)** - 2 options
 4. **OFFRE PREMIUM (High Ticket)** - 2 options
 
 ⚠️ COHÉRENCE DU PARCOURS :
 Chaque niveau doit s'imbriquer logiquement dans une progression :
 - Low Ticket → Premier résultat rapide, soulagement initial
-- Order Bump → Accélération, ressources complémentaires
+- Order Bump → Accélérateur ou facilitateur qui rend l'application du Produit Principal plus rapide, plus simple ou plus organisée
 - Mid Ticket → Maîtrise, accompagnement, communauté
 - Premium → Transformation complète, coaching personnalisé
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 RÈGLES STRICTES POUR L'ORDER BUMP (MÉTHODOLOGIE P.V.S.O.)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+L'Order Bump est un ACCÉLÉRATEUR ou un FACILITATEUR. Il NE remplace PAS le Produit Principal.
+
+✅ CE QUE FAIT L'ORDER BUMP :
+- Permet d'aller plus vite dans l'application du Produit Principal
+- Rend l'application plus simple et organisée
+- Fournit des templates / checklists / outils prêts à l'emploi
+- Aide à s'organiser dans le temps
+- Donne des variantes / adaptations pour différentes situations
+- Évite de perdre du temps à réfléchir/chercher/créer
+
+❌ CE QUE L'ORDER BUMP N'EST PAS :
+- Un deuxième cours complet
+- Du contenu supplémentaire qui n'a rien à voir
+- Une offre qui se suffit à elle-même
+
+**MÉTHODOLOGIE P.V.S.O. pour générer l'Order Bump :**
+
+**P — Problem (Nouveau problème qui apparaît APRÈS l'achat du Produit Principal)**
+Une fois que le client a le Produit Principal, un nouveau problème mineur apparaît :
+→ "J'ai les recettes/méthodes, mais je ne sais pas comment m'organiser dans le temps"
+→ "J'ai le contenu, mais je perds du temps à tout préparer/structurer"
+→ "J'ai la méthode, mais je ne sais pas quoi faire en premier, dans quel ordre"
+→ "J'ai le guide, mais j'aimerais des templates pour aller plus vite"
+→ "J'ai les bases, mais j'ai besoin d'adaptations pour ma situation spécifique"
+Ce problème est moins douloureux que le problème du Produit Principal, mais il est frustrant et fait perdre du temps.
+
+**V — Value Perception (Valeur perçue de gagner du temps / simplicité)**
+Évalue combien le client est prêt à payer pour :
+→ Gagner du temps (ne pas avoir à créer lui-même les outils)
+→ Gagner en simplicité (avoir tout organisé pour lui)
+→ Éviter la réflexion (avoir un plan tout prêt)
+Cette évaluation détermine le prix (7€, 17€ ou 27€).
+
+**S — Solution (L'accélérateur)**
+Décris ce que l'Order Bump va faire concrètement :
+→ Quels outils/templates/plannings il contient
+→ Comment ça accélère l'application du Produit Principal
+→ Comment ça simplifie la vie du client
+
+**O — Offer Title (Titre de l'Order Bump)**
+Titre court et FONCTIONNEL qui indique clairement ce que c'est.
+Structures recommandées :
+→ Format 1 : "Le Pack [Fonction] : [Bénéfice Temps/Organisation]"
+→ Format 2 : "[Outil/Template] pour [Résultat Simplifié]"
+Maximum 8 mots. Le bénéfice "gain de temps" ou "simplicité" doit être clair.
+✅ Exemples : "Le Pack Organisation : Planning + Checklists Prêts" / "Les 10 Templates Prêts à l'Emploi"
+
+**CHOIX DU PRIX (basé sur la valeur perçue du gain de temps) :**
+- 7€ → Gain de temps/simplicité MODÉRÉ : fait gagner quelques heures, "c'est pratique mais je pourrais le faire moi-même"
+  Ex : 1 planning simple, quelques checklists basiques, 2-3 templates
+- 17€ → Gain de temps/simplicité SIGNIFICATIF : fait gagner plusieurs heures voire 1 journée, "ça vaut vraiment le coup"
+  Ex : Planning complet + checklists détaillées + guide d'organisation, pack de templates variés
+- 27€ → Gain de temps/simplicité MAJEUR : fait gagner plusieurs jours, "c'est indispensable, sans ça je perdrais énormément de temps"
+  Ex : Système complet clé en main, pack de templates ultra complets + guide avancé + adaptations multiples
+
+**FORMATS AUTORISÉS pour l'Order Bump :**
+Plannings / Calendriers organisés, Checklists détaillées pas à pas, Templates / Outils prêts à l'emploi, Guides d'organisation avancés, Adaptations / Variantes pour différentes situations, Guides "comment aller plus vite", Astuces de préparation à l'avance, Systèmes d'organisation complets
+
+**RÈGLE CLÉ :** Le client PEUT se passer de l'Order Bump, mais il va clairement perdre du temps.
+Justifie le prix par le temps gagné : "Créer ce planning toi-même te prendrait 3-4 heures. Pour 17€, tu l'as immédiatement."
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔥 PRÉCISION DES LIVRABLES (OBLIGATOIRE)
@@ -151,10 +216,10 @@ CHAQUE description DOIT contenir des CHIFFRES PRÉCIS :
 - "Mini-formation 5 modules vidéo (total 90 min) + workbook 15 pages + accès Notion"
 - "Pack 7 templates prêts à l'emploi + tutoriel d'installation (3 vidéos de 10 min)"
 
-**Order Bump (14-37€) :**
-- "Boîte à outils : 10 scripts email + 5 pages de vente modèles + checklist validation"
-- "Audio bonus 45 min : Les 7 erreurs qui sabotent 90% des débutants + transcription PDF"
-- "Swipe file : 20 exemples annotés + framework d'analyse (1 heure de vidéo)"
+**Order Bump (7-27€) — ACCÉLÉRATEUR, gain de temps mesurable :**
+- "Planning hebdomadaire PDF imprimable (7 pages) + 7 checklists quotidiennes prêtes + Guide d'organisation de 12 pages"
+- "Pack de 15 templates Canva modifiables + Guide d'utilisation de 8 pages + Checklist de démarrage en 30 min"
+- "Système clé en main : Planning mensuel + 20 templates Excel/Notion pré-remplis + Guide d'adaptations pour 5 situations types + Tutoriel vidéo 20 min"
 
 **Mid Ticket (67-297€) :**
 - "Formation complète : 12 modules vidéo (15-25 min chacun) + 4 live Q&A mensuels (90 min) + accès communauté Discord"
@@ -195,9 +260,10 @@ Pour CHAQUE offre, décris l'état émotionnel et mental du client APRÈS (minim
 - Prix autorisés : 17€, 27€, 37€, 47€
 - Formats : PDF, ebook, mini-formation (3 à 5 vidéos), pack de 3 vidéos courtes, template
 
-**ORDER BUMP :**
-- Prix autorisés : 14€, 17€, 27€, 37€
-- Formats : check-list, modèles, scripts, études de cas, audio bonus, swipe file
+**ORDER BUMP (Accélérateur / Facilitateur) :**
+- Prix autorisés : 7€, 17€, 27€ (basé sur la valeur perçue du gain de temps et de la simplicité)
+- Formats : plannings organisés, checklists détaillées, templates prêts à l'emploi, guides d'organisation, systèmes d'organisation complets, adaptations/variantes, guides "aller plus vite"
+- RAPPEL : L'Order Bump fait GAGNER DU TEMPS, pas apprendre quelque chose de nouveau
 
 **UPSELL (Mid Ticket) :**
 - Prix autorisés : 67€, 97€, 197€, 297€
@@ -303,14 +369,14 @@ Si l'une de ces conditions n'est pas remplie, CORRIGE avant d'envoyer.`;
 
 const ALLOWED_PRICES = {
   mainProduct: ['17€', '27€', '37€', '47€'],
-  orderBump: ['14€', '17€', '27€', '37€'],
+  orderBump: ['7€', '17€', '27€'],
   upsell1: ['67€', '97€', '197€', '297€'],
   upsell3: ['1000€', '2000€', '3000€', '5000€']
 };
 
 const ALLOWED_FORMATS = {
   mainProduct: ['PDF', 'ebook', 'mini-formation (3 à 5 vidéos)', 'pack de 3 vidéos courtes', 'template'],
-  orderBump: ['check-list', 'modèles', 'scripts', 'études de cas', 'audio bonus'],
+  orderBump: ['planning', 'checklist', 'templates', 'guide d\'organisation', 'système d\'organisation', 'adaptations', 'guide accéléré', 'pack organisation'],
   upsell1: ['visio 1-on-1 (1 heure)', 'formation complète (10+ vidéos)', 'communauté', 'live mensuel (1 heure)', 'atelier (2 heures)', 'masterclass enregistrée'],
   upsell3: ['coaching personnalisé (ex: 3 mois)', 'accompagnement', 'done-for-you', 'consulting', 'retraite/séminaire']
 };
@@ -524,7 +590,7 @@ Génère une Full Stack Offer IRRÉSISTIBLE pour cet utilisateur.
 
 **RAPPEL DES PRIX AUTORISÉS :**
 - Low Ticket : 17€, 27€, 37€, 47€
-- Order Bump : 14€, 17€, 27€, 37€
+- Order Bump : 7€ (modéré), 17€ (significatif), 27€ (majeur) — basé sur le gain de temps apporté
 - Mid Ticket : 67€, 97€, 197€, 297€
 - Premium : 1000€, 2000€, 3000€, 5000€
 

@@ -107,10 +107,25 @@ Les 4 offres doivent former un SYSTÈME cohérent :
 - Résultat rapide (quick win)
 - Donne envie d'aller plus loin
 
-**Order Bump (petit extra):**
-- Complément immédiat du produit principal
-- Augmente la valeur perçue
-- Prix < 50% du produit principal
+**Order Bump (petit extra) — MÉTHODOLOGIE P.V.S.O. OBLIGATOIRE :**
+L'Order Bump est un ACCÉLÉRATEUR ou un FACILITATEUR du Produit Principal. Il NE remplace PAS le Produit Principal.
+
+Tu dois appliquer la méthodologie P.V.S.O. pour enrichir l'Order Bump :
+
+**P — Problem :** Identifie le nouveau problème mineur qui apparaît APRÈS l'achat du Produit Principal (lié à l'organisation, au temps, à la mise en pratique). Ce problème doit être directement causé par l'application du Produit Principal.
+Ex : "J'ai les recettes/méthodes, mais je ne sais pas comment m'organiser dans le temps" / "J'ai le contenu mais je dois encore créer tous les outils moi-même"
+
+**V — Value Perception :** Évalue le gain de temps concret (en heures ou jours) que l'Order Bump fait gagner par rapport à le créer soi-même. C'est ça qui justifie le prix.
+
+**S — Solution :** Décris précisément les outils/templates/plannings/checklists fournis et comment chacun accélère l'application du Produit Principal.
+
+**O — Offer :** Le titre doit être court, fonctionnel, et indiquer clairement le gain de temps ou la simplicité apportée (max 8 mots).
+
+✅ CE QUE FAIT L'ORDER BUMP : templates prêts à l'emploi, plannings organisés, checklists détaillées, guides d'organisation, adaptations/variantes
+❌ CE QUE L'ORDER BUMP N'EST PAS : un 2e cours, du contenu sans lien, une offre autonome
+
+**RÈGLE CLÉ :** Le client PEUT se passer de l'Order Bump, mais il perdra clairement du temps.
+Justifie toujours : "Sans cet Order Bump, tu devrais créer [X] toi-même — ce qui te prendrait [Y] heures."
 
 **Upsell (mid ticket):**
 - Approfondissement logique
@@ -218,7 +233,10 @@ OFFRES DE BASE À DÉVELOPPER :
 **1. PRODUIT PRINCIPAL (${finalizedOffer.mainProduct.price}):**
 ${JSON.stringify(finalizedOffer.mainProduct, null, 2)}
 
-**2. ORDER BUMP (${finalizedOffer.orderBump?.price || 'N/A'}):**
+**2. ORDER BUMP / PETIT EXTRA (${finalizedOffer.orderBump?.price || 'N/A'}) — À ENRICHIR AVEC P.V.S.O. :**
+⚠️ RAPPEL : L'Order Bump doit être un ACCÉLÉRATEUR du Produit Principal ci-dessus.
+Il répond au problème qui apparaît APRÈS l'achat du Produit Principal (organisation, temps, mise en pratique).
+Le "problem" de l'Order Bump = ce que le client ne peut PAS faire immédiatement avec le Produit Principal seul.
 ${finalizedOffer.orderBump ? JSON.stringify(finalizedOffer.orderBump, null, 2) : 'Non défini'}
 
 **3. UPSELL (${finalizedOffer.upsell1?.price || 'N/A'}):**
@@ -238,6 +256,7 @@ Développe chacune de ces 4 offres en version ULTRA-DÉTAILLÉE selon la structu
 3. Assure la COHÉRENCE entre les 4 offres (elles forment un funnel)
 4. Sois SPÉCIFIQUE au contexte (compétence, audience, transformation)
 5. Détails MESURABLES (pas de vague "tu vas apprendre")
+6. POUR L'ORDER BUMP UNIQUEMENT : applique la méthodologie P.V.S.O. — le "problem" doit décrire ce qui manque APRÈS l'achat du Produit Principal, la "solution" doit chiffrer le gain de temps (ex: "sans cet Order Bump tu perdrais 3-4h à créer ces outils toi-même")
 
 **EXEMPLE de deliverable bien détaillé :**
 ❌ Mauvais : "Des vidéos de formation"

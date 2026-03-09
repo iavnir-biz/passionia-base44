@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { base44 } from '@/api/base44Client';
 import { pagesConfig } from '@/pages.config';
+import { trackPageView } from '@/lib/analytics';
 
 export default function NavigationTracker() {
     const location = useLocation();
@@ -16,6 +17,11 @@ export default function NavigationTracker() {
             type: "app_changed_url",
             url: window.location.href
         }, '*');
+    }, [location]);
+
+    // Track page views in Google Analytics
+    useEffect(() => {
+        trackPageView(location.pathname + location.search);
     }, [location]);
 
     // Log user activity when navigating to a page

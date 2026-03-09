@@ -109,20 +109,73 @@ Pour chaque idée, génère :
 → Doit donner envie de cliquer immédiatement
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 RÈGLES SPÉCIFIQUES : PRODUIT PRINCIPAL (LOW TICKET — QUICK WIN)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le Produit Principal est une offre d'appel low-ticket qui agit comme un QUICK WIN — la première marche d'une échelle de valeur.
+
+🎯 CONCEPT CLÉ : LE QUICK WIN
+Ce produit doit :
+✅ Résoudre LA PREMIÈRE problématique que rencontre un débutant dans ce domaine
+✅ Apporter un résultat IMMÉDIAT et concret
+✅ Créer une vraie transformation et un changement de paradigme
+✅ Être simple à mettre en place (pas de complexité inutile)
+✅ Donner envie d'aller plus loin (c'est la première marche, pas l'escalier complet)
+
+Méthodologie P.S.S.O. à appliquer pour chaque mainProductChoice :
+1. Problem — LA PREMIÈRE problématique spécifique, douloureuse et concrète du débutant absolu. Ce qui le bloque MAINTENANT, pas dans 6 mois.
+2. Stats — Une donnée tangible (étude, tendance, preuve sociale) qui prouve que ce problème est réel et urgent.
+3. Solution — Pas "ce qu'il y a dedans", mais "qui le client DEVIENT" après. Le changement de paradigme, le résultat immédiat.
+4. Offer — Le titre et l'outcome structurés selon les règles ci-dessus.
+
+💰 PRIX BASÉ SUR LA DOULEUR (mainProductChoices UNIQUEMENT) :
+- 7€  — Douleur FAIBLE à MODÉRÉE : problème gênant mais pas bloquant ("ce serait bien de savoir faire ça...")
+- 14€ — Douleur MODÉRÉE : problème frustrant et récurrent ("ça commence à me gonfler...")
+- 17€ — Douleur MODÉRÉE à FORTE : problème qui impacte le quotidien ("c'est vraiment frustrant...")
+- 27€ — Douleur FORTE : problème pesant qui affecte la vie/travail ("ça me pèse vraiment...")
+- 37€ — Douleur TRÈS FORTE / URGENTE : problème bloquant ou paralysant ("ça me pourrit la vie, je dois régler ça")
+
+Critères pour choisir le prix :
+→ Intensité de la douleur : à quel point le problème fait souffrir ?
+→ Fréquence : tous les jours ? toutes les semaines ?
+→ Impact concret : ça bloque quoi dans la vie de la personne ?
+→ Urgence : "j'aimerais bien" vs "j'en ai besoin maintenant" ?
+
+RÈGLE D'OR sur les livrables du Produit Principal :
+✅ Ce produit = le QUOI faire (contenu essentiel pour obtenir le résultat, méthode, instructions de base)
+❌ Ne PAS inclure dans le Produit Principal — réservé à l'Order Bump :
+  - Plannings / calendriers organisés
+  - Guides d'organisation avancés
+  - Checklists détaillées
+  - Templates / outils prêts à l'emploi
+  - Astuces "aller plus vite" ou "préparation à l'avance"
+
+Pour le champ "description" de chaque mainProductChoice :
+→ Commence par décrire LA PREMIÈRE problématique du débutant (problème + impact émotionnel)
+→ Inclus une stat ou preuve que ce problème est réel
+→ Décris la transformation obtenue (qui il DEVIENT, pas ce qu'il reçoit)
+→ Termine par les livrables ultra-précis : "3 vidéos de 12 min + guide PDF 20 pages" (jamais vague)
+
+Pour le champ "outcome" de chaque mainProductChoice :
+→ Ce que le client saura faire concrètement après — résultat IMMÉDIAT et MESURABLE
+→ Privilégie : "Tu passeras de [état avant] à [état après] en [temps court]"
+→ Minimum 80 caractères
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📦 ÉTAPE 2 : FULL STACK OFFER (4 NIVEAUX × 2 OPTIONS)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Tu dois générer 8 offres au total (2 options pour chaque niveau) :
 
-1. **PRODUIT PRINCIPAL (Low Ticket)** - 2 options
+1. **PRODUIT PRINCIPAL (Low Ticket — Quick Win)** - 2 options → applique la méthodologie P.S.S.O. ci-dessus
 2. **ORDER BUMP** - 2 options
 3. **UPSELL (Mid Ticket)** - 2 options
 4. **OFFRE PREMIUM (High Ticket)** - 2 options
 
 ⚠️ COHÉRENCE DU PARCOURS :
 Chaque niveau doit s'imbriquer logiquement dans une progression :
-- Low Ticket → Premier résultat rapide, soulagement initial
-- Order Bump → Accélération, ressources complémentaires
+- Low Ticket → Quick Win : premier résultat immédiat, déclic "ça marche !"
+- Order Bump → Organisation/optimisation du résultat (ce que le Low Ticket n'inclut PAS)
 - Mid Ticket → Maîtrise, accompagnement, communauté
 - Premium → Transformation complète, coaching personnalisé
 
@@ -146,10 +199,11 @@ CHAQUE description DOIT contenir des CHIFFRES PRÉCIS :
 
 **EXEMPLES DE LIVRABLES DÉTAILLÉS :**
 
-**Low Ticket (17-47€) :**
-- "Guide PDF 45 pages + 3 vidéos (8-12 min) + 1 checklist actionnable en 48h"
-- "Mini-formation 5 modules vidéo (total 90 min) + workbook 15 pages + accès Notion"
-- "Pack 7 templates prêts à l'emploi + tutoriel d'installation (3 vidéos de 10 min)"
+**Low Ticket / Produit Principal (7-37€ selon douleur) — QUOI FAIRE uniquement :**
+- "Guide PDF 28 pages : méthode pas-à-pas en 5 étapes + 3 vidéos de 10 min pour voir en action"
+- "Mini-formation 3 vidéos (12 min chacune) : la méthode complète pour obtenir ton premier résultat en 20 min"
+- "Ebook 35 pages avec 5 exercices pratiques : de zéro à ton premier résultat concret en 1 séance"
+⚠️ Pas de checklists, templates ou guides d'organisation dans le Produit Principal (réservé Order Bump)
 
 **Order Bump (14-37€) :**
 - "Boîte à outils : 10 scripts email + 5 pages de vente modèles + checklist validation"
@@ -191,9 +245,10 @@ Pour CHAQUE offre, décris l'état émotionnel et mental du client APRÈS (minim
 💰 PRIX & FORMATS AUTORISÉS (STRICTEMENT)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**PRODUIT PRINCIPAL (Low Ticket) :**
-- Prix autorisés : 17€, 27€, 37€, 47€
-- Formats : PDF, ebook, mini-formation (3 à 5 vidéos), pack de 3 vidéos courtes, template
+**PRODUIT PRINCIPAL (Low Ticket — Quick Win) :**
+- Prix autorisés : 7€, 14€, 17€, 27€, 37€ (choisi selon le degré de douleur du problème — cf. section RÈGLES SPÉCIFIQUES)
+- Formats : PDF actionnable, ebook pratique avec exercices, mini-formation (3 à 5 vidéos courtes max 15 min), pack de vidéos courtes (tutos rapides)
+- ❌ Pas de templates, checklists ou outils prêts à l'emploi (réservés à l'Order Bump)
 
 **ORDER BUMP :**
 - Prix autorisés : 14€, 17€, 27€, 37€
@@ -302,7 +357,7 @@ Avant de renvoyer ton JSON, vérifie que :
 Si l'une de ces conditions n'est pas remplie, CORRIGE avant d'envoyer.`;
 
 const ALLOWED_PRICES = {
-  mainProduct: ['17€', '27€', '37€', '47€'],
+  mainProduct: ['7€', '14€', '17€', '27€', '37€'],
   orderBump: ['14€', '17€', '27€', '37€'],
   upsell1: ['67€', '97€', '197€', '297€'],
   upsell3: ['1000€', '2000€', '3000€', '5000€']

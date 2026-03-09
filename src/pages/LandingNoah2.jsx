@@ -1,6 +1,6 @@
 import React from 'react';
-import LandingNoah2Content from '@/components/landing/LandingNoah2Content';
+import LandingNoah2ContentV2 from '@/components/landing/LandingNoah2ContentV2';
 
 export default function LandingNoah2() {
-  return <LandingNoah2Content />;
+  return <LandingNoah2ContentV2 />;
 }

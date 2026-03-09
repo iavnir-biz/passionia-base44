@@ -12,7 +12,6 @@ export default function LandingPricing({ onCTA }) {
   const included = [
     "Tes 4 offres sur-mesure structurées avec les prix :\nOffre principale, petit extra, offre supérieure, offre premium avec les prix optimaux",
     "Messages personnalisés pour vendre",
-    "Ton plan d'action sur 7 jours étape par étape",
     "Analyse de marché + validation de ton idée",
     "3 avatars clients détaillés",
     "Structure d'ascension claire",
